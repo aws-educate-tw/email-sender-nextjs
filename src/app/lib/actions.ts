@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const formSchema = z.object({
   email_title: z.string(),
@@ -28,10 +29,19 @@ export async function submitForm(formData: FormData) {
         method: "POST",
       }
     );
-    return response.json();
+    if (!response.ok) {
+      return {
+        message: "The templateID or spreadsheetID is invalid",
+      };
+    }
+    return {
+      message: "You have successfully sent the emails",
+      status: response.status,
+    };
   } catch (error: any) {
     return {
-      message: "Database Error: Failed to Send Form Data. Please try again.",
+      message: "Error: Failed to Send Form Data. Please try again.",
+      error: error.message,
     };
   }
 }
