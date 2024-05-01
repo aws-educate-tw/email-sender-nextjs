@@ -24,7 +24,7 @@ export async function submitForm(formData: FormData) {
     //   `https://yo5206a7p0.execute-api.ap-northeast-1.amazonaws.com/default/email-service-dev-sendEmail?${queryParams}`
     // );
     const response = await fetch(
-      `https://yo5206a7p0.execute-api.ap-northeast-1.amazonaws.com/default/email-service-dev-sendEmail?${queryParams}`,
+      `https://jbsh4lggu6.execute-api.ap-northeast-1.amazonaws.com/default/email-service-dev-sendEmail?${queryParams}`,
       {
         method: "POST",
       }
