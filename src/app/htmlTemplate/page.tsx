@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import TextEditor from "@/app/ui/text-editor";
 
 export default function Home() {
@@ -10,13 +10,15 @@ export default function Home() {
         <meta charset="UTF-8">
         <title>Custom Email Template</title>
         <style>
-            body { font-family: 'Arial', sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
-            .container { background-color: white; padding: 40px 60px; margin: auto; max-width: 800px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-            p { color: #333; line-height: 1.6; }
-            a { color: #0077cc; }
-            b { line-height: 2; }
-            .important { color: red; }
-            .highlight { font-weight: bold; }
+            // body { font-family: 'Arial', sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+            // .container { background-color: white; padding: 40px 60px; margin: auto; max-width: 800px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+            // p { color: #333; line-height: 1.6; }
+            // a { color: #0077cc; }
+            // .important { color: red; }
+            // .highlight { font-weight: bold; }
+            .container{
+              padding: 30px;
+            }
         </style>
     </head>
     <body>
@@ -41,22 +43,40 @@ export default function Home() {
               <p>若您有任何問題或需要進一步的幫助，請聯繫我們。</p>
               <p>台灣 AWS Educate Cloud Ambassador 官方社群：<a target="_blank" href="https://bit.ly/3pD9aCr">Facebook</a>＆<a target="_blank" href="https://bit.ly/3BBr7XQ">Instagram</a></p>
             </div>
+            <p>&nbsp;</p>
             <p>Best regards,</p>
-            <div style="display: flex; align-items: center; font-size: 0.9em; color: #777; padding-top:20px">
-                <img src="/aws-educate-avatar.png" alt="Avatar of AWS Educate" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #333; margin-right: 15px;">
-                <div>
-                    <p>Bill Wu</p>
-                    <p>AWS Educate Cloud Ambassador</p>
-                    <p><a href="mailto:billwu0222@gmail.com">billwu0222@gmail.com</a></p>
-                </div>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <div>
+                <p>Bill Wu</p>
+                <p>AWS Educate Cloud Ambassador</p>
+                <p>billwu0222@gmail.com</p>
             </div>
         </div>
     </body>
     </html>
   `);
+  const emailHtmlRef = useRef<string>(emailHtml);
+  const editorRef = useRef<HTMLDivElement | null>(null);
 
-  const downloadHtmlFile = (html: string) => {
-    const blob = new Blob([html], { type: "text/html" });
+  const handleEmailChange = (htmlContent: string) => {
+    setEmailHtml(htmlContent);
+    emailHtmlRef.current = htmlContent;
+    console.log(htmlContent);
+  };
+
+  const previewHtmlContent = () => {
+    const htmlContent = emailHtmlRef.current; // Access current HTML directly from ref
+    const previewWindow = window.open("", "_blank", "width=800,height=600");
+    if (previewWindow) {
+      previewWindow.document.write(htmlContent);
+      previewWindow.document.close();
+    }
+  };
+
+  const downloadHtmlFile = () => {
+    const htmlContent = emailHtmlRef.current; // Access the current HTML from the ref, ensuring it's up-to-date
+    const blob = new Blob([htmlContent], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -69,9 +89,27 @@ export default function Home() {
 
   return (
     <div>
-      <TextEditor content={emailHtml} onChange={setEmailHtml} />
+      <p>Input your email content here : </p>
+      <TextEditor
+        content={emailHtml}
+        onChange={handleEmailChange}
+        editorRef={editorRef}
+      />
       {/* <div dangerouslySetInnerHTML={{ __html: emailHtml }} /> */}
-      <button onClick={() => downloadHtmlFile(emailHtml)}>Download HTML</button>
+      <div className="flex justify-end py-3 gap-3">
+        <button
+          className="flex h-10 items-center rounded-lg px-4 text-sm font-medium text-sky-800 transition-colors hover:text-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 active:text-sky-800"
+          onClick={previewHtmlContent}
+        >
+          Preview HTML
+        </button>
+        <button
+          className="flex h-10 items-center rounded-lg bg-sky-800 px-4 text-sm font-medium text-white transition-colors hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+          onClick={downloadHtmlFile}
+        >
+          Download HTML
+        </button>
+      </div>
     </div>
   );
 }

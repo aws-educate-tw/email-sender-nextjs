@@ -18,13 +18,19 @@ export default function SideNav() {
           className="w-60 sm:w-60 md:w-96"
         />
       </Link>
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 rounded-md">
+      <div className="flex grow flex-row justify-start space-x-2 md:flex-col md:space-x-0 md:space-y-2 rounded-md">
         <Link
           href="/"
-          className="mb-2 flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+          className="flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
         >
           <HomeIcon className="w-6 stroke-white" />
           <p className="px-3 text-white">Go Home</p>
+        </Link>
+        <Link
+          href="/htmlTemplate"
+          className="mb-2 flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">HTML creator</p>
         </Link>
       </div>
     </div>
