@@ -27,10 +27,22 @@ export default function SideNav() {
           <p className="px-3 text-white">Go Home</p>
         </Link>
         <Link
+          href="/sendEmail"
+          className="flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">Send Email</p>
+        </Link>
+        <Link
           href="/htmlTemplate"
           className="mb-2 flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
         >
-          <p className="px-3 text-white">HTML creator</p>
+          <p className="px-3 text-white">HTML Template</p>
+        </Link>
+        <Link
+          href="/htmlRichEditor"
+          className="mb-2 flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">HTML Rich Editor</p>
         </Link>
       </div>
     </div>
