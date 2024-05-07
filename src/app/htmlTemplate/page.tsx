@@ -102,7 +102,7 @@ export default function Home() {
                 <b>您可以透過以下連結訪問：</b>
                 <ul style="padding-left: 20px;">
                   <li>Notion Page：<a target="_blank" href="https://aws-educate-tw.notion.site/AWS-0824fda6e4aa470e863c4d91daf9563a" style="color: #0077cc;">點擊這裡</a></li>
-                  <li>Discord 社群：{Discord Link}</li>
+                  <li>Instagram 社群：<a target="_blank" href="https://www.instagram.com/awseducatestdambtw?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" style="color: #0077cc;">點擊這裡</a></li>
                 </ul>
             </div>
             <b>【注意事項】</b>
