@@ -125,7 +125,7 @@ export default function Home() {
                 <img class="avatar" src="${
                   avatarImageUrl || "/aws-educate-avatar.png"
                 }" alt="Avatar of AWS Educate" style="width: 80px; height: 80px; border-radius: 50%; border: solid 2px #333; margin-right: 15px;">
-                <div class="avatar-info" style="display: flex; flex-direction: column; line-height: 0.5;">
+                <div class="avatar-info">
                     <p>${name}</p>
                     <p>AWS Educate Cloud Ambassador</p>
                     <p><a href="mailto:${email}" style="color: #0077cc;">${email}</a></p>
