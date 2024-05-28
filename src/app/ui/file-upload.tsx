@@ -49,7 +49,7 @@ export default function UploadFile() {
   return (
     <>
       <form onSubmit={onSubmit} ref={ref}>
-        <div className="rounded-md bg-gray-50 p-4">
+        <div className="rounded-md bg-gray-50 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">
             Upload a xlsx file
           </label>
@@ -59,13 +59,13 @@ export default function UploadFile() {
               name="file"
               accept=".xlsx"
               disabled={isSubmitting}
-              className="flex flex-grow hover:cursor-pointer text-lg"
+              className="flex flex-grow hover:cursor-pointer md:text-base text-xs"
             />
             <button
               type="submit"
               className={`flex h-10 items-center rounded-lg ${
                 isSubmitting ? "bg-gray-500" : "bg-sky-800 hover:bg-sky-700"
-              } px-4 text-sm font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
+              } px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
               disabled={isSubmitting}
             >
               {isSubmitting ? "Uploading..." : "Upload File"}
