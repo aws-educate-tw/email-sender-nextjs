@@ -37,32 +37,32 @@ export default function UploadFile() {
     setIsSubmitting(true);
 
     try {
-      // const response = await fetch(
-      //   "https://ssckvgoo10.execute-api.ap-northeast-1.amazonaws.com/dev/upload-file",
-      //   {
-      //     method: "POST",
-      //     body: formData,
-      //   }
-      // );
+      const response = await fetch(
+        "https://ssckvgoo10.execute-api.ap-northeast-1.amazonaws.com/dev/upload-file",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-      // if (!response.ok) {
-      //   const errorMessage = `Upload failed: ${response.status} - ${response.statusText}`;
-      //   throw new Error(errorMessage);
-      // }
-      // const result = await response.json();
+      if (!response.ok) {
+        const errorMessage = `Upload failed: ${response.status} - ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+      const result = await response.json();
 
       // Mock data
-      const result = {
-        file_id: "001b6694f73f4e418f3e532f8a51c2fd",
-        created_at: "2024-05-27T16:22:04Z",
-        updated_at: "2024-05-27T16:22:04Z",
-        file_url:
-          "https://xxxxxx.s3.ap-northeast-1.amazonaws.com/resources/organizations/xxxxxxx/file1.xlsx",
-        file_name: "file1.xlsx",
-        file_extension: "xlsx",
-        file_size: 123456,
-        uploader_id: "dummy_uploader_id",
-      };
+      // const result = {
+      //   file_id: "001b6694f73f4e418f3e532f8a51c2fd",
+      //   created_at: "2024-05-27T16:22:04Z",
+      //   updated_at: "2024-05-27T16:22:04Z",
+      //   file_url:
+      //     "https://xxxxxx.s3.ap-northeast-1.amazonaws.com/resources/organizations/xxxxxxx/file1.xlsx",
+      //   file_name: "file1.xlsx",
+      //   file_extension: "xlsx",
+      //   file_size: 123456,
+      //   uploader_id: "dummy_uploader_id",
+      // };
 
       setFileData(result);
       alert("File uploaded successfully!");
