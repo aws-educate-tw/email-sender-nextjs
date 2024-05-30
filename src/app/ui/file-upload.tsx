@@ -76,30 +76,45 @@ export default function UploadFile() {
   return (
     <>
       <form onSubmit={onSubmit}>
-        <div className="rounded-md bg-gray-50 p-4 min-w-48">
+        <div className="rounded-md bg-gray-100 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">
             Upload a xlsx file
           </label>
-          <div className="flex justify-between py-3 px-5 gap-3 items-center bg-white rounded-md border border-gray-200 text-sm outline-2 placeholder:text-gray-500 w-full">
-            <input
-              type="file"
-              name="file"
-              accept=".xlsx"
-              onChange={handleFileChange}
-              disabled={isSubmitting}
-              className="flex flex-grow hover:cursor-pointer md:text-base text-xs"
-            />
-            <button
-              type="submit"
-              className={`flex h-10 items-center rounded-lg ${
-                isSubmitting ? "bg-gray-500" : "bg-sky-800 hover:bg-sky-700"
-              } px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Uploading..." : "Upload File"}
-            </button>
-          </div>
+          {/* <div className="justify-between py-3 px-5 gap-3 items-center bg-white rounded-md border border-gray-200 text-sm outline-2 placeholder:text-gray-500 w-full"> */}
+          <input
+            className="custom-fileinput block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
+            aria-describedby="file_input_help"
+            id="file_input"
+            type="file"
+            name="file"
+            accept=".xlsx"
+            onChange={handleFileChange}
+            disabled={isSubmitting}
+          />
+          <style jsx>{`
+            .custom-fileinput-label {
+              background-color: #082f49;
+            }
+          `}</style>
+          <p
+            className="mt-1 text-sm text-gray-500 dark:text-gray-300"
+            id="file_input_help"
+          >
+            .xlsx files only
+          </p>
         </div>
+        <div className="flex justify-end py-3">
+          <button
+            type="submit"
+            className={`flex h-10 items-center rounded-lg ${
+              isSubmitting ? "bg-gray-500" : "bg-sky-800 hover:bg-sky-700"
+            } px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Uploading..." : "Upload File"}
+          </button>
+        </div>
+        {/* </div> */}
       </form>
       {fileData && (
         <div className="mt-4">
