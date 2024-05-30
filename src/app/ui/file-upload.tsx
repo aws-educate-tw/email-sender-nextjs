@@ -1,54 +1,81 @@
 "use client";
-import React, { useRef, useState, FormEvent } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
+
+interface FileDataType {
+  file_id: string;
+  created_at: string;
+  updated_at: string;
+  file_url: string;
+  file_name: string;
+  file_extension: string;
+  file_size: number;
+  uploader_id: string;
+}
 
 export default function UploadFile() {
-  const ref = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [link, setLink] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileData, setFileData] = useState<FileDataType | null>(null);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setFile(event.target.files[0]);
+    }
+  };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!ref.current) return;
-
-    const formData = new FormData(ref.current);
-    const fileInput = ref.current.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement;
-
-    if (fileInput && fileInput.files && fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-
-      formData.append("file", file);
-      formData.append("filename", file.name);
-
-      setIsSubmitting(true);
-      try {
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Upload failed: ${response.statusText}`);
-        }
-
-        const result = await response.json();
-        setLink(result.S3URL);
-        alert(result.message || "File uploaded successfully!");
-        // ref.current.reset();
-      } catch (error: any) {
-        alert("Failed to send form data: " + error.message);
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
+    if (!file) {
       alert("Please select a file to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    console.log("Form Data:", formData);
+
+    setIsSubmitting(true);
+
+    try {
+      // const response = await fetch(
+      //   "https://ssckvgoo10.execute-api.ap-northeast-1.amazonaws.com/dev/upload-file",
+      //   {
+      //     method: "POST",
+      //     body: formData,
+      //   }
+      // );
+
+      // if (!response.ok) {
+      //   const errorMessage = `Upload failed: ${response.status} - ${response.statusText}`;
+      //   throw new Error(errorMessage);
+      // }
+      // const result = await response.json();
+
+      // Mock data
+      const result = {
+        file_id: "001b6694f73f4e418f3e532f8a51c2fd",
+        created_at: "2024-05-27T16:22:04Z",
+        updated_at: "2024-05-27T16:22:04Z",
+        file_url:
+          "https://xxxxxx.s3.ap-northeast-1.amazonaws.com/resources/organizations/xxxxxxx/file1.xlsx",
+        file_name: "file1.xlsx",
+        file_extension: "xlsx",
+        file_size: 123456,
+        uploader_id: "dummy_uploader_id",
+      };
+
+      setFileData(result);
+      alert("File uploaded successfully!");
+    } catch (error: any) {
+      alert("Failed to send form data: " + error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      <form onSubmit={onSubmit} ref={ref}>
+      <form onSubmit={onSubmit}>
         <div className="rounded-md bg-gray-50 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">
             Upload a xlsx file
@@ -58,6 +85,7 @@ export default function UploadFile() {
               type="file"
               name="file"
               accept=".xlsx"
+              onChange={handleFileChange}
               disabled={isSubmitting}
               className="flex flex-grow hover:cursor-pointer md:text-base text-xs"
             />
@@ -73,10 +101,45 @@ export default function UploadFile() {
           </div>
         </div>
       </form>
-      {link && (
-        <a href={link} className="hover:text-blue-500 hover:underline">
-          This is the S3 url you have uploaded
-        </a>
+      {fileData && (
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold mb-2">File Details:</h3>
+          <table className="table-fixed w-full">
+            <tbody className="bg-white divide-y divide-gray-200">
+              <tr className="text-sm text-gray-500">
+                <td className="py-2 px-3 font-medium">File Name:</td>
+                <td className="py-2 px-3">{fileData.file_name}</td>
+              </tr>
+              <tr className="text-sm text-gray-500">
+                <td className="py-2 px-3 font-medium">File Size:</td>
+                <td className="py-2 px-3">{fileData.file_size}</td>
+              </tr>
+              <tr className="text-sm text-gray-500">
+                <td className="py-2 px-3 font-medium">Created At:</td>
+                <td className="py-2 px-3">
+                  {new Date(fileData.created_at).toLocaleString()}
+                </td>
+              </tr>
+              <tr className="text-sm text-gray-500">
+                <td className="py-2 px-3 font-medium">Updated At:</td>
+                <td className="py-2 px-3">
+                  {new Date(fileData.updated_at).toLocaleString()}
+                </td>
+              </tr>
+              <tr className="text-sm text-gray-500">
+                <td className="py-2 px-3 font-medium">Download:</td>
+                <td className="py-2 px-3">
+                  <a
+                    href={fileData.file_url}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Download File
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );
