@@ -66,7 +66,7 @@ export default function UploadFile() {
     <>
       <form onSubmit={onSubmit}>
         <div className="rounded-md bg-gray-100 p-4 min-w-48">
-          <label className="mb-2 block text-lg font-medium">Upload files</label>
+          <label className="mb-2 block text-lg font-medium">Select files</label>
           <input
             className="custom-fileinput block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
             aria-describedby="file_input_help"
@@ -86,14 +86,14 @@ export default function UploadFile() {
             className="mt-1 text-sm text-gray-500 dark:text-gray-300 text-right"
             id="file_input_help"
           >
-            .docx .html .xlsx .pdf
+            .docx .html .xlsx and .pdf
           </p>
         </div>
         <div className="flex justify-end py-3">
           <button
             type="submit"
             className={`flex h-10 items-center rounded-lg ${
-              isSubmitting ? "bg-gray-500" : "bg-sky-800 hover:bg-sky-700"
+              isSubmitting ? "bg-gray-500" : "bg-sky-950 hover:bg-sky-800"
             } px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
             disabled={isSubmitting}
           >
@@ -102,15 +102,52 @@ export default function UploadFile() {
         </div>
       </form>
       {fileData && (
-        <div>
-          {fileData.map((file: FileDataType, index: number) => (
-            <div key={index}>
-              <p>File Name: {file.file_name}</p>
-              <p>File URL: {file.file_url}</p>
-              <p>Uploaded At: {file.created_at}</p>
-              <p>File Size: {file.file_size} bytes</p>
+        <div className="rounded-md bg-gray-100 p-4 min-w-48">
+          <label className="mb-2 block text-lg font-medium">
+            Uploaded files
+          </label>
+          <div>
+            <div className="relative overflow-x-auto rounded-md border">
+              <table className="w-full text-sm text-left rtl:text-right text-black">
+                <thead className="text-xs text-black uppercase bg-slate-300">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      FILE NAME
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      FILE SIZE
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      CREATED AT
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      UPDATED AT
+                    </th>
+                  </tr>
+                </thead>
+                {fileData.map((file: FileDataType, index: number) => (
+                  <tbody key={index}>
+                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-semibold text-black whitespace-nowrap"
+                      >
+                        <a
+                          className="hover:cursor-pointer hover:text-blue-500 underline"
+                          href={file.file_url}
+                        >
+                          {file.file_name}
+                        </a>
+                      </th>
+                      <td className="px-6 py-4">{file.file_size}</td>
+                      <td className="px-6 py-4">{file.created_at}</td>
+                      <td className="px-6 py-4">{file.updated_at}</td>
+                    </tr>
+                  </tbody>
+                ))}
+              </table>
             </div>
-          ))}
+          </div>
         </div>
       )}
     </>
