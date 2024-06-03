@@ -23,56 +23,26 @@ export default function ListFiles() {
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      // const limit = 10;
-      // const last_evaluated_key = "eyJmaWxlX2lkIjogIm";
-      // const sort_by = "created_at";
-      // const sort_order = "DESC";
+      const limit = 10;
+      const last_evaluated_key =
+        "eyJmaWxlX2lkIjogIjdkYmY2NGU3ZTIyMDQ5NWU5NmZhNmJmNmI0NzJmNmQzIn0=";
+      const file_extension = "xlsx";
 
-      // const base_url = "https://example.com";
-      // const url = `${base_url}/files?limit=${limit}&last_evaluated_key=${last_evaluated_key}&sort_by=${sort_by}&sort_order=${sort_order}`;
+      const base_url =
+        "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
+      const url = `${base_url}/files?file_extension=${file_extension}&last_evaluated_key=${last_evaluated_key}&limit=${limit}`;
 
-      // const response = await fetch(url, {
-      //   method: "GET",
-      // });
+      const response = await fetch(url, {
+        method: "GET",
+      });
 
-      // if (!response.ok) {
-      //   const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-      //   throw new Error(errorMessage);
-      // }
+      if (!response.ok) {
+        const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
 
-      // Simulated API response
-      const response = {
-        data: [
-          {
-            file_id: "b800a74978654c2488923d7fee1eb61f",
-            created_at: "2024-05-30T16:15:26Z",
-            updated_at: "2024-05-30T16:15:26Z",
-            file_url:
-              "https://email-sender-excel.s3.amazonaws.com/86f278d3-2321-4eba-83e3-c3bbb0643f05_%5Btemplate%5D%20AWS%20Educate%20certificate_FCU.docx",
-            file_name: "[template] AWS Educate certificate_FCU.docx",
-            file_extension: "docx",
-            file_size: 169159,
-            uploader_id: "dummy_uploader_id",
-          },
-          {
-            file_id: "a123a456a789a012b345c678d901e234",
-            created_at: "2024-05-29T12:00:00Z",
-            updated_at: "2024-05-29T12:30:00Z",
-            file_url: "https://example-bucket.s3.amazonaws.com/sample_file.pdf",
-            file_name: "sample_file.pdf",
-            file_extension: "pdf",
-            file_size: 102400,
-            uploader_id: "another_dummy_uploader_id",
-          },
-        ],
-        last_evaluated_key:
-          "eyJmaWxlX2lkIjogImExMjNhNDU2YTc4OWEwMTJiMzQ1YzY3OGQ5MDFlMjM0In0=",
-      };
-
-      const result: fileDataType[] = response.data;
-
-      setFiles(result);
-      // alert("Files fetched successfully!");
+      const result = await response.json();
+      setFiles(result.data);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
