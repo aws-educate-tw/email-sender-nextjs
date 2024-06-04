@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface fileDataType {
   file_id: string;
@@ -36,9 +36,18 @@ export default function FileTable({
 }: FileTableProps) {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const savedFileId = localStorage.getItem(`${title}_key`);
+    if (savedFileId) {
+      setSelectedFileId(savedFileId);
+    }
+  }, [title]);
+
   const handleCheckboxChange = (file_id: string) => {
     setSelectedFileId(file_id);
+    localStorage.setItem(`${title}_key`, file_id);
   };
+
   return files ? (
     <div className="rounded-md bg-gray-100 p-4 min-w-48 mb-4">
       <div className="flex justify-between px-1">
@@ -70,6 +79,9 @@ export default function FileTable({
               </th>
               <th scope="col" className="px-6 py-3">
                 FILE NAME
+              </th>
+              <th scope="col" className="px-6 py-3">
+                FILE ID
               </th>
               <th scope="col" className="px-6 py-3">
                 FILE SIZE
@@ -105,6 +117,7 @@ export default function FileTable({
                     <p className="truncate">{file.file_name}</p>
                   </a>
                 </th>
+                <td className="px-6 py-4">{file.file_id}</td>
                 <td className="px-6 py-4">{file.file_size}</td>
                 <td className="px-6 py-4">{file.created_at}</td>
                 <td className="px-6 py-4">{file.updated_at}</td>
