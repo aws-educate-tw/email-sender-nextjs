@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface fileDataType {
   file_id: string;
@@ -34,6 +34,11 @@ export default function FileTable({
   setLastEvaluatedKey,
   lastEvaluatedKey,
 }: FileTableProps) {
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+
+  const handleCheckboxChange = (file_id: string) => {
+    setSelectedFileId(file_id);
+  };
   return files ? (
     <div className="rounded-md bg-gray-100 p-4 min-w-48 mb-4">
       <div className="flex justify-between px-1">
@@ -84,8 +89,8 @@ export default function FileTable({
                   <input
                     id={`bordered-checkbox-${index}`}
                     type="checkbox"
-                    value=""
-                    name="bordered-checkbox"
+                    checked={selectedFileId === file.file_id}
+                    onChange={() => handleCheckboxChange(file.file_id)}
                     className="flex flex-grow text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                   />
                 </td>
