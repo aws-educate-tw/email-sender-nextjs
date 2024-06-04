@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState, FormEvent } from "react";
+import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/app/lib/actions";
 
 interface SubmitResponse {
@@ -13,6 +13,21 @@ interface SubmitResponse {
 export default function SendForm() {
   const ref = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [templateFileId, setTemplateFileId] = useState<string>("");
+  const [spreadsheetFileId, setSpreadsheetFileId] = useState<string>("");
+
+  useEffect(() => {
+    const storedTemplateFileId = localStorage.getItem("html_key");
+    const storedSpreadsheetFileId = localStorage.getItem("xlsx_key");
+
+    if (storedTemplateFileId) {
+      setTemplateFileId(storedTemplateFileId);
+    }
+
+    if (storedSpreadsheetFileId) {
+      setSpreadsheetFileId(storedSpreadsheetFileId);
+    }
+  }, []);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -72,6 +87,8 @@ export default function SendForm() {
               name="template_file_id"
               type="text"
               placeholder="template_file_id"
+              value={templateFileId}
+              onChange={(event) => setTemplateFileId(event.target.value)}
               disabled={isSubmitting}
               className="block rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
             />
@@ -85,6 +102,8 @@ export default function SendForm() {
               name="spreadsheet_file_id"
               type="text"
               placeholder="spreadsheet_file_id"
+              value={spreadsheetFileId}
+              onChange={(event) => setSpreadsheetFileId(event.target.value)}
               disabled={isSubmitting}
               className="block rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
             />
