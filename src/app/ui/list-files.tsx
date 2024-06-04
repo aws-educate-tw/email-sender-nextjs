@@ -18,30 +18,42 @@ export default function ListFiles() {
   const [xlsxFiles, setXlsxFiles] = useState<fileDataType[] | null>(null);
   const [htmlFiles, setHtmlFiles] = useState<fileDataType[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [xlsxLastEvaluatedKey, setXlsxLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+  const [htmlLastEvaluatedKey, setHtmlLastEvaluatedKey] = useState<
+    string | null
+  >(null);
   const limit = 10;
-  const last_evaluated_key =
-    "eyJmaWxlX2lkIjogIjdkYmY2NGU3ZTIyMDQ5NWU5NmZhNmJmNmI0NzJmNmQzIn0=";
 
   useEffect(() => {
     if (!hasFetched.current) {
-      fetchFiles("xlsx", setXlsxFiles);
-      fetchFiles("html", setHtmlFiles);
+      fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
+      fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
       hasFetched.current = true;
     }
   }, []);
 
   const fetchFiles = async (
     file_extension: string,
-    setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>
+    setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>,
+    setLastEvaluatedKey: React.Dispatch<React.SetStateAction<string | null>>
   ) => {
     try {
       setLoading(true);
-      // alert("fetching files from " + file_extension);
       const base_url =
         "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
-      const url = `${base_url}/files?file_extension=${file_extension}&last_evaluated_key=${last_evaluated_key}&limit=${limit}`;
+      const url = new URL(`${base_url}/files`);
+      url.searchParams.append("file_extension", file_extension);
+      url.searchParams.append("limit", limit.toString());
 
-      const response = await fetch(url, {
+      const lastEvaluatedKey =
+        file_extension === "xlsx" ? xlsxLastEvaluatedKey : htmlLastEvaluatedKey;
+      if (lastEvaluatedKey) {
+        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
+      }
+
+      const response = await fetch(url.toString(), {
         method: "GET",
       });
 
@@ -51,7 +63,10 @@ export default function ListFiles() {
       }
 
       const result = await response.json();
-      setFiles(result.data);
+      setFiles((prevFiles) =>
+        prevFiles ? [...prevFiles, ...result.data] : result.data
+      );
+      setLastEvaluatedKey(result.last_evaluated_key || null);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
@@ -66,16 +81,18 @@ export default function ListFiles() {
         title="xlsx"
         loading={loading}
         fetchFiles={fetchFiles}
-        setXlsxFiles={setXlsxFiles}
-        setHtmlFiles={setHtmlFiles}
+        setFiles={setXlsxFiles}
+        setLastEvaluatedKey={setXlsxLastEvaluatedKey}
+        lastEvaluatedKey={xlsxLastEvaluatedKey}
       />
       <FileTable
         files={htmlFiles}
         title="html"
         loading={loading}
         fetchFiles={fetchFiles}
-        setXlsxFiles={setXlsxFiles}
-        setHtmlFiles={setHtmlFiles}
+        setFiles={setHtmlFiles}
+        setLastEvaluatedKey={setHtmlLastEvaluatedKey}
+        lastEvaluatedKey={htmlLastEvaluatedKey}
       />
     </>
   );

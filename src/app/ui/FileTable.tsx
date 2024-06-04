@@ -17,10 +17,12 @@ interface FileTableProps {
   loading: boolean;
   fetchFiles: (
     file_extension: string,
-    setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>
+    setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>,
+    setLastEvaluatedKey: React.Dispatch<React.SetStateAction<string | null>>
   ) => void;
-  setXlsxFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>;
-  setHtmlFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>;
+  setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>;
+  setLastEvaluatedKey: React.Dispatch<React.SetStateAction<string | null>>;
+  lastEvaluatedKey: string | null;
 }
 
 export default function FileTable({
@@ -28,17 +30,16 @@ export default function FileTable({
   title,
   loading,
   fetchFiles,
-  setXlsxFiles,
-  setHtmlFiles,
+  setFiles,
+  setLastEvaluatedKey,
+  lastEvaluatedKey,
 }: FileTableProps) {
   return files ? (
     <div className="rounded-md bg-gray-100 p-4 min-w-48 mb-4">
       <div className="flex justify-between px-1">
         <label className="mb-2 block text-lg font-medium">{title}</label>
         <button
-          onClick={() =>
-            fetchFiles(title, title === "xlsx" ? setXlsxFiles : setHtmlFiles)
-          }
+          onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
           disabled={loading}
           className="hover:bg-gray-200 rounded-md h-8 w-8 flex justify-center items-center"
         >
@@ -90,13 +91,13 @@ export default function FileTable({
                 </td>
                 <th
                   scope="row"
-                  className="px-6 py-4 font-semibold text-black whitespace-nowrap"
+                  className="px-6 py-4 font-semibold text-black whitespace-nowrap max-w-16"
                 >
                   <a
                     className="hover:cursor-pointer hover:text-blue-500 underline"
                     href={file.file_url}
                   >
-                    {file.file_name}
+                    <p className="truncate">{file.file_name}</p>
                   </a>
                 </th>
                 <td className="px-6 py-4">{file.file_size}</td>
@@ -106,6 +107,25 @@ export default function FileTable({
             </tbody>
           ))}
         </table>
+      </div>
+      <div className="flex justify-center items-center">
+        <button
+          onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
+          disabled={loading || !lastEvaluatedKey}
+          className="mt-3 p-2 text-gray-500 rounded disabled:opacity-50 w-12 h-8 flex justify-center items-center"
+        >
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill="currentColor"
+              d="M12 14.95q-.2 0-.375-.062t-.325-.213l-4.6-4.6q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l3.9 3.9l3.9-3.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-4.6 4.6q-.15.15-.325.213T12 14.95"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   ) : (
