@@ -4,9 +4,9 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 
 export default function SideNav() {
   return (
-    <div className="flex h-full flex-col px-5 py-4 md:px-3 bg-gray-200">
+    <div className="flex h-full flex-col px-5 py-4 md:px-3 bg-gray-200 gap-2 min-w-60">
       <Link
-        className="mb-2 flex h-20 items-end justify-start rounded-md bg-sky-950 p-4 md:h-40"
+        className="flex h-20 min-w-48 items-end justify-start rounded-md bg-sky-950 p-4 md:h-40"
         href="/"
       >
         {/* <p className="text-white text-2xl">aws educate</p> */}
@@ -18,29 +18,41 @@ export default function SideNav() {
           className="w-60 sm:w-60 md:w-96"
         />
       </Link>
-      <div className="flex grow flex-row justify-start space-x-2 md:flex-col md:space-x-0 md:space-y-2 rounded-md">
+      <div className="flex grow flex-row flex-wrap justify-start gap-2 md:flex-col md:space-x-0 rounded-md">
         <Link
           href="/"
-          className="flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
-          <HomeIcon className="w-6 stroke-white" />
+          {/* <HomeIcon className="w-6 stroke-white" /> */}
           <p className="px-3 text-white">Go Home</p>
         </Link>
         <Link
+          href="/listFiles"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">List Files</p>
+        </Link>
+        <Link
+          href="/uploadFile"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">Upload Files</p>
+        </Link>
+        <Link
           href="/sendEmail"
-          className="flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
           <p className="px-3 text-white">Send Email</p>
         </Link>
         <Link
           href="/htmlTemplate"
-          className="mb-2 flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
           <p className="px-3 text-white">HTML Template</p>
         </Link>
         <Link
           href="/htmlRichEditor"
-          className="mb-2 flex h-6 items-center justify-center rounded-md bg-sky-950 p-4 md:h-10 hover:bg-sky-800"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
           <p className="px-3 text-white">HTML Rich Editor</p>
         </Link>
