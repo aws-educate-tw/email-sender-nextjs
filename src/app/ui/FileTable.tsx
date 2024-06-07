@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { convertToTaipeiTime } from "@/app/lib/utils/dataUtils";
 
 interface fileDataType {
   file_id: string;
@@ -37,15 +38,6 @@ export default function FileTable({
   lastEvaluatedKey,
 }: FileTableProps) {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
-
-  const convertToTaipeiTime = (utcDateString: string): string => {
-    const utcDate = new Date(utcDateString);
-
-    const taipeiOffset = 8 * 60;
-    const taipeiTime = new Date(utcDate.getTime() + taipeiOffset * 60 * 1000);
-
-    return taipeiTime.toISOString().replace("T", " ").substring(0, 19);
-  };
 
   useEffect(() => {
     const savedFileId = localStorage.getItem(`${title}_key`);

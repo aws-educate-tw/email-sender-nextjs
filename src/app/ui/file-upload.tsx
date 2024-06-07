@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, FormEvent, ChangeEvent } from "react";
+import { convertToTaipeiTime } from "@/app/lib/utils/dataUtils";
 
 interface FileDataType {
   file_id: string;
@@ -111,9 +112,6 @@ export default function UploadFile() {
               <table className="w-full text-sm text-left rtl:text-right text-black">
                 <thead className="text-xs text-black uppercase bg-slate-300">
                   <tr>
-                    <th scope="col" className="pl-6 py-3">
-                      SELECT
-                    </th>
                     <th scope="col" className="px-6 py-3">
                       FILE NAME
                     </th>
@@ -131,15 +129,6 @@ export default function UploadFile() {
                 {fileData.map((file: FileDataType, index: number) => (
                   <tbody key={index}>
                     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                      <td className="pl-6 py-4">
-                        <input
-                          id="bordered-checkbox-1"
-                          type="checkbox"
-                          value=""
-                          name="bordered-checkbox"
-                          className="flex flex-grow text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                      </td>
                       <th
                         scope="row"
                         className="px-6 py-4 font-semibold text-black whitespace-nowrap"
@@ -152,8 +141,12 @@ export default function UploadFile() {
                         </a>
                       </th>
                       <td className="px-6 py-4">{file.file_size}</td>
-                      <td className="px-6 py-4">{file.created_at}</td>
-                      <td className="px-6 py-4">{file.updated_at}</td>
+                      <td className="px-6 py-4">
+                        {convertToTaipeiTime(file.created_at)}
+                      </td>
+                      <td className="px-6 py-4">
+                        {convertToTaipeiTime(file.updated_at)}
+                      </td>
                     </tr>
                   </tbody>
                 ))}
