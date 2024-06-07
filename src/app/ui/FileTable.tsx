@@ -38,6 +38,15 @@ export default function FileTable({
 }: FileTableProps) {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
+  const convertToTaipeiTime = (utcDateString: string): string => {
+    const utcDate = new Date(utcDateString);
+
+    const taipeiOffset = 8 * 60;
+    const taipeiTime = new Date(utcDate.getTime() + taipeiOffset * 60 * 1000);
+
+    return taipeiTime.toISOString().replace("T", " ").substring(0, 19);
+  };
+
   useEffect(() => {
     const savedFileId = localStorage.getItem(`${title}_key`);
     if (savedFileId) {
@@ -111,7 +120,7 @@ export default function FileTable({
                 </td>
                 <th
                   scope="row"
-                  className="px-6 py-4 font-semibold text-black whitespace-nowrap max-w-16"
+                  className="px-6 py-4 font-semibold text-black whitespace-nowrap max-w-40"
                 >
                   <a
                     className="hover:cursor-pointer hover:text-blue-500 underline"
@@ -122,8 +131,12 @@ export default function FileTable({
                 </th>
                 <td className="px-6 py-4">{file.file_id}</td>
                 <td className="px-6 py-4">{file.file_size}</td>
-                <td className="px-6 py-4">{file.created_at}</td>
-                <td className="px-6 py-4">{file.updated_at}</td>
+                <td className="px-6 py-4">
+                  {convertToTaipeiTime(file.created_at)}
+                </td>
+                <td className="px-6 py-4">
+                  {convertToTaipeiTime(file.updated_at)}
+                </td>
               </tr>
             </tbody>
           ))}
