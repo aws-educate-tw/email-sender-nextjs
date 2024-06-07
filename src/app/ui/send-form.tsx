@@ -8,6 +8,7 @@ interface SubmitResponse {
   request_id?: string;
   timestamp?: string;
   sqs_message_id?: string;
+  errors?: { path: string; message: string }[];
 }
 
 export default function SendForm() {
@@ -15,6 +16,7 @@ export default function SendForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [templateFileId, setTemplateFileId] = useState<string>("");
   const [spreadsheetFileId, setSpreadsheetFileId] = useState<string>("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const storedTemplateFileId = localStorage.getItem("html_key");
@@ -36,10 +38,21 @@ export default function SendForm() {
     const formData = new FormData(ref.current);
 
     setIsSubmitting(true);
+    setErrors({}); // Clear previous errors
     try {
       const response: SubmitResponse = (await submitForm(
         formData
       )) as SubmitResponse;
+
+      if (response.status === "error" && response.errors) {
+        const newErrors: { [key: string]: string } = {};
+        response.errors.forEach((err) => {
+          newErrors[err.path] = err.message;
+        });
+        setErrors(newErrors);
+        return;
+      }
+
       alert(response.status + ": " + response.message);
       ref.current.reset();
     } catch (error: any) {
@@ -62,8 +75,13 @@ export default function SendForm() {
               type="text"
               placeholder="subject"
               disabled={isSubmitting}
-              className="block rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.subject ? "border-red-500" : "border-gray-200"
+              }`}
             />
+            {errors.subject && (
+              <p className="text-red-500 text-sm">{errors.subject}</p>
+            )}
           </div>
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
@@ -75,8 +93,13 @@ export default function SendForm() {
               type="text"
               placeholder="display_name"
               disabled={isSubmitting}
-              className="block rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.display_name ? "border-red-500" : "border-gray-200"
+              }`}
             />
+            {errors.display_name && (
+              <p className="text-red-500 text-sm">{errors.display_name}</p>
+            )}
           </div>
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
@@ -90,8 +113,13 @@ export default function SendForm() {
               value={templateFileId}
               onChange={(event) => setTemplateFileId(event.target.value)}
               disabled={isSubmitting}
-              className="block rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.template_file_id ? "border-red-500" : "border-gray-200"
+              }`}
             />
+            {errors.template_file_id && (
+              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
+            )}
           </div>
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
@@ -105,8 +133,17 @@ export default function SendForm() {
               value={spreadsheetFileId}
               onChange={(event) => setSpreadsheetFileId(event.target.value)}
               disabled={isSubmitting}
-              className="block rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.spreadsheet_file_id
+                  ? "border-red-500"
+                  : "border-gray-200"
+              }`}
             />
+            {errors.spreadsheet_file_id && (
+              <p className="text-red-500 text-sm">
+                {errors.spreadsheet_file_id}
+              </p>
+            )}
           </div>
         </div>
         <div className="w-full flex justify-end my-3 gap-3">

@@ -3,10 +3,10 @@
 import { z } from "zod";
 
 const formSchema = z.object({
-  subject: z.string(),
-  display_name: z.string(),
-  template_file_id: z.string(),
-  spreadsheet_file_id: z.string(),
+  subject: z.string().min(1, "Subject is required"),
+  display_name: z.string().min(1, "Display name is required"),
+  template_file_id: z.string().min(1, "Template file ID is required"),
+  spreadsheet_file_id: z.string().min(1, "Spreadsheet file ID is required"),
 });
 
 export async function submitForm(formData: FormData) {
@@ -16,6 +16,14 @@ export async function submitForm(formData: FormData) {
     template_file_id: formData.get("template_file_id") as string,
     spreadsheet_file_id: formData.get("spreadsheet_file_id") as string,
   });
+
+  if (!data.success) {
+    return {
+      status: "error",
+      message: "Validation failed",
+      errors: data.error.errors,
+    };
+  }
   try {
     const response = await fetch(
       "https://diyf4tafbl.execute-api.ap-northeast-1.amazonaws.com/dev/send-email",
@@ -28,8 +36,9 @@ export async function submitForm(formData: FormData) {
       }
     );
     if (!response.ok) {
+      const errorResponse = await response.json();
       return {
-        message: "The templateID or spreadsheetID is invalid",
+        error: errorResponse,
       };
     }
 
