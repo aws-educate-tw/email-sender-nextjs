@@ -20,6 +20,7 @@ interface FileTableProps {
     setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>,
     setLastEvaluatedKey: React.Dispatch<React.SetStateAction<string | null>>
   ) => void;
+  refreshFiles: (file_extension: string) => void;
   setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>;
   setLastEvaluatedKey: React.Dispatch<React.SetStateAction<string | null>>;
   lastEvaluatedKey: string | null;
@@ -30,6 +31,7 @@ export default function FileTable({
   title,
   loading,
   fetchFiles,
+  refreshFiles,
   setFiles,
   setLastEvaluatedKey,
   lastEvaluatedKey,
@@ -53,7 +55,8 @@ export default function FileTable({
       <div className="flex justify-between px-1">
         <label className="mb-2 block text-lg font-medium">{title}</label>
         <button
-          onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
+          // onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
+          onClick={() => refreshFiles(title)}
           disabled={loading}
           className="hover:bg-gray-200 rounded-md h-8 w-8 flex justify-center items-center"
         >

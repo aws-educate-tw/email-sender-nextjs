@@ -74,6 +74,19 @@ export default function ListFiles() {
     }
   };
 
+  const refreshFiles = (file_extension: string) => {
+    if (file_extension === "xlsx") {
+      setXlsxFiles(null);
+      setXlsxLastEvaluatedKey(null);
+      fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
+    }
+    if (file_extension === "html") {
+      setHtmlFiles(null);
+      setHtmlLastEvaluatedKey(null);
+      fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
+    }
+  };
+
   return (
     <>
       <FileTable
@@ -81,6 +94,7 @@ export default function ListFiles() {
         title="xlsx"
         loading={loading}
         fetchFiles={fetchFiles}
+        refreshFiles={refreshFiles}
         setFiles={setXlsxFiles}
         setLastEvaluatedKey={setXlsxLastEvaluatedKey}
         lastEvaluatedKey={xlsxLastEvaluatedKey}
@@ -90,6 +104,7 @@ export default function ListFiles() {
         title="html"
         loading={loading}
         fetchFiles={fetchFiles}
+        refreshFiles={refreshFiles}
         setFiles={setHtmlFiles}
         setLastEvaluatedKey={setHtmlLastEvaluatedKey}
         lastEvaluatedKey={htmlLastEvaluatedKey}
