@@ -92,12 +92,13 @@ export default function ListFiles() {
       <div className="flex flex-col justify-center items-center">
         <p className="text-4xl font-bold pt-2">TPET drive</p>
         <p className="text-gray-500 italic pb-4">
-          You can see the participants sheet and email template here.
+          Select <strong>a participants sheet</strong> and{" "}
+          <strong>an email template</strong> in each table.
         </p>
       </div>
       <FileTable
         files={xlsxFiles}
-        title="Participants Sheet"
+        title="Participants Sheet Table"
         file_extension="xlsx"
         loading={loading}
         fetchFiles={fetchFiles}
@@ -108,7 +109,7 @@ export default function ListFiles() {
       />
       <FileTable
         files={htmlFiles}
-        title="Email Template"
+        title="Email Template Table"
         file_extension="html"
         loading={loading}
         fetchFiles={fetchFiles}
