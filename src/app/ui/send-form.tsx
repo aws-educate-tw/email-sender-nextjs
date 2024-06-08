@@ -63,6 +63,12 @@ export default function SendForm() {
 
   return (
     <>
+      <div className="flex flex-col justify-center items-center">
+        <p className="text-4xl font-bold pt-2">Send Emails</p>
+        <p className="text-gray-500 italic pb-4">
+          Enter your <strong>subject</strong> and <strong>display name</strong>.
+        </p>
+      </div>
       <form onSubmit={onSubmit} ref={ref}>
         <div className="rounded-md bg-gray-50 p-4">
           <div className="m-3">
@@ -102,13 +108,13 @@ export default function SendForm() {
             )}
           </div>
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            {/* <label className="mb-2 block text-sm font-medium">
               Enter your template file id
-            </label>
+            </label> */}
             <input
               id="template_file_id"
               name="template_file_id"
-              type="text"
+              type="hidden" // to show: change this to text
               placeholder="template_file_id"
               value={templateFileId}
               onChange={(event) => setTemplateFileId(event.target.value)}
@@ -122,13 +128,13 @@ export default function SendForm() {
             )}
           </div>
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            {/* <label className="mb-2 block text-sm font-medium">
               Enter your spreadsheet file id
-            </label>
+            </label> */}
             <input
               id="spreadsheet_file_id"
               name="spreadsheet_file_id"
-              type="text"
+              type="hidden" // to show: change this to text
               placeholder="spreadsheet_file_id"
               value={spreadsheetFileId}
               onChange={(event) => setSpreadsheetFileId(event.target.value)}
