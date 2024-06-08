@@ -15,6 +15,7 @@ interface fileDataType {
 interface FileTableProps {
   files: fileDataType[] | null;
   title: string;
+  file_extension: string;
   loading: boolean;
   fetchFiles: (
     file_extension: string,
@@ -30,6 +31,7 @@ interface FileTableProps {
 export default function FileTable({
   files,
   title,
+  file_extension,
   loading,
   fetchFiles,
   refreshFiles,
@@ -40,24 +42,29 @@ export default function FileTable({
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedFileId = localStorage.getItem(`${title}_key`);
+    const savedFileId = localStorage.getItem(`${file_extension}_key`);
     if (savedFileId) {
       setSelectedFileId(savedFileId);
     }
-  }, [title]);
+  }, [file_extension]);
 
   const handleCheckboxChange = (file_id: string) => {
     setSelectedFileId(file_id);
-    localStorage.setItem(`${title}_key`, file_id);
+    localStorage.setItem(`${file_extension}_key`, file_id);
   };
 
   return files ? (
     <div className="rounded-md bg-gray-100 p-4 min-w-48 mb-4">
       <div className="flex justify-between px-1">
-        <label className="mb-2 block text-lg font-medium">{title}</label>
+        <div className="flex items-end gap-3">
+          <label className="mb-2 flex text-xl font-medium">{title}</label>
+          <label className="mb-2 flex text-md font-medium text-gray-500 italic">
+            .{file_extension} files are shown here
+          </label>
+        </div>
         <button
-          // onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
-          onClick={() => refreshFiles(title)}
+          // onClick={() => fetchFiles(file_extension, setFiles, setLastEvaluatedKey)}
+          onClick={() => refreshFiles(file_extension)}
           disabled={loading}
           className="hover:bg-gray-200 rounded-md h-8 w-8 flex justify-center items-center"
         >
@@ -136,7 +143,9 @@ export default function FileTable({
       </div>
       <div className="flex justify-center items-center">
         <button
-          onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
+          onClick={() =>
+            fetchFiles(file_extension, setFiles, setLastEvaluatedKey)
+          }
           disabled={loading || !lastEvaluatedKey}
           className="mt-3 p-2 text-gray-500 rounded disabled:opacity-50 w-12 h-8 flex justify-center items-center"
         >
