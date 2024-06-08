@@ -55,6 +55,14 @@ export default function UploadFile() {
       const result = await response.json();
 
       setFileData(result.files);
+      result.files.forEach((file: FileDataType) => {
+        if (file.file_extension === "xlsx") {
+          localStorage.setItem("xlsx_key", file.file_id);
+        } else if (file.file_extension === "html") {
+          localStorage.setItem("html_key", file.file_id);
+        }
+      });
+
       alert("File uploaded successfully!");
     } catch (error: any) {
       alert("Failed to send form data: " + error.message);
