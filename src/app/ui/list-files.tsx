@@ -121,9 +121,9 @@ export default function ListFiles() {
       <div className="w-full flex justify-end my-3 gap-3">
         <button
           type="submit"
-          className="text-white min-w-20 flex justify-center items-center bg-sky-950 hover:bg-sky-800 h-10 rounded-lg px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+          className="text-white min-w-28 flex justify-center items-center bg-sky-950 hover:bg-sky-800 h-10 rounded-lg px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
         >
-          <a href="/sendEmail">Next...</a>
+          <a href="/sendEmail">Next Step</a>
         </button>
       </div>
     </>
