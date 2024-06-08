@@ -65,6 +65,13 @@ export default function UploadFile() {
 
   return (
     <>
+      <div className="flex flex-col justify-center items-center">
+        <p className="text-4xl font-bold pt-2">Upload new files</p>
+        <p className="text-gray-500 italic pb-4">
+          Upload your <strong>participants sheet</strong> and{" "}
+          <strong>email template</strong> at once.
+        </p>
+      </div>
       <form onSubmit={onSubmit}>
         <div className="rounded-md bg-gray-100 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">Select files</label>
@@ -98,7 +105,7 @@ export default function UploadFile() {
             } px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Uploading..." : "Upload File"}
+            {isSubmitting ? "Uploading..." : "Upload Files"}
           </button>
         </div>
       </form>
