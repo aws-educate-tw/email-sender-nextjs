@@ -127,7 +127,11 @@ export default function FileTable({
             fetchFiles(file_extension, setFiles, setLastEvaluatedKey)
           }
           disabled={loading || !lastEvaluatedKey}
-          className="mt-3 p-2 rounded disabled:opacity-50 h-8 flex justify-center items-center active:text-sky-950 active:font-bold"
+          className={`mt-3 p-2 rounded h-8 flex justify-center items-center ${
+            loading || !lastEvaluatedKey
+              ? "text-gray-400 cursor-not-allowed"
+              : "active:text-sky-950 active:font-bold"
+          }`}
         >
           <p className="">show more</p>
           <svg
