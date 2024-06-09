@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import FileTable from "@/app/ui/file-table";
+import FileUpload from "@/app/ui/file-upload";
 
 interface fileDataType {
   file_id: string;
@@ -24,6 +25,7 @@ export default function ListFiles() {
     string | null
   >(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showUpload, setShowUpload] = useState<boolean>(false);
   const limit = 10;
 
   useEffect(() => {
@@ -63,7 +65,6 @@ export default function ListFiles() {
       }
 
       const result = await response.json();
-      console.log("Result:", result);
       setFiles((prevFiles) =>
         prevFiles ? [...prevFiles, ...result.data] : result.data
       );
@@ -75,15 +76,45 @@ export default function ListFiles() {
     }
   };
 
+  const handleOpenUpload = () => {
+    setShowUpload(true);
+  };
+  const handleCloseUpload = () => {
+    setShowUpload(false);
+  };
+
   return (
     <>
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">TPET drive</p>
-        <p className="text-gray-500 italic pb-4">
-          Select <strong>a participants sheet</strong> and{" "}
-          <strong>an email template</strong> in each table.
-        </p>
+        <div className="flex justify-between items-center w-full pb-4">
+          <p className="text-gray-500 italic">
+            Select <strong>a participants sheet</strong> and{" "}
+            <strong>an email template</strong> in each table.
+          </p>
+          <button
+            onClick={handleOpenUpload}
+            className="text-white min-w-32 bg-sky-950 hover:bg-sky-800 h-10 rounded-lg px-4 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            Upload New Files
+          </button>
+        </div>
       </div>
+
+      {showUpload && (
+        <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-screen-lg relative">
+            <button
+              onClick={handleCloseUpload}
+              className="absolute top-4 right-4 text-black"
+            >
+              &times;
+            </button>
+            <FileUpload />
+          </div>
+        </div>
+      )}
+      {/* <FileUpload /> */}
       <FileTable
         files={htmlFiles}
         title="Email Template Table"
@@ -104,14 +135,14 @@ export default function ListFiles() {
         setLastEvaluatedKey={setXlsxLastEvaluatedKey}
         lastEvaluatedKey={xlsxLastEvaluatedKey}
       />
-      <div className="w-full flex justify-end my-3 gap-3">
+      {/* <div className="w-full flex justify-end my-3 gap-3">
         <button
           type="submit"
           className="text-white min-w-32 flex justify-center items-center bg-sky-950 hover:bg-sky-800 h-10 rounded-lg px-4 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
         >
           <a href="/sendEmail">Next Step</a>
         </button>
-      </div>
+      </div> */}
     </>
   );
 }
