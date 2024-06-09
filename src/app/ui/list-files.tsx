@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import FileTable from "@/app/ui/file-table";
 import FileUpload from "@/app/ui/file-upload";
-import { set } from "zod";
 
 interface fileDataType {
   file_id: string;
@@ -27,8 +26,7 @@ export default function ListFiles() {
   >(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [showUpload, setShowUpload] = useState<boolean>(false);
-  const limit = 30;
-  const [uploadComplete, setUploadComplete] = useState<boolean>(false);
+  const limit = 10;
 
   useEffect(() => {
     if (!hasFetched.current) {
@@ -37,15 +35,6 @@ export default function ListFiles() {
       hasFetched.current = true;
     }
   }, []);
-  useEffect(() => {
-    if (uploadComplete) {
-      setHtmlFiles(null);
-      setXlsxFiles(null);
-      fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
-      fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
-      setUploadComplete(false);
-    }
-  }, [uploadComplete]);
 
   const fetchFiles = async (
     file_extension: string,
@@ -94,8 +83,20 @@ export default function ListFiles() {
     setShowUpload(false);
   };
 
-  const handleUploadComplete = () => {
-    setUploadComplete(true);
+  const handleFileUploadSuccess = (newFiles: fileDataType[]) => {
+    const htmlFilesUploaded = newFiles.filter(
+      (file) => file.file_extension === "html"
+    );
+    const xlsxFilesUploaded = newFiles.filter(
+      (file) => file.file_extension === "xlsx"
+    );
+
+    setHtmlFiles((prevFiles) =>
+      prevFiles ? [...htmlFilesUploaded, ...prevFiles] : htmlFilesUploaded
+    );
+    setXlsxFiles((prevFiles) =>
+      prevFiles ? [...xlsxFilesUploaded, ...prevFiles] : xlsxFilesUploaded
+    );
   };
 
   return (
@@ -134,7 +135,7 @@ export default function ListFiles() {
                 />
               </svg>
             </button>
-            <FileUpload onUploadComplete={handleUploadComplete} />
+            <FileUpload onFileUploadSuccess={handleFileUploadSuccess} />
           </div>
         </div>
       )}

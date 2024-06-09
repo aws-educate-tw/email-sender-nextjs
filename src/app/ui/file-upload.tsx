@@ -14,10 +14,10 @@ interface FileDataType {
 }
 
 interface FileUploadProps {
-  onUploadComplete: () => void;
+  onFileUploadSuccess: (newFiles: FileDataType[]) => void;
 }
 
-export default function FileUpload(props: FileUploadProps) {
+export default function FileUpload({ onFileUploadSuccess }: FileUploadProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
   const [fileData, setFileData] = useState<FileDataType[]>([]);
@@ -66,7 +66,7 @@ export default function FileUpload(props: FileUploadProps) {
           localStorage.setItem("html_key", file.file_id);
         }
       });
-      props.onUploadComplete();
+      onFileUploadSuccess(result.files);
       alert("File uploaded successfully!");
     } catch (error: any) {
       alert("Failed to send form data: " + error.message);
