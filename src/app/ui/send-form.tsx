@@ -73,13 +73,13 @@ export default function SendForm() {
         <div className="rounded-md bg-gray-50 p-4">
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
-              Enter your subject
+              Subject of the email:
             </label>
             <input
               id="subject"
               name="subject"
               type="text"
-              placeholder="subject"
+              placeholder="Enter the subject"
               disabled={isSubmitting}
               className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
                 errors.subject ? "border-red-500" : "border-gray-200"
@@ -91,13 +91,13 @@ export default function SendForm() {
           </div>
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
-              Enter your display name
+              Name of the sender:
             </label>
             <input
               id="display_name"
               name="display_name"
               type="text"
-              placeholder="display_name"
+              placeholder="Enter the name"
               disabled={isSubmitting}
               className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
                 errors.display_name ? "border-red-500" : "border-gray-200"
@@ -155,10 +155,10 @@ export default function SendForm() {
         <div className="w-full flex justify-end my-3 gap-3">
           <button
             type="submit"
-            className="flex h-10 items-center rounded-lg bg-sky-800 px-4 text-sm font-medium text-white transition-colors hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+            className="text-white min-w-32 flex justify-center items-center bg-sky-950 hover:bg-sky-800 h-10 rounded-lg px-4 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
             disabled={isSubmitting}
           >
-            Send Form
+            Send Emails
           </button>
         </div>
       </form>
