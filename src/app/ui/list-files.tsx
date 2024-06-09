@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import FileTable from "./FileTable";
+import { time } from "console";
 
 interface fileDataType {
   file_id: string;
@@ -15,15 +16,15 @@ interface fileDataType {
 
 export default function ListFiles() {
   const hasFetched = useRef(false);
-  const [xlsxFiles, setXlsxFiles] = useState<fileDataType[] | null>(null);
   const [htmlFiles, setHtmlFiles] = useState<fileDataType[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [xlsxLastEvaluatedKey, setXlsxLastEvaluatedKey] = useState<
-    string | null
-  >(null);
+  const [xlsxFiles, setXlsxFiles] = useState<fileDataType[] | null>(null);
   const [htmlLastEvaluatedKey, setHtmlLastEvaluatedKey] = useState<
     string | null
   >(null);
+  const [xlsxLastEvaluatedKey, setXlsxLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const limit = 10;
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function ListFiles() {
       }
 
       const result = await response.json();
+      console.log("Result:", result);
       setFiles((prevFiles) =>
         prevFiles ? [...prevFiles, ...result.data] : result.data
       );
@@ -71,19 +73,6 @@ export default function ListFiles() {
       alert("Failed to fetch files: " + error.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const refreshFiles = (file_extension: string) => {
-    if (file_extension === "xlsx") {
-      setXlsxFiles(null);
-      setXlsxLastEvaluatedKey(null);
-      fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
-    }
-    if (file_extension === "html") {
-      setHtmlFiles(null);
-      setHtmlLastEvaluatedKey(null);
-      fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
     }
   };
 
@@ -102,7 +91,6 @@ export default function ListFiles() {
         file_extension="html"
         loading={loading}
         fetchFiles={fetchFiles}
-        refreshFiles={refreshFiles}
         setFiles={setHtmlFiles}
         setLastEvaluatedKey={setHtmlLastEvaluatedKey}
         lastEvaluatedKey={htmlLastEvaluatedKey}
@@ -113,7 +101,6 @@ export default function ListFiles() {
         file_extension="xlsx"
         loading={loading}
         fetchFiles={fetchFiles}
-        refreshFiles={refreshFiles}
         setFiles={setXlsxFiles}
         setLastEvaluatedKey={setXlsxLastEvaluatedKey}
         lastEvaluatedKey={xlsxLastEvaluatedKey}
