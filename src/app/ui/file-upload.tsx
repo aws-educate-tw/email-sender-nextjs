@@ -81,7 +81,7 @@ export default function UploadFile() {
         </p>
       </div>
       <form onSubmit={onSubmit}>
-        <div className="rounded-md bg-gray-100 p-4 min-w-48">
+        <div className="rounded-md bg-neutral-100 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">Select files</label>
           <input
             className="custom-fileinput block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
@@ -118,7 +118,7 @@ export default function UploadFile() {
         </div>
       </form>
       {fileData && (
-        <div className="rounded-md bg-gray-100 p-4 min-w-48">
+        <div className="rounded-md bg-neutral-100 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">
             Uploaded files
           </label>

@@ -52,7 +52,7 @@ export default function FileTable({
   };
 
   return files ? (
-    <div className="rounded-md bg-gray-100 p-4 min-w-48 mb-4">
+    <div className="rounded-md bg-neutral-100 p-4 min-w-48 mb-4">
       <div className="flex justify-between px-1">
         <div className="flex items-end gap-3">
           <label className="mb-2 flex text-xl font-medium">{title}</label>

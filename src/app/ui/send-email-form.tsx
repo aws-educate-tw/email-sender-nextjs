@@ -119,7 +119,7 @@ export default function SendEmailForm() {
         </p>
       </div>
       <form onSubmit={onSubmit} ref={ref}>
-        <div className="rounded-md bg-gray-50 p-4">
+        <div className="rounded-md bg-neutral-100 p-4">
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
               Subject of the email:
