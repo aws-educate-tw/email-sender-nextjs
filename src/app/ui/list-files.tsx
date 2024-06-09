@@ -27,7 +27,7 @@ export default function ListFiles() {
   >(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [showUpload, setShowUpload] = useState<boolean>(false);
-  const limit = 10;
+  const limit = 30;
   const [uploadComplete, setUploadComplete] = useState<boolean>(false);
 
   useEffect(() => {
@@ -39,6 +39,8 @@ export default function ListFiles() {
   }, []);
   useEffect(() => {
     if (uploadComplete) {
+      setHtmlFiles(null);
+      setXlsxFiles(null);
       fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
       fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
       setUploadComplete(false);
