@@ -1,10 +1,11 @@
 import SendForm from "@/app/ui/send-form";
-import FileUpload from "@/app/ui/file-upload";
+import SendFormNew from "../ui/send-form-new";
 
 export default function Page() {
   return (
     <div>
-      <SendForm />
+      {/* <SendForm /> */}
+      <SendFormNew />
     </div>
   );
 }
