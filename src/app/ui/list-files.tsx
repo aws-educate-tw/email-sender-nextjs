@@ -97,17 +97,6 @@ export default function ListFiles() {
         </p>
       </div>
       <FileTable
-        files={xlsxFiles}
-        title="Participants Sheet Table"
-        file_extension="xlsx"
-        loading={loading}
-        fetchFiles={fetchFiles}
-        refreshFiles={refreshFiles}
-        setFiles={setXlsxFiles}
-        setLastEvaluatedKey={setXlsxLastEvaluatedKey}
-        lastEvaluatedKey={xlsxLastEvaluatedKey}
-      />
-      <FileTable
         files={htmlFiles}
         title="Email Template Table"
         file_extension="html"
@@ -117,6 +106,17 @@ export default function ListFiles() {
         setFiles={setHtmlFiles}
         setLastEvaluatedKey={setHtmlLastEvaluatedKey}
         lastEvaluatedKey={htmlLastEvaluatedKey}
+      />
+      <FileTable
+        files={xlsxFiles}
+        title="Participants Sheet Table"
+        file_extension="xlsx"
+        loading={loading}
+        fetchFiles={fetchFiles}
+        refreshFiles={refreshFiles}
+        setFiles={setXlsxFiles}
+        setLastEvaluatedKey={setXlsxLastEvaluatedKey}
+        lastEvaluatedKey={xlsxLastEvaluatedKey}
       />
       <div className="w-full flex justify-end my-3 gap-3">
         <button
