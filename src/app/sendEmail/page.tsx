@@ -1,11 +1,9 @@
-import SendForm from "@/app/ui/send-form";
-import SendFormNew from "../ui/send-form-new";
+import SendEmailForm from "@/app/ui/send-email-form";
 
 export default function Page() {
   return (
     <div>
-      {/* <SendForm /> */}
-      <SendFormNew />
+      <SendEmailForm />
     </div>
   );
 }

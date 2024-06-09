@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect, FormEvent } from "react";
-import { submitForm } from "@/app/lib/actions";
+import { submitForm } from "@/lib/actions";
 
 interface SubmitResponse {
   status: string;
@@ -11,11 +11,28 @@ interface SubmitResponse {
   errors?: { path: string; message: string }[];
 }
 
-export default function SendForm() {
+interface fileDataType {
+  file_id: string;
+  created_at: string;
+  updated_at: string;
+  file_url: string;
+  file_name: string;
+  file_extension: string;
+  file_size: number;
+  uploader_id: string;
+}
+
+export default function SendEmailForm() {
   const ref = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [templateFileId, setTemplateFileId] = useState<string>("");
   const [spreadsheetFileId, setSpreadsheetFileId] = useState<string>("");
+  const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
+    null
+  );
+  const [spreadsheetOptions, setSpreadsheetOptions] = useState<
+    fileDataType[] | null
+  >(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -29,7 +46,38 @@ export default function SendForm() {
     if (storedSpreadsheetFileId) {
       setSpreadsheetFileId(storedSpreadsheetFileId);
     }
+
+    fetchFiles("html", 30, setTemplateOptions);
+    fetchFiles("xlsx", 30, setSpreadsheetOptions);
   }, []);
+
+  const fetchFiles = async (
+    file_extension: string,
+    limit: number,
+    setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>
+  ) => {
+    try {
+      const base_url =
+        "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
+      const url = new URL(`${base_url}/files`);
+      url.searchParams.append("file_extension", file_extension);
+      url.searchParams.append("limit", limit.toString());
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      setFiles(result.data);
+    } catch (error: any) {
+      alert("Failed to fetch files: " + error.message);
+    }
+  };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,7 +86,6 @@ export default function SendForm() {
     const formData = new FormData(ref.current);
 
     setIsSubmitting(true);
-    setErrors({}); // Clear previous errors
     try {
       const response: SubmitResponse = (await submitForm(
         formData
@@ -50,10 +97,12 @@ export default function SendForm() {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
+        setIsSubmitting(false);
         return;
       }
 
       alert(response.status + ": " + response.message);
+      setErrors({}); // Clear previous errors
       ref.current.reset();
     } catch (error: any) {
       alert("Failed to send form data: " + error.message);
@@ -108,34 +157,40 @@ export default function SendForm() {
             )}
           </div>
           <div className="m-3">
-            {/* <label className="mb-2 block text-sm font-medium">
-              Enter your template file id
-            </label> */}
-            <input
+            <label className="mb-2 block text-sm font-medium">
+              Select your template file:
+            </label>
+            <select
               id="template_file_id"
               name="template_file_id"
-              type="hidden" // to show: change this to text
-              placeholder="template_file_id"
               value={templateFileId}
               onChange={(event) => setTemplateFileId(event.target.value)}
               disabled={isSubmitting}
               className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
                 errors.template_file_id ? "border-red-500" : "border-gray-200"
               }`}
-            />
+            >
+              <option value="" disabled>
+                Select a template
+              </option>
+              {templateOptions &&
+                templateOptions.map((option: fileDataType, index: number) => (
+                  <option key={index} value={option.file_id}>
+                    {option.file_name}
+                  </option>
+                ))}
+            </select>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
             )}
           </div>
           <div className="m-3">
-            {/* <label className="mb-2 block text-sm font-medium">
-              Enter your spreadsheet file id
-            </label> */}
-            <input
+            <label className="mb-2 block text-sm font-medium">
+              Select your spreadsheet file:
+            </label>
+            <select
               id="spreadsheet_file_id"
               name="spreadsheet_file_id"
-              type="hidden" // to show: change this to text
-              placeholder="spreadsheet_file_id"
               value={spreadsheetFileId}
               onChange={(event) => setSpreadsheetFileId(event.target.value)}
               disabled={isSubmitting}
@@ -144,7 +199,19 @@ export default function SendForm() {
                   ? "border-red-500"
                   : "border-gray-200"
               }`}
-            />
+            >
+              <option value="" disabled>
+                Select a spreadsheet
+              </option>
+              {spreadsheetOptions &&
+                spreadsheetOptions.map(
+                  (option: fileDataType, index: number) => (
+                    <option key={index} value={option.file_id}>
+                      {option.file_name}
+                    </option>
+                  )
+                )}
+            </select>
             {errors.spreadsheet_file_id && (
               <p className="text-red-500 text-sm">
                 {errors.spreadsheet_file_id}

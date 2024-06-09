@@ -23,7 +23,7 @@ export default function Page() {
             </span>
           </p>
           <Link
-            href="/listFiles"
+            href="/uploadFile"
             className="flex items-center gap-5 self-start rounded-lg bg-sky-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-sky-900 md:text-base"
           >
             Start right now !

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { convertToTaipeiTime } from "@/app/lib/utils/dataUtils";
+import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 
 interface fileDataType {
   file_id: string;

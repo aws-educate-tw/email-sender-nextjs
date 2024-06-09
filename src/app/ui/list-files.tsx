@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import FileTable from "./FileTable";
-import { time } from "console";
+import FileTable from "@/app/ui/file-table";
 
 interface fileDataType {
   file_id: string;
