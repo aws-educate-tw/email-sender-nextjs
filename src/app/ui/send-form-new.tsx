@@ -47,18 +47,13 @@ export default function SendForNew() {
       setSpreadsheetFileId(storedSpreadsheetFileId);
     }
 
-    // Fetch template options (simulated with a timeout here)
-    // setTimeout(() => {
-    //   setTemplateOptions(["template1", "template2", "template3"]);
-    //   setSpreadsheetOptions(["spreadsheet1", "spreadsheet2", "spreadsheet3"]);
-    // }, 1000);
-    fetchFiles("xlsx", setTemplateOptions);
-    fetchFiles("html", setSpreadsheetOptions);
+    fetchFiles("html", 30, setTemplateOptions);
+    fetchFiles("xlsx", 30, setSpreadsheetOptions);
   }, []);
 
-  const limit = 10;
   const fetchFiles = async (
     file_extension: string,
+    limit: number,
     setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>
   ) => {
     try {
@@ -91,7 +86,6 @@ export default function SendForNew() {
     const formData = new FormData(ref.current);
 
     setIsSubmitting(true);
-    setErrors({}); // Clear previous errors
     try {
       const response: SubmitResponse = (await submitForm(
         formData
@@ -103,10 +97,12 @@ export default function SendForNew() {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
+        setIsSubmitting(false);
         return;
       }
 
       alert(response.status + ": " + response.message);
+      setErrors({}); // Clear previous errors
       ref.current.reset();
     } catch (error: any) {
       alert("Failed to send form data: " + error.message);

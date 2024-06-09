@@ -16,6 +16,7 @@ export async function submitForm(formData: FormData) {
     template_file_id: formData.get("template_file_id") as string,
     spreadsheet_file_id: formData.get("spreadsheet_file_id") as string,
   });
+  console.log("Data:", data);
 
   if (!data.success) {
     return {
