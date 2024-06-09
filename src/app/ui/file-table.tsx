@@ -39,13 +39,6 @@ export default function FileTable({
 }: FileTableProps) {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const savedFileId = localStorage.getItem(`${file_extension}_key`);
-    if (savedFileId) {
-      setSelectedFileId(savedFileId);
-    }
-  }, [file_extension]);
-
   const handleCheckboxChange = (file_id: string) => {
     setSelectedFileId(file_id);
     localStorage.setItem(`${file_extension}_key`, file_id);

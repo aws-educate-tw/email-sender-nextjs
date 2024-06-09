@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import FileTable from "@/app/ui/file-table";
 import FileUpload from "@/app/ui/file-upload";
+import { set } from "zod";
 
 interface fileDataType {
   file_id: string;
@@ -27,6 +28,7 @@ export default function ListFiles() {
   const [loading, setLoading] = useState<boolean>(true);
   const [showUpload, setShowUpload] = useState<boolean>(false);
   const limit = 10;
+  const [uploadComplete, setUploadComplete] = useState<boolean>(false);
 
   useEffect(() => {
     if (!hasFetched.current) {
@@ -35,6 +37,13 @@ export default function ListFiles() {
       hasFetched.current = true;
     }
   }, []);
+  useEffect(() => {
+    if (uploadComplete) {
+      fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
+      fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
+      setUploadComplete(false);
+    }
+  }, [uploadComplete]);
 
   const fetchFiles = async (
     file_extension: string,
@@ -83,6 +92,10 @@ export default function ListFiles() {
     setShowUpload(false);
   };
 
+  const handleUploadComplete = () => {
+    setUploadComplete(true);
+  };
+
   return (
     <>
       <div className="flex flex-col justify-center items-start">
@@ -100,7 +113,6 @@ export default function ListFiles() {
           </button>
         </div>
       </div>
-
       {showUpload && (
         <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-screen-lg relative">
@@ -110,11 +122,10 @@ export default function ListFiles() {
             >
               &times;
             </button>
-            <FileUpload />
+            <FileUpload onUploadComplete={handleUploadComplete} />
           </div>
         </div>
       )}
-      {/* <FileUpload /> */}
       <FileTable
         files={htmlFiles}
         title="Email Template Table"

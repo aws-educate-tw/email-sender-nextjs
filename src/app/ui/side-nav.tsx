@@ -20,12 +20,6 @@ export default function SideNav() {
       </Link>
       <div className="flex grow flex-row flex-wrap justify-start gap-2 md:flex-col md:space-x-0 rounded-md">
         <Link
-          href="/uploadFile"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Upload New Files</p>
-        </Link>
-        <Link
           href="/listFiles"
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
