@@ -112,11 +112,15 @@ export default function SendEmailForm() {
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">Send Emails</p>
-        <p className="text-gray-500 italic pb-4">
-          Enter your <strong>subject</strong> and <strong>display name</strong>.
-        </p>
+        <div className="flex justify-between items-center w-full pb-4">
+          <p className="text-gray-500 italic">
+            Enter your <strong>subject</strong> and{" "}
+            <strong>display name</strong>.
+          </p>
+          <div className="h-10"></div>
+        </div>
       </div>
       <form onSubmit={onSubmit} ref={ref}>
         <div className="rounded-md bg-neutral-100 p-4">
