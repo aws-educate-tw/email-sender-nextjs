@@ -16,7 +16,6 @@ export async function submitForm(formData: FormData) {
     template_file_id: formData.get("template_file_id") as string,
     spreadsheet_file_id: formData.get("spreadsheet_file_id") as string,
   });
-  console.log("Data:", data);
 
   if (!data.success) {
     return {
@@ -36,14 +35,9 @@ export async function submitForm(formData: FormData) {
         body: JSON.stringify(data.data)
       }
     );
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      return {
-        error: errorResponse,
-      };
-    }
 
     const result = await response.json();
+    // console.log(result);
     return {
       status: result.status,
       message: result.message,
