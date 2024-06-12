@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 
 interface fileDataType {
   file_id: string;
@@ -14,6 +15,7 @@ interface fileDataType {
 interface FileTableProps {
   files: fileDataType[] | null;
   title: string;
+  file_extension: string;
   loading: boolean;
   fetchFiles: (
     file_extension: string,
@@ -28,6 +30,7 @@ interface FileTableProps {
 export default function FileTable({
   files,
   title,
+  file_extension,
   loading,
   fetchFiles,
   setFiles,
@@ -37,38 +40,31 @@ export default function FileTable({
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedFileId = localStorage.getItem(`${title}_key`);
-    if (savedFileId) {
-      setSelectedFileId(savedFileId);
+    if (files && files.length > 0) {
+      const latestFile = files.reduce((latest, file) => {
+        return new Date(file.created_at) > new Date(latest.created_at)
+          ? file
+          : latest;
+      }, files[0]);
+      setSelectedFileId(latestFile.file_id);
+      localStorage.setItem(`${file_extension}_key`, latestFile.file_id);
     }
-  }, [title]);
+  }, [files, file_extension]);
 
   const handleCheckboxChange = (file_id: string) => {
     setSelectedFileId(file_id);
-    localStorage.setItem(`${title}_key`, file_id);
+    localStorage.setItem(`${file_extension}_key`, file_id);
   };
 
   return files ? (
-    <div className="rounded-md bg-gray-100 p-4 min-w-48 mb-4">
+    <div className="rounded-md bg-neutral-100 p-4 min-w-48 mb-4">
       <div className="flex justify-between px-1">
-        <label className="mb-2 block text-lg font-medium">{title}</label>
-        <button
-          onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
-          disabled={loading}
-          className="hover:bg-gray-200 rounded-md h-8 w-8 flex justify-center items-center"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill="currentColor"
-              d="M12 20q-3.35 0-5.675-2.325T4 12t2.325-5.675T12 4q1.725 0 3.3.712T18 6.75V5q0-.425.288-.712T19 4t.713.288T20 5v5q0 .425-.288.713T19 11h-5q-.425 0-.712-.288T13 10t.288-.712T14 9h3.2q-.8-1.4-2.187-2.2T12 6Q9.5 6 7.75 7.75T6 12t1.75 4.25T12 18q1.7 0 3.113-.862t2.187-2.313q.2-.35.563-.487t.737-.013q.4.125.575.525t-.025.75q-1.025 2-2.925 3.2T12 20"
-            />
-          </svg>
-        </button>
+        <div className="flex items-end gap-3">
+          <label className="mb-2 flex text-xl font-medium">{title}</label>
+          <label className="mb-2 flex text-md font-medium text-gray-500 italic">
+            .{file_extension} files are shown here
+          </label>
+        </div>
       </div>
       <div className="relative overflow-x-auto rounded-md border">
         <table className="w-full text-sm text-left rtl:text-right text-black">
@@ -108,7 +104,7 @@ export default function FileTable({
                 </td>
                 <th
                   scope="row"
-                  className="px-6 py-4 font-semibold text-black whitespace-nowrap max-w-16"
+                  className="px-6 py-4 font-semibold text-black whitespace-nowrap max-w-40"
                 >
                   <a
                     className="hover:cursor-pointer hover:text-blue-500 underline"
@@ -119,8 +115,12 @@ export default function FileTable({
                 </th>
                 <td className="px-6 py-4">{file.file_id}</td>
                 <td className="px-6 py-4">{file.file_size}</td>
-                <td className="px-6 py-4">{file.created_at}</td>
-                <td className="px-6 py-4">{file.updated_at}</td>
+                <td className="px-6 py-4">
+                  {convertToTaipeiTime(file.created_at)}
+                </td>
+                <td className="px-6 py-4">
+                  {convertToTaipeiTime(file.updated_at)}
+                </td>
               </tr>
             </tbody>
           ))}
@@ -128,10 +128,17 @@ export default function FileTable({
       </div>
       <div className="flex justify-center items-center">
         <button
-          onClick={() => fetchFiles(title, setFiles, setLastEvaluatedKey)}
+          onClick={() =>
+            fetchFiles(file_extension, setFiles, setLastEvaluatedKey)
+          }
           disabled={loading || !lastEvaluatedKey}
-          className="mt-3 p-2 text-gray-500 rounded disabled:opacity-50 w-12 h-8 flex justify-center items-center"
+          className={`mt-3 p-2 rounded h-8 flex justify-center items-center ${
+            loading || !lastEvaluatedKey
+              ? "text-gray-400 cursor-not-allowed"
+              : "active:text-sky-950 active:font-bold"
+          }`}
         >
+          <p className="">show more</p>
           <svg
             width="32"
             height="32"

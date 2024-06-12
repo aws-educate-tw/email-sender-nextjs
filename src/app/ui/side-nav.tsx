@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { HomeIcon } from "@heroicons/react/24/outline";
+// import { HomeIcon } from "@heroicons/react/24/outline";
 
 export default function SideNav() {
   return (
@@ -20,23 +20,10 @@ export default function SideNav() {
       </Link>
       <div className="flex grow flex-row flex-wrap justify-start gap-2 md:flex-col md:space-x-0 rounded-md">
         <Link
-          href="/"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          {/* <HomeIcon className="w-6 stroke-white" /> */}
-          <p className="px-3 text-white">Go Home</p>
-        </Link>
-        <Link
           href="/listFiles"
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
-          <p className="px-3 text-white">List Files</p>
-        </Link>
-        <Link
-          href="/uploadFile"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Upload Files</p>
+          <p className="px-3 text-white">TPET drive</p>
         </Link>
         <Link
           href="/sendEmail"
@@ -44,7 +31,7 @@ export default function SideNav() {
         >
           <p className="px-3 text-white">Send Email</p>
         </Link>
-        <Link
+        {/* <Link
           href="/htmlTemplate"
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
@@ -55,7 +42,7 @@ export default function SideNav() {
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
           <p className="px-3 text-white">HTML Rich Editor</p>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );
