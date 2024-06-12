@@ -43,9 +43,8 @@ export default function ListFiles() {
   ) => {
     try {
       setLoading(true);
-      const base_url =
-        "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
-      const url = new URL(`${base_url}/files`);
+      const base_url = "https://api.tpet.awseducate.systems";
+      const url = new URL(`${base_url}/dev/files`);
       url.searchParams.append("file_extension", file_extension);
       url.searchParams.append("limit", limit.toString());
 

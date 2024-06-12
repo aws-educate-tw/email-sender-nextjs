@@ -25,8 +25,10 @@ export async function submitForm(formData: FormData) {
     };
   }
   try {
+    const base_url = "https://api.tpet.awseducate.systems";
+    const url = new URL(`${base_url}/dev/send-email`);
     const response = await fetch(
-      "https://diyf4tafbl.execute-api.ap-northeast-1.amazonaws.com/dev/send-email",
+      url.toString(),
       {
         method: "POST",
         headers: {
@@ -35,9 +37,10 @@ export async function submitForm(formData: FormData) {
         body: JSON.stringify(data.data)
       }
     );
+    console.log(response);
 
     const result = await response.json();
-    // console.log(result);
+    console.log(result);
     return {
       status: result.status,
       message: result.message,
