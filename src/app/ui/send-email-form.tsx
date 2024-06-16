@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
+import SelectDropdown from "./select-dropdown";
 
 interface SubmitResponse {
   status: string;
@@ -25,31 +26,14 @@ interface fileDataType {
 export default function SendEmailForm() {
   const ref = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [templateFileId, setTemplateFileId] = useState<string>("");
-  const [spreadsheetFileId, setSpreadsheetFileId] = useState<string>("");
   const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
     null
   );
-  const [spreadsheetOptions, setSpreadsheetOptions] = useState<
-    fileDataType[] | null
-  >(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  useEffect(() => {
-    const storedTemplateFileId = localStorage.getItem("html_key");
-    const storedSpreadsheetFileId = localStorage.getItem("xlsx_key");
-
-    if (storedTemplateFileId) {
-      setTemplateFileId(storedTemplateFileId);
-    }
-
-    if (storedSpreadsheetFileId) {
-      setSpreadsheetFileId(storedSpreadsheetFileId);
-    }
-
-    fetchFiles("html", 30, setTemplateOptions);
-    fetchFiles("xlsx", 30, setSpreadsheetOptions);
-  }, []);
+  // useEffect(() => {
+  //   fetchFiles("html", 30, setTemplateOptions);
+  //   fetchFiles("xlsx", 30, setSpreadsheetOptions);
+  // }, []);
 
   const fetchFiles = async (
     file_extension: string,
@@ -110,6 +94,9 @@ export default function SendEmailForm() {
     setIsSubmitting(false);
   };
 
+  const handleSelect = (file_id: string) => {
+    console.log(file_id);
+  };
   return (
     <>
       <div className="flex flex-col justify-center items-start">
@@ -164,62 +151,11 @@ export default function SendEmailForm() {
             <label className="mb-2 block text-sm font-medium">
               Select your template file:
             </label>
-            <select
-              id="template_file_id"
-              name="template_file_id"
-              value={templateFileId}
-              onChange={(event) => setTemplateFileId(event.target.value)}
-              disabled={isSubmitting}
-              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                errors.template_file_id ? "border-red-500" : "border-gray-200"
-              }`}
-            >
-              <option value="" disabled>
-                Select a template
-              </option>
-              {templateOptions &&
-                templateOptions.map((option: fileDataType, index: number) => (
-                  <option key={index} value={option.file_id}>
-                    {option.file_name}
-                  </option>
-                ))}
-            </select>
+            <div className="flex items-center gap-2">
+              <SelectDropdown onSelect={handleSelect} />
+            </div>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
-            )}
-          </div>
-          <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
-              Select your spreadsheet file:
-            </label>
-            <select
-              id="spreadsheet_file_id"
-              name="spreadsheet_file_id"
-              value={spreadsheetFileId}
-              onChange={(event) => setSpreadsheetFileId(event.target.value)}
-              disabled={isSubmitting}
-              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                errors.spreadsheet_file_id
-                  ? "border-red-500"
-                  : "border-gray-200"
-              }`}
-            >
-              <option value="" disabled>
-                Select a spreadsheet
-              </option>
-              {spreadsheetOptions &&
-                spreadsheetOptions.map(
-                  (option: fileDataType, index: number) => (
-                    <option key={index} value={option.file_id}>
-                      {option.file_name}
-                    </option>
-                  )
-                )}
-            </select>
-            {errors.spreadsheet_file_id && (
-              <p className="text-red-500 text-sm">
-                {errors.spreadsheet_file_id}
-              </p>
             )}
           </div>
         </div>
