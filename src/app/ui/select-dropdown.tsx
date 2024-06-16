@@ -184,7 +184,36 @@ export default function SelectDropdown({
               </table>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No files found.</p>
+            <div>
+              <table className="w-full bg-white">
+                <thead>
+                  <tr className="bg-neutral-100 rounded-t-md">
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
+                      File Name
+                    </th>
+                    <th className="py-2 px-4 border-b border-gray-200">
+                      Created At
+                    </th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
+                      File Size
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <th>
+                    <td className="py-2 px-4 border-b border-gray-200">
+                      No files found
+                    </td>
+                  </th>
+                  <th>
+                    <td className="py-2 px-4 border-b border-gray-200">-</td>
+                  </th>
+                  <th>
+                    <td className="py-2 px-4 border-b border-gray-200">-</td>
+                  </th>
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}

@@ -2,7 +2,6 @@
 import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
 import SelectDropdown from "./select-dropdown";
-import { set } from "zod";
 
 interface SubmitResponse {
   status: string;
@@ -13,23 +12,20 @@ interface SubmitResponse {
   errors?: { path: string; message: string }[];
 }
 
-interface fileDataType {
-  file_id: string;
-  created_at: string;
-  updated_at: string;
-  file_url: string;
-  file_name: string;
-  file_extension: string;
-  file_size: number;
-  uploader_id: string;
-}
+// interface fileDataType {
+//   file_id: string;
+//   created_at: string;
+//   updated_at: string;
+//   file_url: string;
+//   file_name: string;
+//   file_extension: string;
+//   file_size: number;
+//   uploader_id: string;
+// }
 
 export default function SendEmailForm() {
   const ref = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  // const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
-  //   null
-  // );
   const [selectedHtmlFile, setSelectedHtmlFile] = useState("");
   const [selectedXlsxFile, setSelectedXlsxFile] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -71,6 +67,8 @@ export default function SendEmailForm() {
     if (!ref.current) return;
 
     const formData = new FormData(ref.current);
+    formData.append("template_file_id", selectedHtmlFile);
+    formData.append("spreadsheet_file_id", selectedXlsxFile);
 
     setIsSubmitting(true);
     try {
@@ -98,12 +96,12 @@ export default function SendEmailForm() {
   };
 
   const handleHtmlSelect = (file_id: string) => {
-    console.log("selected html file id", file_id);
+    // console.log("selected html file id", file_id);
     setSelectedHtmlFile(file_id);
   };
 
   const handleXlsxSelect = (file_id: string) => {
-    console.log("selected xlsx file id", file_id);
+    // console.log("selected xlsx file id", file_id);
     setSelectedXlsxFile(file_id);
   };
 
@@ -195,8 +193,8 @@ export default function SendEmailForm() {
             Send Emails
           </button>
         </div>
-        <div>template : {selectedHtmlFile}</div>
-        <div>sheet : {selectedXlsxFile}</div>
+        {/* <div>template : {selectedHtmlFile}</div> */}
+        {/* <div>sheet : {selectedXlsxFile}</div> */}
       </form>
     </>
   );
