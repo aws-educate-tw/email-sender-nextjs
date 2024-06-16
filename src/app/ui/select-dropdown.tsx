@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { formatFileSize } from "@/lib/utils/dataUtils";
@@ -26,8 +27,7 @@ export default function SelectDropdown({ onSelect }: SelectDropdownProps) {
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedFileName, setSelectedFileName] =
-    useState("Select a HTML file");
+  const [selectedFileName, setSelectedFileName] = useState("Select a file");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function SelectDropdown({ onSelect }: SelectDropdownProps) {
 
       {isOpen && (
         <div
-          className="p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"

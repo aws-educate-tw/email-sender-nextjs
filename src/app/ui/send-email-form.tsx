@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
 import SelectDropdown from "./select-dropdown";
+import { set } from "zod";
 
 interface SubmitResponse {
   status: string;
@@ -26,42 +27,44 @@ interface fileDataType {
 export default function SendEmailForm() {
   const ref = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
-    null
-  );
+  // const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
+  //   null
+  // );
+  const [selectedHtmlFile, setSelectedHtmlFile] = useState("");
+  const [selectedXlsxFile, setSelectedXlsxFile] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   // useEffect(() => {
   //   fetchFiles("html", 30, setTemplateOptions);
   //   fetchFiles("xlsx", 30, setSpreadsheetOptions);
   // }, []);
 
-  const fetchFiles = async (
-    file_extension: string,
-    limit: number,
-    setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>
-  ) => {
-    try {
-      const base_url =
-        "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
-      const url = new URL(`${base_url}/files`);
-      url.searchParams.append("file_extension", file_extension);
-      url.searchParams.append("limit", limit.toString());
+  // const fetchFiles = async (
+  //   file_extension: string,
+  //   limit: number,
+  //   setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>
+  // ) => {
+  //   try {
+  //     const base_url =
+  //       "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
+  //     const url = new URL(`${base_url}/files`);
+  //     url.searchParams.append("file_extension", file_extension);
+  //     url.searchParams.append("limit", limit.toString());
 
-      const response = await fetch(url.toString(), {
-        method: "GET",
-      });
+  //     const response = await fetch(url.toString(), {
+  //       method: "GET",
+  //     });
 
-      if (!response.ok) {
-        const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
+  //     if (!response.ok) {
+  //       const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
+  //       throw new Error(errorMessage);
+  //     }
 
-      const result = await response.json();
-      setFiles(result.data);
-    } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
-    }
-  };
+  //     const result = await response.json();
+  //     setFiles(result.data);
+  //   } catch (error: any) {
+  //     alert("Failed to fetch files: " + error.message);
+  //   }
+  // };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -94,9 +97,16 @@ export default function SendEmailForm() {
     setIsSubmitting(false);
   };
 
-  const handleSelect = (file_id: string) => {
-    console.log(file_id);
+  const handleHtmlSelect = (file_id: string) => {
+    console.log("selected html file id", file_id);
+    setSelectedHtmlFile(file_id);
   };
+
+  const handleXlsxSelect = (file_id: string) => {
+    console.log("selected xlsx file id", file_id);
+    setSelectedXlsxFile(file_id);
+  };
+
   return (
     <>
       <div className="flex flex-col justify-center items-start">
@@ -152,7 +162,18 @@ export default function SendEmailForm() {
               Select your template file:
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown onSelect={handleSelect} />
+              <SelectDropdown onSelect={handleHtmlSelect} />
+            </div>
+            {errors.template_file_id && (
+              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
+            )}
+          </div>
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">
+              Select your sheet file:
+            </label>
+            <div className="flex items-center gap-2">
+              <SelectDropdown onSelect={handleXlsxSelect} />
             </div>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
@@ -168,6 +189,8 @@ export default function SendEmailForm() {
             Send Emails
           </button>
         </div>
+        <div>template : {selectedHtmlFile}</div>
+        <div>sheet : {selectedXlsxFile}</div>
       </form>
     </>
   );
