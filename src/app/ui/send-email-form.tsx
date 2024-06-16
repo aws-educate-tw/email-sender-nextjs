@@ -162,7 +162,10 @@ export default function SendEmailForm() {
               Select your template file:
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown onSelect={handleHtmlSelect} />
+              <SelectDropdown
+                onSelect={handleHtmlSelect}
+                fileExtension="html"
+              />
             </div>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
@@ -173,7 +176,10 @@ export default function SendEmailForm() {
               Select your sheet file:
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown onSelect={handleXlsxSelect} />
+              <SelectDropdown
+                onSelect={handleXlsxSelect}
+                fileExtension="xlsx"
+              />
             </div>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>

@@ -16,9 +16,13 @@ interface fileDataType {
 
 interface SelectDropdownProps {
   onSelect: (file_id: string) => void;
+  fileExtension: string;
 }
 
-export default function SelectDropdown({ onSelect }: SelectDropdownProps) {
+export default function SelectDropdown({
+  onSelect,
+  fileExtension,
+}: SelectDropdownProps) {
   const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
     null
   );
@@ -27,7 +31,9 @@ export default function SelectDropdown({ onSelect }: SelectDropdownProps) {
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedFileName, setSelectedFileName] = useState("Select a file");
+  const [selectedFileName, setSelectedFileName] = useState(
+    `Select a ${fileExtension} file`
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,7 +87,7 @@ export default function SelectDropdown({ onSelect }: SelectDropdownProps) {
 
   const toggleDropdown = () => {
     if (!isOpen) {
-      fetchFiles("html", 5);
+      fetchFiles(fileExtension, 5);
     }
     setIsOpen(!isOpen);
   };
