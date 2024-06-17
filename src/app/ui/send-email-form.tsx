@@ -1,7 +1,8 @@
 "use client";
 import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
-import SelectDropdown from "./select-dropdown";
+import SelectDropdown from "@/app/ui/select-dropdown";
+import FileUpload from "@/app/ui/file-upload";
 
 interface SubmitResponse {
   status: string;
@@ -12,16 +13,16 @@ interface SubmitResponse {
   errors?: { path: string; message: string }[];
 }
 
-// interface fileDataType {
-//   file_id: string;
-//   created_at: string;
-//   updated_at: string;
-//   file_url: string;
-//   file_name: string;
-//   file_extension: string;
-//   file_size: number;
-//   uploader_id: string;
-// }
+interface fileDataType {
+  file_id: string;
+  created_at: string;
+  updated_at: string;
+  file_url: string;
+  file_name: string;
+  file_extension: string;
+  file_size: number;
+  uploader_id: string;
+}
 
 export default function SendEmailForm() {
   const ref = useRef<HTMLFormElement>(null);
@@ -95,6 +96,8 @@ export default function SendEmailForm() {
     setIsSubmitting(false);
   };
 
+  const [showUpload, setShowUpload] = useState<boolean>(false);
+
   const handleHtmlSelect = (file_id: string) => {
     // console.log("selected html file id", file_id);
     setSelectedHtmlFile(file_id);
@@ -103,6 +106,29 @@ export default function SendEmailForm() {
   const handleXlsxSelect = (file_id: string) => {
     // console.log("selected xlsx file id", file_id);
     setSelectedXlsxFile(file_id);
+  };
+
+  const handleOpenUpload = () => {
+    setShowUpload(true);
+  };
+  const handleCloseUpload = () => {
+    setShowUpload(false);
+  };
+
+  const handleFileUploadSuccess = (newFiles: fileDataType[]) => {
+    // setNewUploaded((prev) => !prev);
+    // const htmlFilesUploaded = newFiles.filter(
+    //   (file) => file.file_extension === "html"
+    // );
+    // const xlsxFilesUploaded = newFiles.filter(
+    //   (file) => file.file_extension === "xlsx"
+    // );
+    // setHtmlFiles((prevFiles) =>
+    //   prevFiles ? [...htmlFilesUploaded, ...prevFiles] : htmlFilesUploaded
+    // );
+    // setXlsxFiles((prevFiles) =>
+    //   prevFiles ? [...xlsxFilesUploaded, ...prevFiles] : xlsxFilesUploaded
+    // );
   };
 
   return (
@@ -164,6 +190,36 @@ export default function SendEmailForm() {
                 onSelect={handleHtmlSelect}
                 fileExtension="html"
               />
+              <button
+                type="button"
+                onClick={handleOpenUpload}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                upload
+              </button>
+              {showUpload && (
+                <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-screen-lg relative">
+                    <button
+                      onClick={handleCloseUpload}
+                      className="absolute top-4 right-4 text-black"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                        />
+                      </svg>
+                    </button>
+                    <FileUpload onFileUploadSuccess={handleFileUploadSuccess} />
+                  </div>
+                </div>
+              )}
             </div>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
