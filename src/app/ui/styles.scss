@@ -211,3 +211,12 @@
   cursor: ew-resize;
   cursor: col-resize;
 }
+
+a {
+  color: blue;
+  cursor: pointer;
+
+  &:hover {
+    color: dodgerblue;
+  }
+}
