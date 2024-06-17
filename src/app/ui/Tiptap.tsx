@@ -3,6 +3,7 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Toolbar from "@/app/ui/Toolbar";
+import { Underline } from "@tiptap/extension-underline";
 
 const Tiptap = ({ onChange, content }: any) => {
   const hangdleChange = (newContent: string) => {
@@ -10,7 +11,7 @@ const Tiptap = ({ onChange, content }: any) => {
   };
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, Underline],
     editorProps: {
       attributes: {
         class:
