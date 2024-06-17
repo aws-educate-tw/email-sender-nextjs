@@ -6,6 +6,7 @@ import Toolbar from "@/app/ui/Toolbar";
 import { Underline } from "@tiptap/extension-underline";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
+import { Link } from "@tiptap/extension-link";
 import "./styles.scss";
 
 const htmltemplate = `
@@ -27,7 +28,16 @@ const Tiptap = ({ onChange, content }: any) => {
   };
 
   const editor = useEditor({
-    extensions: [StarterKit, Underline, BulletList, ListItem],
+    extensions: [
+      StarterKit,
+      Underline,
+      BulletList,
+      ListItem,
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+      }),
+    ],
     editorProps: {
       attributes: {
         class:

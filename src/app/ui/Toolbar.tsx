@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { type Editor } from "@tiptap/react";
 import {
   Bold,
@@ -13,6 +13,7 @@ import {
   Quote,
   Undo,
   Redo,
+  Link,
 } from "lucide-react";
 
 type Props = {
@@ -21,10 +22,44 @@ type Props = {
 };
 
 const Toolbar = ({ editor, content }: Props) => {
-  if (!editor) return null;
+  if (!editor) {
+    return null;
+  }
+
+  const setLink = useCallback(() => {
+    const previousUrl = editor.getAttributes("link").href;
+    const url = window.prompt("URL", previousUrl);
+
+    // cancelled
+    if (url === null) {
+      return;
+    }
+
+    // empty
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+
+      return;
+    }
+
+    // update link
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+  }, [editor]);
+
   return (
     <div className="px-4 py-3 rounded-tl-md rounded-tr-md flex justify-between items-start gap-5 w-full flex-wrap border border-gray-700">
       <div className="flex justify-start items-center gap-5 w-full lg:w-10/12 flex-wrap">
+        <button
+          onClick={setLink}
+          className={
+            editor.isActive("link")
+              ? "bg-sky-700 text-white p-1 rounded-lg"
+              : "text-sky-400 p-1"
+          }
+        >
+          <Link className="w-5 h-5" />
+        </button>
+
         <button
           onClick={(e) => {
             e.preventDefault();
