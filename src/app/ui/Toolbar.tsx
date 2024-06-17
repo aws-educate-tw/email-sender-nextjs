@@ -6,7 +6,9 @@ import {
   Italic,
   List,
   ListOrdered,
+  Heading1,
   Heading2,
+  Heading3,
   Underline,
   Quote,
   Undo,
@@ -78,6 +80,19 @@ const Toolbar = ({ editor, content }: Props) => {
         <button
           onClick={(e) => {
             e.preventDefault();
+            editor.chain().focus().toggleHeading({ level: 1 }).run();
+          }}
+          className={
+            editor.isActive("heading", { level: 1 })
+              ? "bg-sky-700 text-white p-1 rounded-lg"
+              : "text-sky-400 p-1"
+          }
+        >
+          <Heading1 className="w-5 h-5" />
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
             editor.chain().focus().toggleHeading({ level: 2 }).run();
           }}
           className={
@@ -88,7 +103,19 @@ const Toolbar = ({ editor, content }: Props) => {
         >
           <Heading2 className="w-5 h-5" />
         </button>
-
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleHeading({ level: 3 }).run();
+          }}
+          className={
+            editor.isActive("heading", { level: 3 })
+              ? "bg-sky-700 text-white p-1 rounded-lg"
+              : "text-sky-400 p-1"
+          }
+        >
+          <Heading3 className="w-5 h-5" />
+        </button>
         <button
           onClick={(e) => {
             e.preventDefault();
