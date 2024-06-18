@@ -14,6 +14,7 @@ import {
   Undo,
   Redo,
   Link,
+  Image,
 } from "lucide-react";
 
 type Props = {
@@ -46,6 +47,18 @@ const Toolbar = ({ editor, content }: Props) => {
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
+  const addImage = useCallback(() => {
+    const url = window.prompt("URL");
+
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  }, [editor]);
+
+  if (!editor) {
+    return null;
+  }
+
   return (
     <div className="px-4 py-3 rounded-tl-md rounded-tr-md flex justify-between items-start gap-5 w-full flex-wrap border border-gray-700">
       <div className="flex justify-start items-center gap-5 w-full lg:w-10/12 flex-wrap">
@@ -59,7 +72,6 @@ const Toolbar = ({ editor, content }: Props) => {
         >
           <Link className="w-5 h-5" />
         </button>
-
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -189,6 +201,16 @@ const Toolbar = ({ editor, content }: Props) => {
           }
         >
           <Quote className="w-5 h-5" />
+        </button>
+        <button
+          onClick={addImage}
+          className={
+            editor.isActive("image")
+              ? "bg-sky-700 text-white p-1 rounded-lg"
+              : "text-sky-400 p-1"
+          }
+        >
+          <Image className="w-5 h-5" />
         </button>
         <button
           onClick={(e) => {
