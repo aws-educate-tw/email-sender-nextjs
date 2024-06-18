@@ -10,6 +10,7 @@ import { Link } from "@tiptap/extension-link";
 import "./styles.scss";
 import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
+import { useState } from "react";
 
 const htmltemplate = `
     <p>親愛的 {姓名}，</p>
@@ -22,10 +23,25 @@ const htmltemplate = `
     <p>台灣 AWS Educate Cloud Ambassador 官方社群：Facebook＆Instagram</p>
     <p>Best regards,</p>
     <p>Bill Wu</p>
-    <p>AWS Educate Cloud Ambassadorbillwu0222@gmail.com</p>`;
+    <p>AWS Educate Cloud Ambassador</p>
+    <p>billwu0222@gmail.com</p>`;
 
 const Tiptap = ({ onChange, content }: any) => {
-  const hangdleChange = (newContent: string) => {
+  const [editorContent, setEditorContent] = useState(htmltemplate);
+
+  const handleSave = () => {
+    const blob = new Blob([editorContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "editor-content.html";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleChange = (newContent: string) => {
+    console.log(newContent);
+    setEditorContent(newContent);
     onChange(newContent);
   };
 
@@ -50,7 +66,7 @@ const Tiptap = ({ onChange, content }: any) => {
     },
     content: htmltemplate,
     onUpdate: ({ editor }) => {
-      hangdleChange(editor.getHTML());
+      handleChange(editor.getHTML());
     },
   });
 
@@ -58,6 +74,12 @@ const Tiptap = ({ onChange, content }: any) => {
     <div className="w-full px-4">
       <Toolbar editor={editor} content={content} />
       <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
+      <button
+        onClick={handleSave}
+        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+      >
+        Save as HTML
+      </button>
     </div>
   );
 };
