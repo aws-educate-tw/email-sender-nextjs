@@ -8,6 +8,8 @@ import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 import { Link } from "@tiptap/extension-link";
 import "./styles.scss";
+import Image from "@tiptap/extension-image";
+import ImageResize from "tiptap-extension-resize-image";
 
 const htmltemplate = `
     <p>親愛的 {姓名}，</p>
@@ -37,11 +39,13 @@ const Tiptap = ({ onChange, content }: any) => {
         openOnClick: false,
         autolink: true,
       }),
+      Image,
+      ImageResize,
     ],
     editorProps: {
       attributes: {
         class:
-          "flex min-h-96 flex-col px-4 justify-start border-b border-l border-r border-gray-700 text-gray-400 items-start w-full gap-3 font-medium pt-4 rounded-bl-md rounded-br-md outline-none focus:ring-2 focus:ring-sky-900 focus:ring-opacity-50",
+          "w-full flex-col px-4 justify-start border-b border-l border-r border-gray-700 text-gray-400 items-start w-full gap-3 font-medium pt-4 rounded-bl-md rounded-br-md outline-none focus:ring-2 focus:ring-sky-900 focus:ring-opacity-50",
       },
     },
     content: htmltemplate,
