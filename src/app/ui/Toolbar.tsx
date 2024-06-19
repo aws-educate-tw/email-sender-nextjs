@@ -31,28 +31,51 @@ const Toolbar = ({ editor, content }: Props) => {
     const previousUrl = editor.getAttributes("link").href;
     const url = window.prompt("URL", previousUrl);
 
-    // cancelled
     if (url === null) {
       return;
     }
 
-    // empty
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
-
       return;
     }
 
-    // update link
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
-  const addImage = useCallback(() => {
-    const url = window.prompt("URL");
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
 
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    const response = await fetch(
+      "https://sojek1stci.execute-api.ap-northeast-1.amazonaws.com/dev/upload-multiple-file",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+    if (result && result.files && result.files.length > 0) {
+      return result.files[0].file_url;
     }
+
+    return null;
+  };
+
+  const addImage = useCallback(async () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.onchange = async () => {
+      if (fileInput.files && fileInput.files[0]) {
+        const fileUrl = await uploadFile(fileInput.files[0]);
+        if (fileUrl) {
+          editor.chain().focus().setImage({ src: fileUrl }).run();
+        }
+      }
+    };
+    fileInput.click();
   }, [editor]);
 
   if (!editor) {
