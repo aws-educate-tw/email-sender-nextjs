@@ -28,6 +28,9 @@ const htmltemplate = `
 
 const Tiptap = ({ onChange, content }: any) => {
   const [editorContent, setEditorContent] = useState(htmltemplate);
+  const [uploadResponse, setUploadResponse] = useState<null | {
+    error: string;
+  }>(null);
 
   const handleSave = () => {
     const blob = new Blob([editorContent], { type: "text/html" });
@@ -37,6 +40,28 @@ const Tiptap = ({ onChange, content }: any) => {
     a.download = "editor-content.html";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleUpload = async () => {
+    const blob = new Blob([editorContent], { type: "text/html" });
+    const formData = new FormData();
+    formData.append("file", blob, "editor-content.html");
+
+    try {
+      const response = await fetch(
+        "https://sojek1stci.execute-api.ap-northeast-1.amazonaws.com/dev/upload-multiple-file",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+      setUploadResponse(result);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      setUploadResponse({ error: "Upload failed" });
+    }
   };
 
   const handleChange = (newContent: string) => {
@@ -74,12 +99,25 @@ const Tiptap = ({ onChange, content }: any) => {
     <div className="w-full px-4">
       <Toolbar editor={editor} content={content} />
       <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
-      <button
-        onClick={handleSave}
-        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-      >
-        Save as HTML
-      </button>
+      <div className="mt-4">
+        <button
+          onClick={handleSave}
+          className="bg-blue-500 text-white py-2 px-4 rounded mr-4"
+        >
+          Save as HTML
+        </button>
+        <button
+          onClick={handleUpload}
+          className="bg-green-500 text-white py-2 px-4 rounded"
+        >
+          Upload and Show Response
+        </button>
+      </div>
+      {uploadResponse && (
+        <pre className="mt-4 p-4 bg-gray-800 text-white rounded">
+          {JSON.stringify(uploadResponse, null, 2)}
+        </pre>
+      )}
     </div>
   );
 };
