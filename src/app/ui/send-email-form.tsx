@@ -2,7 +2,8 @@
 import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
 import SelectDropdown from "@/app/ui/select-dropdown";
-import FileUpload from "@/app/ui/file-upload";
+// import FileUpload from "@/app/ui/file-upload";
+import Upload from "@/app/ui/upload";
 
 interface SubmitResponse {
   status: string;
@@ -30,38 +31,6 @@ export default function SendEmailForm() {
   const [selectedHtmlFile, setSelectedHtmlFile] = useState("");
   const [selectedXlsxFile, setSelectedXlsxFile] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  // useEffect(() => {
-  //   fetchFiles("html", 30, setTemplateOptions);
-  //   fetchFiles("xlsx", 30, setSpreadsheetOptions);
-  // }, []);
-
-  // const fetchFiles = async (
-  //   file_extension: string,
-  //   limit: number,
-  //   setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>
-  // ) => {
-  //   try {
-  //     const base_url =
-  //       "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
-  //     const url = new URL(`${base_url}/files`);
-  //     url.searchParams.append("file_extension", file_extension);
-  //     url.searchParams.append("limit", limit.toString());
-
-  //     const response = await fetch(url.toString(), {
-  //       method: "GET",
-  //     });
-
-  //     if (!response.ok) {
-  //       const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-  //       throw new Error(errorMessage);
-  //     }
-
-  //     const result = await response.json();
-  //     setFiles(result.data);
-  //   } catch (error: any) {
-  //     alert("Failed to fetch files: " + error.message);
-  //   }
-  // };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -113,22 +82,6 @@ export default function SendEmailForm() {
   };
   const handleCloseUpload = () => {
     setShowUpload(false);
-  };
-
-  const handleFileUploadSuccess = (newFiles: fileDataType[]) => {
-    // setNewUploaded((prev) => !prev);
-    // const htmlFilesUploaded = newFiles.filter(
-    //   (file) => file.file_extension === "html"
-    // );
-    // const xlsxFilesUploaded = newFiles.filter(
-    //   (file) => file.file_extension === "xlsx"
-    // );
-    // setHtmlFiles((prevFiles) =>
-    //   prevFiles ? [...htmlFilesUploaded, ...prevFiles] : htmlFilesUploaded
-    // );
-    // setXlsxFiles((prevFiles) =>
-    //   prevFiles ? [...xlsxFilesUploaded, ...prevFiles] : xlsxFilesUploaded
-    // );
   };
 
   return (
@@ -216,7 +169,7 @@ export default function SendEmailForm() {
                         />
                       </svg>
                     </button>
-                    <FileUpload onFileUploadSuccess={handleFileUploadSuccess} />
+                    <Upload OnFileType=".html" />
                   </div>
                 </div>
               )}
@@ -234,6 +187,36 @@ export default function SendEmailForm() {
                 onSelect={handleXlsxSelect}
                 fileExtension="xlsx"
               />
+              <button
+                type="button"
+                onClick={handleOpenUpload}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                upload
+              </button>
+              {showUpload && (
+                <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg shadow-2xl p-8 pb-20 w-full max-w-screen-lg relative">
+                    <button
+                      onClick={handleCloseUpload}
+                      className="absolute top-8 right-8 text-black"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                        />
+                      </svg>
+                    </button>
+                    <Upload OnFileType=".xlsx" />
+                  </div>
+                </div>
+              )}
             </div>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
