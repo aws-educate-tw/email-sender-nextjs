@@ -94,6 +94,7 @@ export default function SelectDropdown({
 
   const handleSelect = (file_id: string, file_name: string) => {
     onSelect(file_id);
+    console.log("Selected file:", file_id);
     setSelectedFileName(file_name);
     setIsOpen(false);
   };
@@ -164,7 +165,7 @@ export default function SelectDropdown({
                   {filteredOptions.map((option) => (
                     <tr
                       key={option.file_id}
-                      className="hover:bg-gray-200 cursor-pointer"
+                      className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
                       onClick={() =>
                         handleSelect(option.file_id, option.file_name)
                       }
@@ -200,17 +201,14 @@ export default function SelectDropdown({
                   </tr>
                 </thead>
                 <tbody>
-                  <th>
-                    <td className="py-2 px-4 border-b border-gray-200">
+                  <tr>
+                    <td
+                      className="py-2 px-4 border-b border-gray-200"
+                      colSpan={3}
+                    >
                       No files found
                     </td>
-                  </th>
-                  <th>
-                    <td className="py-2 px-4 border-b border-gray-200">-</td>
-                  </th>
-                  <th>
-                    <td className="py-2 px-4 border-b border-gray-200">-</td>
-                  </th>
+                  </tr>
                 </tbody>
               </table>
             </div>

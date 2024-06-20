@@ -31,6 +31,8 @@ export default function SendEmailForm() {
   const [selectedHtmlFile, setSelectedHtmlFile] = useState("");
   const [selectedXlsxFile, setSelectedXlsxFile] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showHtmlUpload, setShowHtmlUpload] = useState<boolean>(false);
+  const [showXlsxUpload, setShowXlsxUpload] = useState<boolean>(false);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,8 +67,6 @@ export default function SendEmailForm() {
     setIsSubmitting(false);
   };
 
-  const [showUpload, setShowUpload] = useState<boolean>(false);
-
   const handleHtmlSelect = (file_id: string) => {
     // console.log("selected html file id", file_id);
     setSelectedHtmlFile(file_id);
@@ -77,11 +77,18 @@ export default function SendEmailForm() {
     setSelectedXlsxFile(file_id);
   };
 
-  const handleOpenUpload = () => {
-    setShowUpload(true);
+  const handleOpenHtmlUpload = () => {
+    setShowHtmlUpload(true);
   };
-  const handleCloseUpload = () => {
-    setShowUpload(false);
+  const handleHtmlCloseUpload = () => {
+    setShowHtmlUpload(false);
+  };
+
+  const handleXlsxOpenUpload = () => {
+    setShowXlsxUpload(true);
+  };
+  const handleXlsxCloseUpload = () => {
+    setShowXlsxUpload(false);
   };
 
   return (
@@ -145,16 +152,16 @@ export default function SendEmailForm() {
               />
               <button
                 type="button"
-                onClick={handleOpenUpload}
+                onClick={handleOpenHtmlUpload}
                 className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
               >
                 upload
               </button>
-              {showUpload && (
+              {showHtmlUpload && (
                 <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
                   <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-screen-lg relative">
                     <button
-                      onClick={handleCloseUpload}
+                      onClick={handleHtmlCloseUpload}
                       className="absolute top-4 right-4 text-black"
                     >
                       <svg
@@ -189,16 +196,16 @@ export default function SendEmailForm() {
               />
               <button
                 type="button"
-                onClick={handleOpenUpload}
+                onClick={handleXlsxOpenUpload}
                 className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
               >
                 upload
               </button>
-              {showUpload && (
+              {showXlsxUpload && (
                 <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
                   <div className="bg-white rounded-lg shadow-2xl p-8 pb-20 w-full max-w-screen-lg relative">
                     <button
-                      onClick={handleCloseUpload}
+                      onClick={handleXlsxCloseUpload}
                       className="absolute top-8 right-8 text-black"
                     >
                       <svg
