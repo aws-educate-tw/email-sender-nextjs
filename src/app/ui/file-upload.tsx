@@ -13,7 +13,11 @@ interface FileDataType {
   uploader_id: string;
 }
 
-export default function FileUpload({ OnFileType }: { OnFileType: string }) {
+export default function FileUpload({
+  OnFileExtension,
+}: {
+  OnFileExtension: string;
+}) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
   const [fileData, setFileData] = useState<FileDataType[]>([]);
@@ -66,7 +70,7 @@ export default function FileUpload({ OnFileType }: { OnFileType: string }) {
     <>
       <div className="flex flex-col justify-center items-start py-3 gap-2">
         <p className="text-4xl font-bold pt-2">Upload new files</p>
-        {OnFileType === "html" ? (
+        {OnFileExtension === ".html" ? (
           <p className="text-gray-500 italic pb-4">
             Upload your email template.
           </p>
@@ -88,7 +92,7 @@ export default function FileUpload({ OnFileType }: { OnFileType: string }) {
             onChange={handleFileChange}
             disabled={isSubmitting}
             multiple
-            accept={OnFileType}
+            accept={OnFileExtension}
           />
           <style jsx>{`
             .custom-fileinput-label {
@@ -99,7 +103,7 @@ export default function FileUpload({ OnFileType }: { OnFileType: string }) {
             className="mt-1 text-sm text-gray-500 dark:text-gray-300 text-right"
             id="file_input_help"
           >
-            only {OnFileType} is accepted
+            only {OnFileExtension} is accepted
           </p>
         </div>
         <div className="flex justify-end py-3">

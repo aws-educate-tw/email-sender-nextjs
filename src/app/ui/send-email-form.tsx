@@ -176,7 +176,7 @@ export default function SendEmailForm() {
                         />
                       </svg>
                     </button>
-                    <FileUpload OnFileType=".html" />
+                    <FileUpload OnFileExtension=".html" />
                   </div>
                 </div>
               )}
@@ -220,7 +220,7 @@ export default function SendEmailForm() {
                         />
                       </svg>
                     </button>
-                    <FileUpload OnFileType=".xlsx" />
+                    <FileUpload OnFileExtension=".xlsx" />
                   </div>
                 </div>
               )}
