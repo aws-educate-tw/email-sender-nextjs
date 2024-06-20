@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import FileTable from "@/app/ui/file-table";
-import FileUpload from "@/app/ui/file-upload";
+import DriveUpload from "@/app/ui/drive-upload";
 
 interface fileDataType {
   file_id: string;
@@ -135,7 +135,7 @@ export default function ListFiles() {
                 />
               </svg>
             </button>
-            <FileUpload onFileUploadSuccess={handleFileUploadSuccess} />
+            <DriveUpload onFileUploadSuccess={handleFileUploadSuccess} />
           </div>
         </div>
       )}

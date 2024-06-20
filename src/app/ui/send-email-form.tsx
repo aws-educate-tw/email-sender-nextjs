@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
 import SelectDropdown from "@/app/ui/select-dropdown";
 // import FileUpload from "@/app/ui/file-upload";
-import Upload from "@/app/ui/upload";
+import FileUpload from "@/app/ui/file-upload";
 
 interface SubmitResponse {
   status: string;
@@ -176,7 +176,7 @@ export default function SendEmailForm() {
                         />
                       </svg>
                     </button>
-                    <Upload OnFileType=".html" />
+                    <FileUpload OnFileType=".html" />
                   </div>
                 </div>
               )}
@@ -220,7 +220,7 @@ export default function SendEmailForm() {
                         />
                       </svg>
                     </button>
-                    <Upload OnFileType=".xlsx" />
+                    <FileUpload OnFileType=".xlsx" />
                   </div>
                 </div>
               )}
