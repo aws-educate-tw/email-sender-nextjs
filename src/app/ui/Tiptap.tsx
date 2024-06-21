@@ -86,7 +86,7 @@ const Tiptap = ({ onChange, content }: any) => {
     editorProps: {
       attributes: {
         class:
-          "w-full flex-col px-4 justify-start border-b border-l border-r border-gray-700 text-gray-400 items-start w-full gap-3 font-medium pt-4 rounded-bl-md rounded-br-md outline-none focus:ring-2 focus:ring-sky-900 focus:ring-opacity-50",
+          "w-full flex-col justify-start text-black items-start w-full gap-3 pt-4 rounded-bl-md rounded-br-md outline-none",
       },
     },
     content: htmltemplate,
@@ -97,8 +97,10 @@ const Tiptap = ({ onChange, content }: any) => {
 
   return (
     <div className="w-full px-4">
-      <Toolbar editor={editor} content={content} />
-      <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
+      <div className="p-3 border-2 border-black flex flex-col justify-between rounded-lg">
+        <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
+        <Toolbar editor={editor} content={content} />
+      </div>
       <div className="mt-4">
         <button
           onClick={handleSave}

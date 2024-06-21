@@ -83,17 +83,20 @@ const Toolbar = ({ editor, content }: Props) => {
   }
 
   return (
-    <div className="px-4 py-3 rounded-tl-md rounded-tr-md flex justify-between items-start gap-5 w-full flex-wrap border border-gray-700">
-      <div className="flex justify-start items-center gap-5 w-full lg:w-10/12 flex-wrap">
+    <div className="">
+      <hr className="mt-12 mb-2 h-0.5 border-t-0 bg-neutral-300" />
+      <div className="flex justify-start items-center gap-1 lg:w-10/12 flex-wrap">
         <button
           onClick={setLink}
           className={
             editor.isActive("link")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Link className="w-5 h-5" />
+          <div className="p-2">
+            <Link className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -102,11 +105,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("bold")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Bold className="w-5 h-5" />
+          <div className="p-2">
+            <Bold className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -115,11 +120,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("italic")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Italic className="w-5 h-5" />
+          <div className="p-2">
+            <Italic className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -128,11 +135,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("underline")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Underline className="w-5 h-5" />
+          <div className="p-2">
+            <Underline className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -141,11 +150,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("strike")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Strikethrough className="w-5 h-5" />
+          <div className="p-2">
+            <Strikethrough className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -154,11 +165,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("heading", { level: 1 })
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Heading1 className="w-5 h-5" />
+          <div className="p-2">
+            <Heading1 className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -167,11 +180,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("heading", { level: 2 })
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Heading2 className="w-5 h-5" />
+          <div className="p-2">
+            <Heading2 className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -180,11 +195,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("heading", { level: 3 })
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Heading3 className="w-5 h-5" />
+          <div className="p-2">
+            <Heading3 className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -193,11 +210,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("bulletList")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <List className="w-5 h-5" />
+          <div className="p-2">
+            <List className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -206,11 +225,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("orderedList")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <ListOrdered className="w-5 h-5" />
+          <div className="p-2">
+            <ListOrdered className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -219,21 +240,25 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("blockquote")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Quote className="w-5 h-5" />
+          <div className="p-2">
+            <Quote className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={addImage}
           className={
             editor.isActive("image")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 p-1"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Image className="w-5 h-5" />
+          <div className="p-2">
+            <Image className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -242,11 +267,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("undo")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 hover:bg-sky-700 hover:text-white p-1 hover:rounded-lg"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Undo className="w-5 h-5" />
+          <div className="p-2">
+            <Undo className="w-5 h-5" />
+          </div>
         </button>
         <button
           onClick={(e) => {
@@ -255,11 +282,13 @@ const Toolbar = ({ editor, content }: Props) => {
           }}
           className={
             editor.isActive("redo")
-              ? "bg-sky-700 text-white p-1 rounded-lg"
-              : "text-sky-400 hover:bg-sky-700 hover:text-white p-1 hover:rounded-lg"
+              ? "border-2 border-neutral-300  bg-neutral-300 rounded text-white hover:bg-neutral-200 active:bg-neutral-100 active:border-neutral-200"
+              : "border-2 border-neutral-300  text-sky-950 rounded shadow-lg hover:bg-neutral-100 active:bg-neutral-300 active:border-neutral-200"
           }
         >
-          <Redo className="w-5 h-5" />
+          <div className="p-2">
+            <Redo className="w-5 h-5" />
+          </div>
         </button>
       </div>
     </div>
