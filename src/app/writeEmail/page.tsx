@@ -21,10 +21,10 @@ export default function Page() {
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <p className="bg-neutral-100 px-8 py-4 text-xl font-bold rounded-lg">
+        <p className="bg-neutral-100 px-8 py-4 text-xl font-bold rounded-lg shadow-md">
           New Email
         </p>
-        <div className="rounded-md bg-neutral-100 p-4">
+        <div className="rounded-md bg-neutral-100 p-4 shadow-md">
           <div className="flex items-center m-3 px-1">
             <label className="min-w-24 text-sm font-medium">主旨 :</label>
             <input

@@ -97,7 +97,7 @@ const Tiptap = ({ onChange, content }: any) => {
   });
 
   return (
-    <div className="w-full px-4">
+    <div className="w-full px-4 pb-6">
       <div
         className={`bg-white p-3 px-6 border-2 border-gray-200 flex flex-col justify-between rounded-lg ${
           isFocused ? "outline outline-2 outline-blue-500" : ""
