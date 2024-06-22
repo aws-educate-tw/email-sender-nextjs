@@ -25,9 +25,9 @@ export async function submitForm(formData: FormData) {
     };
   }
   try {
-    // console.log("data", data.data);
+    console.log("data", data.data);
     const response = await fetch(
-      "https://z5aqrxotn2.execute-api.ap-northeast-1.amazonaws.com/dev/validate-input",
+      "https://58a66niby9.execute-api.ap-northeast-1.amazonaws.com/dev/send-email",
       {
         method: "POST",
         headers: {

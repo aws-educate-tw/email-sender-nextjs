@@ -231,13 +231,22 @@ export default function SendEmailForm() {
           </div>
         </div>
         <div className="w-full flex justify-end my-3 gap-3">
-          <button
-            type="submit"
-            className="text-white min-w-32 flex justify-center items-center bg-sky-950 hover:bg-sky-800 h-10 rounded-lg px-4 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-            disabled={isSubmitting}
-          >
-            Send Emails
-          </button>
+          {isSubmitting ? (
+            <button
+              type="button"
+              className="flex h-10 items-center rounded-lg bg-gray-500 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              disabled
+            >
+              Sending...
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="flex h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            >
+              Send Email
+            </button>
+          )}
         </div>
         {/* <div>template : {selectedHtmlFile}</div> */}
         {/* <div>sheet : {selectedXlsxFile}</div> */}
