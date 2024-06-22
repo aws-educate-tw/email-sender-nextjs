@@ -133,7 +133,7 @@ export default function SelectDropdown({
 
       {isOpen && (
         <div
-          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          className="z-50 p-3 pb-6 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
@@ -175,7 +175,7 @@ export default function SelectDropdown({
             </div>
           ) : filteredOptions && filteredOptions.length > 0 ? (
             <div>
-              <table className="w-full bg-white">
+              <table className="w-full bg-white shadow-md rounded-md">
                 <thead>
                   <tr className="bg-neutral-100 rounded-t-md">
                     <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
@@ -198,7 +198,7 @@ export default function SelectDropdown({
                         handleSelect(option.file_id, option.file_name)
                       }
                     >
-                      <td className="py-2 px-4 border-b border-gray-200">
+                      <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
                         {option.file_name}
                       </td>
                       <td className="py-2 px-4 border-b border-gray-200">
