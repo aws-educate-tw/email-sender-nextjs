@@ -31,6 +31,7 @@ const Tiptap = ({ onChange, content }: any) => {
   const [uploadResponse, setUploadResponse] = useState<null | {
     error: string;
   }>(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSave = () => {
     const blob = new Blob([editorContent], { type: "text/html" });
@@ -97,11 +98,20 @@ const Tiptap = ({ onChange, content }: any) => {
 
   return (
     <div className="w-full px-4">
-      <div className="p-3 border-2 border-black flex flex-col justify-between rounded-lg">
-        <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
+      <div
+        className={`bg-white p-3 px-6 border-2 border-gray-200 flex flex-col justify-between rounded-lg ${
+          isFocused ? "outline outline-2 outline-blue-500" : ""
+        }`}
+      >
+        <EditorContent
+          style={{ whiteSpace: "pre-line" }}
+          editor={editor}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
         <Toolbar editor={editor} content={content} />
       </div>
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <button
           onClick={handleSave}
           className="bg-blue-500 text-white py-2 px-4 rounded mr-4"
@@ -119,7 +129,7 @@ const Tiptap = ({ onChange, content }: any) => {
         <pre className="mt-4 p-4 bg-gray-800 text-white rounded">
           {JSON.stringify(uploadResponse, null, 2)}
         </pre>
-      )}
+      )} */}
     </div>
   );
 };
