@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 
 interface FileDataType {
@@ -13,11 +13,11 @@ interface FileDataType {
   uploader_id: string;
 }
 
-export default function FileUpload({
-  OnFileExtension,
-}: {
-  OnFileExtension: string;
-}) {
+interface FileUploadProps {
+  onFileUploadSuccess: (newFiles: FileDataType[]) => void;
+}
+
+export default function DriveUpload({ onFileUploadSuccess }: FileUploadProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
   const [fileData, setFileData] = useState<FileDataType[]>([]);
@@ -28,7 +28,8 @@ export default function FileUpload({
     }
   };
 
-  const handleUpload = async () => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (files.length === 0) {
       alert("Please select a file to upload.");
       return;
@@ -58,6 +59,14 @@ export default function FileUpload({
       const result = await response.json();
 
       setFileData(result.files);
+      result.files.forEach((file: FileDataType) => {
+        if (file.file_extension === "xlsx") {
+          localStorage.setItem("xlsx_key", file.file_id);
+        } else if (file.file_extension === "html") {
+          localStorage.setItem("html_key", file.file_id);
+        }
+      });
+      onFileUploadSuccess(result.files);
       alert("File uploaded successfully!");
     } catch (error: any) {
       alert("Failed to send form data: " + error.message);
@@ -68,19 +77,14 @@ export default function FileUpload({
 
   return (
     <>
-      <div className="flex flex-col justify-center items-start py-3 gap-2">
+      <div className="flex flex-col justify-center items-center">
         <p className="text-4xl font-bold pt-2">Upload new files</p>
-        {OnFileExtension === ".html" ? (
-          <p className="text-gray-500 italic pb-4">
-            Upload your email template.
-          </p>
-        ) : (
-          <p className="text-gray-500 italic pb-4">
-            Upload your participants sheet.
-          </p>
-        )}
+        <p className="text-gray-500 italic pb-4">
+          Upload your <strong>participants sheet</strong> and{" "}
+          <strong>email template</strong> at once.
+        </p>
       </div>
-      <div>
+      <form onSubmit={onSubmit}>
         <div className="rounded-md bg-neutral-100 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">Select files</label>
           <input
@@ -92,7 +96,6 @@ export default function FileUpload({
             onChange={handleFileChange}
             disabled={isSubmitting}
             multiple
-            accept={OnFileExtension}
           />
           <style jsx>{`
             .custom-fileinput-label {
@@ -103,13 +106,12 @@ export default function FileUpload({
             className="mt-1 text-sm text-gray-500 dark:text-gray-300 text-right"
             id="file_input_help"
           >
-            only {OnFileExtension} is accepted
+            .docx .html .xlsx and .pdf
           </p>
         </div>
         <div className="flex justify-end py-3">
           <button
-            type="button"
-            onClick={handleUpload}
+            type="submit"
             className={`flex h-10 items-center rounded-lg ${
               isSubmitting ? "bg-gray-500" : "bg-sky-950 hover:bg-sky-800"
             } px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
@@ -118,7 +120,7 @@ export default function FileUpload({
             {isSubmitting ? "Uploading..." : "Upload Files"}
           </button>
         </div>
-      </div>
+      </form>
       {fileData && (
         <div className="rounded-md bg-neutral-100 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">
