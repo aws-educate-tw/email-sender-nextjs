@@ -25,8 +25,9 @@ export async function submitForm(formData: FormData) {
     };
   }
   try {
+    console.log("data", data.data);
     const response = await fetch(
-      "https://diyf4tafbl.execute-api.ap-northeast-1.amazonaws.com/dev/send-email",
+      "https://xtbr94xbt7.execute-api.ap-northeast-2.amazonaws.com/dev/send-email",
       {
         method: "POST",
         headers: {
@@ -37,7 +38,7 @@ export async function submitForm(formData: FormData) {
     );
 
     const result = await response.json();
-    // console.log(result);
+    // console.log(result); 
     return {
       status: result.status,
       message: result.message,
