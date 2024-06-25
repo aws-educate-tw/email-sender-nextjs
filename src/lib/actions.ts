@@ -27,7 +27,7 @@ export async function submitForm(formData: FormData) {
   try {
     console.log("data", data.data);
     const response = await fetch(
-      "https://58a66niby9.execute-api.ap-northeast-1.amazonaws.com/dev/send-email",
+      "https://xtbr94xbt7.execute-api.ap-northeast-2.amazonaws.com/dev/send-email",
       {
         method: "POST",
         headers: {
