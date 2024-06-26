@@ -243,10 +243,10 @@ export default function SendEmailForm() {
               )}
               {previewXlsx && (
                 <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50 p-20">
-                  <div className="bg-white rounded-lg shadow-2xl p-8 pb-10 w-full h-full relative">
+                  <div className="bg-green-700 rounded-lg shadow-2xl p-8 pb-12 w-full h-full relative">
                     <button
                       onClick={handlePreviewXlsxClose}
-                      className="absolute top-8 right-8 text-black"
+                      className="absolute top-8 right-8 text-white"
                     >
                       <svg
                         width="24"
@@ -261,7 +261,7 @@ export default function SendEmailForm() {
                       </svg>
                     </button>
                     <div className="w-full h-full p-2 flex flex-col">
-                      <p className="text-2xl">Preview xlsx</p>
+                      <p className="text-2xl text-white">Preview xlsx</p>
                       <IframePreview
                         src="https://view.officeapps.live.com/op/view.aspx?src=https://github.com/user-attachments/files/15975003/e5a31a0a586a41f88ee5f3a8955bee2f_scrum7-0618.xlsx"
                         title="Participants Sheet Preview"

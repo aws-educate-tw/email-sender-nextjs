@@ -14,13 +14,13 @@ export default function IframePreview({
   height,
 }: IframePreviewProps) {
   return (
-    <div style={{ width, height }}>
+    <div style={{ width, height }} className="shadow-xl">
       <iframe
         src={src}
         title={title}
         width="100%"
         height="100%"
-        style={{ border: "none" }}
+        style={{ border: "none", borderRadius: "8px" }}
       />
     </div>
   );
