@@ -44,7 +44,7 @@ export default function FileUpload({
 
     try {
       const response = await fetch(
-        "https://sojek1stci.execute-api.ap-northeast-1.amazonaws.com/dev/upload-multiple-file",
+        "https://api.tpet.awseducate.systems/dev/upload-multiple-file",
         {
           method: "POST",
           body: formData,
