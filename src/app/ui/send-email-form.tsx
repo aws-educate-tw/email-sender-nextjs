@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState, useEffect, FormEvent } from "react";
+import React, { useRef, useState, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
 import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "./attach-dropdown";
@@ -41,19 +41,30 @@ export default function SendEmailForm() {
   const [showAttachUpload, setShowAttachUpload] = useState<boolean>(false);
 
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
+  const [isGenerateCertificate, setIsGenerateCertificate] =
+    useState<boolean>(false);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!ref.current) return;
 
-    const formData = new FormData(ref.current);
-    formData.append("template_file_id", selectedHtmlFile);
-    formData.append("spreadsheet_file_id", selectedXlsxFile);
+    const formData = {
+      subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement)
+        .value,
+      display_name: (
+        ref.current.querySelector("[id='display_name']") as HTMLInputElement
+      ).value,
+      template_file_id: selectedHtmlFile,
+      spreadsheet_file_id: selectedXlsxFile,
+      attachment_file_ids: attachment_file_ids,
+      is_generate_certificate: isGenerateCertificate,
+    };
 
+    console.log(formData.attachment_file_ids);
     setIsSubmitting(true);
     try {
       const response: SubmitResponse = (await submitForm(
-        formData
+        JSON.stringify(formData)
       )) as SubmitResponse;
 
       if (response.status === "error" && response.errors) {
@@ -67,7 +78,7 @@ export default function SendEmailForm() {
       }
 
       alert(response.status + ": " + response.message);
-      setErrors({}); // Clear previous errors
+      setErrors({});
       ref.current.reset();
     } catch (error: any) {
       alert("Failed to send form data: " + error.message);
@@ -76,14 +87,11 @@ export default function SendEmailForm() {
   };
 
   const handleHtmlSelect = (file_id: string, file_url: string) => {
-    // console.log("selected html file id", file_id);
     setSelectedHtmlFile(file_id);
     setHtmlPreviewLink(file_url);
   };
 
   const handleXlsxSelect = (file_id: string, file_url: string) => {
-    // console.log("selected xlsx file id", file_id);
-    // console.log("selected xlsx file url", file_url);
     setSelectedXlsxFile(file_id);
     setXlsxPreviewLink(file_url);
   };
@@ -91,7 +99,7 @@ export default function SendEmailForm() {
   const handleAttachSelect = (selectedFiles: any) => {
     const selected_ids = selectedFiles.map((file: any) => file.file_id);
     setAttachment_file_ids(selected_ids);
-    // console.log("selected attachment file ids", selected_ids);
+    console.log("selected attachment file ids", selected_ids);
   };
 
   const handleOpenHtmlUpload = () => {
