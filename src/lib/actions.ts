@@ -27,32 +27,28 @@ export async function submitForm(data: string) {
   }
 
   try {
-    console.log("data", validation.data);
-    return {
-      status: "success",
-      message: "Form data is valid",
-    }
-    // const base_url = "https://api.tpet.awseducate.systems/dev";
-    // const url = new URL(`${base_url}/send-email`);
-    // const response = await fetch(
-    //   url.toString(),
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(validation.data)
-    //   }
-    // );
+    // console.log("data", validation.data);
+    const base_url = "https://api.tpet.awseducate.systems/dev";
+    const url = new URL(`${base_url}/send-email`);
+    const response = await fetch(
+      url.toString(),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(validation.data)
+      }
+    );
 
-    // const result = await response.json();
-    // return {
-    //   status: result.status,
-    //   message: result.message,
-    //   request_id: result.request_id,
-    //   timestamp: result.timestamp,
-    //   sqs_message_id: result.sqs_message_id,
-    // };
+    const result = await response.json();
+    return {
+      status: result.status,
+      message: result.message,
+      request_id: result.request_id,
+      timestamp: result.timestamp,
+      sqs_message_id: result.sqs_message_id,
+    };
   } catch (error: any) {
     return {
       status: "error",

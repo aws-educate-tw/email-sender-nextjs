@@ -140,6 +140,12 @@ export default function SendEmailForm() {
     setPreviewXlsx(false);
   };
 
+  // const handleCertificateChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   setIsGenerateCertificate(event.target.value === "yes");
+  // };
+
   return (
     <>
       <div className="flex flex-col justify-center items-start">
@@ -406,6 +412,45 @@ export default function SendEmailForm() {
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
             )}
+          </div>
+          <div className="my-5 mx-3">
+            <label className="mb-2 block text-sm font-medium">
+              Provide a certification of participation?
+            </label>
+            <div className="flex">
+              <div className="flex items-center me-4">
+                <input
+                  id="inline-radio"
+                  type="radio"
+                  value="yes"
+                  onChange={() => setIsGenerateCertificate(true)}
+                  name="inline-radio-group"
+                  className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                ></input>
+                <label
+                  htmlFor="inline-radio"
+                  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                >
+                  Yes
+                </label>
+              </div>
+              <div className="flex items-center me-4">
+                <input
+                  id="inline-2-radio"
+                  type="radio"
+                  value="no"
+                  onChange={() => setIsGenerateCertificate(false)}
+                  name="inline-radio-group"
+                  className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                ></input>
+                <label
+                  htmlFor="inline-2-radio"
+                  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                >
+                  No
+                </label>
+              </div>
+            </div>
           </div>
         </div>
         <div className="w-full flex justify-end my-3 gap-3">
