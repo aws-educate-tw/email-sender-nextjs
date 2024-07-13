@@ -2,10 +2,9 @@
 import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
 import SelectDropdown from "@/app/ui/select-dropdown";
-// import FileUpload from "@/app/ui/file-upload";
+import AttachDropdown from "./attach-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
-import { set } from "zod";
 
 interface SubmitResponse {
   status: string;
@@ -39,6 +38,9 @@ export default function SendEmailForm() {
   const [showXlsxUpload, setShowXlsxUpload] = useState<boolean>(false);
   const [previewHtml, setPreviewHtml] = useState<boolean>(false);
   const [previewXlsx, setPreviewXlsx] = useState<boolean>(false);
+  const [showAttachUpload, setShowAttachUpload] = useState<boolean>(false);
+
+  const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -86,6 +88,12 @@ export default function SendEmailForm() {
     setXlsxPreviewLink(file_url);
   };
 
+  const handleAttachSelect = (selectedFiles: any) => {
+    const selected_ids = selectedFiles.map((file: any) => file.file_id);
+    setAttachment_file_ids(selected_ids);
+    // console.log("selected attachment file ids", selected_ids);
+  };
+
   const handleOpenHtmlUpload = () => {
     setShowHtmlUpload(true);
   };
@@ -98,6 +106,14 @@ export default function SendEmailForm() {
   };
   const handleXlsxCloseUpload = () => {
     setShowXlsxUpload(false);
+  };
+
+  const handleAttachOpenUpload = () => {
+    setShowAttachUpload(true);
+  };
+
+  const handleAttachCloseUpload = () => {
+    setShowAttachUpload(false);
   };
 
   const handlePreviewHtml = () => {
@@ -334,6 +350,47 @@ export default function SendEmailForm() {
                         </div>
                       )}
                     </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {errors.template_file_id && (
+              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
+            )}
+          </div>
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">
+              Attach files:
+            </label>
+            <div className="flex items-center gap-2">
+              <AttachDropdown onSelect={handleAttachSelect} />
+              <button
+                type="button"
+                onClick={handleAttachOpenUpload}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                upload
+              </button>
+              {showAttachUpload && (
+                <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg shadow-2xl p-8 pb-20 w-full max-w-screen-lg relative">
+                    <button
+                      onClick={handleAttachCloseUpload}
+                      className="absolute top-8 right-8 text-black"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                        />
+                      </svg>
+                    </button>
+                    <FileUpload OnFileExtension="all" />
                   </div>
                 </div>
               )}
