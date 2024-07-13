@@ -65,8 +65,7 @@ export default function SelectDropdown({
   const fetchFiles = async (file_extension: string, limit: number) => {
     try {
       setIsLoading(true);
-      const base_url =
-        "https://8um2zizr80.execute-api.ap-northeast-1.amazonaws.com/dev";
+      const base_url = "https://api.tpet.awseducate.systems/dev";
       const url = new URL(`${base_url}/files`);
       url.searchParams.append("file_extension", file_extension);
       url.searchParams.append("limit", limit.toString());

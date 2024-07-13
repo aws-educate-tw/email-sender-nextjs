@@ -43,13 +43,12 @@ export default function FileUpload({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        "https://sojek1stci.execute-api.ap-northeast-1.amazonaws.com/dev/upload-multiple-file",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const base_url = "https://api.tpet.awseducate.systems/dev";
+      const url = new URL(`${base_url}/upload-multiple-file`);
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        body: formData,
+      });
 
       if (!response.ok) {
         const errorMessage = `Upload failed: ${response.status} - ${response.statusText}`;

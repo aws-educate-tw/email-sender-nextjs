@@ -26,8 +26,10 @@ export async function submitForm(formData: FormData) {
   }
   try {
     console.log("data", data.data);
+    const base_url = "https://api.tpet.awseducate.systems/dev";
+    const url = new URL(`${base_url}/send-email`);
     const response = await fetch(
-      "https://xtbr94xbt7.execute-api.ap-northeast-2.amazonaws.com/dev/send-email",
+      url.toString(),
       {
         method: "POST",
         headers: {
