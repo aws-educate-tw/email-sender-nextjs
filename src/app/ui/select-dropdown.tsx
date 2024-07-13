@@ -15,7 +15,7 @@ interface fileDataType {
 }
 
 interface SelectDropdownProps {
-  onSelect: (file_id: string) => void;
+  onSelect: (file_id: string, file_url: string) => void;
   fileExtension: string;
 }
 
@@ -95,8 +95,12 @@ export default function SelectDropdown({
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (file_id: string, file_name: string) => {
-    onSelect(file_id);
+  const handleSelect = (
+    file_id: string,
+    file_url: string,
+    file_name: string
+  ) => {
+    onSelect(file_id, file_url);
     console.log("Selected file:", file_id);
     setSelectedFileName(file_name);
     setIsOpen(false);
@@ -194,7 +198,11 @@ export default function SelectDropdown({
                       key={option.file_id}
                       className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
                       onClick={() =>
-                        handleSelect(option.file_id, option.file_name)
+                        handleSelect(
+                          option.file_id,
+                          option.file_url,
+                          option.file_name
+                        )
                       }
                     >
                       <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">

@@ -4,6 +4,8 @@ import { submitForm } from "@/lib/actions";
 import SelectDropdown from "@/app/ui/select-dropdown";
 // import FileUpload from "@/app/ui/file-upload";
 import FileUpload from "@/app/ui/file-upload";
+import IframePreview from "@/app/ui/iframe-preview";
+import { set } from "zod";
 
 interface SubmitResponse {
   status: string;
@@ -30,9 +32,13 @@ export default function SendEmailForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedHtmlFile, setSelectedHtmlFile] = useState("");
   const [selectedXlsxFile, setSelectedXlsxFile] = useState("");
+  const [htmlPreviewLink, setHtmlPreviewLink] = useState<string>("");
+  const [xlsxPreviewLink, setXlsxPreviewLink] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showHtmlUpload, setShowHtmlUpload] = useState<boolean>(false);
   const [showXlsxUpload, setShowXlsxUpload] = useState<boolean>(false);
+  const [previewHtml, setPreviewHtml] = useState<boolean>(false);
+  const [previewXlsx, setPreviewXlsx] = useState<boolean>(false);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -67,14 +73,17 @@ export default function SendEmailForm() {
     setIsSubmitting(false);
   };
 
-  const handleHtmlSelect = (file_id: string) => {
+  const handleHtmlSelect = (file_id: string, file_url: string) => {
     // console.log("selected html file id", file_id);
     setSelectedHtmlFile(file_id);
+    setHtmlPreviewLink(file_url);
   };
 
-  const handleXlsxSelect = (file_id: string) => {
+  const handleXlsxSelect = (file_id: string, file_url: string) => {
     // console.log("selected xlsx file id", file_id);
+    // console.log("selected xlsx file url", file_url);
     setSelectedXlsxFile(file_id);
+    setXlsxPreviewLink(file_url);
   };
 
   const handleOpenHtmlUpload = () => {
@@ -89,6 +98,22 @@ export default function SendEmailForm() {
   };
   const handleXlsxCloseUpload = () => {
     setShowXlsxUpload(false);
+  };
+
+  const handlePreviewHtml = () => {
+    setPreviewHtml(true);
+  };
+
+  const handlePreviewHtmlClose = () => {
+    setPreviewHtml(false);
+  };
+
+  const handlePreviewXlsx = () => {
+    setPreviewXlsx(true);
+  };
+
+  const handlePreviewXlsxClose = () => {
+    setPreviewXlsx(false);
   };
 
   return (
@@ -152,6 +177,13 @@ export default function SendEmailForm() {
               />
               <button
                 type="button"
+                onClick={handlePreviewHtml}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                preview
+              </button>
+              <button
+                type="button"
                 onClick={handleOpenHtmlUpload}
                 className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
               >
@@ -180,6 +212,43 @@ export default function SendEmailForm() {
                   </div>
                 </div>
               )}
+              {previewHtml && (
+                <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50 p-20">
+                  <div className="bg-yellow-400 rounded-lg shadow-2xl p-8 pb-12 w-full h-full relative">
+                    <button
+                      onClick={handlePreviewHtmlClose}
+                      className="absolute top-8 right-8 text-white"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                        />
+                      </svg>
+                    </button>
+                    <div className="w-full h-full p-2 flex flex-col">
+                      <p className="text-2xl text-white">Preview Html</p>
+                      {htmlPreviewLink ? (
+                        <IframePreview
+                          src={htmlPreviewLink}
+                          title="Participants Sheet Preview"
+                          width="100%"
+                          height="100%"
+                        />
+                      ) : (
+                        <div className="flex w-full h-full justify-center items-center">
+                          <p className="text-white">No preview available</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             {errors.template_file_id && (
               <p className="text-red-500 text-sm">{errors.template_file_id}</p>
@@ -194,6 +263,13 @@ export default function SendEmailForm() {
                 onSelect={handleXlsxSelect}
                 fileExtension="xlsx"
               />
+              <button
+                type="button"
+                onClick={handlePreviewXlsx}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                preview
+              </button>
               <button
                 type="button"
                 onClick={handleXlsxOpenUpload}
@@ -221,6 +297,43 @@ export default function SendEmailForm() {
                       </svg>
                     </button>
                     <FileUpload OnFileExtension=".xlsx" />
+                  </div>
+                </div>
+              )}
+              {previewXlsx && (
+                <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50 p-20">
+                  <div className="bg-green-700 rounded-lg shadow-2xl p-8 pb-12 w-full h-full relative">
+                    <button
+                      onClick={handlePreviewXlsxClose}
+                      className="absolute top-8 right-8 text-white"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                        />
+                      </svg>
+                    </button>
+                    <div className="w-full h-full p-2 flex flex-col">
+                      <p className="text-2xl text-white">Preview xlsx</p>
+                      {xlsxPreviewLink ? (
+                        <IframePreview
+                          src={`https://view.officeapps.live.com/op/view.aspx?src=${xlsxPreviewLink}`}
+                          title="Participants Sheet Preview"
+                          width="100%"
+                          height="100%"
+                        />
+                      ) : (
+                        <div className="flex w-full h-full justify-center items-center">
+                          <p className="text-white">No preview available</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
