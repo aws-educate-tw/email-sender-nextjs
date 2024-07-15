@@ -46,14 +46,13 @@ const Toolbar = ({ editor, content }: Props) => {
   const uploadFile = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
+    const base_url = "https://api.tpet.awseducate.systems/dev";
+    const url = new URL(`${base_url}/upload-multiple-file`);
 
-    const response = await fetch(
-      "https://sojek1stci.execute-api.ap-northeast-1.amazonaws.com/dev/upload-multiple-file",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      body: formData,
+    });
 
     const result = await response.json();
     if (result && result.files && result.files.length > 0) {

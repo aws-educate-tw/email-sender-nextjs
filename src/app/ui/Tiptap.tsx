@@ -43,27 +43,26 @@ const Tiptap = ({ onChange, content }: any) => {
     URL.revokeObjectURL(url);
   };
 
-  const handleUpload = async () => {
-    const blob = new Blob([editorContent], { type: "text/html" });
-    const formData = new FormData();
-    formData.append("file", blob, "editor-content.html");
+  // const handleUpload = async () => {
+  //   const blob = new Blob([editorContent], { type: "text/html" });
+  //   const formData = new FormData();
+  //   formData.append("file", blob, "editor-content.html");
 
-    try {
-      const response = await fetch(
-        "https://sojek1stci.execute-api.ap-northeast-1.amazonaws.com/dev/upload-multiple-file",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+  //   try {
+  //     const base_url = "https://api.tpet.awseducate.systems/dev";
+  //     const url = new URL(`${base_url}/upload-multiple-file`);
+  //     const response = await fetch(url.toString(), {
+  //       method: "POST",
+  //       body: formData,
+  //     });
 
-      const result = await response.json();
-      setUploadResponse(result);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      setUploadResponse({ error: "Upload failed" });
-    }
-  };
+  //     const result = await response.json();
+  //     setUploadResponse(result);
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //     setUploadResponse({ error: "Upload failed" });
+  //   }
+  // };
 
   const handleChange = (newContent: string) => {
     console.log(newContent);
