@@ -57,13 +57,13 @@ export default function FileUpload({
       const result = await response.json();
 
       setFileData(result.files);
-      result.files.forEach((file: FileDataType) => {
-        if (file.file_extension === "xlsx") {
-          localStorage.setItem("xlsx_key", file.file_id);
-        } else if (file.file_extension === "html") {
-          localStorage.setItem("html_key", file.file_id);
-        }
-      });
+      // result.files.forEach((file: FileDataType) => {
+      //   if (file.file_extension === "xlsx") {
+      //     localStorage.setItem("xlsx_key", file.file_id);
+      //   } else if (file.file_extension === "html") {
+      //     localStorage.setItem("html_key", file.file_id);
+      //   }
+      // });
       // onFileUploadSuccess(result.files);
       alert("File uploaded successfully!");
     } catch (error: any) {
@@ -81,10 +81,14 @@ export default function FileUpload({
           <p className="text-gray-500 italic pb-4">
             Upload your email template.
           </p>
-        ) : (
+        ) : OnFileExtension === ".xlsx" ? (
           <p className="text-gray-500 italic pb-4">
             Upload your participants sheet.
           </p>
+        ) : OnFileExtension === "all" ? (
+          <p className="text-gray-500 italic pb-4">Attach your files.</p>
+        ) : (
+          <p className="text-gray-500 italic pb-4">Unsupported file type.</p>
         )}
       </div>
       <div>
@@ -106,12 +110,21 @@ export default function FileUpload({
               background-color: #082f49;
             }
           `}</style>
-          <p
-            className="mt-1 text-sm text-gray-500 dark:text-gray-300 text-right"
-            id="file_input_help"
-          >
-            only {OnFileExtension} is accepted
-          </p>
+          {OnFileExtension === "all" ? (
+            <p
+              className="mt-1 text-sm text-gray-500 dark:text-gray-300 text-right"
+              id="file_input_help"
+            >
+              all types of files are accepted
+            </p>
+          ) : (
+            <p
+              className="mt-1 text-sm text-gray-500 dark:text-gray-300 text-right"
+              id="file_input_help"
+            >
+              only {OnFileExtension} is accepted
+            </p>
+          )}
         </div>
         <div className="flex justify-end py-3">
           <button
