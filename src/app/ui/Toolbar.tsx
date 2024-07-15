@@ -23,11 +23,8 @@ type Props = {
 };
 
 const Toolbar = ({ editor, content }: Props) => {
-  if (!editor) {
-    return null;
-  }
-
   const setLink = useCallback(() => {
+    if (!editor) return;
     const previousUrl = editor.getAttributes("link").href;
     const url = window.prompt("URL", previousUrl);
 
@@ -63,6 +60,7 @@ const Toolbar = ({ editor, content }: Props) => {
   };
 
   const addImage = useCallback(async () => {
+    if (!editor) return;
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = "image/*";
