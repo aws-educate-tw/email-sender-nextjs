@@ -11,7 +11,7 @@ import "./styles.scss";
 import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
 import { useState } from "react";
-import { Download, Upload } from "lucide-react";
+import NextStepLink from "next/link";
 
 const htmltemplate = `
     <p>親愛的 {Name}，</p>
@@ -29,20 +29,9 @@ const htmltemplate = `
 
 const Tiptap = ({ onChange, content }: any) => {
   const [editorContent, setEditorContent] = useState(htmltemplate);
-  const [uploadResponse, setUploadResponse] = useState<null | {
-    error: string;
-  }>(null);
   const [isFocused, setIsFocused] = useState(false);
-
-  const handleSave = () => {
-    const blob = new Blob([editorContent], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "html-generate.html";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const [isUploading, setIsUploading] = useState(false);
+  const [showNextStep, setShowNextStep] = useState(false);
 
   const handleUpload = async () => {
     const blob = new Blob([editorContent], { type: "text/html" });
@@ -52,17 +41,18 @@ const Tiptap = ({ onChange, content }: any) => {
     try {
       const base_url = "https://api.tpet.awseducate.systems/dev";
       const url = new URL(`${base_url}/upload-multiple-file`);
+      setIsUploading(true);
       const response = await fetch(url.toString(), {
         method: "POST",
         body: formData,
       });
-
       const result = await response.json();
+      console.log(result);
+      setIsUploading(false);
+      setShowNextStep(true);
       alert("You have uploaded the html file successfully!");
-      setUploadResponse(result);
     } catch (error) {
       console.error("Upload failed:", error);
-      setUploadResponse({ error: "Upload failed" });
     }
   };
 
@@ -98,38 +88,53 @@ const Tiptap = ({ onChange, content }: any) => {
   });
 
   return (
-    <div className="w-full px-4 pb-6">
-      <div
-        className={`bg-white p-3 px-6 border-2 border-gray-200 flex flex-col justify-between rounded-lg ${
-          isFocused ? "outline outline-2 outline-blue-500" : ""
-        }`}
-      >
-        <EditorContent
-          style={{ whiteSpace: "pre-line" }}
-          editor={editor}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-        />
-        <Toolbar editor={editor} content={content} />
+    <>
+      <div className="w-full p-4 rounded-md bg-neutral-100">
+        <div
+          className={`bg-white p-3 px-6 border-2 border-gray-200 flex flex-col justify-between rounded-lg ${
+            isFocused ? "outline outline-2 outline-blue-500" : ""
+          }`}
+        >
+          <EditorContent
+            style={{ whiteSpace: "pre-line" }}
+            editor={editor}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          />
+          <Toolbar editor={editor} content={content} />
+        </div>
       </div>
       <div className="mt-4 flex justify-end gap-2">
         {/* <button onClick={handleSave} className="">
-          <Download className="w-5 h-5" />
-        </button> */}
-        <button
-          onClick={handleUpload}
-          className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-        >
-          <Upload className="w-5 h-5" />
-          <p className="px-2">Save as template</p>
-        </button>
+            <Download className="w-5 h-5" />
+          </button> */}
+        {isUploading ? (
+          <button
+            onClick={handleUpload}
+            className="flex h-10 items-center rounded-lg bg-gray-500 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            disabled
+          >
+            Saving...
+          </button>
+        ) : (
+          <button
+            onClick={handleUpload}
+            className="flex h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+          >
+            {/* <Upload className="w-5 h-5" /> */}
+            Save as template
+          </button>
+        )}
+        {showNextStep && (
+          <NextStepLink
+            href="/sendEmail"
+            className="flex h-10 items-center rounded-lg bg-sky-800 hover:bg-sky-700 hover:text-white px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+          >
+            Next Step &rarr;
+          </NextStepLink>
+        )}
       </div>
-      {/* {uploadResponse && (
-        <pre className="mt-4 p-4 bg-gray-800 text-white rounded">
-          {JSON.stringify(uploadResponse, null, 2)}
-        </pre>
-      )} */}
-    </div>
+    </>
   );
 };
 
