@@ -11,9 +11,10 @@ import "./styles.scss";
 import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
 import { useState } from "react";
+import { Download, Upload } from "lucide-react";
 
 const htmltemplate = `
-    <p>親愛的 {姓名}，</p>
+    <p>親愛的 {Name}，</p>
     <p>您好！恭喜您成功加入<strong class="highlight">「6th AWS Educate Taiwan 雲端校園大使證照陪跑計畫」</strong>！非常高興您決定與我們一起踏上學習的旅程，共同探索雲端技術的無限可能！</p>
     <p>為確保您能夠有效利用本計畫資源，校園大使團隊精心統整許多考照資源於在 Notion Page，並建立 Discord 社群以促進更深入的討論和即時互動，讓您可以輕鬆地提問並與大使互動問答。</p>
     <p>您可以透過以下連結訪問：<br>Notion Page：<a target="_blank" href="https://aws-educate-tw.notion.site/AWS-0824fda6e4aa470e863c4d91daf9563a">點擊這裡</a><br>Discord 社群：{Discord Link}</p>
@@ -38,31 +39,32 @@ const Tiptap = ({ onChange, content }: any) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "editor-content.html";
+    a.download = "html-generate.html";
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  // const handleUpload = async () => {
-  //   const blob = new Blob([editorContent], { type: "text/html" });
-  //   const formData = new FormData();
-  //   formData.append("file", blob, "editor-content.html");
+  const handleUpload = async () => {
+    const blob = new Blob([editorContent], { type: "text/html" });
+    const formData = new FormData();
+    formData.append("file", blob, "html-generate.html");
 
-  //   try {
-  //     const base_url = "https://api.tpet.awseducate.systems/dev";
-  //     const url = new URL(`${base_url}/upload-multiple-file`);
-  //     const response = await fetch(url.toString(), {
-  //       method: "POST",
-  //       body: formData,
-  //     });
+    try {
+      const base_url = "https://api.tpet.awseducate.systems/dev";
+      const url = new URL(`${base_url}/upload-multiple-file`);
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        body: formData,
+      });
 
-  //     const result = await response.json();
-  //     setUploadResponse(result);
-  //   } catch (error) {
-  //     console.error("Upload failed:", error);
-  //     setUploadResponse({ error: "Upload failed" });
-  //   }
-  // };
+      const result = await response.json();
+      alert("You have uploaded the html file successfully!");
+      setUploadResponse(result);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      setUploadResponse({ error: "Upload failed" });
+    }
+  };
 
   const handleChange = (newContent: string) => {
     console.log(newContent);
@@ -110,21 +112,19 @@ const Tiptap = ({ onChange, content }: any) => {
         />
         <Toolbar editor={editor} content={content} />
       </div>
-      {/* <div className="mt-4">
-        <button
-          onClick={handleSave}
-          className="bg-blue-500 text-white py-2 px-4 rounded mr-4"
-        >
-          Save as HTML
-        </button>
+      <div className="mt-4 flex justify-end gap-2">
+        {/* <button onClick={handleSave} className="">
+          <Download className="w-5 h-5" />
+        </button> */}
         <button
           onClick={handleUpload}
-          className="bg-green-500 text-white py-2 px-4 rounded"
+          className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
         >
-          Upload and Show Response
+          <Upload className="w-5 h-5" />
+          <p className="px-2">Save as template</p>
         </button>
       </div>
-      {uploadResponse && (
+      {/* {uploadResponse && (
         <pre className="mt-4 p-4 bg-gray-800 text-white rounded">
           {JSON.stringify(uploadResponse, null, 2)}
         </pre>
