@@ -28,14 +28,6 @@ export default function ListFiles() {
   const [showUpload, setShowUpload] = useState<boolean>(false);
   const limit = 10;
 
-  useEffect(() => {
-    if (!hasFetched.current) {
-      fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
-      fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
-      hasFetched.current = true;
-    }
-  }, []);
-
   const fetchFiles = async (
     file_extension: string,
     setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>,
@@ -75,6 +67,14 @@ export default function ListFiles() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      fetchFiles("xlsx", setXlsxFiles, setXlsxLastEvaluatedKey);
+      fetchFiles("html", setHtmlFiles, setHtmlLastEvaluatedKey);
+      hasFetched.current = true;
+    }
+  }, [fetchFiles]);
 
   const handleOpenUpload = () => {
     setShowUpload(true);
