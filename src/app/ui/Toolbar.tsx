@@ -43,7 +43,7 @@ const Toolbar = ({ editor, content }: Props) => {
   const uploadFile = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    const base_url = "https://api.tpet.awseducate.systems/dev";
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/upload-multiple-file`);
 
     const response = await fetch(url.toString(), {
