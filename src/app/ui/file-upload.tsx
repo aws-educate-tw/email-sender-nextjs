@@ -43,7 +43,7 @@ export default function FileUpload({
     setIsSubmitting(true);
 
     try {
-      const base_url = "https://api.tpet.awseducate.systems/dev";
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/upload-multiple-file`);
       const response = await fetch(url.toString(), {
         method: "POST",

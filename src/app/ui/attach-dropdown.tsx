@@ -58,7 +58,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
   const fetchFiles = async (limit: number) => {
     try {
       setIsLoading(true);
-      const base_url = "https://api.tpet.awseducate.systems/dev";
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/files`);
       url.searchParams.append("limit", limit.toString());
 

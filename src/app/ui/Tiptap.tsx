@@ -50,7 +50,7 @@ const Tiptap = ({ onChange, content }: any) => {
     formData.append("file", blob, "html-generate.html");
 
     try {
-      const base_url = "https://api.tpet.awseducate.systems/dev";
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/upload-multiple-file`);
       setIsUploading(true);
       const response = await fetch(url.toString(), {

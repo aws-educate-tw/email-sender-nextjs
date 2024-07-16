@@ -28,7 +28,7 @@ export async function submitForm(data: string) {
 
   try {
     // console.log("data", validation.data);
-    const base_url = "https://api.tpet.awseducate.systems/dev";
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(
       url.toString(),
