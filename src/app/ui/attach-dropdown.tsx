@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import { formatFileSize } from "@/lib/utils/dataUtils";
+import { convertToTaipeiTime, formatFileSize } from "@/lib/utils/dataUtils";
 
 interface fileDataType {
   file_id: string;
@@ -14,15 +13,11 @@ interface fileDataType {
   uploader_id: string;
 }
 
-interface SelectDropdownProps {
-  onSelect: (file_id: string, file_url: string) => void;
-  fileExtension: string;
+interface AttachDropdownProps {
+  onSelect: (selectedFiles: { file_id: string; file_url: string }[]) => void;
 }
 
-export default function SelectDropdown({
-  onSelect,
-  fileExtension,
-}: SelectDropdownProps) {
+export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
   const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
     null
   );
@@ -32,9 +27,7 @@ export default function SelectDropdown({
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFileName, setSelectedFileName] = useState(
-    `Select a ${fileExtension} file`
-  );
+  const [selectedFiles, setSelectedFiles] = useState<fileDataType[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,12 +55,11 @@ export default function SelectDropdown({
     };
   }, [dropdownRef]);
 
-  const fetchFiles = async (file_extension: string, limit: number) => {
+  const fetchFiles = async (limit: number) => {
     try {
       setIsLoading(true);
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/files`);
-      url.searchParams.append("file_extension", file_extension);
       url.searchParams.append("limit", limit.toString());
 
       const response = await fetch(url.toString(), {
@@ -90,20 +82,30 @@ export default function SelectDropdown({
 
   const toggleDropdown = () => {
     if (!isOpen) {
-      fetchFiles(fileExtension, 5);
+      fetchFiles(15);
     }
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (
-    file_id: string,
-    file_url: string,
-    file_name: string
-  ) => {
-    onSelect(file_id, file_url);
-    console.log("Selected file:", file_id);
-    setSelectedFileName(file_name);
-    setIsOpen(false);
+  const handleSelect = (file: fileDataType) => {
+    const alreadySelected = selectedFiles.some(
+      (selectedFile) => selectedFile.file_id === file.file_id
+    );
+    let updatedSelectedFiles;
+    if (alreadySelected) {
+      updatedSelectedFiles = selectedFiles.filter(
+        (selectedFile) => selectedFile.file_id !== file.file_id
+      );
+    } else {
+      updatedSelectedFiles = [...selectedFiles, file];
+    }
+    setSelectedFiles(updatedSelectedFiles);
+    onSelect(
+      updatedSelectedFiles.map(({ file_id, file_url }) => ({
+        file_id,
+        file_url,
+      }))
+    );
   };
 
   return (
@@ -111,13 +113,15 @@ export default function SelectDropdown({
       <div>
         <button
           type="button"
-          className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="text-start inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           id="options-menu"
           aria-expanded={isOpen}
           aria-haspopup="true"
           onClick={toggleDropdown}
         >
-          {selectedFileName}
+          {selectedFiles.length > 0
+            ? `${selectedFiles.map((file) => file.file_name).join(", ")}`
+            : "Attach your files"}
           <svg
             className="-mr-1 ml-2 h-5 w-5"
             xmlns="http://www.w3.org/2000/svg"
@@ -142,7 +146,7 @@ export default function SelectDropdown({
           aria-labelledby="options-menu"
         >
           <div className="flex justify-between items-center mb-2 pl-4">
-            <p className="font-medium">SELECT A FILE</p>
+            <p className="font-medium">ATTACH FILES</p>
             <input
               className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               placeholder="Search a file name..."
@@ -196,14 +200,14 @@ export default function SelectDropdown({
                   {filteredOptions.map((option) => (
                     <tr
                       key={option.file_id}
-                      className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
-                      onClick={() =>
-                        handleSelect(
-                          option.file_id,
-                          option.file_url,
-                          option.file_name
+                      className={`hover:bg-gray-200 cursor-pointer active:bg-gray-300 ${
+                        selectedFiles.some(
+                          (file) => file.file_id === option.file_id
                         )
-                      }
+                          ? "bg-gray-100"
+                          : ""
+                      }`}
+                      onClick={() => handleSelect(option)}
                     >
                       <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
                         {option.file_name}
@@ -226,6 +230,9 @@ export default function SelectDropdown({
                   <tr className="bg-neutral-100 rounded-t-md">
                     <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
                       File Name
+                    </th>
+                    <th className="py-2 px-4 border-b border-gray-200">
+                      Created At
                     </th>
                     <th className="py-2 px-4 border-b border-gray-200">
                       Created At

@@ -19,30 +19,18 @@ export default function SideNav() {
         />
       </Link>
       <div className="flex grow flex-row flex-wrap justify-start gap-2 md:flex-col md:space-x-0 rounded-md">
-        {/* <Link
-          href="/listFiles"
+        <Link
+          href="/templateEdit"
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
-          <p className="px-3 text-white">TPET drive</p>
-        </Link> */}
+          <p className="px-3 text-white">Create Template</p>
+        </Link>
         <Link
           href="/sendEmail"
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
           <p className="px-3 text-white">Send Email</p>
         </Link>
-        {/* <Link
-          href="/htmlTemplate"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">HTML Template</p>
-        </Link>
-        <Link
-          href="/htmlRichEditor"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">HTML Rich Editor</p>
-        </Link> */}
       </div>
     </div>
   );
