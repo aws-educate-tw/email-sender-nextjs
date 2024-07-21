@@ -1,5 +1,17 @@
 "use client";
 import { FormEvent, useRef } from "react";
+import { submitLogin } from "@/lib/actions";
+
+interface SubmitResponse {
+  message: string;
+  challengeName: string;
+  session: string;
+  challengeParameters: {
+    USER_ID_FOR_SRP: string;
+    requiredAttributes: string;
+    userAttributes: string;
+  };
+}
 
 export default function Page() {
   const ref = useRef<HTMLFormElement>(null);
@@ -7,13 +19,32 @@ export default function Page() {
     event.preventDefault();
     if (!ref.current) return;
 
-    console.log(
-      (ref.current.querySelector("[id='subject']") as HTMLInputElement).value
-    );
-    console.log(
-      (ref.current.querySelector("[id='display_name']") as HTMLInputElement)
-        .value
-    );
+    const formData = {
+      account: (ref.current.querySelector("[id='account']") as HTMLInputElement)
+        .value,
+      password: (
+        ref.current.querySelector("[id='password']") as HTMLInputElement
+      ).value,
+    };
+
+    try {
+      const response = (await submitLogin(JSON.stringify(formData))) as
+        | SubmitResponse
+        | undefined;
+
+      if (response === undefined) {
+        console.error("Login failed: No response");
+        return;
+      }
+      console.log("response", response);
+      alert(response.message);
+
+      if (response.challengeName == "NEW_PASSWORD_REQUIRED") {
+        console.log("New password required");
+      }
+    } catch (error: any) {
+      console.error("Login failed", error);
+    }
   };
   return (
     <div className="flex h-screen justify-center items-center">
@@ -22,10 +53,10 @@ export default function Page() {
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">Username</label>
             <input
-              id="username"
-              name="username"
+              id="account"
+              name="account"
               type="text"
-              placeholder="Enter the username"
+              placeholder="Enter the account"
               className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
             />
           </div>
