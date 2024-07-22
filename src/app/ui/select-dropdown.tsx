@@ -72,6 +72,7 @@ export default function SelectDropdown({
 
       const response = await fetch(url.toString(), {
         method: "GET",
+        credentials: "include",
       });
 
       if (!response.ok) {
