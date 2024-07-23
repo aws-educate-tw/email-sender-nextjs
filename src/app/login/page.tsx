@@ -104,7 +104,7 @@ export default function Page() {
   return (
     <div className="flex flex-col h-screen justify-center items-center pb-12">
       <div className="flex flex-col items-center py-4">
-        <p className="text-4xl font-bold pt-2">Let's sign in first!</p>
+        <p className="text-4xl font-bold pt-2">Let&apos;s sign in first!</p>
         <p className="text-gray-500 italic">Welcome to TPET</p>
       </div>
       <form
