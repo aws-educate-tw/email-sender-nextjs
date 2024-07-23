@@ -2,6 +2,7 @@
 import { FormEvent, useRef, useState, useEffect } from "react";
 import { submitLogin, submitChangePassword } from "@/lib/actions";
 import { useRouter } from "next/navigation";
+import { ScanEye } from "lucide-react";
 
 interface SubmitResponse {
   message: string;
@@ -101,14 +102,18 @@ export default function Page() {
   };
 
   return (
-    <div className="flex h-screen justify-center items-center">
+    <div className="flex flex-col h-screen justify-center items-center pb-12">
+      <div className="flex flex-col items-center py-4">
+        <p className="text-4xl font-bold pt-2">Let's sign in first!</p>
+        <p className="text-gray-500 italic">Welcome to TPET</p>
+      </div>
       <form
         onSubmit={session ? onSubmitNewPassword : onSubmit}
         ref={ref}
-        className="max-w-80"
+        className="min-w-80 "
       >
-        <div className="rounded-md bg-neutral-100 p-4">
-          <div className="m-3">
+        <div className="flex flex-col gap-3">
+          <div className="">
             <label className="mb-2 block text-sm font-medium">Username</label>
             <input
               id="account"
@@ -120,7 +125,7 @@ export default function Page() {
           </div>
 
           {!session && (
-            <div className="m-3 relative">
+            <div className="relative">
               <label className="mb-2 block text-sm font-medium">Password</label>
               <input
                 id="password"
@@ -132,16 +137,16 @@ export default function Page() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-12 transform -translate-y-1/2 bg-gray-200 rounded-md px-2 py-1 text-sm"
+                className="absolute right-2 top-12 transform -translate-y-1/2 bg-gray-200 rounded-md p-1 hover:bg-gray-300"
               >
-                {showPassword ? "Hide" : "Show"}
+                <ScanEye size={16} />
               </button>
             </div>
           )}
 
           {session && (
             <>
-              <div className="m-3 relative">
+              <div className="relative">
                 <label className="mb-2 block text-sm font-medium">
                   New Password
                 </label>
@@ -155,13 +160,13 @@ export default function Page() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-12 transform -translate-y-1/2 bg-gray-200 rounded-md px-2 py-1 text-sm"
+                  className="absolute right-2 top-12 transform -translate-y-1/2 bg-gray-200 rounded-md p-1 hover:bg-gray-300"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  <ScanEye size={16} />
                 </button>
               </div>
 
-              <div className="m-3 relative">
+              <div className="relative">
                 <label className="mb-2 block text-sm font-medium">
                   Confirm New Password
                 </label>
@@ -175,9 +180,9 @@ export default function Page() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-2 top-12 transform -translate-y-1/2 bg-gray-200 rounded-md px-2 py-1 text-sm"
+                  className="absolute right-2 top-12 transform -translate-y-1/2 bg-gray-200 rounded-md p-1 hover:bg-gray-300"
                 >
-                  {showConfirmPassword ? "Hide" : "Show"}
+                  <ScanEye size={16} />
                 </button>
               </div>
 
@@ -185,10 +190,10 @@ export default function Page() {
             </>
           )}
         </div>
-        <div className="w-full flex justify-end my-3 gap-3">
+        <div className="flex flex-col my-5">
           <button
             type="submit"
-            className="flex h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            className="h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
           >
             {session ? "Change Password" : "Login"}
           </button>
