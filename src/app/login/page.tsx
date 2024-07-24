@@ -59,11 +59,11 @@ export default function Page() {
         return;
       }
       console.log("response", response);
-      
+
       if (response.cookie) {
         Cookies.set("accessToken", response.cookie, { path: "/" }); // Set the cookie in the client using js-cookie
       }
-      
+
       alert(response.message);
       if (response.message == "Login successful") {
         router.push("/sendEmail");
