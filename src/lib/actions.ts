@@ -1,4 +1,5 @@
 "use server";
+import { cookies } from "next/headers";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -92,14 +93,24 @@ export async function submitLogin(data: string) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          credentials: "include",
         },
-        body: JSON.stringify(validation.data)
+        body: JSON.stringify(validation.data),
+        credentials: 'include',
       }
     );
+    // const cookie = response.headers.get('set-cookie');
+    // console.log('Cookie:', cookie);
+    // const cookieValue = cookie?.split('=')[1];
 
     const result = await response.json();
-    // console.log("response", result);
+    const setCookie = response.headers.get('set-cookie');
+    const cookieValue = setCookie ? setCookie.split('accessToken=')[1] : null;
+    console.log("cookieValue", cookieValue);
+
+    console.log("response", result);
     return {
+      cookie: cookieValue,
       message: result.message,
       challengeName: result.challengeName,
       session: result.session,
@@ -157,3 +168,24 @@ export async function submitChangePassword(data: string) {
     };
   }
 }
+
+export async function checkLoginStatus () {
+  const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+  const url = new URL(`${base_url}/auth/is-logged-in`);
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+    });
+
+    const result = await response.json();
+    console.log('log in or not', result);
+    return result.loggedIn;
+  } catch (error) {
+    console.error('Failed to check login status:', error);
+    return false;
+  }
+};

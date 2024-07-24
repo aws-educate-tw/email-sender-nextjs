@@ -3,8 +3,10 @@ import { FormEvent, useRef, useState, useEffect } from "react";
 import { submitLogin, submitChangePassword } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { ScanEye } from "lucide-react";
+import Cookies from "js-cookie";
 
 interface SubmitResponse {
+  cookie?: string;
   message: string;
   challengeName: string;
   session: string;
@@ -58,6 +60,9 @@ export default function Page() {
       }
       console.log("response", response);
 
+      if (response.cookie) {
+        Cookies.set("accessToken", response.cookie, { path: "/" }); // Set the cookie in the client using js-cookie
+      }
       alert(response.message);
       if (response.message == "Login successful") {
         router.push("/sendEmail");
