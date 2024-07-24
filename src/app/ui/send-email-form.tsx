@@ -5,6 +5,9 @@ import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "./attach-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { checkLoginStatus } from "@/lib/actions";
 
 interface SubmitResponse {
   status: string;
@@ -43,6 +46,51 @@ export default function SendEmailForm() {
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
   const [isGenerateCertificate, setIsGenerateCertificate] =
     useState<boolean>(false);
+
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // const checkLoginStatus = async () => {
+  //   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+  //   const url = new URL(`${base_url}/auth/is-logged-in`);
+  //   // const accessToken = document.cookie
+  //   //   .split("; ")
+  //   //   .find((row) => row.startsWith("accessToken="))
+  //   //   ?.split("=")[1];
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         // cookie: `accessToken=${accessToken}`,
+  //         // credentials: "include",
+  //       },
+  //     });
+
+  //     const result = await response.json();
+  //     // console.log("Log in or not:", result);
+  //     return result.loggedIn;
+  //   } catch (error) {
+  //     console.error("Failed to check login status:", error);
+  //     return false;
+  //   }
+  // };
+
+  useEffect(() => {
+    console.log("checkLoginStatus function called");
+    const verifyLoginStatus = async () => {
+      const loggedIn = await checkLoginStatus();
+      if (!loggedIn) {
+        // router.push("/login");
+        console.log("not logged in");
+      } else {
+        console.log("logged in");
+        setIsLoggedIn(true);
+      }
+    };
+    verifyLoginStatus();
+  }, [router]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
