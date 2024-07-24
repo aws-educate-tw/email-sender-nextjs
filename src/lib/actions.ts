@@ -167,8 +167,7 @@ export async function submitChangePassword(data: string) {
       error: error.message,
     };
   }
-}
-
+  
 export async function checkLoginStatus () {
   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
   const url = new URL(`${base_url}/auth/is-logged-in`);
