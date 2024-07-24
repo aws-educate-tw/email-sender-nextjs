@@ -1,5 +1,5 @@
 "use server";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -167,7 +167,8 @@ export async function submitChangePassword(data: string) {
       error: error.message,
     };
   }
-  
+}
+
 export async function checkLoginStatus () {
   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
   const url = new URL(`${base_url}/auth/is-logged-in`);
