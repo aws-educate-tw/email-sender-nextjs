@@ -12,6 +12,9 @@ import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
 import { useState } from "react";
 import NextStepLink from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { checkLoginStatus } from "@/lib/actions";
 
 const htmltemplateContent = `
     <p>親愛的{{Name}}，</p>
@@ -32,6 +35,22 @@ const Tiptap = ({ onChange, content }: any) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showNextStep, setShowNextStep] = useState(false);
+
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const verifyLoginStatus = async () => {
+      const loggedIn = await checkLoginStatus();
+      if (!loggedIn) {
+        router.push("/login");
+      } else {
+        setIsLoggedIn(true);
+      }
+    };
+
+    verifyLoginStatus();
+  }, [router]);
 
   const handleUpload = async () => {
     const html = `
