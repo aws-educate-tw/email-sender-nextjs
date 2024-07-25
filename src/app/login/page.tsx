@@ -3,10 +3,12 @@ import { FormEvent, useRef, useState, useEffect } from "react";
 import { submitLogin, submitChangePassword } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { ScanEye } from "lucide-react";
-import Cookies from "js-cookie";
 
-interface SubmitResponse {
-  cookie?: string;
+interface LoginResponse {
+  message: string;
+  accessToken: string;
+}
+interface FirstTimeLoginResponse {
   message: string;
   challengeName: string;
   session: string;
@@ -50,27 +52,16 @@ export default function Page() {
     };
 
     try {
-      const response = (await submitLogin(JSON.stringify(formData))) as
-        | SubmitResponse
-        | undefined;
-
-      if (response === undefined) {
-        console.error("Login failed: No response");
-        return;
-      }
-      console.log("response", response);
-
-      if (response.cookie) {
-        Cookies.set("accessToken", response.cookie, { path: "/" }); // Set the cookie in the client using js-cookie
-      }
+      const response = await submitLogin(JSON.stringify(formData));
 
       alert(response.message);
+
       if (response.message == "Login successful") {
+        localStorage.setItem("access_token", response.access_token);
         router.push("/sendEmail");
       }
 
       if (response.challengeName == "NEW_PASSWORD_REQUIRED") {
-        console.log(response);
         setSession(response.session);
       }
     } catch (error: any) {

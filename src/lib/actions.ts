@@ -1,5 +1,4 @@
 "use server";
-// import { cookies } from "next/headers";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -71,7 +70,7 @@ export async function submitForm(data: string) {
 export async function submitLogin(data: string) {
   const parsedData = JSON.parse(data);
   const validation = loginSchema.safeParse(parsedData);
-  console.log("validation", validation);
+  // console.log("validation", validation);
 
   if (!validation.success) {
     return {
@@ -93,29 +92,26 @@ export async function submitLogin(data: string) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          credentials: "include",
         },
         body: JSON.stringify(validation.data),
-        credentials: 'include',
       }
     );
-    // const cookie = response.headers.get('set-cookie');
-    // console.log('Cookie:', cookie);
-    // const cookieValue = cookie?.split('=')[1];
 
     const result = await response.json();
-    const setCookie = response.headers.get('set-cookie');
-    const cookieValue = setCookie ? setCookie.split('accessToken=')[1] : null;
-    console.log("cookieValue", cookieValue);
-
     console.log("response", result);
-    return {
-      cookie: cookieValue,
-      message: result.message,
-      challengeName: result.challengeName,
-      session: result.session,
-      challengeParameters: result.challengeParameters,
+    if (result.challengeName === "NEW_PASSWORD_REQUIRED" ){
+      return {
+        message: result.message,
+        challengeName: result.challengeName,
+        session: result.session,
+        challengeParameters: result.challengeParameters,
+      }
+    } else {
+      return {
+        message: result.message,
+        access_token: result.access_token,
     }
+  }
   } catch (error: any) {
     return {
       status: "error",
