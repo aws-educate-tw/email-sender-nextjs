@@ -79,7 +79,6 @@ export default function SendEmailForm() {
       is_generate_certificate: isGenerateCertificate,
     };
 
-    console.log(formData.attachment_file_ids);
     setIsSubmitting(true);
     try {
       const response: SubmitResponse = (await submitForm(

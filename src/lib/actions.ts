@@ -84,7 +84,7 @@ export async function submitLogin(data: string) {
     };
   }
   // console.log(parsedData);
-  console.log("validation", validation);
+  // console.log("validation", validation);
   try {
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/auth/login`);
@@ -100,7 +100,7 @@ export async function submitLogin(data: string) {
     );
 
     const result = await response.json();
-    console.log("response", result);
+    // console.log("response", result);
     if (result.challengeName === "NEW_PASSWORD_REQUIRED" ){
       return {
         message: result.message,
