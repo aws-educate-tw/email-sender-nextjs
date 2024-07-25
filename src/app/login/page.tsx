@@ -58,6 +58,10 @@ export default function Page() {
 
       if (response.message == "Login successful") {
         localStorage.setItem("access_token", response.access_token);
+
+        const tokenExpiryTime = new Date().getTime() + 24 * 60 * 60 * 10000;
+        localStorage.setItem("token_expiry_time", tokenExpiryTime.toString());
+
         router.push("/sendEmail");
       }
 

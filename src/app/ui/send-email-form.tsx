@@ -7,7 +7,8 @@ import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { checkLoginStatus } from "@/lib/actions";
+import { access } from "fs";
+// import { checkLoginStatus } from "@/lib/actions";
 
 interface SubmitResponse {
   status: string;
@@ -48,22 +49,21 @@ export default function SendEmailForm() {
     useState<boolean>(false);
 
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const isTokenExpired = () => {
+    const expiryTime = localStorage.getItem("token_expiry_time");
+    if (!expiryTime) return true;
+    return new Date().getTime() > parseInt(expiryTime);
+  };
 
   useEffect(() => {
     console.log("checkLoginStatus function called");
-    const verifyLoginStatus = async () => {
-      const loggedIn = await checkLoginStatus();
-      if (!loggedIn) {
-        // router.push("/login");
-        console.log("not logged in");
-      } else {
-        console.log("logged in");
-        setIsLoggedIn(true);
-      }
-    };
-    verifyLoginStatus();
-  }, [router]);
+    const access_token = localStorage.getItem("access_token");
+    if (!access_token || isTokenExpired()) {
+      // alert("Session expired. Please login again.");
+      router.push("/login");
+    }
+  }, []);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
