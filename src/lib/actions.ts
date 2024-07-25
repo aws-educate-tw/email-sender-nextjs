@@ -21,7 +21,7 @@ const changePasswordSchema = z.object({
   session: z.string().min(1, "Session is required"),
 });
 
-export async function submitForm(data: string) {
+export async function submitForm(data: string, access_token: string) {
   const parsedData = JSON.parse(data);
   const validation = formSchema.safeParse(parsedData);
   if (!validation.success) {
@@ -37,7 +37,6 @@ export async function submitForm(data: string) {
 
   try {
     // console.log("data", validation.data);
-    const token = localStorage.getItem("access_token");
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(
@@ -46,7 +45,7 @@ export async function submitForm(data: string) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access_token}`,
         },
         body: JSON.stringify(validation.data)
       }

@@ -7,6 +7,7 @@ import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { access } from "fs";
 
 interface SubmitResponse {
   status: string;
@@ -15,17 +16,6 @@ interface SubmitResponse {
   timestamp?: string;
   sqs_message_id?: string;
   errors?: { path: string; message: string }[];
-}
-
-interface fileDataType {
-  file_id: string;
-  created_at: string;
-  updated_at: string;
-  file_url: string;
-  file_name: string;
-  file_extension: string;
-  file_size: number;
-  uploader_id: string;
 }
 
 export default function SendEmailForm() {
@@ -81,9 +71,10 @@ export default function SendEmailForm() {
 
     setIsSubmitting(true);
     try {
-      const response: SubmitResponse = (await submitForm(
-        JSON.stringify(formData)
-      )) as SubmitResponse;
+      const response: SubmitResponse = await submitForm(
+        JSON.stringify(formData),
+        localStorage.getItem("access_token") ?? ""
+      );
 
       if (response.status === "error" && response.errors) {
         const newErrors: { [key: string]: string } = {};
