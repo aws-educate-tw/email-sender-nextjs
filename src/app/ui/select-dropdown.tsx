@@ -141,15 +141,15 @@ export default function SelectDropdown({
 
       {isOpen && (
         <div
-          className="z-50 p-3 pb-6 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          className="z-50 p-3 pb-6 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5  min-w-96"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
-          <div className="flex justify-between items-center mb-2 pl-4">
+          <div className="flex justify-between items-center mb-2 pl-4 ">
             <p className="font-medium">SELECT A FILE</p>
             <input
-              className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full max-w-52"
               placeholder="Search a file name..."
               type="text"
               value={searchTerm}
