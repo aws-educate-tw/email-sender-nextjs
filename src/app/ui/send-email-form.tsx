@@ -7,8 +7,6 @@ import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { access } from "fs";
-// import { checkLoginStatus } from "@/lib/actions";
 
 interface SubmitResponse {
   status: string;
