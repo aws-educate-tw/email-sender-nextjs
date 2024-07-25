@@ -37,6 +37,7 @@ export async function submitForm(data: string) {
 
   try {
     // console.log("data", validation.data);
+    const token = localStorage.getItem("access_token");
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(
@@ -45,6 +46,7 @@ export async function submitForm(data: string) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(validation.data)
       }

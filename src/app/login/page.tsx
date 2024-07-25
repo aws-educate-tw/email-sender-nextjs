@@ -4,20 +4,20 @@ import { submitLogin, submitChangePassword } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { ScanEye } from "lucide-react";
 
-interface LoginResponse {
-  message: string;
-  accessToken: string;
-}
-interface FirstTimeLoginResponse {
-  message: string;
-  challengeName: string;
-  session: string;
-  challengeParameters: {
-    USER_ID_FOR_SRP: string;
-    requiredAttributes: string;
-    userAttributes: string;
-  };
-}
+// interface LoginResponse {
+//   message: string;
+//   accessToken: string;
+// }
+// interface FirstTimeLoginResponse {
+//   message: string;
+//   challengeName: string;
+//   session: string;
+//   challengeParameters: {
+//     USER_ID_FOR_SRP: string;
+//     requiredAttributes: string;
+//     userAttributes: string;
+//   };
+// }
 
 export default function Page() {
   const router = useRouter();

@@ -70,9 +70,13 @@ export default function SelectDropdown({
       url.searchParams.append("file_extension", file_extension);
       url.searchParams.append("limit", limit.toString());
 
+      const token = localStorage.getItem("access_token");
       const response = await fetch(url.toString(), {
         method: "GET",
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {

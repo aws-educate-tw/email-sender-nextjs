@@ -74,6 +74,9 @@ const Tiptap = ({ onChange, content }: any) => {
       setIsUploading(true);
       const response = await fetch(url.toString(), {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
         body: formData,
       });
       const result = await response.json();
