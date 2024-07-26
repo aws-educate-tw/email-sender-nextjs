@@ -377,8 +377,10 @@ export default function SendEmailForm() {
                 </div>
               )}
             </div>
-            {errors.template_file_id && (
-              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
+            {errors.spreadsheet_file_id && (
+              <p className="text-red-500 text-sm">
+                {errors.spreadsheet_file_id}
+              </p>
             )}
           </div>
           <div className="m-3">
@@ -418,9 +420,6 @@ export default function SendEmailForm() {
                 </div>
               )}
             </div>
-            {errors.template_file_id && (
-              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
-            )}
           </div>
           <div className="my-5 mx-3">
             <label className="mb-2 block text-sm font-medium">
