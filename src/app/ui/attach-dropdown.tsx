@@ -64,6 +64,9 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
 
       const response = await fetch(url.toString(), {
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
       });
 
       if (!response.ok) {

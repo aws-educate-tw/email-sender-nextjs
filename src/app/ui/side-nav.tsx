@@ -1,8 +1,16 @@
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 // import { HomeIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 
 export default function SideNav() {
+  const router = useRouter();
+  const signout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("token_expiry_time");
+    router.push("/");
+  };
   return (
     <div className="flex h-full flex-col px-5 py-4 md:px-3 bg-gray-200 gap-2 min-w-60">
       <Link
@@ -31,6 +39,15 @@ export default function SideNav() {
         >
           <p className="px-3 text-white">Send Email</p>
         </Link>
+      </div>
+      <div>
+        <button
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 w-full"
+          type="button"
+          onClick={signout}
+        >
+          <p className="px-3 text-white">Sign Out</p>
+        </button>
       </div>
     </div>
   );

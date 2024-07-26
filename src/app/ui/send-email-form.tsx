@@ -7,7 +7,7 @@ import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { checkLoginStatus } from "@/lib/actions";
+import { access } from "fs";
 
 interface SubmitResponse {
   status: string;
@@ -16,17 +16,6 @@ interface SubmitResponse {
   timestamp?: string;
   sqs_message_id?: string;
   errors?: { path: string; message: string }[];
-}
-
-interface fileDataType {
-  file_id: string;
-  created_at: string;
-  updated_at: string;
-  file_url: string;
-  file_name: string;
-  file_extension: string;
-  file_size: number;
-  uploader_id: string;
 }
 
 export default function SendEmailForm() {
@@ -48,22 +37,21 @@ export default function SendEmailForm() {
     useState<boolean>(false);
 
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const isTokenExpired = () => {
+    const expiryTime = localStorage.getItem("token_expiry_time");
+    if (!expiryTime) return true;
+    return new Date().getTime() > parseInt(expiryTime);
+  };
 
   useEffect(() => {
     console.log("checkLoginStatus function called");
-    const verifyLoginStatus = async () => {
-      const loggedIn = await checkLoginStatus();
-      if (!loggedIn) {
-        // router.push("/login");
-        console.log("not logged in");
-      } else {
-        console.log("logged in");
-        setIsLoggedIn(true);
-      }
-    };
-    verifyLoginStatus();
-  }, [router]);
+    const access_token = localStorage.getItem("access_token");
+    if (!access_token || isTokenExpired()) {
+      // alert("Session expired. Please login again.");
+      router.push("/login");
+    }
+  }, []);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -81,12 +69,12 @@ export default function SendEmailForm() {
       is_generate_certificate: isGenerateCertificate,
     };
 
-    console.log(formData.attachment_file_ids);
     setIsSubmitting(true);
     try {
-      const response: SubmitResponse = (await submitForm(
-        JSON.stringify(formData)
-      )) as SubmitResponse;
+      const response: SubmitResponse = await submitForm(
+        JSON.stringify(formData),
+        localStorage.getItem("access_token") ?? ""
+      );
 
       if (response.status === "error" && response.errors) {
         const newErrors: { [key: string]: string } = {};
@@ -389,8 +377,10 @@ export default function SendEmailForm() {
                 </div>
               )}
             </div>
-            {errors.template_file_id && (
-              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
+            {errors.spreadsheet_file_id && (
+              <p className="text-red-500 text-sm">
+                {errors.spreadsheet_file_id}
+              </p>
             )}
           </div>
           <div className="m-3">
@@ -430,9 +420,6 @@ export default function SendEmailForm() {
                 </div>
               )}
             </div>
-            {errors.template_file_id && (
-              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
-            )}
           </div>
           <div className="my-5 mx-3">
             <label className="mb-2 block text-sm font-medium">
