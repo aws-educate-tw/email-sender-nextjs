@@ -47,6 +47,9 @@ export default function FileUpload({
       const url = new URL(`${base_url}/upload-multiple-file`);
       const response = await fetch(url.toString(), {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
         body: formData,
       });
 

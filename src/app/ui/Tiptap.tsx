@@ -14,7 +14,6 @@ import { useState } from "react";
 import NextStepLink from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { checkLoginStatus } from "@/lib/actions";
 
 const htmltemplateContent = `
     <p>親愛的{{Name}}，</p>
@@ -37,20 +36,21 @@ const Tiptap = ({ onChange, content }: any) => {
   const [showNextStep, setShowNextStep] = useState(false);
 
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const isTokenExpired = () => {
+    const expiryTime = localStorage.getItem("token_expiry_time");
+    if (!expiryTime) return true;
+    return new Date().getTime() > parseInt(expiryTime);
+  };
 
   useEffect(() => {
-    const verifyLoginStatus = async () => {
-      const loggedIn = await checkLoginStatus();
-      if (!loggedIn) {
-        router.push("/login");
-      } else {
-        setIsLoggedIn(true);
-      }
-    };
-
-    verifyLoginStatus();
-  }, [router]);
+    console.log("checkLoginStatus function called");
+    const access_token = localStorage.getItem("access_token");
+    if (!access_token || isTokenExpired()) {
+      // alert("Session expired. Please login again.");
+      router.push("/login");
+    }
+  }, []);
 
   const handleUpload = async () => {
     const html = `
@@ -74,6 +74,9 @@ const Tiptap = ({ onChange, content }: any) => {
       setIsUploading(true);
       const response = await fetch(url.toString(), {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
         body: formData,
       });
       const result = await response.json();

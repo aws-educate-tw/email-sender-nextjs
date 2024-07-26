@@ -48,6 +48,9 @@ const Toolbar = ({ editor, content }: Props) => {
 
     const response = await fetch(url.toString(), {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
       body: formData,
     });
 
