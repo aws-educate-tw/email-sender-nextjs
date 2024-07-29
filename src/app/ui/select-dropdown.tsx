@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { formatFileSize } from "@/lib/utils/dataUtils";
+import { set, string } from "zod";
 
 interface fileDataType {
   file_id: string;
@@ -23,9 +24,7 @@ export default function SelectDropdown({
   onSelect,
   fileExtension,
 }: SelectDropdownProps) {
-  const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
-    null
-  );
+  const [options, setOptions] = useState<fileDataType[] | null>(null);
   const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(
     null
   );
@@ -35,17 +34,27 @@ export default function SelectDropdown({
   const [selectedFileName, setSelectedFileName] = useState(
     `Select a ${fileExtension} file`
   );
+  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+  // const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
+  //   string | null
+  // >(null);
+  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (templateOptions) {
+    if (options) {
       setFilteredOptions(
-        templateOptions.filter((option) =>
+        options.filter((option) =>
           option.file_name.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
-  }, [searchTerm, templateOptions]);
+  }, [searchTerm, options]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -62,13 +71,20 @@ export default function SelectDropdown({
     };
   }, [dropdownRef]);
 
-  const fetchFiles = async (file_extension: string, limit: number) => {
+  const fetchFiles = async (
+    file_extension: string,
+    limit: number,
+    lastEvaluatedKey: string | null
+  ) => {
     try {
       setIsLoading(true);
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/files`);
       url.searchParams.append("file_extension", file_extension);
       url.searchParams.append("limit", limit.toString());
+      if (lastEvaluatedKey) {
+        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
+      }
 
       const token = localStorage.getItem("access_token");
       const response = await fetch(url.toString(), {
@@ -85,7 +101,10 @@ export default function SelectDropdown({
       }
 
       const result = await response.json();
-      setTemplateOptions(result.data);
+      setOptions(result.data);
+      setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
+      // setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
+      setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
@@ -95,7 +114,7 @@ export default function SelectDropdown({
 
   const toggleDropdown = () => {
     if (!isOpen) {
-      fetchFiles(fileExtension, 5);
+      fetchFiles(fileExtension, 5, null);
     }
     setIsOpen(!isOpen);
   };
@@ -141,7 +160,7 @@ export default function SelectDropdown({
 
       {isOpen && (
         <div
-          className="z-50 p-3 pb-6 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5  min-w-96"
+          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5  min-w-96"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
@@ -223,6 +242,38 @@ export default function SelectDropdown({
                   ))}
                 </tbody>
               </table>
+              <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
+                <button
+                  className={`${
+                    !previousLastEvaluatedKey
+                      ? "cursor-not-allowed"
+                      : "hover:text-gray-300 hover:underline"
+                  }`}
+                  onClick={() => {
+                    if (previousLastEvaluatedKey) {
+                      fetchFiles(fileExtension, 5, previousLastEvaluatedKey);
+                    }
+                  }}
+                  disabled={!previousLastEvaluatedKey}
+                >
+                  &lt; Previous
+                </button>
+                <button
+                  className={`${
+                    !nextLastEvaluatedKey
+                      ? "cursor-not-allowed"
+                      : "hover:text-gray-300 hover:underline"
+                  }`}
+                  onClick={() => {
+                    if (nextLastEvaluatedKey) {
+                      fetchFiles(fileExtension, 5, nextLastEvaluatedKey);
+                    }
+                  }}
+                  disabled={!nextLastEvaluatedKey}
+                >
+                  Next &gt;
+                </button>
+              </div>
             </div>
           ) : (
             <div>
