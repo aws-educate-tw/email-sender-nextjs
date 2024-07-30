@@ -37,9 +37,9 @@ export default function SelectDropdown({
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
     string | null
   >(null);
-  // const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
-  //   string | null
-  // >(null);
+  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
+    string | null
+  >(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<
     string | null
   >(null);
@@ -103,7 +103,7 @@ export default function SelectDropdown({
       const result = await response.json();
       setOptions(result.data);
       setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
-      // setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
+      setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
       setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
@@ -245,24 +245,22 @@ export default function SelectDropdown({
               <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
                 <button
                   className={`${
-                    !previousLastEvaluatedKey
-                      ? "cursor-not-allowed"
-                      : "hover:text-gray-300 hover:underline"
+                    !currentLastEvaluatedKey
+                      ? "cursor-default text-gray-400"
+                      : "hover:text-gray-600 hover:underline"
                   }`}
                   onClick={() => {
-                    if (previousLastEvaluatedKey) {
-                      fetchFiles(fileExtension, 5, previousLastEvaluatedKey);
-                    }
+                    fetchFiles(fileExtension, 5, previousLastEvaluatedKey);
                   }}
-                  disabled={!previousLastEvaluatedKey}
+                  disabled={!currentLastEvaluatedKey}
                 >
                   &lt; Previous
                 </button>
                 <button
                   className={`${
                     !nextLastEvaluatedKey
-                      ? "cursor-not-allowed"
-                      : "hover:text-gray-300 hover:underline"
+                      ? "cursor-default text-gray-400"
+                      : "hover:text-gray-600 hover:underline"
                   }`}
                   onClick={() => {
                     if (nextLastEvaluatedKey) {

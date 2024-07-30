@@ -18,9 +18,7 @@ interface AttachDropdownProps {
 }
 
 export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
-  const [templateOptions, setTemplateOptions] = useState<fileDataType[] | null>(
-    null
-  );
+  const [options, setOptions] = useState<fileDataType[] | null>(null);
   const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(
     null
   );
@@ -28,17 +26,27 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<fileDataType[]>([]);
+  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (templateOptions) {
+    if (options) {
       setFilteredOptions(
-        templateOptions.filter((option) =>
+        options.filter((option) =>
           option.file_name.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
-  }, [searchTerm, templateOptions]);
+  }, [searchTerm, options]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -55,12 +63,15 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
     };
   }, [dropdownRef]);
 
-  const fetchFiles = async (limit: number) => {
+  const fetchFiles = async (limit: number, lastEvaluatedKey: string | null) => {
     try {
       setIsLoading(true);
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/files`);
       url.searchParams.append("limit", limit.toString());
+      if (lastEvaluatedKey) {
+        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
+      }
 
       const response = await fetch(url.toString(), {
         method: "GET",
@@ -75,7 +86,10 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
       }
 
       const result = await response.json();
-      setTemplateOptions(result.data);
+      setOptions(result.data);
+      setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
+      setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
+      setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
@@ -85,7 +99,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
 
   const toggleDropdown = () => {
     if (!isOpen) {
-      fetchFiles(15);
+      fetchFiles(5, null);
     }
     setIsOpen(!isOpen);
   };
@@ -143,7 +157,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
 
       {isOpen && (
         <div
-          className="z-50 p-3 pb-6 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
@@ -225,6 +239,36 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
                   ))}
                 </tbody>
               </table>
+              <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
+                <button
+                  className={`${
+                    !currentLastEvaluatedKey
+                      ? "cursor-default text-gray-400"
+                      : "hover:text-gray-600 hover:underline"
+                  }`}
+                  onClick={() => {
+                    fetchFiles(5, previousLastEvaluatedKey);
+                  }}
+                  disabled={!currentLastEvaluatedKey}
+                >
+                  &lt; Previous
+                </button>
+                <button
+                  className={`${
+                    !nextLastEvaluatedKey
+                      ? "cursor-default text-gray-400"
+                      : "hover:text-gray-600 hover:underline"
+                  }`}
+                  onClick={() => {
+                    if (nextLastEvaluatedKey) {
+                      fetchFiles(5, nextLastEvaluatedKey);
+                    }
+                  }}
+                  disabled={!nextLastEvaluatedKey}
+                >
+                  Next &gt;
+                </button>
+              </div>
             </div>
           ) : (
             <div>
