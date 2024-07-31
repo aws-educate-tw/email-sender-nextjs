@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowRightIcon } from "lucide-react";
 
 export default function Page() {
   return (
@@ -23,10 +24,11 @@ export default function Page() {
             </span>
           </p>
           <Link
-            href="sendEmail"
-            className="flex items-center gap-5 self-start rounded-lg bg-sky-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-sky-900 md:text-base"
+            href="login"
+            className="flex items-center gap-2 self-start rounded-lg bg-sky-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-sky-900 md:text-base"
           >
-            Start Sending Emails
+            <p className="animate-pulse">Let&apos;s Get Started</p>
+            <ArrowRightIcon size={20} className="animate-pulse" />
           </Link>
         </div>
         <div className="flex items-center justify-center p-6 md:w-3/5 md:px-12 md:py-4">
