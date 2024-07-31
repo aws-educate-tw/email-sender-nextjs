@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { formatFileSize } from "@/lib/utils/dataUtils";
-import { set, string } from "zod";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface fileDataType {
   file_id: string;
@@ -244,7 +244,7 @@ export default function SelectDropdown({
               </table>
               <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
                 <button
-                  className={`${
+                  className={`flex items-center gap-1 ${
                     !currentLastEvaluatedKey
                       ? "cursor-default text-gray-400"
                       : "hover:text-gray-600 hover:underline"
@@ -254,10 +254,11 @@ export default function SelectDropdown({
                   }}
                   disabled={!currentLastEvaluatedKey}
                 >
-                  &lt; Previous
+                  <ChevronLeft size={20} />
+                  Previous
                 </button>
                 <button
-                  className={`${
+                  className={`flex items-center gap-1 ${
                     !nextLastEvaluatedKey
                       ? "cursor-default text-gray-400"
                       : "hover:text-gray-600 hover:underline"
@@ -269,7 +270,8 @@ export default function SelectDropdown({
                   }}
                   disabled={!nextLastEvaluatedKey}
                 >
-                  Next &gt;
+                  Next
+                  <ChevronRight size={20} />
                 </button>
               </div>
             </div>
