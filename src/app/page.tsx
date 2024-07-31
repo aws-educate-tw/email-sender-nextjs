@@ -27,7 +27,7 @@ export default function Page() {
             href="login"
             className="flex items-center gap-2 self-start rounded-lg bg-sky-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-sky-900 md:text-base"
           >
-            <p className="animate-pulse">Let's Get Started</p>
+            <p className="animate-pulse">Let&apos;s Get Started</p>
             <ArrowRightIcon size={20} className="animate-pulse" />
           </Link>
         </div>
