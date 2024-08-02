@@ -5,9 +5,9 @@ import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "./attach-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
+import EmailInput from "@/app/ui/email-input";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { access } from "fs";
 
 interface SubmitResponse {
   status: string;
@@ -36,6 +36,11 @@ export default function SendEmailForm() {
   const [isGenerateCertificate, setIsGenerateCertificate] =
     useState<boolean>(false);
 
+  const [replyToEmail, setReplyToEmail] = useState<string>("");
+  const [bccEmails, setBccEmails] = useState<string[]>([]);
+  const [ccEmails, setCcEmails] = useState<string[]>([]);
+  const [localPart, setLocalPart] = useState<string>("");
+
   const router = useRouter();
 
   const isTokenExpired = () => {
@@ -48,7 +53,6 @@ export default function SendEmailForm() {
     console.log("checkLoginStatus function called");
     const access_token = localStorage.getItem("access_token");
     if (!access_token || isTokenExpired()) {
-      // alert("Session expired. Please login again.");
       router.push("/login");
     }
   }, []);
@@ -67,7 +71,12 @@ export default function SendEmailForm() {
       spreadsheet_file_id: selectedXlsxFile,
       attachment_file_ids: attachment_file_ids,
       is_generate_certificate: isGenerateCertificate,
+      reply_to: replyToEmail,
+      sender_local_part: localPart,
+      bcc: bccEmails,
+      cc: ccEmails,
     };
+    console.log("form data", formData);
 
     setIsSubmitting(true);
     try {
@@ -149,11 +158,17 @@ export default function SendEmailForm() {
     setPreviewXlsx(false);
   };
 
-  // const handleCertificateChange = (
-  //   event: React.ChangeEvent<HTMLInputElement>
-  // ) => {
-  //   setIsGenerateCertificate(event.target.value === "yes");
-  // };
+  const handleReplyToEmailChange = (emails: string[]) => {
+    setReplyToEmail(emails[0] || "");
+  };
+
+  const handleBccEmailsChange = (emails: string[]) => {
+    setBccEmails(emails);
+  };
+
+  const handleCcEmailsChange = (emails: string[]) => {
+    setCcEmails(emails);
+  };
 
   return (
     <>
@@ -168,6 +183,54 @@ export default function SendEmailForm() {
         </div>
       </div>
       <form onSubmit={onSubmit} ref={ref}>
+        {/* Reply To */}
+        <div className="m-3">
+          <label className="mb-2 block text-sm font-medium">Reply To:</label>
+          <EmailInput
+            allowMultiple={false}
+            onEmailsChange={handleReplyToEmailChange}
+          />
+        </div>
+
+        {/* BCC */}
+        <div className="m-3">
+          <label className="mb-2 block text-sm font-medium">BCC:</label>
+          <EmailInput
+            allowMultiple={true}
+            onEmailsChange={handleBccEmailsChange}
+          />
+        </div>
+
+        {/* CC */}
+        <div className="m-3">
+          <label className="mb-2 block text-sm font-medium">CC:</label>
+          <EmailInput
+            allowMultiple={true}
+            onEmailsChange={handleCcEmailsChange}
+          />
+        </div>
+
+        {/* Sender Local Part */}
+        <div className="m-3">
+          <label className="mb-2 block text-sm font-medium">
+            Sender Local Part:
+          </label>
+          <input
+            id="sender_local_part"
+            name="sender_local_part"
+            type="text"
+            value={localPart}
+            onChange={(e) => setLocalPart(e.target.value)}
+            placeholder="Enter the local part of sender's email"
+            disabled={isSubmitting}
+            className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+              errors.sender_local_part ? "border-red-500" : "border-gray-200"
+            }`}
+          />
+          {errors.sender_local_part && (
+            <p className="text-red-500 text-sm">{errors.sender_local_part}</p>
+          )}
+        </div>
         <div className="rounded-md bg-neutral-100 p-4">
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
