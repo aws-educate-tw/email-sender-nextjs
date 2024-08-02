@@ -53,7 +53,7 @@ export default function EmailInput({
         {emails.map((email, index) => (
           <div
             key={index}
-            className="flex items-center bg-sky-300 bg-opacity-50 hover:bg-opacity-70 px-2 rounded-md"
+            className="flex items-center bg-neutral-400 bg-opacity-50 hover:bg-opacity-70 px-2 rounded-md"
           >
             <span className="mr-2 text-sm">{email}</span>
             <button
