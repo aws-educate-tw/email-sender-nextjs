@@ -183,54 +183,6 @@ export default function SendEmailForm() {
         </div>
       </div>
       <form onSubmit={onSubmit} ref={ref}>
-        {/* Reply To */}
-        <div className="m-3">
-          <label className="mb-2 block text-sm font-medium">Reply To:</label>
-          <EmailInput
-            allowMultiple={false}
-            onEmailsChange={handleReplyToEmailChange}
-          />
-        </div>
-
-        {/* BCC */}
-        <div className="m-3">
-          <label className="mb-2 block text-sm font-medium">BCC:</label>
-          <EmailInput
-            allowMultiple={true}
-            onEmailsChange={handleBccEmailsChange}
-          />
-        </div>
-
-        {/* CC */}
-        <div className="m-3">
-          <label className="mb-2 block text-sm font-medium">CC:</label>
-          <EmailInput
-            allowMultiple={true}
-            onEmailsChange={handleCcEmailsChange}
-          />
-        </div>
-
-        {/* Sender Local Part */}
-        <div className="m-3">
-          <label className="mb-2 block text-sm font-medium">
-            Sender Local Part:
-          </label>
-          <input
-            id="sender_local_part"
-            name="sender_local_part"
-            type="text"
-            value={localPart}
-            onChange={(e) => setLocalPart(e.target.value)}
-            placeholder="Enter the local part of sender's email"
-            disabled={isSubmitting}
-            className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-              errors.sender_local_part ? "border-red-500" : "border-gray-200"
-            }`}
-          />
-          {errors.sender_local_part && (
-            <p className="text-red-500 text-sm">{errors.sender_local_part}</p>
-          )}
-        </div>
         <div className="rounded-md bg-neutral-100 p-4">
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
@@ -446,6 +398,7 @@ export default function SendEmailForm() {
               </p>
             )}
           </div>
+          <p>Optional</p>
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
               Attach files:
@@ -523,6 +476,51 @@ export default function SendEmailForm() {
               </div>
             </div>
           </div>
+          {/* Reply To */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">Reply To:</label>
+            <EmailInput
+              allowMultiple={false}
+              onEmailsChange={handleReplyToEmailChange}
+            />
+          </div>
+
+          {/* BCC */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">BCC:</label>
+            <EmailInput
+              allowMultiple={true}
+              onEmailsChange={handleBccEmailsChange}
+            />
+          </div>
+
+          {/* CC */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">CC:</label>
+            <EmailInput
+              allowMultiple={true}
+              onEmailsChange={handleCcEmailsChange}
+            />
+          </div>
+
+          {/* Sender Local Part */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">
+              Sender Local Part:
+            </label>
+            <input
+              id="sender_local_part"
+              name="sender_local_part"
+              type="text"
+              value={localPart}
+              onChange={(e) => setLocalPart(e.target.value)}
+              placeholder="Enter the local part of sender's email"
+              disabled={isSubmitting}
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.sender_local_part ? "border-red-500" : "border-gray-200"
+              }`}
+            />
+          </div>
         </div>
         <div className="w-full flex justify-end my-3 gap-3">
           {isSubmitting ? (
@@ -542,8 +540,6 @@ export default function SendEmailForm() {
             </button>
           )}
         </div>
-        {/* <div>template : {selectedHtmlFile}</div> */}
-        {/* <div>sheet : {selectedXlsxFile}</div> */}
       </form>
     </>
   );

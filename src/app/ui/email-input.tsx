@@ -7,7 +7,7 @@ interface EmailInputProps {
 }
 
 export default function EmailInput({
-  allowMultiple,
+  allowMultiple = true,
   onEmailsChange,
 }: EmailInputProps) {
   const [email, setEmail] = useState("");
@@ -18,15 +18,15 @@ export default function EmailInput({
   }, [emails, onEmailsChange]);
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Tab" && email.trim()) {
+    if ((e.key === "Tab" || e.key === "Enter") && email.trim()) {
+      e.preventDefault(); // Prevent default tab/enter behavior
       if (validateEmail(email.trim())) {
-        if (allowMultiple) {
+        if (allowMultiple || emails.length === 0) {
           setEmails((prevEmails) => [...prevEmails, email.trim()]);
         } else {
           setEmails([email.trim()]);
         }
         setEmail("");
-        onEmailsChange(emails);
       } else {
         alert("Please enter a valid email address");
       }
@@ -48,17 +48,17 @@ export default function EmailInput({
   };
 
   return (
-    <div className="p-4">
-      <div className="border border-gray-300 rounded-md p-2 flex flex-wrap gap-2">
+    <div className="">
+      <div className="bg-white rounded-md shadow-sm flex items-center flex-wrap border border-gray-200 p-2 gap-2 focus-within:border-blue-500 focus-within:outline-none focus-within:ring-1 focus-within:ring-blue-500">
         {emails.map((email, index) => (
           <div
             key={index}
-            className="flex items-center bg-gray-200 px-2 py-1 rounded-md"
+            className="flex items-center bg-sky-300 bg-opacity-50 hover:bg-opacity-70 px-2 rounded-md"
           >
-            <span className="mr-2">{email}</span>
+            <span className="mr-2 text-sm">{email}</span>
             <button
               onClick={(e) => removeEmail(e, index)}
-              className="text-red-500 hover:text-red-700"
+              className="text-black-500 hover:text-red-700"
             >
               &times;
             </button>
@@ -74,7 +74,7 @@ export default function EmailInput({
               ? "Edit the existing email and press tab"
               : "Type an email and press tab"
           }
-          className="flex-grow p-2 outline-none border-none focus:ring-0"
+          className="flex-grow p-2 outline-none border-none focus:ring-0 text-sm rounded-md"
         />
       </div>
     </div>
