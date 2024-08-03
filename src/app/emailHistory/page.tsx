@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
-import { json } from "stream/consumers";
+import { useEffect, useState } from "react";
+import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import { useEditor } from "@tiptap/react";
 
 interface attachmentFilesType {
   file_url: string;
@@ -41,7 +42,7 @@ interface templateFileType {
 interface senderType {
   user_id: string;
   email: string;
-  user_name: string;
+  username: string;
 }
 
 interface dateType {
@@ -62,7 +63,7 @@ interface dateType {
   sender: senderType;
   template_file_id: string;
   success_email_count: number;
-  expected_email_count: number;
+  expected_email_send_count: number;
   reply_to: string;
   template_file: templateFileType;
   created_year_month_day: string;
@@ -77,17 +78,17 @@ interface responseType {
 }
 
 export default function Page() {
-  const [runs, setRuns] = useState<responseType[] | null>(null);
+  const [data, setData] = useState<dateType[] | null>(null);
 
-  const fetchFiles = async (
-    file_extension: string,
-    limit: number,
-    lastEvaluatedKey: string | null
-  ) => {
+  useEffect(() => {
+    fetchFiles(10, null);
+  }, []);
+
+  const fetchFiles = async (limit: number, lastEvaluatedKey: string | null) => {
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
-      url.searchParams.append("file_extension", file_extension);
+
       url.searchParams.append("limit", limit.toString());
       if (lastEvaluatedKey) {
         url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
@@ -109,23 +110,82 @@ export default function Page() {
 
       const result = await response.json();
       // console.log(result);
-      setRuns(result);
+      setData(result.data);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
       // setLoading
     }
   };
-  const handleALlFiles = async () => {
-    fetchFiles("all", 10, null);
-  };
+  // const handleALlFiles = async () => {
+  //   fetchFiles("all", 10, null);
+  // };
 
   return (
     <div>
-      <button className="bg-blue-300" onClick={handleALlFiles}>
+      {/* <button className="bg-blue-300" onClick={handleALlFiles}>
         button
-      </button>
-      <div>{runs ? JSON.stringify(runs) : "No data"}</div>
+      </button> */}
+      <div>
+        <table className="w-full bg-white shadow-md rounded-md">
+          <thead>
+            <tr className="bg-neutral-100 rounded-t-md">
+              <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
+                Subject
+              </th>
+              <th className="py-2 px-4 border-b border-gray-200">
+                Display name
+              </th>
+              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
+                Sender
+              </th>
+              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
+                template_file
+              </th>
+              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
+                Created at
+              </th>
+              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
+                status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* {data?.map((item) => (
+              <tr key={item.run_id}>
+                <td>{item.subject}</td>
+                <td>{item.sender.email}</td>
+                <td>{item.created_at}</td>
+              </tr>
+            ))} */}
+            {data?.map((item) => (
+              <tr
+                key={item.run_id}
+                className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
+              >
+                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                  {item.subject}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                  {item.display_name}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                  {item.sender.username}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                  {item.template_file.file_name}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                  {convertToTaipeiTime(item.created_at)}
+                </td>
+                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                  {item.success_email_count}/{item.expected_email_send_count}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
