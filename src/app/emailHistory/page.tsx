@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import { useEditor } from "@tiptap/react";
+import { CalendarDays, User, FileText, Clock, CheckCircle } from "lucide-react";
 
 interface attachmentFilesType {
   file_url: string;
@@ -70,12 +70,12 @@ interface dateType {
   created_year: string;
 }
 
-interface responseType {
-  data: dateType[];
-  previous_last_evaluated_key: string;
-  current_last_evaluated_key: string;
-  next_last_evaluated_key: string;
-}
+// interface responseType {
+//   data: dateType[];
+//   previous_last_evaluated_key: string;
+//   current_last_evaluated_key: string;
+//   next_last_evaluated_key: string;
+// }
 
 export default function Page() {
   const [data, setData] = useState<dateType[] | null>(null);
@@ -126,65 +126,74 @@ export default function Page() {
       {/* <button className="bg-blue-300" onClick={handleALlFiles}>
         button
       </button> */}
+      <div className="flex flex-col justify-center items-start">
+        <p className="text-4xl font-bold pt-2">Emails history</p>
+        <div className="flex justify-between items-center w-full pb-4">
+          <p className="text-gray-500 italic">
+            Emails you <strong>have sent</strong> are displayed here.
+          </p>
+          <div className="h-10"></div>
+        </div>
+      </div>
       <div>
-        <table className="w-full bg-white shadow-md rounded-md">
-          <thead>
-            <tr className="bg-neutral-100 rounded-t-md">
-              <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
-                Subject
-              </th>
-              <th className="py-2 px-4 border-b border-gray-200">
-                Display name
-              </th>
-              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                Sender
-              </th>
-              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                template_file
-              </th>
-              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                Created at
-              </th>
-              <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* {data?.map((item) => (
-              <tr key={item.run_id}>
-                <td>{item.subject}</td>
-                <td>{item.sender.email}</td>
-                <td>{item.created_at}</td>
-              </tr>
-            ))} */}
-            {data?.map((item) => (
-              <tr
-                key={item.run_id}
-                className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
-              >
-                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                  {item.subject}
-                </td>
-                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                  {item.display_name}
-                </td>
-                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                  {item.sender.username}
-                </td>
-                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                  {item.template_file.file_name}
-                </td>
-                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                  {convertToTaipeiTime(item.created_at)}
-                </td>
-                <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                  {item.success_email_count}/{item.expected_email_send_count}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="w-full p-3 flex flex-col gap-3 bg-neutral-100 shadow-md rounded-md">
+          {data?.map((item) => (
+            <div className="w-full bg-white rounded-xl shadow-md overflow-hidden">
+              <div className="">
+                <div className="p-8">
+                  <div className="flex flex-col">
+                    <div className="uppercase tracking-wide text-2xl text-black font-semibold mb-1">
+                      {item.subject}
+                    </div>
+                    <hr />
+                    <div className="flex py-2 items-center gap-2">
+                      <div className="bg-blue-300 rounded-full p-1 border-2 border-blue-300">
+                        <User className="" size={32} color="white" />
+                      </div>
+                      <div className="flex flex-col justify-start">
+                        <p className="text-md font-medium text-black">
+                          {item.display_name}
+                        </p>
+                        <p className="text-sm font-medium text-neutral-500">
+                          {item.sender_local_part}@aws-educate.tw
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-col space-y-3">
+                    <div className="flex items-center">
+                      <User className="h-5 w-5 text-gray-400 mr-2" />
+                      <p className="text-gray-500">{item.sender.username}</p>
+                    </div>
+                    <div className="flex items-center">
+                      <FileText className="h-5 w-5 text-gray-400 mr-2" />
+                      <p className="text-gray-500">
+                        {item.template_file.file_name}
+                      </p>
+                    </div>
+                    <div className="flex items-center">
+                      <CalendarDays className="h-5 w-5 text-gray-400 mr-2" />
+                      <p className="text-gray-500">{item.created_at}</p>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                      <p
+                        className={`font-semibold ${
+                          status === "Active"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {item.success_email_count}/
+                        {item.expected_email_send_count}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
