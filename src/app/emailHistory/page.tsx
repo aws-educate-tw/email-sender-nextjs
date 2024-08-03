@@ -159,7 +159,10 @@ export default function Page() {
       <div>
         <div className="w-full p-3 flex flex-col gap-3 bg-neutral-100 shadow-md rounded-md">
           {data?.map((item) => (
-            <div className="w-full hover:shadow-xl transition bg-white rounded-xl shadow-md overflow-hidden">
+            <div
+              key={item.run_id}
+              className="w-full hover:shadow-xl transition bg-white rounded-xl shadow-md overflow-hidden"
+            >
               <div className="">
                 <div className="p-8">
                   <div className="flex flex-col">
