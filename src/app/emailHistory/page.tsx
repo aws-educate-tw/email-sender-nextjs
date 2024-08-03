@@ -167,7 +167,7 @@ export default function Page() {
                       {item.subject}
                     </div>
                     <hr />
-                    <div className="flex justify-between">
+                    <div className="flex flex-col lg:flex-row justify-between">
                       <div className="flex-1 flex py-2 gap-2 items-center">
                         <div className="bg-sky-900 rounded-full p-1 border-2 border-sky-900">
                           <User className="" size={32} color="white" />
@@ -209,23 +209,23 @@ export default function Page() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-end gap-8 pt-8">
+                  <div className="flex flex-col justify-end pt-2 pl-3 gap-2 lg:flex-row  lg:pt-8  lg:gap-8">
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         <CalendarDays size={20} />
                         <p>Send at</p>
                       </div>
                       <strong>{convertToTaipeiTime(item.created_at)}</strong>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         <Send size={20} />
                         <p>Sender</p>
                       </div>
                       <strong>{item.sender.username}</strong>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         <Clock size={20} />
                         <p>Status</p>
                       </div>
