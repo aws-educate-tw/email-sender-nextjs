@@ -39,6 +39,12 @@ export default function SideNav() {
         >
           <p className="px-3 text-white">Send Email</p>
         </Link>
+        <Link
+          href="/emailHistory"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">Email History</p>
+        </Link>
       </div>
       <div>
         <button
