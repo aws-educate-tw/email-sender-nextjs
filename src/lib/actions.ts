@@ -8,6 +8,10 @@ const formSchema = z.object({
   spreadsheet_file_id: z.string().min(1, "Spreadsheet file ID is required"),
   attachment_file_ids: z.array(z.string()),
   is_generate_certificate: z.boolean(),
+  reply_to: z.string().email("Invalid email address"),
+  sender_local_part: z.string(),
+  bcc: z.array(z.string().email("Invalid email address")),
+  cc: z.array(z.string().email("Invalid email address")),
 });
 
 const loginSchema = z.object({
@@ -36,7 +40,7 @@ export async function submitForm(data: string, access_token: string) {
   }
 
   try {
-    // console.log("data", validation.data);
+    console.log("data", validation.data);
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(
