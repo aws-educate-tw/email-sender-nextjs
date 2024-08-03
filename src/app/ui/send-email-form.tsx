@@ -5,9 +5,10 @@ import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "./attach-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
+import EmailInput from "@/app/ui/email-input";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { access } from "fs";
+import { ChevronDown } from "lucide-react";
 
 interface SubmitResponse {
   status: string;
@@ -36,6 +37,11 @@ export default function SendEmailForm() {
   const [isGenerateCertificate, setIsGenerateCertificate] =
     useState<boolean>(false);
 
+  const [replyToEmail, setReplyToEmail] = useState<string>("");
+  const [bccEmails, setBccEmails] = useState<string[]>([]);
+  const [ccEmails, setCcEmails] = useState<string[]>([]);
+  const [localPart, setLocalPart] = useState<string>("");
+
   const router = useRouter();
 
   const isTokenExpired = () => {
@@ -48,7 +54,6 @@ export default function SendEmailForm() {
     console.log("checkLoginStatus function called");
     const access_token = localStorage.getItem("access_token");
     if (!access_token || isTokenExpired()) {
-      // alert("Session expired. Please login again.");
       router.push("/login");
     }
   }, []);
@@ -67,7 +72,12 @@ export default function SendEmailForm() {
       spreadsheet_file_id: selectedXlsxFile,
       attachment_file_ids: attachment_file_ids,
       is_generate_certificate: isGenerateCertificate,
+      reply_to: replyToEmail,
+      sender_local_part: localPart,
+      bcc: bccEmails,
+      cc: ccEmails,
     };
+    console.log("form data", formData);
 
     setIsSubmitting(true);
     try {
@@ -149,17 +159,23 @@ export default function SendEmailForm() {
     setPreviewXlsx(false);
   };
 
-  // const handleCertificateChange = (
-  //   event: React.ChangeEvent<HTMLInputElement>
-  // ) => {
-  //   setIsGenerateCertificate(event.target.value === "yes");
-  // };
+  const handleReplyToEmailChange = (emails: string[]) => {
+    setReplyToEmail(emails[0] || "");
+  };
+
+  const handleBccEmailsChange = (emails: string[]) => {
+    setBccEmails(emails);
+  };
+
+  const handleCcEmailsChange = (emails: string[]) => {
+    setCcEmails(emails);
+  };
 
   return (
     <>
       <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">Send Emails</p>
-        <div className="flex justify-between items-center w-full pb-4">
+        <div className="flex justify-between items-center w-full">
           <p className="text-gray-500 italic">
             Enter your <strong>subject</strong> and{" "}
             <strong>display name</strong>.
@@ -167,7 +183,9 @@ export default function SendEmailForm() {
           <div className="h-10"></div>
         </div>
       </div>
+      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       <form onSubmit={onSubmit} ref={ref}>
+        <p className="text-2xl font-bold py-2">Required</p>
         <div className="rounded-md bg-neutral-100 p-4">
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
@@ -383,6 +401,60 @@ export default function SendEmailForm() {
               </p>
             )}
           </div>
+        </div>
+        <p className="text-2xl font-bold py-2 flex items-center gap-1">
+          Optional
+          {/* <ChevronDown size={24} /> */}
+        </p>
+        <div className="rounded-md bg-neutral-100 p-4">
+          {/* Sender Local Part */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">
+              Sender Local Part:
+            </label>
+            <div className="flex items-center bg-neutral-300 rounded-md">
+              <input
+                id="sender_local_part"
+                name="sender_local_part"
+                type="text"
+                value={localPart}
+                onChange={(e) => setLocalPart(e.target.value)}
+                placeholder="Enter the local part of email"
+                disabled={isSubmitting}
+                className={`rounded-l-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                  errors.sender_local_part
+                    ? "border-red-500"
+                    : "border-gray-200"
+                }`}
+              />
+              <div className="w-44 text-center text-sm">@aws-educate.tw</div>
+            </div>
+          </div>
+          {/* Reply To */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">Reply To:</label>
+            <EmailInput
+              allowMultiple={false}
+              onEmailsChange={handleReplyToEmailChange}
+            />
+          </div>
+          {/* BCC */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">BCC:</label>
+            <EmailInput
+              allowMultiple={true}
+              onEmailsChange={handleBccEmailsChange}
+            />
+          </div>
+          {/* CC */}
+          <div className="m-3">
+            <label className="mb-2 block text-sm font-medium">CC:</label>
+            <EmailInput
+              allowMultiple={true}
+              onEmailsChange={handleCcEmailsChange}
+            />
+          </div>
+          {/* Attach files */}
           <div className="m-3">
             <label className="mb-2 block text-sm font-medium">
               Attach files:
@@ -421,6 +493,7 @@ export default function SendEmailForm() {
               )}
             </div>
           </div>
+          {/* Generate certificate */}
           <div className="my-5 mx-3">
             <label className="mb-2 block text-sm font-medium">
               Provide a certification of participation?
@@ -479,8 +552,6 @@ export default function SendEmailForm() {
             </button>
           )}
         </div>
-        {/* <div>template : {selectedHtmlFile}</div> */}
-        {/* <div>sheet : {selectedXlsxFile}</div> */}
       </form>
     </>
   );
