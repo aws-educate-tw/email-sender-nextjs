@@ -1,7 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import { CalendarDays, User, FileText, Clock, Send, Sheet } from "lucide-react";
+import {
+  CalendarDays,
+  User,
+  FileText,
+  Clock,
+  Send,
+  Sheet,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 
 interface attachmentFilesType {
   file_url: string;
@@ -79,6 +88,15 @@ interface dateType {
 
 export default function Page() {
   const [data, setData] = useState<dateType[] | null>(null);
+  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
+    string | null
+  >(null);
+  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     fetchFiles(10, null);
@@ -111,6 +129,9 @@ export default function Page() {
       const result = await response.json();
       // console.log(result);
       setData(result.data);
+      setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
+      setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
+      setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
@@ -148,7 +169,7 @@ export default function Page() {
                     <hr />
                     <div className="flex justify-between">
                       <div className="flex-1 flex py-2 gap-2 items-center">
-                        <div className="bg-sky-500 rounded-full p-1 border-2 border-sky-500">
+                        <div className="bg-sky-900 rounded-full p-1 border-2 border-sky-900">
                           <User className="" size={32} color="white" />
                         </div>
                         <div className="flex flex-col justify-start">
@@ -161,7 +182,7 @@ export default function Page() {
                         </div>
                       </div>
                       <div className="flex-1 flex py-2 gap-2 items-center">
-                        <div className="bg-sky-400 rounded-full p-1 border-2 border-sky-400">
+                        <div className="bg-sky-800 rounded-full p-1 border-2 border-sky-800">
                           <Sheet size={32} color="white" />
                         </div>
                         <div className="flex flex-col justify-start">
@@ -174,7 +195,7 @@ export default function Page() {
                         </div>
                       </div>
                       <div className="flex-1 flex py-2 gap-2 items-center">
-                        <div className="bg-sky-300 rounded-full p-1 border-2 border-sky-300">
+                        <div className="bg-sky-700 rounded-full p-1 border-2 border-sky-700">
                           <FileText size={32} color="white" />
                         </div>
                         <div className="flex flex-col justify-start">
@@ -188,7 +209,7 @@ export default function Page() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-end gap-5 pt-8">
+                  <div className="flex justify-end gap-8 pt-8">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1">
                         <CalendarDays size={20} />
@@ -218,6 +239,38 @@ export default function Page() {
               </div>
             </div>
           ))}
+          <div className="flex justify-end gap-8 pb-1 px-2">
+            <button
+              className={`flex items-center gap-1 ${
+                !currentLastEvaluatedKey
+                  ? "cursor-default text-gray-400"
+                  : "hover:text-gray-600 hover:underline"
+              }`}
+              onClick={() => {
+                fetchFiles(5, previousLastEvaluatedKey);
+              }}
+              disabled={!currentLastEvaluatedKey}
+            >
+              <ChevronLeft size={20} />
+              Previous
+            </button>
+            <button
+              className={`flex items-center gap-1 ${
+                !nextLastEvaluatedKey
+                  ? "cursor-default text-gray-400"
+                  : "hover:text-gray-600 hover:underline"
+              }`}
+              onClick={() => {
+                if (nextLastEvaluatedKey) {
+                  fetchFiles(5, nextLastEvaluatedKey);
+                }
+              }}
+              disabled={!nextLastEvaluatedKey}
+            >
+              Next
+              <ChevronRight size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
