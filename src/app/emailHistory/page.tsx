@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import EmailHistoryCard from "@/app/ui/loading/email-history-card";
+import EmailHistoryCardLoading from "@/app/ui/loading/email-history-card-loading";
 import {
   CalendarDays,
   User,
@@ -12,7 +12,7 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
-import { set } from "zod";
+import EmailHistoryCard from "../ui/email-history-card";
 
 interface attachmentFilesType {
   file_url: string;
@@ -163,92 +163,9 @@ export default function Page() {
       <div>
         <div className="w-full p-3 flex flex-col gap-3 bg-neutral-100 shadow-md rounded-md">
           {isLoading ? (
-            <EmailHistoryCard />
+            <EmailHistoryCardLoading />
           ) : (
-            data?.map((item) => (
-              <div
-                key={item.run_id}
-                className="w-full hover:shadow-xl transition bg-white rounded-xl shadow-md overflow-hidden"
-              >
-                <div className="">
-                  <div className="p-8">
-                    <div className="flex flex-col">
-                      <div className="uppercase tracking-wide text-lg text-black font-semibold mb-1">
-                        {item.subject}
-                      </div>
-                      <hr />
-                      <div className="flex flex-col lg:flex-row justify-between">
-                        <div className="flex-1 flex py-2 gap-2 items-center">
-                          <div className="bg-sky-900 rounded-full p-1 border-2 border-sky-900">
-                            <User className="" size={32} color="white" />
-                          </div>
-                          <div className="flex flex-col justify-start">
-                            <p className="text-md font-medium text-black">
-                              {item.display_name}
-                            </p>
-                            <p className="text-sm font-medium text-neutral-500">
-                              {item.sender_local_part}@aws-educate.tw
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex-1 flex py-2 gap-2 items-center">
-                          <div className="bg-sky-800 rounded-full p-1 border-2 border-sky-800">
-                            <Sheet size={32} color="white" />
-                          </div>
-                          <div className="flex flex-col justify-start">
-                            <p className="text-md font-medium text-black">
-                              Spreadsheet file
-                            </p>
-                            <p className="text-sm font-medium text-neutral-500">
-                              {item.spreadsheet_file.file_name}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex-1 flex py-2 gap-2 items-center">
-                          <div className="bg-sky-700 rounded-full p-1 border-2 border-sky-700">
-                            <FileText size={32} color="white" />
-                          </div>
-                          <div className="flex flex-col justify-start">
-                            <p className="text-md font-medium text-black">
-                              template file
-                            </p>
-                            <p className="text-sm font-medium text-neutral-500">
-                              {item.template_file.file_name}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col justify-end pt-2 pl-3 gap-2 lg:flex-row  lg:pt-8  lg:gap-8">
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <CalendarDays size={20} />
-                          <p>Send at</p>
-                        </div>
-                        <strong>{convertToTaipeiTime(item.created_at)}</strong>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <Send size={20} />
-                          <p>Sender</p>
-                        </div>
-                        <strong>{item.sender.username}</strong>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <Clock size={20} />
-                          <p>Status</p>
-                        </div>
-                        <strong className="text-red-500">
-                          {item.success_email_count}/
-                          {item.expected_email_send_count}
-                        </strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
+            <EmailHistoryCard data={data} />
           )}
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
