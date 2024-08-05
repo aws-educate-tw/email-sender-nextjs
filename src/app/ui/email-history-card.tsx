@@ -1,5 +1,6 @@
 import { CalendarDays, User, FileText, Clock, Send, Sheet } from "lucide-react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import Link from "next/link";
 
 interface attachmentFilesType {
   file_url: string;
@@ -76,8 +77,9 @@ export default function EmailHistoryCard({ data }: props) {
   return (
     <>
       {data?.map((item) => (
-        <div
+        <Link
           key={item.run_id}
+          href={`/emailHistory/${item.run_id}`}
           className="w-full hover:shadow-xl transition bg-white rounded-xl shadow-md overflow-hidden"
         >
           <div className="">
@@ -156,7 +158,7 @@ export default function EmailHistoryCard({ data }: props) {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </>
   );
