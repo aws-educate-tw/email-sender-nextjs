@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import EmailHistoryCardLoading from "@/app/ui/loading/email-history-card-loading";
+import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import {
   CalendarDays,
   User,

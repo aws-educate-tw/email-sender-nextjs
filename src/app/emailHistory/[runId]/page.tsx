@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import EmailDetailsTable from "@/app/ui/email-details-table";
+import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface PageProps {
@@ -37,7 +38,7 @@ interface dataType {
 }
 
 export default function Page({ params }: PageProps) {
-  const [data, setData] = useState<dataType[] | null>(null);
+  const [data, setData] = useState<dataType[]>([]);
   const [status, setStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
@@ -116,115 +117,9 @@ export default function Page({ params }: PageProps) {
       </div>
       <div className="">
         {isLoading ? (
-          <p className="text-gray-500">Loading...</p>
+          <EmailDetailsTableSkeleton />
         ) : (
-          <div className="overflow-x-auto shadow-lg rounded-md">
-            <table className="w-full bg-white rounded-md">
-              <thead>
-                <tr>
-                  <th className="rounded-tl-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
-                    Recipient Email
-                  </th>
-                  <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
-                    BCC
-                  </th>
-                  <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
-                    CC
-                  </th>
-                  <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
-                    Status
-                  </th>
-                  <th className="rounded-tr-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
-                    Sent At
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {data?.map((item, index) => (
-                  <tr
-                    key={index}
-                    className={`${
-                      index !== 0 ? "border-t border-gray-200" : ""
-                    }`}
-                  >
-                    <td className="py-2 px-4 text-sm text-gray-700 font-bold">
-                      {item.recipient_email}
-                    </td>
-                    <td className="py-2 px-4 text-sm text-gray-700">
-                      {item.bcc.length === 0 ? (
-                        <div className="flex flex-col justify-start text-gray-300">
-                          NO BCC
-                        </div>
-                      ) : (
-                        <div className="flex flex-col justify-start">
-                          {item.bcc.map((email, idx) => (
-                            <div
-                              className={`py-1 ${
-                                idx !== 0
-                                  ? "border-dashed border-t-2 border-gray-200"
-                                  : ""
-                              }`}
-                              key={idx}
-                            >
-                              {email}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-2 px-4 text-sm text-gray-700">
-                      {item.cc.length === 0 ? (
-                        <div className="flex flex-col justify-start text-gray-300">
-                          NO CC
-                        </div>
-                      ) : (
-                        <div className="flex flex-col justify-start">
-                          {item.cc.map((email, idx) => (
-                            <div
-                              className={`py-1 ${
-                                idx !== 0
-                                  ? "border-dashed border-t-2 border-gray-200"
-                                  : ""
-                              }`}
-                              key={idx}
-                            >
-                              {email}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-2 px-4 text-gray-700">
-                      {item.status === "SUCCESS" ? (
-                        <div className="bg-green-500 text-white text-sm p-1 rounded-full text-center">
-                          {item.status}
-                        </div>
-                      ) : item.status === "FAILED" ? (
-                        <div className="bg-red-500 text-white text-sm p-1 rounded-full text-center">
-                          {item.status}
-                        </div>
-                      ) : (
-                        <div className="bg-yellow-200 text-black text-sm p-1 rounded-full text-center">
-                          {item.status}
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-2 px-4 text-sm text-gray-700">
-                      {item.status === "SUCCESS" && item.sent_at ? (
-                        convertToTaipeiTime(item.sent_at)
-                      ) : item.status === "FAILED" ? (
-                        <p className="text-red-500">This email is not sent.</p>
-                      ) : (
-                        <p className="text-yellow-400">
-                          This email is on its way.
-                        </p>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <EmailDetailsTable data={data} />
         )}
         <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
           <button

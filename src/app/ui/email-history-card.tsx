@@ -44,7 +44,7 @@ interface senderType {
   username: string;
 }
 
-interface dateType {
+interface dataType {
   bcc: string[];
   subject: string;
   cc: string[];
@@ -70,7 +70,7 @@ interface dateType {
 }
 
 interface props {
-  data: dateType[] | null;
+  data: dataType[] | null;
 }
 
 export default function EmailHistoryCard({ data }: props) {

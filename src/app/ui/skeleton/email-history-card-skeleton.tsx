@@ -1,6 +1,6 @@
 import { CalendarDays, Send, Clock } from "lucide-react";
 
-export default function EmailHistoryCardLoading() {
+export default function EmailHistoryCardSkeleton() {
   return (
     <div className="w-full hover:shadow-xl transition bg-white rounded-xl shadow-md overflow-hidden">
       <div className="animate-pulse">
