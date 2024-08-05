@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface PageProps {
   params: {
@@ -51,6 +52,11 @@ export default function Page({ params }: PageProps) {
 
   useEffect(() => {
     fetchFiles(10, null, null);
+    // const intervalId = setInterval(() => {
+    //   fetchFiles(10, null, null);
+    // }, 3000);
+
+    // return () => clearInterval(intervalId);
   }, []);
 
   const fetchFiles = async (
@@ -103,16 +109,16 @@ export default function Page({ params }: PageProps) {
         <p className="text-4xl font-bold pt-2">Emails history</p>
         <div className="flex justify-between items-center w-full pb-4">
           <p className="text-gray-500 italic">
-            Details of <strong>one of the run </strong>is shown here.
+            Details of <strong>one of the runs </strong>is shown here.
           </p>
           <div className="h-10"></div>
         </div>
       </div>
-      <div className="mx-auto rounded-md shadow-lg">
+      <div className="">
         {isLoading ? (
           <p className="text-gray-500">Loading...</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto shadow-lg rounded-md">
             <table className="w-full bg-white rounded-md">
               <thead>
                 <tr>
@@ -135,43 +141,84 @@ export default function Page({ params }: PageProps) {
               </thead>
               <tbody>
                 {data?.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-300">
-                    <td className="py-2 px-4 text-sm text-gray-700">
+                  <tr
+                    key={index}
+                    className={`${
+                      index !== 0 ? "border-t border-gray-200" : ""
+                    }`}
+                  >
+                    <td className="py-2 px-4 text-sm text-gray-700 font-bold">
                       {item.recipient_email}
                     </td>
                     <td className="py-2 px-4 text-sm text-gray-700">
-                      <div className="flex flex-col justify-start">
-                        {item.bcc.map((email, idx) => (
-                          <div
-                            className={
-                              idx !== 0 ? "border-t border-gray-200" : ""
-                            }
-                            key={idx}
-                          >
-                            {email}
-                          </div>
-                        ))}
-                      </div>
+                      {item.bcc.length === 0 ? (
+                        <div className="flex flex-col justify-start text-gray-300">
+                          NO BCC
+                        </div>
+                      ) : (
+                        <div className="flex flex-col justify-start">
+                          {item.bcc.map((email, idx) => (
+                            <div
+                              className={`py-1 ${
+                                idx !== 0
+                                  ? "border-dashed border-t-2 border-gray-200"
+                                  : ""
+                              }`}
+                              key={idx}
+                            >
+                              {email}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </td>
                     <td className="py-2 px-4 text-sm text-gray-700">
-                      <div className="flex flex-col justify-start">
-                        {item.cc.map((email, idx) => (
-                          <div
-                            className={`py-1 ${
-                              idx !== 0 ? "border-t-2 border-gray-200" : ""
-                            }`}
-                            key={idx}
-                          >
-                            {email}
-                          </div>
-                        ))}
-                      </div>
+                      {item.cc.length === 0 ? (
+                        <div className="flex flex-col justify-start text-gray-300">
+                          NO CC
+                        </div>
+                      ) : (
+                        <div className="flex flex-col justify-start">
+                          {item.cc.map((email, idx) => (
+                            <div
+                              className={`py-1 ${
+                                idx !== 0
+                                  ? "border-dashed border-t-2 border-gray-200"
+                                  : ""
+                              }`}
+                              key={idx}
+                            >
+                              {email}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                    <td className="py-2 px-4 text-gray-700">
+                      {item.status === "SUCCESS" ? (
+                        <div className="bg-green-500 text-white text-sm p-1 rounded-full text-center">
+                          {item.status}
+                        </div>
+                      ) : item.status === "FAILED" ? (
+                        <div className="bg-red-500 text-white text-sm p-1 rounded-full text-center">
+                          {item.status}
+                        </div>
+                      ) : (
+                        <div className="bg-yellow-200 text-black text-sm p-1 rounded-full text-center">
+                          {item.status}
+                        </div>
+                      )}
                     </td>
                     <td className="py-2 px-4 text-sm text-gray-700">
-                      {item.status}
-                    </td>
-                    <td className="py-2 px-4 text-sm text-gray-700">
-                      {convertToTaipeiTime(item.sent_at)}
+                      {item.status === "SUCCESS" && item.sent_at ? (
+                        convertToTaipeiTime(item.sent_at)
+                      ) : item.status === "FAILED" ? (
+                        <p className="text-red-500">This email is not sent.</p>
+                      ) : (
+                        <p className="text-yellow-400">
+                          This email is on its way.
+                        </p>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -179,6 +226,38 @@ export default function Page({ params }: PageProps) {
             </table>
           </div>
         )}
+        <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
+          <button
+            className={`flex items-center gap-1 ${
+              !currentLastEvaluatedKey
+                ? "cursor-default text-gray-400"
+                : "hover:text-gray-600 hover:underline"
+            }`}
+            onClick={() => {
+              fetchFiles(10, null, previousLastEvaluatedKey);
+            }}
+            disabled={!currentLastEvaluatedKey}
+          >
+            <ChevronLeft size={20} />
+            Previous
+          </button>
+          <button
+            className={`flex items-center gap-1 ${
+              !nextLastEvaluatedKey
+                ? "cursor-default text-gray-400"
+                : "hover:text-gray-600 hover:underline"
+            }`}
+            onClick={() => {
+              if (nextLastEvaluatedKey) {
+                fetchFiles(10, null, nextLastEvaluatedKey);
+              }
+            }}
+            disabled={!nextLastEvaluatedKey}
+          >
+            Next
+            <ChevronRight size={20} />
+          </button>
+        </div>
       </div>
     </>
   );
