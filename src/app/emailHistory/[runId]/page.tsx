@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 
 interface PageProps {
   params: {
@@ -97,16 +98,88 @@ export default function Page({ params }: PageProps) {
   };
 
   return (
-    <div>
-      {data?.map((item, index) => (
-        <div key={index}>
-          <p>{item.bcc}</p>
-          <p>----</p>
-          <p>{item.subject}</p>
-          <p>----</p>
-          <p>{item.cc}</p>
+    <>
+      <div className="flex flex-col justify-center items-start">
+        <p className="text-4xl font-bold pt-2">Emails history</p>
+        <div className="flex justify-between items-center w-full pb-4">
+          <p className="text-gray-500 italic">
+            Details of <strong>one of the run </strong>is shown here.
+          </p>
+          <div className="h-10"></div>
         </div>
-      ))}
-    </div>
+      </div>
+      <div className="mx-auto rounded-md shadow-lg">
+        {isLoading ? (
+          <p className="text-gray-500">Loading...</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white rounded-md">
+              <thead>
+                <tr>
+                  <th className="rounded-tl-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
+                    Recipient Email
+                  </th>
+                  <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
+                    BCC
+                  </th>
+                  <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
+                    CC
+                  </th>
+                  <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
+                    Status
+                  </th>
+                  <th className="rounded-tr-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
+                    Sent At
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data?.map((item, index) => (
+                  <tr key={index} className="border-b border-gray-300">
+                    <td className="py-2 px-4 text-sm text-gray-700">
+                      {item.recipient_email}
+                    </td>
+                    <td className="py-2 px-4 text-sm text-gray-700">
+                      <div className="flex flex-col justify-start">
+                        {item.bcc.map((email, idx) => (
+                          <div
+                            className={
+                              idx !== 0 ? "border-t border-gray-200" : ""
+                            }
+                            key={idx}
+                          >
+                            {email}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="py-2 px-4 text-sm text-gray-700">
+                      <div className="flex flex-col justify-start">
+                        {item.cc.map((email, idx) => (
+                          <div
+                            className={`py-1 ${
+                              idx !== 0 ? "border-t-2 border-gray-200" : ""
+                            }`}
+                            key={idx}
+                          >
+                            {email}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="py-2 px-4 text-sm text-gray-700">
+                      {item.status}
+                    </td>
+                    <td className="py-2 px-4 text-sm text-gray-700">
+                      {convertToTaipeiTime(item.sent_at)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
