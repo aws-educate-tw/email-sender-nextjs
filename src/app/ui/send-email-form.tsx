@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef, useState, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
+import HelpTip from "@/app/ui/help-tip";
 import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "./attach-dropdown";
 import FileUpload from "@/app/ui/file-upload";
@@ -8,7 +9,7 @@ import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { Info } from "lucide-react";
 
 interface SubmitResponse {
   status: string;
@@ -188,8 +189,11 @@ export default function SendEmailForm() {
         <p className="text-2xl font-bold py-2">Required</p>
         <div className="rounded-md bg-neutral-100 p-4">
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Subject of the email:
+              <HelpTip message="Enter the email subject that recipients will see.">
+                <Info size={16} color="gray" />
+              </HelpTip>
             </label>
             <input
               id="subject"
@@ -206,8 +210,11 @@ export default function SendEmailForm() {
             )}
           </div>
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Name of the sender:
+              <HelpTip message="Enter the sender's name as it will appear to recipients.">
+                <Info size={16} color="gray" />
+              </HelpTip>
             </label>
             <input
               id="display_name"
@@ -224,8 +231,11 @@ export default function SendEmailForm() {
             )}
           </div>
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Select your template file:
+              <HelpTip message="Choose or upload a .html file that contains the email content.">
+                <Info size={16} color="gray" />
+              </HelpTip>
             </label>
             <div className="flex items-center gap-2">
               <SelectDropdown
@@ -312,8 +322,11 @@ export default function SendEmailForm() {
             )}
           </div>
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Select your sheet file:
+              <HelpTip message="Choose or upload a .xlsx file containing the list of recipients.">
+                <Info size={16} color="gray" />
+              </HelpTip>
             </label>
             <div className="flex items-center gap-2">
               <SelectDropdown
@@ -409,8 +422,11 @@ export default function SendEmailForm() {
         <div className="rounded-md bg-neutral-100 p-4">
           {/* Sender Local Part */}
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Sender Local Part:
+              <HelpTip message="Enter the prefix for your email address (e.g., if you enter john.doe, the email will be john.doe@aws-educate.tw). This setting will affect the forwarding rules.">
+                <Info size={16} color="gray" />
+              </HelpTip>
             </label>
             <div className="flex items-center bg-neutral-300 rounded-md">
               <input
@@ -432,7 +448,12 @@ export default function SendEmailForm() {
           </div>
           {/* Reply To */}
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">Reply To:</label>
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              Reply To:
+              <HelpTip message="The email address where replies from recipients will be sent. You can set this to match the Sender Local Part or customize it.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
             <EmailInput
               allowMultiple={false}
               onEmailsChange={handleReplyToEmailChange}
@@ -440,7 +461,12 @@ export default function SendEmailForm() {
           </div>
           {/* BCC */}
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">BCC:</label>
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              BCC:
+              <HelpTip message="Add email addresses to send blind carbon copies.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
             <EmailInput
               allowMultiple={true}
               onEmailsChange={handleBccEmailsChange}
@@ -448,7 +474,12 @@ export default function SendEmailForm() {
           </div>
           {/* CC */}
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">CC:</label>
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              CC:
+              <HelpTip message="Add email addresses to send carbon copies. Recipients will see these addresses.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
             <EmailInput
               allowMultiple={true}
               onEmailsChange={handleCcEmailsChange}
@@ -456,8 +487,11 @@ export default function SendEmailForm() {
           </div>
           {/* Attach files */}
           <div className="m-3">
-            <label className="mb-2 block text-sm font-medium">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Attach files:
+              <HelpTip message="Attach any files you want to include with the email. Note: It is recommended that the total size of attachments does not exceed 5MB.">
+                <Info size={16} color="gray" />
+              </HelpTip>
             </label>
             <div className="flex items-center gap-2">
               <AttachDropdown onSelect={handleAttachSelect} />
@@ -495,8 +529,11 @@ export default function SendEmailForm() {
           </div>
           {/* Generate certificate */}
           <div className="my-5 mx-3">
-            <label className="mb-2 block text-sm font-medium">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Provide a certification of participation?
+              <HelpTip message="Select Yes or No if you want to provide a certification. Note: If you select Yes, the Excel file must include two columns: Name and Certificate Text.">
+                <Info size={16} color="gray" />
+              </HelpTip>
             </label>
             <div className="flex">
               <div className="flex items-center me-4">
