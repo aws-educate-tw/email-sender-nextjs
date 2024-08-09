@@ -3,8 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { on } from "events";
-import { set } from "zod";
 
 interface fileDataType {
   file_id: string;
