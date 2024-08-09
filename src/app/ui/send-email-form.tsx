@@ -22,10 +22,10 @@ interface SubmitResponse {
 export default function SendEmailForm() {
   const ref = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [selectedHtmlFile, setSelectedHtmlFile] = useState("");
-  const [selectedXlsxFile, setSelectedXlsxFile] = useState("");
-  const [htmlPreviewLink, setHtmlPreviewLink] = useState<string>("");
-  const [xlsxPreviewLink, setXlsxPreviewLink] = useState<string>("");
+  const [selectedHtmlFile, setSelectedHtmlFile] = useState<string | null>("");
+  const [selectedXlsxFile, setSelectedXlsxFile] = useState<string | null>("");
+  const [htmlPreviewLink, setHtmlPreviewLink] = useState<string | null>("");
+  const [xlsxPreviewLink, setXlsxPreviewLink] = useState<string | null>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showHtmlUpload, setShowHtmlUpload] = useState<boolean>(false);
   const [showXlsxUpload, setShowXlsxUpload] = useState<boolean>(false);
@@ -105,7 +105,10 @@ export default function SendEmailForm() {
     setIsSubmitting(false);
   };
 
-  const handleHtmlSelect = (file_id: string, file_url: string) => {
+  const handleHtmlSelect = (
+    file_id: string | null,
+    file_url: string | null
+  ) => {
     setSelectedHtmlFile(file_id);
     setHtmlPreviewLink(file_url);
   };
