@@ -109,6 +109,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
     if (!file) {
       setSelectedFiles([]);
       onSelect([]);
+      setIsOpen(false);
       return;
     }
     const alreadySelected = selectedFiles.some(
