@@ -105,7 +105,13 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (file: fileDataType) => {
+  const handleSelect = (file: fileDataType | null) => {
+    if (!file) {
+      setSelectedFiles([]);
+      onSelect([]);
+      setIsOpen(false);
+      return;
+    }
     const alreadySelected = selectedFiles.some(
       (selectedFile) => selectedFile.file_id === file.file_id
     );
@@ -215,6 +221,17 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
                   </tr>
                 </thead>
                 <tbody>
+                  <tr
+                    className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
+                    onClick={() => handleSelect(null)}
+                  >
+                    <td
+                      className="py-2 px-4 border-b border-gray-200 text-start"
+                      colSpan={3}
+                    >
+                      No Selection
+                    </td>
+                  </tr>
                   {filteredOptions.map((option) => (
                     <tr
                       key={option.file_id}

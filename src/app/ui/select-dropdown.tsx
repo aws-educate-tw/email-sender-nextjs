@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { on } from "events";
+import { set } from "zod";
 
 interface fileDataType {
   file_id: string;
@@ -120,12 +122,18 @@ export default function SelectDropdown({
   };
 
   const handleSelect = (
-    file_id: string,
-    file_url: string,
-    file_name: string
+    file_id: string | null,
+    file_url: string | null,
+    file_name: string | null
   ) => {
+    if (!file_id || !file_url || !file_name) {
+      onSelect("", "");
+      setSelectedFileName(`Select a ${fileExtension} file`);
+      setIsOpen(false);
+      return;
+    }
     onSelect(file_id, file_url);
-    console.log("Selected file:", file_id);
+    // console.log("Selected file:", file_id);
     setSelectedFileName(file_name);
     setIsOpen(false);
   };
@@ -217,6 +225,17 @@ export default function SelectDropdown({
                   </tr>
                 </thead>
                 <tbody>
+                  <tr
+                    className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
+                    onClick={() => handleSelect(null, null, null)}
+                  >
+                    <td
+                      className="py-2 px-4 border-b border-gray-200 text-start"
+                      colSpan={3}
+                    >
+                      No Selection
+                    </td>
+                  </tr>
                   {filteredOptions.map((option) => (
                     <tr
                       key={option.file_id}
