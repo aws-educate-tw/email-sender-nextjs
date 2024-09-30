@@ -1,5 +1,6 @@
 "use server";
-import { z } from "zod";
+import { Session } from "inspector";
+import { optional, z } from "zod";
 
 const formSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
@@ -22,8 +23,15 @@ const loginSchema = z.object({
 const changePasswordSchema = z.object({
   account: z.string().min(1, "Account is required"),
   new_password: z.string().min(1, "Password is required"),
-  session: z.string().min(1, "Session is required"),
-});
+  session: z.string().optional(),
+  verification_code: z.string().optional(),
+}).refine(
+  (data) => data.session || data.verification_code,
+  {
+    message: "Either session or verification code must be provided",
+    path: ["session", "verification_code"], // Optional path for the error message
+  }
+);
 
 export async function submitForm(data: string, access_token: string) {
   const parsedData = JSON.parse(data);
@@ -129,7 +137,7 @@ export async function submitLogin(data: string) {
 export async function submitChangePassword(data: string) {
   const parsedData = JSON.parse(data);
   const validation = changePasswordSchema.safeParse(parsedData);
-  console.log("validation", validation);
+  // console.log("validation", validation);
 
   if (!validation.success) {
     return {
@@ -142,6 +150,7 @@ export async function submitChangePassword(data: string) {
   }
   // console.log(parsedData);
   console.log("validation", validation);
+
   try {
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/auth/change-password`);

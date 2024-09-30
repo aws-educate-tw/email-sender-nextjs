@@ -4,24 +4,13 @@ import { submitLogin, submitChangePassword } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { ScanEye } from "lucide-react";
 
-// interface LoginResponse {
-//   message: string;
-//   accessToken: string;
-// }
-// interface FirstTimeLoginResponse {
-//   message: string;
-//   challengeName: string;
-//   session: string;
-//   challengeParameters: {
-//     USER_ID_FOR_SRP: string;
-//     requiredAttributes: string;
-//     userAttributes: string;
-//   };
-// }
-
 export default function Page() {
   const router = useRouter();
   const [session, setSession] = useState<string | null>(null);
+  const [verificationRequired, setVerificationRequired] =
+    useState<boolean>(false);
+  const [verificationCode, setVerificationCode] = useState<string>("");
+
   const [error, setError] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -54,18 +43,19 @@ export default function Page() {
     try {
       const response = await submitLogin(JSON.stringify(formData));
 
+      console.log(response);
       alert(response.message);
 
-      if (response.message == "Login successful") {
+      if (response.message === "Login successful") {
         localStorage.setItem("access_token", response.access_token);
 
         const tokenExpiryTime = new Date().getTime() + 24 * 60 * 60 * 10000;
         localStorage.setItem("token_expiry_time", tokenExpiryTime.toString());
 
         router.push("/sendEmail");
-      }
-
-      if (response.challengeName == "NEW_PASSWORD_REQUIRED") {
+      } else if (response.message === "Password reset required for the user") {
+        setVerificationRequired(true);
+      } else if (response.challengeName === "NEW_PASSWORD_REQUIRED") {
         setSession(response.session);
       }
     } catch (error: any) {
@@ -85,17 +75,34 @@ export default function Page() {
       ref.current.querySelector("[id='account']") as HTMLInputElement
     ).value;
 
-    const payload = {
-      account: account,
-      new_password: newPassword,
-      session: session,
-    };
+    let payload;
+
+    if (session) {
+      // If session is available (NEW_PASSWORD_REQUIRED)
+      payload = {
+        account: account,
+        new_password: newPassword,
+        session: session,
+      };
+    } else if (verificationRequired) {
+      // If verification code is required (Password reset)
+      payload = {
+        account: account,
+        new_password: newPassword,
+        verification_code: verificationCode,
+      };
+    }
 
     try {
       const response = await submitChangePassword(JSON.stringify(payload));
-      alert("Password changed successfully");
-      if (response.message == "Password changed successfully") {
-        router.push("/sendEmail");
+
+      // console.log(response);
+      if (
+        response.message === "Password changed successfully (First Login)" ||
+        response.message === "Password reset successfully (Forgot Password)"
+      ) {
+        alert("Password changed successfully, please login again");
+        router.push("/");
       }
     } catch (error: any) {
       console.error("Password change failed", error);
@@ -109,7 +116,9 @@ export default function Page() {
         <p className="text-gray-500 italic">Welcome to TPET</p>
       </div>
       <form
-        onSubmit={session ? onSubmitNewPassword : onSubmit}
+        onSubmit={
+          session || verificationRequired ? onSubmitNewPassword : onSubmit
+        }
         ref={ref}
         className="min-w-80 "
       >
@@ -125,7 +134,7 @@ export default function Page() {
             />
           </div>
 
-          {!session && (
+          {!session && !verificationRequired && (
             <div className="relative">
               <label className="mb-2 block text-sm font-medium">Password</label>
               <input
@@ -145,8 +154,23 @@ export default function Page() {
             </div>
           )}
 
-          {session && (
+          {(session || verificationRequired) && (
             <>
+              {verificationRequired && (
+                <div className="relative">
+                  <label className="mb-2 block text-sm font-medium">
+                    Verification Code
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter verification code again"
+                    className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                  />
+                </div>
+              )}
+
               <div className="relative">
                 <label className="mb-2 block text-sm font-medium">
                   New Password
@@ -196,7 +220,7 @@ export default function Page() {
             type="submit"
             className="h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
           >
-            {session ? "Change Password" : "Login"}
+            {session || verificationRequired ? "Change Password" : "Login"}
           </button>
         </div>
       </form>
