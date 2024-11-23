@@ -54,7 +54,7 @@ export default function CreateWebhookForm() {
     if (!access_token || isTokenExpired()) {
       router.push("/login");
     }
-  }, []);
+  }, [router]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
