@@ -36,8 +36,7 @@ export default function CreateWebhookForm() {
   // 首先加入 state
   const [showAttachUpload, setShowAttachUpload] = useState<boolean>(false);
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
-  const [isGenerateCertificate, setIsGenerateCertificate] =
-    useState<boolean>(false);
+  const [isGenerateCertificate, setIsGenerateCertificate] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
@@ -62,23 +61,14 @@ export default function CreateWebhookForm() {
     if (!ref.current) return;
 
     const formData = {
-      subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement)
-        .value,
-      display_name: (
-        ref.current.querySelector("[id='display_name']") as HTMLInputElement
-      ).value,
+      subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement).value,
+      display_name: (ref.current.querySelector("[id='display_name']") as HTMLInputElement).value,
       template_file_id: selectedHTML,
-      webhook_name: (
-        ref.current.querySelector("[id='webhook_name']") as HTMLInputElement
-      ).value,
-      hash_key: (
-        ref.current.querySelector("[id='hash_key']") as HTMLInputElement
-      ).value,
-      iv_key: (ref.current.querySelector("[id='iv_key']") as HTMLInputElement)
+      webhook_name: (ref.current.querySelector("[id='webhook_name']") as HTMLInputElement).value,
+      hash_key: (ref.current.querySelector("[id='hash_key']") as HTMLInputElement).value,
+      iv_key: (ref.current.querySelector("[id='iv_key']") as HTMLInputElement).value,
+      surveycake_link: (ref.current.querySelector("[id='surveycake_link']") as HTMLInputElement)
         .value,
-      surveycake_link: (
-        ref.current.querySelector("[id='surveycake_link']") as HTMLInputElement
-      ).value,
       attachment_file_ids: attachment_file_ids,
       reply_to: replyToEmail,
       sender_local_part: localPart,
@@ -96,7 +86,7 @@ export default function CreateWebhookForm() {
 
       if (response.status === "error" && response.errors) {
         const newErrors: { [key: string]: string } = {};
-        response.errors.forEach((err) => {
+        response.errors.forEach(err => {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
@@ -115,10 +105,7 @@ export default function CreateWebhookForm() {
     setIsSubmitting(false);
   };
 
-  const handleHtmlSelect = (
-    file_id: string | null,
-    file_url: string | null
-  ) => {
+  const handleHtmlSelect = (file_id: string | null, file_url: string | null) => {
     setSelectedHtmlFile(file_id);
     setHtmlPreviewLink(file_url);
   };
@@ -164,9 +151,7 @@ export default function CreateWebhookForm() {
       <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">Create Webhook</p>
         <div className="flex justify-between items-center w-full">
-          <p className="text-gray-500 italic">
-            Configure your webhook settings.
-          </p>
+          <p className="text-gray-500 italic">Configure your webhook settings.</p>
           <div className="h-10"></div>
         </div>
       </div>
@@ -191,9 +176,7 @@ export default function CreateWebhookForm() {
                 errors.subject ? "border-red-500" : "border-gray-200"
               }`}
             />
-            {errors.subject && (
-              <p className="text-red-500 text-sm">{errors.subject}</p>
-            )}
+            {errors.subject && <p className="text-red-500 text-sm">{errors.subject}</p>}
           </div>
 
           <div className="m-3">
@@ -213,9 +196,7 @@ export default function CreateWebhookForm() {
                 errors.display_name ? "border-red-500" : "border-gray-200"
               }`}
             />
-            {errors.display_name && (
-              <p className="text-red-500 text-sm">{errors.display_name}</p>
-            )}
+            {errors.display_name && <p className="text-red-500 text-sm">{errors.display_name}</p>}
           </div>
 
           <div className="m-3">
@@ -231,13 +212,11 @@ export default function CreateWebhookForm() {
                 name="sender_local_part"
                 type="text"
                 value={localPart}
-                onChange={(e) => setLocalPart(e.target.value)}
+                onChange={e => setLocalPart(e.target.value)}
                 placeholder="Enter the local part of email"
                 disabled={isSubmitting}
                 className={`rounded-l-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                  errors.sender_local_part
-                    ? "border-red-500"
-                    : "border-gray-200"
+                  errors.sender_local_part ? "border-red-500" : "border-gray-200"
                 }`}
               />
               <div className="w-44 text-center text-sm">@aws-educate.tw</div>
@@ -255,10 +234,7 @@ export default function CreateWebhookForm() {
               </HelpTip>
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown
-                onSelect={handleHtmlSelect}
-                fileExtension="html"
-              />
+              <SelectDropdown onSelect={handleHtmlSelect} fileExtension="html" />
               <button
                 type="button"
                 onClick={() => setPreviewTemplate(true)}
@@ -296,10 +272,7 @@ export default function CreateWebhookForm() {
                   name="inline-radio-group"
                   className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500"
                 />
-                <label
-                  htmlFor="inline-radio"
-                  className="ms-2 text-sm font-medium text-gray-900"
-                >
+                <label htmlFor="inline-radio" className="ms-2 text-sm font-medium text-gray-900">
                   Yes
                 </label>
               </div>
@@ -312,10 +285,7 @@ export default function CreateWebhookForm() {
                   name="inline-radio-group"
                   className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500"
                 />
-                <label
-                  htmlFor="inline-2-radio"
-                  className="ms-2 text-sm font-medium text-gray-900"
-                >
+                <label htmlFor="inline-2-radio" className="ms-2 text-sm font-medium text-gray-900">
                   No
                 </label>
               </div>
@@ -339,9 +309,7 @@ export default function CreateWebhookForm() {
                 errors.webhook_name ? "border-red-500" : "border-gray-200"
               }`}
             />
-            {errors.webhook_name && (
-              <p className="text-red-500 text-sm">{errors.webhook_name}</p>
-            )}
+            {errors.webhook_name && <p className="text-red-500 text-sm">{errors.webhook_name}</p>}
           </div>
 
           <div className="m-3">
@@ -351,13 +319,8 @@ export default function CreateWebhookForm() {
                 <Info size={16} color="gray" />
               </HelpTip>
             </label>
-            <EmailInput
-              allowMultiple={false}
-              onEmailsChange={handleReplyToEmailChange}
-            />
-            {errors.reply_to && (
-              <p className="text-red-500 text-sm">{errors.reply_to}</p>
-            )}
+            <EmailInput allowMultiple={false} onEmailsChange={handleReplyToEmailChange} />
+            {errors.reply_to && <p className="text-red-500 text-sm">{errors.reply_to}</p>}
           </div>
 
           <div className="m-3">
@@ -367,10 +330,7 @@ export default function CreateWebhookForm() {
                 <Info size={16} color="gray" />
               </HelpTip>
             </label>
-            <EmailInput
-              allowMultiple={true}
-              onEmailsChange={handleBccEmailsChange}
-            />
+            <EmailInput allowMultiple={true} onEmailsChange={handleBccEmailsChange} />
             {errors.bcc && <p className="text-red-500 text-sm">{errors.bcc}</p>}
           </div>
 
@@ -381,10 +341,7 @@ export default function CreateWebhookForm() {
                 <Info size={16} color="gray" />
               </HelpTip>
             </label>
-            <EmailInput
-              allowMultiple={true}
-              onEmailsChange={handleCcEmailsChange}
-            />
+            <EmailInput allowMultiple={true} onEmailsChange={handleCcEmailsChange} />
             {errors.cc && <p className="text-red-500 text-sm">{errors.cc}</p>}
           </div>
 
@@ -469,9 +426,7 @@ export default function CreateWebhookForm() {
                 errors.hash_key ? "border-red-500" : "border-gray-200"
               }`}
             />
-            {errors.hash_key && (
-              <p className="text-red-500 text-sm">{errors.hash_key}</p>
-            )}
+            {errors.hash_key && <p className="text-red-500 text-sm">{errors.hash_key}</p>}
           </div>
 
           <div className="m-3">
@@ -491,9 +446,7 @@ export default function CreateWebhookForm() {
                 errors.iv_key ? "border-red-500" : "border-gray-200"
               }`}
             />
-            {errors.iv_key && (
-              <p className="text-red-500 text-sm">{errors.iv_key}</p>
-            )}
+            {errors.iv_key && <p className="text-red-500 text-sm">{errors.iv_key}</p>}
           </div>
         </div>
 
@@ -524,12 +477,7 @@ export default function CreateWebhookForm() {
               onClick={() => setShowTemplateUpload(false)}
               className="absolute top-4 right-4 text-black"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path
                   fill="currentColor"
                   d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
@@ -548,12 +496,7 @@ export default function CreateWebhookForm() {
               onClick={() => setPreviewTemplate(false)}
               className="absolute top-8 right-8 text-white"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path
                   fill="currentColor"
                   d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"

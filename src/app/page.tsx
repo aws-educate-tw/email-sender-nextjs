@@ -19,9 +19,7 @@ export default function Page() {
           <p className="text-xl text-gray-800 md:text-3xl md:leading-normal">
             <strong>Welcome to AWS Educate.</strong>
             <br />
-            <span className="text-lg">
-              This is the TPET for AWS Ambassadors
-            </span>
+            <span className="text-lg">This is the TPET for AWS Ambassadors</span>
           </p>
           <Link
             href="login"

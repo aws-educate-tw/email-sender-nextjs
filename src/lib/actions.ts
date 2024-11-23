@@ -26,7 +26,7 @@ const changePasswordSchema = z
     session: z.string().optional(),
     verification_code: z.string().optional(),
   })
-  .refine((data) => data.session || data.verification_code, {
+  .refine(data => data.session || data.verification_code, {
     message: "Either session or verification code must be provided",
     path: ["session", "verification_code"], // Optional path for the error message
   });
@@ -54,7 +54,7 @@ export async function submitForm(data: string, access_token: string) {
     return {
       status: "error",
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
+      errors: validation.error.errors.map(err => ({
         path: err.path.join("."),
         message: err.message,
       })),
@@ -99,7 +99,7 @@ export async function submitLogin(data: string) {
   if (!validation.success) {
     return {
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
+      errors: validation.error.errors.map(err => ({
         path: err.path.join("."),
         message: err.message,
       })),
@@ -150,7 +150,7 @@ export async function submitChangePassword(data: string) {
   if (!validation.success) {
     return {
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
+      errors: validation.error.errors.map(err => ({
         path: err.path.join("."),
         message: err.message,
       })),
@@ -191,7 +191,7 @@ export async function submitWebhookForm(data: string, access_token: string) {
     return {
       status: "error",
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
+      errors: validation.error.errors.map(err => ({
         path: err.path.join("."),
         message: err.message,
       })),

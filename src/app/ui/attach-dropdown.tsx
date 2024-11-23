@@ -20,41 +20,28 @@ interface AttachDropdownProps {
 
 export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
   const [options, setOptions] = useState<fileDataType[] | null>(null);
-  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(
-    null
-  );
+  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<fileDataType[]>([]);
-  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
-    string | null
-  >(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
-    string | null
-  >(null);
-  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<
-    string | null
-  >(null);
+  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
+  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
+  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (options) {
       setFilteredOptions(
-        options.filter((option) =>
-          option.file_name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        options.filter(option => option.file_name.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
   }, [searchTerm, options]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -113,12 +100,12 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
       return;
     }
     const alreadySelected = selectedFiles.some(
-      (selectedFile) => selectedFile.file_id === file.file_id
+      selectedFile => selectedFile.file_id === file.file_id
     );
     let updatedSelectedFiles;
     if (alreadySelected) {
       updatedSelectedFiles = selectedFiles.filter(
-        (selectedFile) => selectedFile.file_id !== file.file_id
+        selectedFile => selectedFile.file_id !== file.file_id
       );
     } else {
       updatedSelectedFiles = [...selectedFiles, file];
@@ -144,7 +131,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
           onClick={toggleDropdown}
         >
           {selectedFiles.length > 0
-            ? `${selectedFiles.map((file) => file.file_name).join(", ")}`
+            ? `${selectedFiles.map(file => file.file_name).join(", ")}`
             : "Attach your files"}
           <svg
             className="-mr-1 ml-2 h-5 w-5"
@@ -176,7 +163,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
               placeholder="Search a file name..."
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </div>
 
@@ -209,15 +196,9 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
               <table className="w-full bg-white shadow-md rounded-md">
                 <thead>
                   <tr className="bg-neutral-100 rounded-t-md">
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
-                      File Name
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200">
-                      Created At
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                      File Size
-                    </th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">File Size</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -225,20 +206,15 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
                     className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
                     onClick={() => handleSelect(null)}
                   >
-                    <td
-                      className="py-2 px-4 border-b border-gray-200 text-start"
-                      colSpan={3}
-                    >
+                    <td className="py-2 px-4 border-b border-gray-200 text-start" colSpan={3}>
                       No Selection
                     </td>
                   </tr>
-                  {filteredOptions.map((option) => (
+                  {filteredOptions.map(option => (
                     <tr
                       key={option.file_id}
                       className={`hover:bg-gray-200 cursor-pointer active:bg-gray-300 ${
-                        selectedFiles.some(
-                          (file) => file.file_id === option.file_id
-                        )
+                        selectedFiles.some(file => file.file_id === option.file_id)
                           ? "bg-gray-100"
                           : ""
                       }`}
@@ -295,26 +271,15 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
               <table className="w-full bg-white">
                 <thead>
                   <tr className="bg-neutral-100 rounded-t-md">
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
-                      File Name
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200">
-                      Created At
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200">
-                      Created At
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                      File Size
-                    </th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">File Size</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td
-                      className="py-2 px-4 border-b border-gray-200"
-                      colSpan={3}
-                    >
+                    <td className="py-2 px-4 border-b border-gray-200" colSpan={3}>
                       No files found
                     </td>
                   </tr>

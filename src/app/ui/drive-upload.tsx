@@ -36,7 +36,7 @@ export default function DriveUpload({ onFileUploadSuccess }: FileUploadProps) {
     }
 
     const formData = new FormData();
-    files.forEach((file) => {
+    files.forEach(file => {
       formData.append("file", file);
     });
     // console.log("Form Data:", formData);
@@ -80,8 +80,8 @@ export default function DriveUpload({ onFileUploadSuccess }: FileUploadProps) {
       <div className="flex flex-col justify-center items-center">
         <p className="text-4xl font-bold pt-2">Upload new files</p>
         <p className="text-gray-500 italic pb-4">
-          Upload your <strong>participants sheet</strong> and{" "}
-          <strong>email template</strong> at once.
+          Upload your <strong>participants sheet</strong> and <strong>email template</strong> at
+          once.
         </p>
       </div>
       <form onSubmit={onSubmit}>
@@ -123,9 +123,7 @@ export default function DriveUpload({ onFileUploadSuccess }: FileUploadProps) {
       </form>
       {fileData && (
         <div className="rounded-md bg-neutral-100 p-4 min-w-48">
-          <label className="mb-2 block text-lg font-medium">
-            Uploaded files
-          </label>
+          <label className="mb-2 block text-lg font-medium">Uploaded files</label>
           <div>
             <div className="relative overflow-x-auto rounded-md border">
               <table className="w-full text-sm text-left rtl:text-right text-black">
@@ -160,12 +158,8 @@ export default function DriveUpload({ onFileUploadSuccess }: FileUploadProps) {
                         </a>
                       </th>
                       <td className="px-6 py-4">{file.file_size}</td>
-                      <td className="px-6 py-4">
-                        {convertToTaipeiTime(file.created_at)}
-                      </td>
-                      <td className="px-6 py-4">
-                        {convertToTaipeiTime(file.updated_at)}
-                      </td>
+                      <td className="px-6 py-4">{convertToTaipeiTime(file.created_at)}</td>
+                      <td className="px-6 py-4">{convertToTaipeiTime(file.updated_at)}</td>
                     </tr>
                   </tbody>
                 ))}

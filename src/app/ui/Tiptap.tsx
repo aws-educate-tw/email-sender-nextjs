@@ -59,7 +59,7 @@ const Tiptap = ({ onChange, content }: any) => {
           // 將已有的空段落轉換為包含 &nbsp; 的格式
           .replace(/<p>\s*<\/p>/g, "<p>&nbsp;</p>")
           // 處理連續空行，但保留它們
-          .replace(/(<p>&nbsp;<\/p>)+/g, (match) => match)
+          .replace(/(<p>&nbsp;<\/p>)+/g, match => match)
           // 確保段落之間有換行符號
           .replace(/<\/p><p>/g, "</p>\n<p>")
       );

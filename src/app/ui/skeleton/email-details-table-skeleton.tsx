@@ -26,10 +26,7 @@ export default function EmailDetailsTableSkeleton() {
         </thead>
         <tbody>
           {skeletonRows.map((_, index) => (
-            <tr
-              key={index}
-              className={`${index !== 0 ? "border-t border-gray-200" : ""}`}
-            >
+            <tr key={index} className={`${index !== 0 ? "border-t border-gray-200" : ""}`}>
               <td className="py-2 px-4 text-sm">
                 <div className="bg-gray-200 h-4 rounded-md animate-pulse"></div>
               </td>
