@@ -14,7 +14,7 @@ import {
   Undo,
   Redo,
   Link,
-  Image,
+  ImagePlus,
 } from "lucide-react";
 
 type Props = {
@@ -257,7 +257,7 @@ const Toolbar = ({ editor, content }: Props) => {
           }
         >
           <div className="p-2">
-            <Image className="w-5 h-5" />
+            <ImagePlus className="w-5 h-5" aria-hidden="true" />
           </div>
         </button>
         <button
