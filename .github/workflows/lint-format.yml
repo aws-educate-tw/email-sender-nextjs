@@ -3,12 +3,12 @@ name: Lint and Format Check
 on:
   pull_request:
     paths:
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/*.css'
-      - '**/*.scss'
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.css"
+      - "**/*.scss"
 
 jobs:
   lint-format:
