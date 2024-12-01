@@ -176,18 +176,23 @@ const Tiptap = ({ onChange, content }: any) => {
           </button>
         ) : (
           <div className="flex gap-2">
-            <input
-              id="save_file_name"
-              name="save_file_name"
-              type="text"
-              placeholder="Please Enter the File Name"
-              onChange={handleFileNameChange}
-              className="flex whitespace-nowrap rounded-md border py-2 pl-4 font-medium outline-2 placeholder:text-gray-500 w-72"
-            />
+            <div className="flex items-center rounded-md border-2 overflow-hidden focus-within:outline focus-within:outline-2 focus-within:outline-blue-500">
+              <input
+                id="save_file_name"
+                name="save_file_name"
+                type="text"
+                placeholder="Please Enter the File Name"
+                onChange={handleFileNameChange}
+                className="py-2 pl-4 pr-0 font-medium w-72 focus:outline-none border-none"
+              />
+              <div className="px-3 flex items-center justify-center font-medium bg-neutral-300 h-full text-black">
+                .html
+              </div>
+            </div>
             <button
               onClick={handleUpload}
               disabled={isFileNameEmpty}
-              className="flex whitespace-nowrap h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-500"
+              className="flex whitespace-nowrap border-2 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-500"
             >
               Save as template
             </button>
@@ -196,7 +201,7 @@ const Tiptap = ({ onChange, content }: any) => {
         {showNextStep && (
           <NextStepLink
             href="/sendEmail"
-            className="flex h-10 items-center rounded-lg bg-sky-800 hover:bg-sky-700 hover:text-white px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            className="flex border-2 items-center rounded-lg  bg-sky-800 hover:bg-sky-700 hover:text-white px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
           >
             Next Step &rarr;
           </NextStepLink>
