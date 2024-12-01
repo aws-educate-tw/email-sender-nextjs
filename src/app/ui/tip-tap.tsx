@@ -14,6 +14,8 @@ import { useState } from "react";
 import NextStepLink from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Toast } from "flowbite-react";
+import { HiCheck } from "react-icons/hi";
 
 const htmltemplateContent = `
     <p>親愛的{{Name}}，</p>
@@ -36,6 +38,7 @@ export default function TipTap({ onChange, content }: any) {
   const [isUploading, setIsUploading] = useState(false);
   const [showNextStep, setShowNextStep] = useState(false);
   const [isFileNameEmpty, setIsFileNameEmpty] = useState(true);
+  const [showToast, setShowToast] = useState(false);
 
   const router = useRouter();
 
@@ -104,7 +107,8 @@ export default function TipTap({ onChange, content }: any) {
       setIsUploading(false);
       setIsFileNameEmpty(true);
       setShowNextStep(true);
-      alert("You have uploaded the html file successfully!");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
     } catch (error) {
       console.error("Upload failed:", error);
     }
@@ -149,6 +153,21 @@ export default function TipTap({ onChange, content }: any) {
 
   return (
     <>
+      {showToast && (
+        <div className="fixed top-4 right-6 z-50">
+          <Toast
+            className="bg-green-400 drop-shadow-lg transition-opacity hover: cursor-pointer"
+            onClick={() => setShowToast(false)}
+          >
+            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
+              <HiCheck className="h-6 w-6 text-green-500" />
+            </div>
+            <div className="ml-3 font-medium text-white">
+              File uploaded successfully.
+            </div>
+          </Toast>
+        </div>
+      )}
       <div className="w-full p-4 rounded-md bg-neutral-100">
         <div
           className={`bg-white p-3 px-6 border-2 border-gray-200 flex flex-col justify-between rounded-lg ${
