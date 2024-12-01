@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Toolbar from "@/app/ui/Toolbar";
+import Toolbar from "@/app/ui/tool-bar";
 import { Underline } from "@tiptap/extension-underline";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
@@ -14,7 +14,6 @@ import { useState } from "react";
 import NextStepLink from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { stat } from "fs";
 
 const htmltemplateContent = `
     <p>親愛的{{Name}}，</p>
@@ -31,7 +30,7 @@ const htmltemplateContent = `
     <p>AWS Educate Cloud Ambassador</p>
     <p>billwu0222@gmail.com</p>`;
 
-export default function Tiptap({ onChange, content }: any) {
+export default function TipTap({ onChange, content }: any) {
   const [editorContent, setEditorContent] = useState(htmltemplateContent);
   const [isFocused, setIsFocused] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
