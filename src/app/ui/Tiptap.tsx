@@ -103,6 +103,7 @@ const Tiptap = ({ onChange, content }: any) => {
       const result = await response.json();
       console.log(result);
       setIsUploading(false);
+      setIsFileNameEmpty(true);
       setShowNextStep(true);
       alert("You have uploaded the html file successfully!");
     } catch (error) {
