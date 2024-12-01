@@ -162,9 +162,7 @@ export default function TipTap({ onChange, content }: any) {
             <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
               <HiCheck className="h-6 w-6 text-green-500" />
             </div>
-            <div className="ml-3 font-medium text-white">
-              File uploaded successfully.
-            </div>
+            <div className="ml-3 font-medium text-white">File uploaded successfully.</div>
           </Toast>
         </div>
       )}
