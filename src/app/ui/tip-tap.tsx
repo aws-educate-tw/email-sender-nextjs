@@ -31,7 +31,7 @@ const htmltemplateContent = `
     <p>AWS Educate Cloud Ambassador</p>
     <p>billwu0222@gmail.com</p>`;
 
-const Tiptap = ({ onChange, content }: any) => {
+export default function Tiptap({ onChange, content }: any) {
   const [editorContent, setEditorContent] = useState(htmltemplateContent);
   const [isFocused, setIsFocused] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -209,6 +209,4 @@ const Tiptap = ({ onChange, content }: any) => {
       </div>
     </>
   );
-};
-
-export default Tiptap;
+}
