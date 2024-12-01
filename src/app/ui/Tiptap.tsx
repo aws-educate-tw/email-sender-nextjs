@@ -54,6 +54,10 @@ const Tiptap = ({ onChange, content }: any) => {
   }, [router]);
 
   const handleUpload = async () => {
+    const saveFileNameInput = document.getElementById("save_file_name") as HTMLInputElement;
+    // Remove the leading and trailing white spaces
+    const saveFileName = saveFileNameInput?.value.trim();
+
     const preserveEmptyLines = (content: string): string => {
       return (
         content
@@ -80,8 +84,9 @@ const Tiptap = ({ onChange, content }: any) => {
     </body>
     </html>`;
     const blob = new Blob([html], { type: "text/html" });
+    const fileName = `${saveFileName}.html`;
     const formData = new FormData();
-    formData.append("file", blob, "html-generate.html");
+    formData.append("file", blob, fileName);
 
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -165,13 +170,23 @@ const Tiptap = ({ onChange, content }: any) => {
             Saving...
           </button>
         ) : (
-          <button
-            onClick={handleUpload}
-            className="flex h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
-          >
-            {/* <Upload className="w-5 h-5" /> */}
-            Save as template
-          </button>
+          <div className="flex gap-2">
+            <input
+              id="save_file_name"
+              name="save_file_name"
+              type="text"
+              placeholder="Please Enter the File Name"
+              // disabled={isSubmitting}
+              className="flex whitespace-nowrap rounded-md border py-2 pl-4 font-medium outline-2 placeholder:text-gray-500 w-72"
+            />
+            <button
+              onClick={handleUpload}
+              className="flex whitespace-nowrap h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            >
+              {/* <Upload className="w-5 h-5" /> */}
+              Save as template
+            </button>
+          </div>
         )}
         {showNextStep && (
           <NextStepLink
