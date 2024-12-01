@@ -7,16 +7,14 @@ import { ScanEye } from "lucide-react";
 export default function Page() {
   const router = useRouter();
   const [session, setSession] = useState<string | null>(null);
-  const [verificationRequired, setVerificationRequired] =
-    useState<boolean>(false);
+  const [verificationRequired, setVerificationRequired] = useState<boolean>(false);
   const [verificationCode, setVerificationCode] = useState<string>("");
 
   const [error, setError] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false); // for the pw of login and the pw of new password
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false); //for the confirm pw
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false); //for the confirm pw
   const ref = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -33,11 +31,8 @@ export default function Page() {
     setShowPassword(false);
 
     const formData = {
-      account: (ref.current.querySelector("[id='account']") as HTMLInputElement)
-        .value,
-      password: (
-        ref.current.querySelector("[id='password']") as HTMLInputElement
-      ).value,
+      account: (ref.current.querySelector("[id='account']") as HTMLInputElement).value,
+      password: (ref.current.querySelector("[id='password']") as HTMLInputElement).value,
     };
 
     try {
@@ -71,9 +66,7 @@ export default function Page() {
     }
     if (!ref.current) return;
 
-    const account = (
-      ref.current.querySelector("[id='account']") as HTMLInputElement
-    ).value;
+    const account = (ref.current.querySelector("[id='account']") as HTMLInputElement).value;
 
     let payload;
 
@@ -116,9 +109,7 @@ export default function Page() {
         <p className="text-gray-500 italic">Welcome to TPET</p>
       </div>
       <form
-        onSubmit={
-          session || verificationRequired ? onSubmitNewPassword : onSubmit
-        }
+        onSubmit={session || verificationRequired ? onSubmitNewPassword : onSubmit}
         ref={ref}
         className="min-w-80 "
       >
@@ -158,29 +149,25 @@ export default function Page() {
             <>
               {verificationRequired && (
                 <div className="relative">
-                  <label className="mb-2 block text-sm font-medium">
-                    Verification Code
-                  </label>
+                  <label className="mb-2 block text-sm font-medium">Verification Code</label>
                   <input
                     type="text"
                     placeholder="Enter verification code again"
                     className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
                     value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
+                    onChange={e => setVerificationCode(e.target.value)}
                   />
                 </div>
               )}
 
               <div className="relative">
-                <label className="mb-2 block text-sm font-medium">
-                  New Password
-                </label>
+                <label className="mb-2 block text-sm font-medium">New Password</label>
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
                   className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={e => setNewPassword(e.target.value)}
                 />
                 <button
                   type="button"
@@ -192,15 +179,13 @@ export default function Page() {
               </div>
 
               <div className="relative">
-                <label className="mb-2 block text-sm font-medium">
-                  Confirm New Password
-                </label>
+                <label className="mb-2 block text-sm font-medium">Confirm New Password</label>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm new password"
                   className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={e => setConfirmPassword(e.target.value)}
                 />
                 <button
                   type="button"

@@ -76,7 +76,7 @@ interface props {
 export default function EmailHistoryCard({ data }: props) {
   return (
     <>
-      {data?.map((item) => (
+      {data?.map(item => (
         <Link
           key={item.run_id}
           href={`/emailHistory/${item.run_id}`}
@@ -95,9 +95,7 @@ export default function EmailHistoryCard({ data }: props) {
                       <User className="" size={32} color="white" />
                     </div>
                     <div className="flex flex-col justify-start">
-                      <p className="text-md font-medium text-black">
-                        {item.display_name}
-                      </p>
+                      <p className="text-md font-medium text-black">{item.display_name}</p>
                       <p className="text-sm font-medium text-neutral-500">
                         {item.sender_local_part}@aws-educate.tw
                       </p>
@@ -108,9 +106,7 @@ export default function EmailHistoryCard({ data }: props) {
                       <Sheet size={32} color="white" />
                     </div>
                     <div className="flex flex-col justify-start">
-                      <p className="text-md font-medium text-black">
-                        Spreadsheet file
-                      </p>
+                      <p className="text-md font-medium text-black">Spreadsheet file</p>
                       <p className="text-sm font-medium text-neutral-500">
                         {item.spreadsheet_file.file_name}
                       </p>
@@ -121,9 +117,7 @@ export default function EmailHistoryCard({ data }: props) {
                       <FileText size={32} color="white" />
                     </div>
                     <div className="flex flex-col justify-start">
-                      <p className="text-md font-medium text-black">
-                        template file
-                      </p>
+                      <p className="text-md font-medium text-black">template file</p>
                       <p className="text-sm font-medium text-neutral-500">
                         {item.template_file.file_name}
                       </p>

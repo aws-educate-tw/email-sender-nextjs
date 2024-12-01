@@ -14,7 +14,7 @@ import {
   Undo,
   Redo,
   Link,
-  Image,
+  ImagePlus,
 } from "lucide-react";
 
 type Props = {
@@ -99,7 +99,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleBold().run();
           }}
@@ -114,7 +114,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleItalic().run();
           }}
@@ -129,7 +129,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleUnderline().run();
           }}
@@ -144,7 +144,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleStrike().run();
           }}
@@ -159,7 +159,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleHeading({ level: 1 }).run();
           }}
@@ -174,7 +174,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleHeading({ level: 2 }).run();
           }}
@@ -189,7 +189,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleHeading({ level: 3 }).run();
           }}
@@ -204,7 +204,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleBulletList().run();
           }}
@@ -219,7 +219,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleOrderedList().run();
           }}
@@ -234,7 +234,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().toggleBlockquote().run();
           }}
@@ -257,11 +257,11 @@ const Toolbar = ({ editor, content }: Props) => {
           }
         >
           <div className="p-2">
-            <Image className="w-5 h-5" />
+            <ImagePlus className="w-5 h-5" aria-hidden="true" />
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().undo().run();
           }}
@@ -276,7 +276,7 @@ const Toolbar = ({ editor, content }: Props) => {
           </div>
         </button>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             editor.chain().focus().redo().run();
           }}

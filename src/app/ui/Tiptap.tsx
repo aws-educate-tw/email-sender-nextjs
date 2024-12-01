@@ -24,6 +24,7 @@ const htmltemplateContent = `
     <p>【開幕活動與報名資訊】<br>隨著「6th AWS Educate Taiwan 雲端校園大使證照陪跑計畫」正式啟動，誠摯邀請您參加 2024 年 5 月 3 日（星期五）舉行的開幕活動。開幕活動不僅標誌著計畫的正式啟動，也將針對計畫內容、規則等詳細說明，亦可與其他參與者相互認識、交流分享。<br>有意願參加開幕活動請填寫以下報名表單，<span class="important">表單將於 4/29（一）18:00 截止</span>：<a target="_blank" href="https://www.surveycake.com/s/VKO3k">點擊這裡</a></p>
     <p>若您有任何問題或需要進一步協助，請隨時與我們聯繫，我們將竭誠為您服務！</p>
     <p>台灣 AWS Educate Cloud Ambassador 官方社群：Facebook＆Instagram</p>
+    <br>
     <p>Best regards,</p>
     <p>Bill Wu</p>
     <p>AWS Educate Cloud Ambassador</p>
@@ -50,18 +51,19 @@ const Tiptap = ({ onChange, content }: any) => {
       // alert("Session expired. Please login again.");
       router.push("/login");
     }
-  }, []);
+  }, [router]);
 
   const handleUpload = async () => {
-
     const preserveEmptyLines = (content: string): string => {
-      return content
-        // 將已有的空段落轉換為包含 &nbsp; 的格式
-        .replace(/<p>\s*<\/p>/g, '<p>&nbsp;</p>')
-        // 處理連續空行，但保留它們
-        .replace(/(<p>&nbsp;<\/p>)+/g, (match) => match)
-        // 確保段落之間有換行符號
-        .replace(/<\/p><p>/g, '</p>\n<p>');
+      return (
+        content
+          // 將已有的空段落轉換為包含 &nbsp; 的格式
+          .replace(/<p>\s*<\/p>/g, "<p>&nbsp;</p>")
+          // 處理連續空行，但保留它們
+          .replace(/(<p>&nbsp;<\/p>)+/g, match => match)
+          // 確保段落之間有換行符號
+          .replace(/<\/p><p>/g, "</p>\n<p>")
+      );
     };
 
     const formattedContent = preserveEmptyLines(editorContent);
@@ -103,7 +105,7 @@ const Tiptap = ({ onChange, content }: any) => {
   };
 
   const handleChange = (newContent: string) => {
-    console.log(newContent);
+    // console.log(newContent);
     setEditorContent(newContent);
     onChange(newContent);
   };

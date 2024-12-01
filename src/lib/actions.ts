@@ -19,18 +19,17 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-const changePasswordSchema = z.object({
-  account: z.string().min(1, "Account is required"),
-  new_password: z.string().min(1, "Password is required"),
-  session: z.string().optional(),
-  verification_code: z.string().optional(),
-}).refine(
-  (data) => data.session || data.verification_code,
-  {
+const changePasswordSchema = z
+  .object({
+    account: z.string().min(1, "Account is required"),
+    new_password: z.string().min(1, "Password is required"),
+    session: z.string().optional(),
+    verification_code: z.string().optional(),
+  })
+  .refine(data => data.session || data.verification_code, {
     message: "Either session or verification code must be provided",
     path: ["session", "verification_code"], // Optional path for the error message
-  }
-);
+  });
 
 const webhookFormSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
@@ -45,7 +44,7 @@ const webhookFormSchema = z.object({
   surveycake_link: z.string(),
   hash_key: z.string().min(1, "Hash key is required"),
   iv_key: z.string().min(1, "IV key is required"),
-  webhook_name: z.string().min(1, "Webhook name is required")
+  webhook_name: z.string().min(1, "Webhook name is required"),
 });
 
 export async function submitForm(data: string, access_token: string) {
@@ -55,8 +54,8 @@ export async function submitForm(data: string, access_token: string) {
     return {
       status: "error",
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
-        path: err.path.join('.'),
+      errors: validation.error.errors.map(err => ({
+        path: err.path.join("."),
         message: err.message,
       })),
     };
@@ -66,17 +65,14 @@ export async function submitForm(data: string, access_token: string) {
     console.log("data", validation.data);
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
-    const response = await fetch(
-      url.toString(),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${access_token}`,
-        },
-        body: JSON.stringify(validation.data)
-      }
-    );
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+      body: JSON.stringify(validation.data),
+    });
 
     const result = await response.json();
     return {
@@ -103,8 +99,8 @@ export async function submitLogin(data: string) {
   if (!validation.success) {
     return {
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
-        path: err.path.join('.'),
+      errors: validation.error.errors.map(err => ({
+        path: err.path.join("."),
         message: err.message,
       })),
     };
@@ -114,32 +110,29 @@ export async function submitLogin(data: string) {
   try {
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/auth/login`);
-    const response = await fetch(
-      url.toString(),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(validation.data),
-      }
-    );
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(validation.data),
+    });
 
     const result = await response.json();
     // console.log("response", result);
-    if (result.challengeName === "NEW_PASSWORD_REQUIRED" ){
+    if (result.challengeName === "NEW_PASSWORD_REQUIRED") {
       return {
         message: result.message,
         challengeName: result.challengeName,
         session: result.session,
         challengeParameters: result.challengeParameters,
-      }
+      };
     } else {
       return {
         message: result.message,
         access_token: result.access_token,
+      };
     }
-  }
   } catch (error: any) {
     return {
       status: "error",
@@ -157,8 +150,8 @@ export async function submitChangePassword(data: string) {
   if (!validation.success) {
     return {
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
-        path: err.path.join('.'),
+      errors: validation.error.errors.map(err => ({
+        path: err.path.join("."),
         message: err.message,
       })),
     };
@@ -169,22 +162,19 @@ export async function submitChangePassword(data: string) {
   try {
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/auth/change-password`);
-    const response = await fetch(
-      url.toString(),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(validation.data)
-      }
-    );
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(validation.data),
+    });
 
     const result = await response.json();
     console.log("result", result);
     return {
       message: result.message,
-    }
+    };
   } catch (error: any) {
     return {
       status: "error",
@@ -201,8 +191,8 @@ export async function submitWebhookForm(data: string, access_token: string) {
     return {
       status: "error",
       message: "Validation failed",
-      errors: validation.error.errors.map((err) => ({
-        path: err.path.join('.'),
+      errors: validation.error.errors.map(err => ({
+        path: err.path.join("."),
         message: err.message,
       })),
     };
@@ -212,17 +202,14 @@ export async function submitWebhookForm(data: string, access_token: string) {
     console.log("data", validation.data);
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/webhook`);
-    const response = await fetch(
-      url.toString(),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${access_token}`,
-        },
-        body: JSON.stringify(validation.data)
-      }
-    );
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+      body: JSON.stringify(validation.data),
+    });
 
     const result = await response.json();
     return {

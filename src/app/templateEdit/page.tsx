@@ -14,9 +14,7 @@ export default function Page() {
       <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">Create an Email template</p>
         <div className="flex justify-between items-center w-full pb-4">
-          <p className="text-gray-500 italic">
-            Create and save your html file here.
-          </p>
+          <p className="text-gray-500 italic">Create and save your html file here.</p>
           <div className="h-10"></div>
         </div>
       </div>

@@ -91,15 +91,9 @@ interface dateType {
 export default function Page() {
   const [data, setData] = useState<dateType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
-    string | null
-  >(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
-    string | null
-  >(null);
-  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<
-    string | null
-  >(null);
+  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
+  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
+  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFiles(10, null);
@@ -162,11 +156,7 @@ export default function Page() {
       </div>
       <div>
         <div className="w-full p-3 flex flex-col gap-3 bg-neutral-100 shadow-md rounded-md">
-          {isLoading ? (
-            <EmailHistoryCardLoading />
-          ) : (
-            <EmailHistoryCard data={data} />
-          )}
+          {isLoading ? <EmailHistoryCardLoading /> : <EmailHistoryCard data={data} />}
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
               className={`flex items-center gap-1 ${

@@ -13,11 +13,7 @@ interface FileDataType {
   uploader_id: string;
 }
 
-export default function FileUpload({
-  OnFileExtension,
-}: {
-  OnFileExtension: string;
-}) {
+export default function FileUpload({ OnFileExtension }: { OnFileExtension: string }) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
   const [fileData, setFileData] = useState<FileDataType[]>([]);
@@ -35,7 +31,7 @@ export default function FileUpload({
     }
 
     const formData = new FormData();
-    files.forEach((file) => {
+    files.forEach(file => {
       formData.append("file", file);
     });
     // console.log("Form Data:", formData);
@@ -81,13 +77,9 @@ export default function FileUpload({
       <div className="flex flex-col justify-center items-start py-3 gap-2">
         <p className="text-4xl font-bold pt-2">Upload new files</p>
         {OnFileExtension === ".html" ? (
-          <p className="text-gray-500 italic pb-4">
-            Upload your email template.
-          </p>
+          <p className="text-gray-500 italic pb-4">Upload your email template.</p>
         ) : OnFileExtension === ".xlsx" ? (
-          <p className="text-gray-500 italic pb-4">
-            Upload your participants sheet.
-          </p>
+          <p className="text-gray-500 italic pb-4">Upload your participants sheet.</p>
         ) : OnFileExtension === "all" ? (
           <p className="text-gray-500 italic pb-4">Attach your files.</p>
         ) : (
@@ -144,9 +136,7 @@ export default function FileUpload({
       </div>
       {fileData && (
         <div className="rounded-md bg-neutral-100 p-4 min-w-48">
-          <label className="mb-2 block text-lg font-medium">
-            Uploaded files
-          </label>
+          <label className="mb-2 block text-lg font-medium">Uploaded files</label>
           <div>
             <div className="relative overflow-x-auto rounded-md border">
               <table className="w-full text-sm text-left rtl:text-right text-black">
@@ -181,12 +171,8 @@ export default function FileUpload({
                         </a>
                       </th>
                       <td className="px-6 py-4">{file.file_size}</td>
-                      <td className="px-6 py-4">
-                        {convertToTaipeiTime(file.created_at)}
-                      </td>
-                      <td className="px-6 py-4">
-                        {convertToTaipeiTime(file.updated_at)}
-                      </td>
+                      <td className="px-6 py-4">{convertToTaipeiTime(file.created_at)}</td>
+                      <td className="px-6 py-4">{convertToTaipeiTime(file.updated_at)}</td>
                     </tr>
                   </tbody>
                 ))}

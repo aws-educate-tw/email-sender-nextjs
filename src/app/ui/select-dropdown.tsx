@@ -20,48 +20,30 @@ interface SelectDropdownProps {
   fileExtension: string;
 }
 
-export default function SelectDropdown({
-  onSelect,
-  fileExtension,
-}: SelectDropdownProps) {
+export default function SelectDropdown({ onSelect, fileExtension }: SelectDropdownProps) {
   const [options, setOptions] = useState<fileDataType[] | null>(null);
-  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(
-    null
-  );
+  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFileName, setSelectedFileName] = useState(
-    `Select a ${fileExtension} file`
-  );
-  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<
-    string | null
-  >(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<
-    string | null
-  >(null);
-  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<
-    string | null
-  >(null);
+  const [selectedFileName, setSelectedFileName] = useState(`Select a ${fileExtension} file`);
+  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
+  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
+  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (options) {
       setFilteredOptions(
-        options.filter((option) =>
-          option.file_name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        options.filter(option => option.file_name.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
   }, [searchTerm, options]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -178,7 +160,7 @@ export default function SelectDropdown({
               placeholder="Search a file name..."
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </div>
 
@@ -211,15 +193,9 @@ export default function SelectDropdown({
               <table className="w-full bg-white shadow-md rounded-md">
                 <thead>
                   <tr className="bg-neutral-100 rounded-t-md">
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
-                      File Name
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200">
-                      Created At
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                      File Size
-                    </th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">File Size</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -227,23 +203,16 @@ export default function SelectDropdown({
                     className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
                     onClick={() => handleSelect(null, null, null)}
                   >
-                    <td
-                      className="py-2 px-4 border-b border-gray-200 text-start"
-                      colSpan={3}
-                    >
+                    <td className="py-2 px-4 border-b border-gray-200 text-start" colSpan={3}>
                       No Selection
                     </td>
                   </tr>
-                  {filteredOptions.map((option) => (
+                  {filteredOptions.map(option => (
                     <tr
                       key={option.file_id}
                       className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
                       onClick={() =>
-                        handleSelect(
-                          option.file_id,
-                          option.file_url,
-                          option.file_name
-                        )
+                        handleSelect(option.file_id, option.file_url, option.file_name)
                       }
                     >
                       <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
@@ -297,23 +266,14 @@ export default function SelectDropdown({
               <table className="w-full bg-white">
                 <thead>
                   <tr className="bg-neutral-100 rounded-t-md">
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">
-                      File Name
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200">
-                      Created At
-                    </th>
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">
-                      File Size
-                    </th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">File Size</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td
-                      className="py-2 px-4 border-b border-gray-200"
-                      colSpan={3}
-                    >
+                    <td className="py-2 px-4 border-b border-gray-200" colSpan={3}>
                       No files found
                     </td>
                   </tr>
