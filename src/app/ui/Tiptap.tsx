@@ -14,6 +14,7 @@ import { useState } from "react";
 import NextStepLink from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { stat } from "fs";
 
 const htmltemplateContent = `
     <p>親愛的{{Name}}，</p>
@@ -35,6 +36,7 @@ const Tiptap = ({ onChange, content }: any) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showNextStep, setShowNextStep] = useState(false);
+  const [isFileNameEmpty, setIsFileNameEmpty] = useState(true);
 
   const router = useRouter();
 
@@ -48,7 +50,6 @@ const Tiptap = ({ onChange, content }: any) => {
     console.log("checkLoginStatus function called");
     const access_token = localStorage.getItem("access_token");
     if (!access_token || isTokenExpired()) {
-      // alert("Session expired. Please login again.");
       router.push("/login");
     }
   }, [router]);
@@ -109,10 +110,16 @@ const Tiptap = ({ onChange, content }: any) => {
     }
   };
 
+  // Update the state of rich editor based on the input value
   const handleChange = (newContent: string) => {
-    // console.log(newContent);
     setEditorContent(newContent);
     onChange(newContent);
+  };
+
+  // Update the state of file name based on the input value
+  const handleFileNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.trim();
+    setIsFileNameEmpty(value === "");
   };
 
   const editor = useEditor({
@@ -158,9 +165,6 @@ const Tiptap = ({ onChange, content }: any) => {
         </div>
       </div>
       <div className="mt-4 flex justify-end gap-2">
-        {/* <button onClick={handleSave} className="">
-            <Download className="w-5 h-5" />
-          </button> */}
         {isUploading ? (
           <button
             onClick={handleUpload}
@@ -176,14 +180,14 @@ const Tiptap = ({ onChange, content }: any) => {
               name="save_file_name"
               type="text"
               placeholder="Please Enter the File Name"
-              // disabled={isSubmitting}
+              onChange={handleFileNameChange}
               className="flex whitespace-nowrap rounded-md border py-2 pl-4 font-medium outline-2 placeholder:text-gray-500 w-72"
             />
             <button
               onClick={handleUpload}
-              className="flex whitespace-nowrap h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+              disabled={isFileNameEmpty}
+              className="flex whitespace-nowrap h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-500"
             >
-              {/* <Upload className="w-5 h-5" /> */}
               Save as template
             </button>
           </div>
