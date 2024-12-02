@@ -34,8 +34,7 @@ Open your browser and navigate to `http://localhost:3000/` to view the applicati
 
 1. Create your branch from the `dev-new` branch and switch to it:
 
-   > [!IMPORTANT]
-   > `dev` branch has been deprecated. Please create your branch from `dev-new` branch.
+   `dev` branch has been deprecated. Please create your branch from `dev-new` branch !!!
 
 2. Make sure you have your code formatted and linted:
 
