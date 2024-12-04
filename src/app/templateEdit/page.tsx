@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import TipTap from "@/app/ui/Tiptap";
+import TipTap from "@/app/ui/tip-tap";
 
 export default function Page() {
   const [content, setContent] = useState("");

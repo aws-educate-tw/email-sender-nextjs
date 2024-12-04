@@ -22,7 +22,7 @@ type Props = {
   content: string;
 };
 
-const Toolbar = ({ editor, content }: Props) => {
+export default function ToolBar({ editor, content }: Props) {
   const setLink = useCallback(() => {
     if (!editor) return;
     const previousUrl = editor.getAttributes("link").href;
@@ -293,6 +293,4 @@ const Toolbar = ({ editor, content }: Props) => {
       </div>
     </div>
   );
-};
-
-export default Toolbar;
+}
