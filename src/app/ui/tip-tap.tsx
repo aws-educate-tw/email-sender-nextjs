@@ -181,46 +181,49 @@ export default function TipTap({ onChange, content }: any) {
           <Toolbar editor={editor} content={content} />
         </div>
       </div>
-      <div className="mt-4 flex justify-end gap-2">
+      <div className="mt-1 flex justify-end gap-2">
         {isUploading ? (
           <button
             onClick={handleUpload}
-            className="flex h-10 items-center rounded-lg bg-gray-500 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            className="flex mt-4 h-10 items-center rounded-lg bg-gray-500 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
             disabled
           >
             Saving...
           </button>
         ) : (
-          <div className="flex gap-2">
-            <div className="flex items-center rounded-md border-2 overflow-hidden focus-within:outline focus-within:outline-2 focus-within:outline-blue-500">
-              <input
-                id="save_file_name"
-                name="save_file_name"
-                type="text"
-                placeholder="Please Enter the File Name"
-                onChange={handleFileNameChange}
-                className="py-2 pl-4 pr-0 font-medium w-72 focus:outline-none border-none"
-              />
-              <div className="px-3 flex items-center justify-center font-medium bg-neutral-300 h-full text-black">
-                .html
+          <div className="flex flex-col">
+            <p className="text-sm">File name</p>
+            <div className="flex gap-2">
+              <div className="flex items-center rounded-md border-2 overflow-hidden focus-within:outline focus-within:outline-2 focus-within:outline-blue-500">
+                <input
+                  id="save_file_name"
+                  name="save_file_name"
+                  type="text"
+                  placeholder="Please Enter the File Name"
+                  onChange={handleFileNameChange}
+                  className="py-2 pl-4 pr-0 font-medium w-72 focus:outline-none border-none"
+                />
+                <div className="px-3 flex h-10 items-center justify-center font-medium bg-neutral-300 text-black">
+                  .html
+                </div>
               </div>
+              <button
+                onClick={handleUpload}
+                disabled={isFileNameEmpty}
+                className="flex whitespace-nowrap border-2 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-500"
+              >
+                Save as template
+              </button>
+              {showNextStep && (
+                <NextStepLink
+                  href="/sendEmail"
+                  className="flex border-2 items-center rounded-lg  bg-sky-800 hover:bg-sky-700 hover:text-white px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+                >
+                  Next Step &rarr;
+                </NextStepLink>
+              )}
             </div>
-            <button
-              onClick={handleUpload}
-              disabled={isFileNameEmpty}
-              className="flex whitespace-nowrap border-2 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-500"
-            >
-              Save as template
-            </button>
           </div>
-        )}
-        {showNextStep && (
-          <NextStepLink
-            href="/sendEmail"
-            className="flex border-2 items-center rounded-lg  bg-sky-800 hover:bg-sky-700 hover:text-white px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
-          >
-            Next Step &rarr;
-          </NextStepLink>
         )}
       </div>
     </>
