@@ -42,9 +42,7 @@ export default function FileTable({
   useEffect(() => {
     if (files && files.length > 0) {
       const latestFile = files.reduce((latest, file) => {
-        return new Date(file.created_at) > new Date(latest.created_at)
-          ? file
-          : latest;
+        return new Date(file.created_at) > new Date(latest.created_at) ? file : latest;
       }, files[0]);
       setSelectedFileId(latestFile.file_id);
       localStorage.setItem(`${file_extension}_key`, latestFile.file_id);
@@ -115,12 +113,8 @@ export default function FileTable({
                 </th>
                 <td className="px-6 py-4">{file.file_id}</td>
                 <td className="px-6 py-4">{file.file_size}</td>
-                <td className="px-6 py-4">
-                  {convertToTaipeiTime(file.created_at)}
-                </td>
-                <td className="px-6 py-4">
-                  {convertToTaipeiTime(file.updated_at)}
-                </td>
+                <td className="px-6 py-4">{convertToTaipeiTime(file.created_at)}</td>
+                <td className="px-6 py-4">{convertToTaipeiTime(file.updated_at)}</td>
               </tr>
             </tbody>
           ))}
@@ -128,9 +122,7 @@ export default function FileTable({
       </div>
       <div className="flex justify-center items-center">
         <button
-          onClick={() =>
-            fetchFiles(file_extension, setFiles, setLastEvaluatedKey)
-          }
+          onClick={() => fetchFiles(file_extension, setFiles, setLastEvaluatedKey)}
           disabled={loading || !lastEvaluatedKey}
           className={`mt-3 p-2 rounded h-8 flex justify-center items-center ${
             loading || !lastEvaluatedKey
@@ -139,12 +131,7 @@ export default function FileTable({
           }`}
         >
           <p className="">show more</p>
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path
               fill="currentColor"
               d="M12 14.95q-.2 0-.375-.062t-.325-.213l-4.6-4.6q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l3.9 3.9l3.9-3.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-4.6 4.6q-.15.15-.325.213T12 14.95"

@@ -35,8 +35,7 @@ export default function SendEmailForm() {
   const [showAttachUpload, setShowAttachUpload] = useState<boolean>(false);
 
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
-  const [isGenerateCertificate, setIsGenerateCertificate] =
-    useState<boolean>(false);
+  const [isGenerateCertificate, setIsGenerateCertificate] = useState<boolean>(false);
 
   const [replyToEmail, setReplyToEmail] = useState<string>("");
   const [bccEmails, setBccEmails] = useState<string[]>([]);
@@ -57,18 +56,15 @@ export default function SendEmailForm() {
     if (!access_token || isTokenExpired()) {
       router.push("/login");
     }
-  }, []);
+  }, [router]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!ref.current) return;
 
     const formData = {
-      subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement)
-        .value,
-      display_name: (
-        ref.current.querySelector("[id='display_name']") as HTMLInputElement
-      ).value,
+      subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement).value,
+      display_name: (ref.current.querySelector("[id='display_name']") as HTMLInputElement).value,
       template_file_id: selectedHtmlFile,
       spreadsheet_file_id: selectedXlsxFile,
       attachment_file_ids: attachment_file_ids,
@@ -89,7 +85,7 @@ export default function SendEmailForm() {
 
       if (response.status === "error" && response.errors) {
         const newErrors: { [key: string]: string } = {};
-        response.errors.forEach((err) => {
+        response.errors.forEach(err => {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
@@ -106,10 +102,7 @@ export default function SendEmailForm() {
     setIsSubmitting(false);
   };
 
-  const handleHtmlSelect = (
-    file_id: string | null,
-    file_url: string | null
-  ) => {
+  const handleHtmlSelect = (file_id: string | null, file_url: string | null) => {
     setSelectedHtmlFile(file_id);
     setHtmlPreviewLink(file_url);
   };
@@ -181,8 +174,7 @@ export default function SendEmailForm() {
         <p className="text-4xl font-bold pt-2">Send Emails</p>
         <div className="flex justify-between items-center w-full">
           <p className="text-gray-500 italic">
-            Enter your <strong>subject</strong> and{" "}
-            <strong>display name</strong>.
+            Enter your <strong>subject</strong> and <strong>display name</strong>.
           </p>
           <div className="h-10"></div>
         </div>
@@ -208,9 +200,7 @@ export default function SendEmailForm() {
                 errors.subject ? "border-red-500" : "border-gray-200"
               }`}
             />
-            {errors.subject && (
-              <p className="text-red-500 text-sm">{errors.subject}</p>
-            )}
+            {errors.subject && <p className="text-red-500 text-sm">{errors.subject}</p>}
           </div>
           <div className="m-3">
             <label className="mb-2 flex text-sm font-medium gap-2">
@@ -229,9 +219,7 @@ export default function SendEmailForm() {
                 errors.display_name ? "border-red-500" : "border-gray-200"
               }`}
             />
-            {errors.display_name && (
-              <p className="text-red-500 text-sm">{errors.display_name}</p>
-            )}
+            {errors.display_name && <p className="text-red-500 text-sm">{errors.display_name}</p>}
           </div>
           <div className="m-3">
             <label className="mb-2 flex text-sm font-medium gap-2">
@@ -241,10 +229,7 @@ export default function SendEmailForm() {
               </HelpTip>
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown
-                onSelect={handleHtmlSelect}
-                fileExtension="html"
-              />
+              <SelectDropdown onSelect={handleHtmlSelect} fileExtension="html" />
               <button
                 type="button"
                 onClick={handlePreviewHtml}
@@ -332,10 +317,7 @@ export default function SendEmailForm() {
               </HelpTip>
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown
-                onSelect={handleXlsxSelect}
-                fileExtension="xlsx"
-              />
+              <SelectDropdown onSelect={handleXlsxSelect} fileExtension="xlsx" />
               <button
                 type="button"
                 onClick={handlePreviewXlsx}
@@ -412,9 +394,7 @@ export default function SendEmailForm() {
               )}
             </div>
             {errors.spreadsheet_file_id && (
-              <p className="text-red-500 text-sm">
-                {errors.spreadsheet_file_id}
-              </p>
+              <p className="text-red-500 text-sm">{errors.spreadsheet_file_id}</p>
             )}
           </div>
         </div>
@@ -437,13 +417,11 @@ export default function SendEmailForm() {
                 name="sender_local_part"
                 type="text"
                 value={localPart}
-                onChange={(e) => setLocalPart(e.target.value)}
+                onChange={e => setLocalPart(e.target.value)}
                 placeholder="Enter the local part of email"
                 disabled={isSubmitting}
                 className={`rounded-l-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                  errors.sender_local_part
-                    ? "border-red-500"
-                    : "border-gray-200"
+                  errors.sender_local_part ? "border-red-500" : "border-gray-200"
                 }`}
               />
               <div className="w-44 text-center text-sm">@aws-educate.tw</div>
@@ -457,10 +435,7 @@ export default function SendEmailForm() {
                 <Info size={16} color="gray" />
               </HelpTip>
             </label>
-            <EmailInput
-              allowMultiple={false}
-              onEmailsChange={handleReplyToEmailChange}
-            />
+            <EmailInput allowMultiple={false} onEmailsChange={handleReplyToEmailChange} />
           </div>
           {/* BCC */}
           <div className="m-3">
@@ -470,10 +445,7 @@ export default function SendEmailForm() {
                 <Info size={16} color="gray" />
               </HelpTip>
             </label>
-            <EmailInput
-              allowMultiple={true}
-              onEmailsChange={handleBccEmailsChange}
-            />
+            <EmailInput allowMultiple={true} onEmailsChange={handleBccEmailsChange} />
           </div>
           {/* CC */}
           <div className="m-3">
@@ -483,10 +455,7 @@ export default function SendEmailForm() {
                 <Info size={16} color="gray" />
               </HelpTip>
             </label>
-            <EmailInput
-              allowMultiple={true}
-              onEmailsChange={handleCcEmailsChange}
-            />
+            <EmailInput allowMultiple={true} onEmailsChange={handleCcEmailsChange} />
           </div>
           {/* Attach files */}
           <div className="m-3">

@@ -6,10 +6,7 @@ interface EmailInputProps {
   onEmailsChange: (emails: string[]) => void;
 }
 
-export default function EmailInput({
-  allowMultiple = true,
-  onEmailsChange,
-}: EmailInputProps) {
+export default function EmailInput({ allowMultiple = true, onEmailsChange }: EmailInputProps) {
   const [email, setEmail] = useState("");
   const [emails, setEmails] = useState<string[]>([]);
 
@@ -22,7 +19,7 @@ export default function EmailInput({
       e.preventDefault(); // Prevent default tab/enter behavior
       if (validateEmail(email.trim())) {
         if (allowMultiple || emails.length === 0) {
-          setEmails((prevEmails) => [...prevEmails, email.trim()]);
+          setEmails(prevEmails => [...prevEmails, email.trim()]);
         } else {
           setEmails([email.trim()]);
         }
@@ -35,7 +32,7 @@ export default function EmailInput({
 
   const removeEmail = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault();
-    setEmails((prevEmails) => {
+    setEmails(prevEmails => {
       const updatedEmails = prevEmails.filter((_, i) => i !== index);
       onEmailsChange(updatedEmails); // Notify parent of the change
       return updatedEmails;
@@ -57,7 +54,7 @@ export default function EmailInput({
           >
             <span className="mr-2 text-sm">{email}</span>
             <button
-              onClick={(e) => removeEmail(e, index)}
+              onClick={e => removeEmail(e, index)}
               className="text-black-500 hover:text-red-700"
             >
               &times;
@@ -67,7 +64,7 @@ export default function EmailInput({
         <input
           type="text"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder={
             !allowMultiple && emails.length > 0

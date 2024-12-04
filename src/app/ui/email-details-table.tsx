@@ -52,26 +52,17 @@ export default function EmailDetailsTable({ data }: { data: dataType[] }) {
         </thead>
         <tbody>
           {data.map((item: dataType, index: number) => (
-            <tr
-              key={index}
-              className={`${index !== 0 ? "border-t border-gray-200" : ""}`}
-            >
-              <td className="py-2 px-4 text-sm text-gray-700 font-bold">
-                {item.recipient_email}
-              </td>
+            <tr key={index} className={`${index !== 0 ? "border-t border-gray-200" : ""}`}>
+              <td className="py-2 px-4 text-sm text-gray-700 font-bold">{item.recipient_email}</td>
               <td className="py-2 px-4 text-sm text-gray-700">
                 {item.bcc.length === 0 ? (
-                  <div className="flex flex-col justify-start text-gray-300">
-                    NO BCC
-                  </div>
+                  <div className="flex flex-col justify-start text-gray-300">NO BCC</div>
                 ) : (
                   <div className="flex flex-col justify-start">
                     {item.bcc.map((email, idx) => (
                       <div
                         className={`py-1 ${
-                          idx !== 0
-                            ? "border-dashed border-t-2 border-gray-200"
-                            : ""
+                          idx !== 0 ? "border-dashed border-t-2 border-gray-200" : ""
                         }`}
                         key={idx}
                       >
@@ -83,17 +74,13 @@ export default function EmailDetailsTable({ data }: { data: dataType[] }) {
               </td>
               <td className="py-2 px-4 text-sm text-gray-700">
                 {item.cc.length === 0 ? (
-                  <div className="flex flex-col justify-start text-gray-300">
-                    NO CC
-                  </div>
+                  <div className="flex flex-col justify-start text-gray-300">NO CC</div>
                 ) : (
                   <div className="flex flex-col justify-start">
                     {item.cc.map((email, idx) => (
                       <div
                         className={`py-1 ${
-                          idx !== 0
-                            ? "border-dashed border-t-2 border-gray-200"
-                            : ""
+                          idx !== 0 ? "border-dashed border-t-2 border-gray-200" : ""
                         }`}
                         key={idx}
                       >
