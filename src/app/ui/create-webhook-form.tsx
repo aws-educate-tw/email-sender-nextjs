@@ -39,7 +39,7 @@ export default function CreateWebhookForm() {
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
   const [isGenerateCertificate, setIsGenerateCertificate] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
-  const [showCopyToast, setShowCopyToast] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookType, setWebhookType] = useState<string>("surveycake");
 
@@ -99,9 +99,10 @@ export default function CreateWebhookForm() {
 
       setWebhookUrl(response.webhook_url || "");
       setShowSuccessToast(true);
+      setIsCopied(false);
       setTimeout(() => setShowSuccessToast(false), 10000);
       setErrors({});
-      ref.current.reset();
+      // ref.current.reset();
     } catch (error: any) {
       alert("Failed to create webhook: " + error.message);
     }
@@ -142,12 +143,10 @@ export default function CreateWebhookForm() {
     setWebhookType(webhook_type);
   };
 
-  // 複製功能
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setShowCopyToast(true); // 顯示複製成功提示
-      setTimeout(() => setShowCopyToast(false), 3000); // 3秒後關閉
+      setIsCopied(true);
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -290,6 +289,7 @@ export default function CreateWebhookForm() {
                   value="no"
                   onChange={() => setIsGenerateCertificate(false)}
                   name="inline-radio-group"
+                  defaultChecked
                   className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500"
                 />
                 <label htmlFor="inline-2-radio" className="ms-2 text-sm font-medium text-gray-900">
@@ -541,13 +541,22 @@ export default function CreateWebhookForm() {
       {/* 建立成功的 Toast */}
       {showSuccessToast && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Toast>
-            <div className="flex items-start gap-4">
-              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500">
-                <HiCheck className="h-5 w-5" />
+          <Toast
+            className={`${isCopied ? "bg-blue-400" : "bg-green-400"} drop-shadow-lg transition-all`}
+          >
+            <div className="flex flex-col items-start gap-4">
+              <div className="flex items-center gap-2">
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
+                  <HiCheck className="h-5 w-5" />
+                </div>
+                {isCopied ? (
+                  <p className="font-medium text-white">URL copied to clipboard !</p>
+                ) : (
+                  <p className="font-medium text-white">Webhook created successfully !</p>
+                )}
+                {/* <p className="font-medium text-white">Webhook created successfully!</p> */}
               </div>
               <div className="flex flex-col gap-2">
-                <p className="font-semibold">Webhook created successfully!</p>
                 <div className="flex items-center gap-2 bg-gray-100 p-2 rounded">
                   <p className="text-sm break-all">{webhookUrl}</p>
                   <button
@@ -557,22 +566,6 @@ export default function CreateWebhookForm() {
                     <HiClipboard className="h-5 w-5" />
                   </button>
                 </div>
-              </div>
-            </div>
-          </Toast>
-        </div>
-      )}
-
-      {/* 複製成功的 Toast */}
-      {showCopyToast && (
-        <div className="fixed bottom-20 right-4 z-50">
-          <Toast>
-            <div className="flex items-start gap-4">
-              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-500">
-                <HiCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <p>URL copied to clipboard!</p>
               </div>
             </div>
           </Toast>
