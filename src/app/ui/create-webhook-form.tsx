@@ -4,6 +4,7 @@ import { submitWebhookForm } from "@/lib/actions";
 import HelpTip from "@/app/ui/help-tip";
 import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "./attach-dropdown";
+import WebhookTypeDropdown from "@/app/ui/webhook-type-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";
@@ -40,6 +41,7 @@ export default function CreateWebhookForm() {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookType, setWebhookType] = useState<string>("surveycake");
 
   const router = useRouter();
 
@@ -75,6 +77,7 @@ export default function CreateWebhookForm() {
       bcc: bccEmails,
       cc: ccEmails,
       is_generate_certificate: isGenerateCertificate,
+      webhook_type: webhookType,
     };
 
     setIsSubmitting(true);
@@ -133,6 +136,10 @@ export default function CreateWebhookForm() {
 
   const handleAttachCloseUpload = () => {
     setShowAttachUpload(false);
+  };
+
+  const handleWebhookTypeChange = (webhook_type: string) => {
+    setWebhookType(webhook_type);
   };
 
   // 複製功能
@@ -447,6 +454,15 @@ export default function CreateWebhookForm() {
               }`}
             />
             {errors.iv_key && <p className="text-red-500 text-sm">{errors.iv_key}</p>}
+          </div>
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              Webhook Type:
+              <HelpTip message="Select the webhook type.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <WebhookTypeDropdown onSelect={handleWebhookTypeChange} />
           </div>
         </div>
 

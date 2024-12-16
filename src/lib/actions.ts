@@ -45,6 +45,7 @@ const webhookFormSchema = z.object({
   hash_key: z.string().min(1, "Hash key is required"),
   iv_key: z.string().min(1, "IV key is required"),
   webhook_name: z.string().min(1, "Webhook name is required"),
+  webhook_type: z.string().min(1, "Webhook type is required"),
 });
 
 export async function submitForm(data: string, access_token: string) {
