@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Toast } from "flowbite-react";
 import { HiCheck, HiClipboard } from "react-icons/hi";
+import { GoAlert } from "react-icons/go";
 
 interface SubmitResponse {
   status: string;
@@ -39,6 +40,7 @@ export default function CreateWebhookForm() {
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
   const [isGenerateCertificate, setIsGenerateCertificate] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showFailedToast, setShowFailedToast] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookType, setWebhookType] = useState<string>("surveycake");
@@ -60,6 +62,8 @@ export default function CreateWebhookForm() {
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setErrors({});
+
     if (!ref.current) return;
 
     const formData = {
@@ -86,8 +90,14 @@ export default function CreateWebhookForm() {
         JSON.stringify(formData),
         localStorage.getItem("access_token") ?? ""
       );
+      console.log(response);
 
-      if (response.status === "error" && response.errors) {
+      // for validation checked
+      if (
+        response.status === "error" &&
+        response.errors &&
+        response.message === "Validation failed"
+      ) {
         const newErrors: { [key: string]: string } = {};
         response.errors.forEach(err => {
           newErrors[err.path] = err.message;
@@ -97,11 +107,24 @@ export default function CreateWebhookForm() {
         return;
       }
 
-      setWebhookUrl(response.webhook_url || "");
-      setShowSuccessToast(true);
-      setIsCopied(false);
-      setTimeout(() => setShowSuccessToast(false), 10000);
-      setErrors({});
+      // for api error checked
+      if (
+        response.status === "error" &&
+        response.message === "Failed to create webhook. Please try again."
+      ) {
+        setShowFailedToast(true);
+        setTimeout(() => setShowFailedToast(false), 3000);
+        setIsSubmitting(false);
+
+        return;
+      } else {
+        setWebhookUrl(response.webhook_url || "");
+        setIsCopied(false);
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 10000);
+      }
+
+      // Use this if you want to reset the form after submission
       // ref.current.reset();
     } catch (error: any) {
       alert("Failed to create webhook: " + error.message);
@@ -566,6 +589,21 @@ export default function CreateWebhookForm() {
                     <HiClipboard className="h-5 w-5" />
                   </button>
                 </div>
+              </div>
+            </div>
+          </Toast>
+        </div>
+      )}
+      {showFailedToast && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <Toast className="bg-red-500 drop-shadow-lg transition-all">
+            <div className="flex flex-col items-start gap-4">
+              <div className="flex items-center gap-2">
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
+                  <GoAlert className="h-5 w-5" />
+                </div>
+                <p className="font-medium text-white">Failed to create the Webhook Url !</p>
+                {/* <p className="font-medium text-white">Webhook created successfully!</p> */}
               </div>
             </div>
           </Toast>

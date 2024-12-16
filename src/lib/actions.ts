@@ -1,4 +1,5 @@
 "use server";
+import { error } from "console";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -201,6 +202,7 @@ export async function submitWebhookForm(data: string, access_token: string) {
 
   try {
     console.log("data", validation.data);
+
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/webhook`);
     const response = await fetch(url.toString(), {
@@ -221,9 +223,10 @@ export async function submitWebhookForm(data: string, access_token: string) {
       errors: result.errors,
     };
   } catch (error: any) {
+    console.error("Failed to create webhook:", error);
     return {
       status: "error",
-      message: "Error: Failed to create webhook. Please try again.",
+      message: "Failed to create webhook. Please try again.",
       error: error.message,
     };
   }
