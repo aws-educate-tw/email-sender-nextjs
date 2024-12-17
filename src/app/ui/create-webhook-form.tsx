@@ -4,6 +4,7 @@ import { submitWebhookForm } from "@/lib/actions";
 import HelpTip from "@/app/ui/help-tip";
 import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "./attach-dropdown";
+import WebhookTypeDropdown from "@/app/ui/webhook-type-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";
@@ -12,12 +13,12 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Toast } from "flowbite-react";
 import { HiCheck, HiClipboard } from "react-icons/hi";
+import { GoAlert } from "react-icons/go";
 
 interface SubmitResponse {
   status: string;
   message: string;
-  webhook_id?: string;
-  webhook_url?: string;
+  data?: { webhook_id: string; webhook_url: string };
   errors?: { path: string; message: string }[];
 }
 
@@ -38,8 +39,10 @@ export default function CreateWebhookForm() {
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
   const [isGenerateCertificate, setIsGenerateCertificate] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
-  const [showCopyToast, setShowCopyToast] = useState(false);
+  const [showFailedToast, setShowFailedToast] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookType, setWebhookType] = useState<string>("surveycake");
 
   const router = useRouter();
 
@@ -58,8 +61,12 @@ export default function CreateWebhookForm() {
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setErrors({});
+    setIsSubmitting(true);
+
     if (!ref.current) return;
 
+    // Extract form data
     const formData = {
       subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement).value,
       display_name: (ref.current.querySelector("[id='display_name']") as HTMLInputElement).value,
@@ -75,34 +82,58 @@ export default function CreateWebhookForm() {
       bcc: bccEmails,
       cc: ccEmails,
       is_generate_certificate: isGenerateCertificate,
+      webhook_type: webhookType,
     };
 
-    setIsSubmitting(true);
     try {
-      const response: SubmitResponse = await submitWebhookForm(
+      const response = await submitWebhookForm(
         JSON.stringify(formData),
-        localStorage.getItem("access_token") ?? ""
+        localStorage.getItem("access_token") || ""
       );
 
-      if (response.status === "error" && response.errors) {
+      handleResponse(response);
+    } catch (error: any) {
+      console.error("Unexpected error:", error);
+      showToast("error", "Unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Helper function to handle the response
+  const handleResponse = (response: SubmitResponse) => {
+    if (response.status === "error") {
+      if (response.errors) {
+        // Handle validation errors
         const newErrors: { [key: string]: string } = {};
         response.errors.forEach(err => {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
-        setIsSubmitting(false);
-        return;
+        showToast("error", "Validation failed. Please fix the errors.");
+      } else {
+        // Handle general API errors
+        showToast("error", response.message || "Failed to create webhook.");
       }
+      return;
+    }
 
-      setWebhookUrl(response.webhook_url || "");
+    // Success case
+    setWebhookUrl(response.data?.webhook_url || "");
+    setIsCopied(false);
+    showToast("success", "Webhook created successfully!");
+  };
+
+  // Helper function for showing toast notifications
+  const showToast = (status: "success" | "error", message: string) => {
+    if (status === "success") {
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 10000);
-      setErrors({});
-      ref.current.reset();
-    } catch (error: any) {
-      alert("Failed to create webhook: " + error.message);
+    } else {
+      setShowFailedToast(true);
+      setTimeout(() => setShowFailedToast(false), 3000);
     }
-    setIsSubmitting(false);
+    console.log(`[${status.toUpperCase()}] ${message}`);
   };
 
   const handleHtmlSelect = (file_id: string | null, file_url: string | null) => {
@@ -135,12 +166,14 @@ export default function CreateWebhookForm() {
     setShowAttachUpload(false);
   };
 
-  // 複製功能
+  const handleWebhookTypeChange = (webhook_type: string) => {
+    setWebhookType(webhook_type);
+  };
+
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setShowCopyToast(true); // 顯示複製成功提示
-      setTimeout(() => setShowCopyToast(false), 3000); // 3秒後關閉
+      setIsCopied(true);
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -283,6 +316,7 @@ export default function CreateWebhookForm() {
                   value="no"
                   onChange={() => setIsGenerateCertificate(false)}
                   name="inline-radio-group"
+                  defaultChecked
                   className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500"
                 />
                 <label htmlFor="inline-2-radio" className="ms-2 text-sm font-medium text-gray-900">
@@ -448,6 +482,15 @@ export default function CreateWebhookForm() {
             />
             {errors.iv_key && <p className="text-red-500 text-sm">{errors.iv_key}</p>}
           </div>
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              Webhook Type:
+              <HelpTip message="Select the webhook type.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <WebhookTypeDropdown onSelect={handleWebhookTypeChange} />
+          </div>
         </div>
 
         <div className="w-full flex justify-end my-3 gap-3">
@@ -525,13 +568,22 @@ export default function CreateWebhookForm() {
       {/* 建立成功的 Toast */}
       {showSuccessToast && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Toast>
-            <div className="flex items-start gap-4">
-              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500">
-                <HiCheck className="h-5 w-5" />
+          <Toast
+            className={`${isCopied ? "bg-blue-400" : "bg-green-400"} drop-shadow-lg transition-all`}
+          >
+            <div className="flex flex-col items-start gap-4">
+              <div className="flex items-center gap-2">
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
+                  <HiCheck className="h-5 w-5" />
+                </div>
+                {isCopied ? (
+                  <p className="font-medium text-white">URL copied to clipboard !</p>
+                ) : (
+                  <p className="font-medium text-white">Webhook created successfully !</p>
+                )}
+                {/* <p className="font-medium text-white">Webhook created successfully!</p> */}
               </div>
               <div className="flex flex-col gap-2">
-                <p className="font-semibold">Webhook created successfully!</p>
                 <div className="flex items-center gap-2 bg-gray-100 p-2 rounded">
                   <p className="text-sm break-all">{webhookUrl}</p>
                   <button
@@ -546,17 +598,16 @@ export default function CreateWebhookForm() {
           </Toast>
         </div>
       )}
-
-      {/* 複製成功的 Toast */}
-      {showCopyToast && (
-        <div className="fixed bottom-20 right-4 z-50">
-          <Toast>
-            <div className="flex items-start gap-4">
-              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-500">
-                <HiCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <p>URL copied to clipboard!</p>
+      {showFailedToast && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <Toast className="bg-red-500 drop-shadow-lg transition-all">
+            <div className="flex flex-col items-start gap-4">
+              <div className="flex items-center gap-2">
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
+                  <GoAlert className="h-5 w-5" />
+                </div>
+                <p className="font-medium text-white">Failed to create the Webhook Url !</p>
+                {/* <p className="font-medium text-white">Webhook created successfully!</p> */}
               </div>
             </div>
           </Toast>
