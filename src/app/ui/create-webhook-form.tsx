@@ -18,8 +18,7 @@ import { GoAlert } from "react-icons/go";
 interface SubmitResponse {
   status: string;
   message: string;
-  webhook_id?: string;
-  webhook_url?: string;
+  data?: { webhook_id: string; webhook_url: string };
   errors?: { path: string; message: string }[];
 }
 
@@ -63,9 +62,11 @@ export default function CreateWebhookForm() {
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrors({});
+    setIsSubmitting(true);
 
     if (!ref.current) return;
 
+    // Extract form data
     const formData = {
       subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement).value,
       display_name: (ref.current.querySelector("[id='display_name']") as HTMLInputElement).value,
@@ -84,52 +85,55 @@ export default function CreateWebhookForm() {
       webhook_type: webhookType,
     };
 
-    setIsSubmitting(true);
     try {
-      const response: SubmitResponse = await submitWebhookForm(
+      const response = await submitWebhookForm(
         JSON.stringify(formData),
-        localStorage.getItem("access_token") ?? ""
+        localStorage.getItem("access_token") || ""
       );
-      console.log(response);
 
-      // for validation checked
-      if (
-        response.status === "error" &&
-        response.errors &&
-        response.message === "Validation failed"
-      ) {
+      handleResponse(response);
+    } catch (error: any) {
+      console.error("Unexpected error:", error);
+      showToast("error", "Unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Helper function to handle the response
+  const handleResponse = (response: SubmitResponse) => {
+    if (response.status === "error") {
+      if (response.errors) {
+        // Handle validation errors
         const newErrors: { [key: string]: string } = {};
         response.errors.forEach(err => {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
-        setIsSubmitting(false);
-        return;
-      }
-
-      // for api error checked
-      if (
-        response.status === "error" &&
-        response.message === "Failed to create webhook. Please try again."
-      ) {
-        setShowFailedToast(true);
-        setTimeout(() => setShowFailedToast(false), 3000);
-        setIsSubmitting(false);
-
-        return;
+        showToast("error", "Validation failed. Please fix the errors.");
       } else {
-        setWebhookUrl(response.webhook_url || "");
-        setIsCopied(false);
-        setShowSuccessToast(true);
-        setTimeout(() => setShowSuccessToast(false), 10000);
+        // Handle general API errors
+        showToast("error", response.message || "Failed to create webhook.");
       }
-
-      // Use this if you want to reset the form after submission
-      // ref.current.reset();
-    } catch (error: any) {
-      alert("Failed to create webhook: " + error.message);
+      return;
     }
-    setIsSubmitting(false);
+
+    // Success case
+    setWebhookUrl(response.data?.webhook_url || "");
+    setIsCopied(false);
+    showToast("success", "Webhook created successfully!");
+  };
+
+  // Helper function for showing toast notifications
+  const showToast = (status: "success" | "error", message: string) => {
+    if (status === "success") {
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 10000);
+    } else {
+      setShowFailedToast(true);
+      setTimeout(() => setShowFailedToast(false), 3000);
+    }
+    console.log(`[${status.toUpperCase()}] ${message}`);
   };
 
   const handleHtmlSelect = (file_id: string | null, file_url: string | null) => {

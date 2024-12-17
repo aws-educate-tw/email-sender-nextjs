@@ -1,5 +1,4 @@
 "use server";
-import { error } from "console";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -214,20 +213,32 @@ export async function submitWebhookForm(data: string, access_token: string) {
       body: JSON.stringify(validation.data),
     });
 
+    // Deal with the error response
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("API responded with an error:", errorResponse);
+      return {
+        status: "error",
+        message: errorResponse.message || "Failed to create webhook.",
+      };
+    }
+
+    // Deal with the success response
     const result = await response.json();
     return {
-      status: result.status,
-      message: result.message,
-      webhook_id: result.webhook_id,
-      webhook_url: result.webhook_url,
-      errors: result.errors,
+      status: "success",
+      message: result.message || "Webhook created successfully.",
+      data: {
+        webhook_id: result.webhook_id,
+        webhook_url: result.webhook_url,
+      },
     };
   } catch (error: any) {
-    console.error("Failed to create webhook:", error);
+    console.error("Error during API call:", error);
     return {
       status: "error",
-      message: "Failed to create webhook. Please try again.",
-      error: error.message,
+      message: "An unexpected error occurred while creating the webhook.",
+      debugInfo: error.message,
     };
   }
 }
