@@ -42,19 +42,19 @@ export default function TopNav() {
 
   return (
     <header className="bg-sky-950 text-white py-4 fixed w-full top-0 z-10 shadow-md">
-      <nav className="max-w-5xl container mx-auto flex justify-between items-center">
+      <nav className="max-w-5xl container mx-auto flex justify-between items-center px-4">
         <div className="flex items-center space-x-4">
           <Link href="/">
             <Image
               src="/aws-educate-logo.png"
               alt="AWS Educate logo"
-              width={500}
-              height={400}
-              className="w-30 sm:w-30 md:w-60"
+              width={300}
+              height={300}
+              className="hidden sm:block w-40"
             />
           </Link>
         </div>
-        <ul className="flex space-x-6">
+        <ul className="flex space-x-6 ">
           <Link href="/" className="text-lg hover:text-amber-300">
             Home
           </Link>
