@@ -56,7 +56,7 @@ export default function TpetGuide() {
               Download PDF Guide
             </a>
             <a
-              href="https://notion.so/link-to-page"
+              href="https://aws-educate-tw.notion.site/AWS-Educate-TPET-4682e862471a4998bb52b7972f026077"
               target="_blank"
               className="flex gap-2 p-4 items-center bg-sky-950 text-white rounded-lg shadow-md hover:bg-sky-800 transition duration-300"
             >
