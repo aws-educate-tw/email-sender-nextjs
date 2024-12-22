@@ -24,7 +24,7 @@ export default function MemberCard({
         alt={`${name}'s avatar`}
         width={200}
         height={200}
-        className="rounded-full mb-4 border-4 border-sky-950 shadow-lg"
+        className={`rounded-full mb-4 border-8 ${isNew ? "border-amber-400" : "border-sky-950"} shadow-lg`}
       />
       <p className="text-2xl font-bold text-gray-800 text-center">{name}</p>
       <p className="text-sm text-blue-600 text-center">{role}</p>
@@ -35,7 +35,7 @@ export default function MemberCard({
       </p>
       {note && <p className="text-xs text-gray-500 text-center mt-1">{note}</p>}
       {isNew && (
-        <span className="mt-2 px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">
+        <span className="mt-2 px-3 py-1 text-xs font-semibold text-sky-950 bg-amber-200 rounded-full">
           New Member
         </span>
       )}

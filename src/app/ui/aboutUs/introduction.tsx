@@ -1,15 +1,17 @@
 export default function Introduction() {
   return (
     <section id="introduction" className="bg-white p-8 rounded-lg shadow-lg">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Who We Are?</h1>
+      <h1 className="text-4xl font-bold text-sky-950 mb-6">Who We Are?</h1>
       <div className="space-y-4">
         <p className="text-lg text-gray-700">
-          <strong className="text-blue-600">AWS Educate Ambassadors:</strong> We are a vibrant
-          community of students who are deeply passionate about AWS cloud technologies. Our mission
-          is to foster innovation, empower peers, and share knowledge about cloud computing,
-          artificial intelligence, and modern software development practices. Through workshops,
-          hackathons, and mentorship initiatives, we aim to create opportunities for students to
-          excel in their tech careers.
+          <strong className="text-sky-950">AWS Educate Ambassadors:</strong>
+          <p className="text-lg text-gray-700">
+            We are a vibrant community of students who are deeply passionate about AWS cloud
+            technologies. Our mission is to foster innovation, empower peers, and share knowledge
+            about cloud computing, artificial intelligence, and modern software development
+            practices. Through workshops, hackathons, and mentorship initiatives, we aim to create
+            opportunities for students to excel in their tech careers.
+          </p>
         </p>
         <p className="text-lg text-gray-700">
           As ambassadors, we bridge the gap between academic learning and real-world applications.
@@ -17,11 +19,14 @@ export default function Introduction() {
           cutting-edge skills but also inspire others to embrace the future of technology.
         </p>
         <p className="text-lg text-gray-700">
-          <strong className="text-blue-600">About Dev Team:</strong> Founded in April 2024, the Dev
-          Team was established as a specialized group within the AWS Educate Ambassadors. Our focus
-          lies in leveraging technology to improve operational efficiency and streamline program
-          activities. We tackle real-world challenges such as managing bulk Discord invitations,
-          generating custom certificates, and automating communication for large-scale events.
+          <strong className="text-sky-950">About Dev Team:</strong>
+          <p className="text-lg text-gray-700">
+            Founded in April 2024, the Dev Team was established as a specialized group within the
+            AWS Educate Ambassadors. Our focus lies in leveraging technology to improve operational
+            efficiency and streamline program activities. We tackle real-world challenges such as
+            managing bulk Discord invitations, generating custom certificates, and automating
+            communication for large-scale events.
+          </p>
         </p>
         <p className="text-lg text-gray-700">
           The Dev Team prides itself on its ability to adapt and innovate. By combining technical

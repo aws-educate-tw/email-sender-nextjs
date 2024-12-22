@@ -35,7 +35,7 @@ export default function DevTeam() {
       role: "Backend",
       email: "rich.liu627@gmail.com",
       note: "創始成員",
-      // avatar: "/avatar/richie.jpg",
+      avatar: "/avatar/richie.jpg",
     },
     {
       name: "Shiun",
@@ -62,7 +62,7 @@ export default function DevTeam() {
 
       {/* Existing Members */}
       <div className="mb-8">
-        <h3 className="text-2xl font-semibold text-blue-600 mb-4">Old Members</h3>
+        <h3 className="text-2xl font-semibold text-sky-950 mb-4">Old Members</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {existingMembers.map((member, index) => (
             <MemberCard
@@ -79,7 +79,7 @@ export default function DevTeam() {
 
       {/* New Members */}
       <div>
-        <h3 className="text-2xl font-semibold text-green-600 mb-4">New Members</h3>
+        <h3 className="text-2xl font-semibold text-amber-400 mb-4">New Members</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {newMembers.map((member, index) => (
             <MemberCard
