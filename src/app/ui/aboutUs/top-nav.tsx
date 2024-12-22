@@ -55,15 +55,15 @@ export default function TopNav() {
           </Link>
         </div>
         <ul className="flex space-x-6">
-          <Link href="/" className="text-lg hover:text-blue-400">
+          <Link href="/" className="text-lg hover:text-amber-300">
             Home
           </Link>
           {navItems.map(item => (
             <li key={item.href}>
               <button
                 className={`text-lg ${
-                  activeSection === item.href ? "text-blue-400" : "text-white"
-                } hover:text-blue-400`}
+                  activeSection === item.href ? "text-amber-300" : "text-white"
+                } hover:text-amber-300`}
                 onClick={() => scrollToSection(item.href)}
               >
                 {item.label}
