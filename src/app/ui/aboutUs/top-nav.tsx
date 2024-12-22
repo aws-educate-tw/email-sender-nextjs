@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import Link from "next/link"; // Import Link component
+import Image from "next/image";
 
 export default function TopNav() {
   const navItems = [
@@ -39,10 +41,23 @@ export default function TopNav() {
   };
 
   return (
-    <header className="bg-gray-800 text-white py-4 fixed w-full top-0 z-10 shadow-md">
-      <nav className="container mx-auto flex justify-between items-center">
-        <h1 className="text-2xl font-bold">AWS Educate Dev Team</h1>
+    <header className="bg-sky-950 text-white py-4 fixed w-full top-0 z-10 shadow-md">
+      <nav className="max-w-5xl container mx-auto flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <Link href="/">
+            <Image
+              src="/aws-educate-logo.png"
+              alt="AWS Educate logo"
+              width={500}
+              height={400}
+              className="w-30 sm:w-30 md:w-60"
+            />
+          </Link>
+        </div>
         <ul className="flex space-x-6">
+          <Link href="/" className="text-lg hover:text-blue-400">
+            Home
+          </Link>
           {navItems.map(item => (
             <li key={item.href}>
               <button
