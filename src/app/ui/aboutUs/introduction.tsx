@@ -31,9 +31,9 @@ export default function Introduction() {
         <p className="text-lg text-gray-700">
           The Dev Team prides itself on its ability to adapt and innovate. By combining technical
           expertise and a strong collaborative spirit, we develop scalable solutions that directly
-          impact the success of the AWS Educate program. Whether it's creating tools to simplify
-          workflows or offering technical support to the community, we are committed to driving
-          excellence in everything we do.
+          impact the success of the AWS Educate program. Whether it&apos;s creating tools to
+          simplify workflows or offering technical support to the community, we are committed to
+          driving excellence in everything we do.
         </p>
         <p className="text-lg text-gray-700">
           Together, the AWS Educate Ambassadors and the Dev Team are shaping the future of cloud

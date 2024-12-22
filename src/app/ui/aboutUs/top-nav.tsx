@@ -1,13 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link"; // Import Link component
 import Image from "next/image";
 
 export default function TopNav() {
-  const navItems = [
-    { label: "Introduction", href: "#introduction" },
-    { label: "DevTeam", href: "#dev-team" },
-    { label: "TPET Guide", href: "#tpet-guide" },
-  ];
+  const navItems = useMemo(
+    () => [
+      { label: "Introduction", href: "#introduction" },
+      { label: "DevTeam", href: "#dev-team" },
+      { label: "TPET Guide", href: "#tpet-guide" },
+    ],
+    []
+  );
+
   const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
