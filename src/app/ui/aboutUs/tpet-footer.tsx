@@ -1,4 +1,5 @@
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
+import { Instagram, Mail } from "lucide-react";
 
 export default function TpetFooter() {
   return (
@@ -8,26 +9,23 @@ export default function TpetFooter() {
           <div>
             <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
             <div className="flex items-center mb-4">
-              <EnvelopeIcon className="w-5 h-5 mr-2" />
-              <a href="mailto:devteam@awseducate.com" className="text-blue-400 hover:underline">
-                devteam@awseducate.com
+              <a
+                href="mailto:awseducate.cloudambassador@gmail.com"
+                className="flex items-center gap-2 hover:text-neutral-100"
+              >
+                <Mail className="w-5 h-5" />
+                awseducate.cloudambassador@gmail.com
               </a>
             </div>
             <h3 className="text-xl font-semibold mb-2">Social Media</h3>
             <div className="flex space-x-4">
               <a
-                href="https://twitter.com/yourprofile"
+                href="https://www.instagram.com/awseducatestdambtw?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                 target="_blank"
-                className="text-blue-400 hover:text-blue-300 transition duration-300"
+                className="flex items-center gap-2 hover:text-neutral-100 transition duration-300"
               >
-                Twitter
-              </a>
-              <a
-                href="https://linkedin.com/yourprofile"
-                target="_blank"
-                className="text-blue-400 hover:text-blue-300 transition duration-300"
-              >
-                LinkedIn
+                <Instagram className="w-5 h-5" />
+                Instagram
               </a>
             </div>
           </div>
