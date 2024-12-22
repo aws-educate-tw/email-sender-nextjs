@@ -3,7 +3,7 @@ import { ArrowDownTrayIcon, BookOpenIcon } from "@heroicons/react/24/outline";
 export default function TpetGuide() {
   return (
     <section id="tpet-guide" className="bg-white p-8 rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">Solving Real Problems with TPET</h2>
+      <h2 className="text-3xl font-bold text-gray-800 mb-6">How to use TPET?</h2>
       <div className="space-y-6">
         <div>
           <h3 className="text-2xl font-semibold text-blue-600 mb-2">Overview of TPET</h3>
