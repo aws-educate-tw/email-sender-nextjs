@@ -1,4 +1,5 @@
 import MemberCard from "@/app/ui/aboutUs/member-card";
+import Timeline from "@/app/ui/aboutUs/time-line";
 
 export default function DevTeam() {
   const members = [
@@ -58,7 +59,12 @@ export default function DevTeam() {
 
   return (
     <section id="dev-team" className="bg-white p-8 rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Journey</h2>
+      <h2 className="text-3xl font-bold text-gray-800 mb-6">Dev Team</h2>
+      {/* Our Journey */}
+      <div>
+        <h3 className="text-2xl font-bold text-gray-800 mb-6">Our Journey</h3>
+        <Timeline />
+      </div>
 
       {/* Existing Members */}
       <div className="mb-8">
