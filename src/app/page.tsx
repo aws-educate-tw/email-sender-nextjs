@@ -28,7 +28,7 @@ export default function Page() {
           />
         </div>
         {/* Content container */}
-        <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-gray-100 px-6 py-10 order-last md:order-first md:w-3/5 md:px-20">
+        <div className="flex flex-col items-center md:items-start justify-center gap-6 rounded-lg bg-gray-100 px-6 py-10 order-last md:order-first md:w-3/5 md:pl-36">
           <div className="text-gray-800 text-center md:text-left">
             <p className="text-xl md:text-3xl">
               <strong>Welcome to AWS Educate.</strong>
