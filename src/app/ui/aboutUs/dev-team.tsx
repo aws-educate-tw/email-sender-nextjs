@@ -8,7 +8,7 @@ export default function DevTeam() {
       role: "PO",
       email: "boyi.wang1223@gmail.com",
       note: "創始成員",
-      // avatar: "/avatar/boyi.jpg",
+      avatar: "/avatar/boyi.jpg",
     },
     {
       name: "Queena",
