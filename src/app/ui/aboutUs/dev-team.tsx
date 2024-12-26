@@ -28,7 +28,7 @@ export default function DevTeam() {
       name: "Tony",
       role: "Full-Stack",
       email: "poyang1024@gmail.com",
-      // avatar: "/avatar/tony.jpg",
+      avatar: "/avatar/tony.jpg",
       isNew: true,
     },
     {
