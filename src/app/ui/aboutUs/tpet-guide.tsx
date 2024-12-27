@@ -48,8 +48,9 @@ export default function TpetGuide() {
           <h3 className="text-2xl font-semibold text-sky-950 mb-4">Getting Started with TPET</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xl">
             <a
-              href="/path-to-pdf"
+              href="/aws-educate-tpet-guide.pdf"
               target="_blank"
+              download
               className="flex gap-2 p-4 items-center bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-300"
             >
               <Download className="w-6 h-6 mr-2" />

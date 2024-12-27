@@ -21,7 +21,7 @@ export default function MemberCard({
     <div className="flex flex-col items-center p-4 rounded-lg ">
       {note && <p className="text-xs text-gray-500 text-center mt-1">{note}</p>}
       {isNew && (
-        <span className="mb-2 px-3 py-1 text-xs font-semibold text-sky-950 bg-amber-200 rounded-full">
+        <span className="mb-2 px-3 py-1 text-xs font-semibold text-sky-950 bg-amber-200 rounded-full animate-bounce">
           New Member
         </span>
       )}

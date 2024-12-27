@@ -50,7 +50,7 @@ export default function DevTeam() {
       role: "Frontend",
       email: "tmfel91219pinyu@gmail.com",
       note: "創始成員",
-      // avatar: "/avatar/yuna.jpg",
+      avatar: "/avatar/yuna.jpg",
     },
   ];
 
