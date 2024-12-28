@@ -2,7 +2,7 @@ import { CalendarDays, User, FileText, Clock, Send, Sheet, Mail } from "lucide-r
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import Link from "next/link";
 
-interface FileType {
+interface fileType {
   file_url: string;
   uploaded_id: string | null;
   updated_at: string;
@@ -14,19 +14,19 @@ interface FileType {
   file_size: number;
 }
 
-interface SenderType {
+interface senderType {
   user_id: string;
   email: string;
   username: string;
   message?: string;
 }
 
-interface DataType {
+interface dataType {
   bcc: string[];
   subject: string;
   cc: string[];
   run_id: string;
-  attachment_files: FileType[];
+  attachment_files: fileType[];
   recipient_source: "DIRECT" | "SPREADSHEET";
   created_at: string;
   sender_local_part: string;
@@ -35,25 +35,25 @@ interface DataType {
   recipients: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
   is_generate_certificate: boolean;
-  spreadsheet_file: FileType | null;
+  spreadsheet_file: fileType | null;
   display_name: string;
   sender_id: string | null;
-  sender: SenderType;
+  sender: senderType;
   template_file_id: string;
   success_email_count: number;
   expected_email_send_count: number;
   reply_to: string;
-  template_file: FileType;
+  template_file: fileType;
   created_year_month_day: string;
   created_year: string;
 }
 
-interface Props {
-  data: DataType[] | null;
+interface propsType {
+  data: dataType[] | null;
 }
 
-export default function EmailHistoryCard({ data }: Props) {
-  const renderRecipientInfo = (item: DataType) => {
+export default function EmailHistoryCard({ data }: propsType) {
+  const renderRecipientInfo = (item: dataType) => {
     const isDirect = item.recipient_source === "DIRECT";
 
     return (

@@ -1,17 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
-import {
-  CalendarDays,
-  User,
-  FileText,
-  Clock,
-  Send,
-  Sheet,
-  ChevronRight,
-  ChevronLeft,
-} from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "../ui/email-history-card";
 
 interface attachmentFilesType {
@@ -56,21 +46,23 @@ interface senderType {
   username: string;
 }
 
-interface dateType {
+interface dataType {
   bcc: string[];
   subject: string;
   cc: string[];
   run_id: string;
   attachment_files: attachmentFilesType[];
+  recipient_source: "DIRECT" | "SPREADSHEET";
   created_at: string;
   sender_local_part: string;
-  spreadsheet_id: string;
+  spreadsheet_file_id: string | null;
   created_year_month: string;
+  recipients: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
-  is_generated_certficate: boolean;
-  spreadsheet_file: spreadsheetFileType;
+  is_generate_certificate: boolean;
+  spreadsheet_file: spreadsheetFileType | null;
   display_name: string;
-  sender_id: string;
+  sender_id: string | null;
   sender: senderType;
   template_file_id: string;
   success_email_count: number;
@@ -81,15 +73,8 @@ interface dateType {
   created_year: string;
 }
 
-// interface responseType {
-//   data: dateType[];
-//   previous_last_evaluated_key: string;
-//   current_last_evaluated_key: string;
-//   next_last_evaluated_key: string;
-// }
-
 export default function Page() {
-  const [data, setData] = useState<dateType[] | null>(null);
+  const [data, setData] = useState<dataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
@@ -124,7 +109,6 @@ export default function Page() {
       }
 
       const result = await response.json();
-      // console.log(result);
       setIsLoading(false);
       setData(result.data);
       setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
@@ -132,19 +116,11 @@ export default function Page() {
       setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
-    } finally {
-      // setLoading
     }
   };
-  // const handleALlFiles = async () => {
-  //   fetchFiles("all", 10, null);
-  // };
 
   return (
     <div>
-      {/* <button className="bg-blue-300" onClick={handleALlFiles}>
-        button
-      </button> */}
       <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">Emails history</p>
         <div className="flex justify-between items-center w-full pb-4">
