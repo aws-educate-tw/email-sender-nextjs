@@ -74,7 +74,6 @@ export default function Page({ params }: PageProps) {
         const result = await response.json();
         setIsLoading(false);
         setData(result.data);
-        console.log(result.data);
         setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
         setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
         setNextLastEvaluatedKey(result.next_last_evaluated_key);
@@ -82,7 +81,7 @@ export default function Page({ params }: PageProps) {
         alert("Failed to fetch files: " + error.message);
       }
     },
-    [params.runId] // 添加需要的依賴
+    [params.runId]
   );
 
   useEffect(() => {
@@ -92,10 +91,10 @@ export default function Page({ params }: PageProps) {
   return (
     <>
       <div className="flex flex-col justify-center items-start">
-        <p className="text-4xl font-bold pt-2">Emails history</p>
+        <p className="text-4xl font-bold pt-2">Email Sending Details</p>
         <div className="flex justify-between items-center w-full pb-4">
           <p className="text-gray-500 italic">
-            Details of <strong>one of the runs </strong>is shown here.
+            Detailed delivery status for run ID: <strong>{params.runId}</strong>
           </p>
           <div className="h-10"></div>
         </div>
