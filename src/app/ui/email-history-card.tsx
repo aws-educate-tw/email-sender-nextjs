@@ -53,6 +53,11 @@ interface propsType {
 }
 
 export default function EmailHistoryCard({ data }: propsType) {
+  // Early return for empty or undefined data
+  if (!data || data.length === 0) {
+    return <div className="w-full p-8 text-center text-gray-500">No email history found</div>;
+  }
+
   const renderRecipientInfo = (item: dataType) => {
     const isDirect = item.recipient_source === "DIRECT";
 
@@ -95,10 +100,6 @@ export default function EmailHistoryCard({ data }: propsType) {
       </div>
     );
   };
-
-  if (!data || data.length === 0) {
-    return <div className="w-full p-8 text-center text-gray-500">No email history found</div>;
-  }
 
   return (
     <>
