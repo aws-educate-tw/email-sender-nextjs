@@ -94,7 +94,7 @@ export default function Page({ params }: PageProps) {
         <p className="text-4xl font-bold pt-2">Email Sending Details</p>
         <div className="flex justify-between items-center w-full pb-4">
           <p className="text-gray-500 italic">
-            Detailed delivery status for run ID: <strong>{params.runId}</strong>
+            Details of <strong>one of the runs</strong> is shown here.
           </p>
           <div className="h-10"></div>
         </div>
