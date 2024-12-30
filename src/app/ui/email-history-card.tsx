@@ -161,7 +161,7 @@ export default function EmailHistoryCard({ data }: propsType) {
                     <Send size={20} />
                     <p>Sender</p>
                   </div>
-                  <strong>{item.sender.username}</strong>
+                  <strong>{item.sender?.username || "Unknown"}</strong>
                 </div>
 
                 <div className="flex items-center gap-2">
