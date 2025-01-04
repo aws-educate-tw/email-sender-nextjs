@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import { formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface fileDataType {
@@ -22,8 +21,6 @@ interface TemplateDropdownProps {
 export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
   const fileExtension = "html";
   const [options, setOptions] = useState<fileDataType[] | null>(null);
-  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string>("Recent Templates");
@@ -32,14 +29,6 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (options) {
-      setFilteredOptions(
-        options.filter(option => option.file_name.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-  }, [searchTerm, options]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -113,7 +102,6 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
       return;
     }
     onSelect(file_id, file_url);
-    // console.log("Selected file:", file_id);
     setSelectedFileName(file_name);
     setIsOpen(false);
   };
@@ -148,24 +136,17 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
 
       {isOpen && (
         <div
-          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 min-w-96 right-0"
+          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 min-w-80 md:min-w-max right-0 border border-neutral-300"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
-          <div className="flex justify-between items-center mb-2 pl-4 ">
-            <p className="font-medium">SELECT A FILE</p>
-            <input
-              className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full max-w-52"
-              placeholder="Search a file name..."
-              type="text"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
+          <div className="flex flex-col items-center rounded-md text-lg font-semibold mb-2 p-2 shadow-md bg-neutral-100 border border-neutral-300">
+            <p className="">Recently Updated Templates</p>
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-4">
+            <div className="flex justify-center items-center py-4 w-96">
               <svg
                 className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
                 xmlns="http://www.w3.org/2000/svg"
@@ -188,9 +169,37 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
               </svg>
               <p>Loading...</p>
             </div>
-          ) : filteredOptions && filteredOptions.length > 0 ? (
-            <div>
-              <table className="w-full bg-white shadow-md rounded-md">
+          ) : options && options.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              {options.map(option => (
+                <div>
+                  <div
+                    key={option.file_id}
+                    className="flex gap-4 justify-between items-center py-2 px-4 bg-neutral-100 hover:bg-gray-200 cursor-pointer active:bg-gray-300 rounded-md"
+                    onClick={() => handleSelect(option.file_id, option.file_url, option.file_name)}
+                  >
+                    {option.file_name}
+                  </div>
+                  <p className="flex w-full justify-end text-xs text-gray-500 p-1">
+                    Created at&nbsp;
+                    <strong className="underline">{convertToTaipeiTime(option.created_at)}</strong>
+                  </p>
+                </div>
+
+                // <tr
+                //   key={option.file_id}
+                //   className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
+                //   onClick={() => handleSelect(option.file_id, option.file_url, option.file_name)}
+                // >
+                //   <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                //     {option.file_name}
+                //   </td>
+                //   <td className="py-2 px-4 border-b border-gray-200">
+                //     {convertToTaipeiTime(option.created_at)}
+                //   </td>
+                // </tr>
+              ))}
+              {/* <table className="w-full bg-white shadow-md rounded-md">
                 <thead>
                   <tr className="bg-neutral-100 rounded-t-md">
                     <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
@@ -198,15 +207,7 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
-                    onClick={() => handleSelect(null, null, null)}
-                  >
-                    <td className="py-2 px-4 border-b border-gray-200 text-start" colSpan={3}>
-                      No Selection
-                    </td>
-                  </tr>
-                  {filteredOptions.map(option => (
+                  {options.map(option => (
                     <tr
                       key={option.file_id}
                       className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
@@ -223,7 +224,7 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table> */}
               <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
                 <button
                   className={`flex items-center gap-1 ${
