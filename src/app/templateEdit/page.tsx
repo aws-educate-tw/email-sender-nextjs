@@ -20,7 +20,6 @@ const htmltemplateContent = `
 
 export default function Page() {
   const [content, setContent] = useState(htmltemplateContent);
-  const [selectedHtmlFile, setSelectedHtmlFile] = useState<string | null>(null);
   const [htmlPreviewLink, setHtmlPreviewLink] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,7 +54,6 @@ export default function Page() {
   };
 
   const handleHtmlSelect = (file_id: string | null, file_url: string | null) => {
-    setSelectedHtmlFile(file_id);
     setHtmlPreviewLink(file_url);
   };
 

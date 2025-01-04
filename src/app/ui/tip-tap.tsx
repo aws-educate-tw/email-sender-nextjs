@@ -99,12 +99,6 @@ export default function TipTap({ onChange, content }: any) {
     }
   };
 
-  // Update the state of rich editor based on the input value
-  const handleChange = (newContent: string) => {
-    setEditorContent(newContent);
-    onChange(newContent);
-  };
-
   // Update the state of file name based on the input value
   const handleFileNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.trim();
