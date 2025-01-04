@@ -173,9 +173,8 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
           ) : options && options.length > 0 ? (
             <div className="flex flex-col gap-2">
               {options.map(option => (
-                <div>
+                <div key={option.file_id}>
                   <div
-                    key={option.file_id}
                     className="flex gap-4 justify-between items-center py-2 px-4 bg-neutral-100 hover:bg-gray-200 cursor-pointer active:bg-gray-300 rounded-md"
                     onClick={() => handleSelect(option.file_id, option.file_url, option.file_name)}
                   >
