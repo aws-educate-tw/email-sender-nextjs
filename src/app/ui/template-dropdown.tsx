@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, CalendarClock } from "lucide-react";
 
 interface fileDataType {
   file_id: string;
@@ -111,12 +111,13 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
       <div>
         <button
           type="button"
-          className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex justify-between items-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           id="options-menu"
           aria-expanded={isOpen}
           aria-haspopup="true"
           onClick={toggleDropdown}
         >
+          <CalendarClock width={20} className="mr-2" />
           {selectedFileName}
           <svg
             className="-mr-1 ml-2 h-5 w-5"
@@ -136,12 +137,12 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
 
       {isOpen && (
         <div
-          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 min-w-80 md:min-w-max right-0 border border-neutral-300"
+          className="z-50 p-3 origin-top-right absolute w-full mt-4 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 min-w-80 md:min-w-max right-0 border border-neutral-300"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
-          <div className="flex flex-col items-center rounded-md text-lg font-semibold mb-2 p-2 shadow-md bg-neutral-100 border border-neutral-300">
+          <div className="flex flex-col items-center rounded-md text-lg font-semibold mb-2 p-2">
             <p className="">Recently Updated Templates</p>
           </div>
 
@@ -185,46 +186,8 @@ export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
                     <strong className="underline">{convertToTaipeiTime(option.created_at)}</strong>
                   </p>
                 </div>
-
-                // <tr
-                //   key={option.file_id}
-                //   className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
-                //   onClick={() => handleSelect(option.file_id, option.file_url, option.file_name)}
-                // >
-                //   <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                //     {option.file_name}
-                //   </td>
-                //   <td className="py-2 px-4 border-b border-gray-200">
-                //     {convertToTaipeiTime(option.created_at)}
-                //   </td>
-                // </tr>
               ))}
-              {/* <table className="w-full bg-white shadow-md rounded-md">
-                <thead>
-                  <tr className="bg-neutral-100 rounded-t-md">
-                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
-                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {options.map(option => (
-                    <tr
-                      key={option.file_id}
-                      className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
-                      onClick={() =>
-                        handleSelect(option.file_id, option.file_url, option.file_name)
-                      }
-                    >
-                      <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
-                        {option.file_name}
-                      </td>
-                      <td className="py-2 px-4 border-b border-gray-200">
-                        {convertToTaipeiTime(option.created_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table> */}
+
               <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
                 <button
                   className={`flex items-center gap-1 ${
