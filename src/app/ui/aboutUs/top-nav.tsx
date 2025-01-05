@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import Link from "next/link"; // Import Link component
+import Link from "next/link";
 import Image from "next/image";
 
 export default function TopNav() {
@@ -17,19 +17,45 @@ export default function TopNav() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 120; // Offset for the fixed header
+      const viewportHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrolledToBottom = window.innerHeight + window.scrollY >= documentHeight - 50; // Added tolerance
 
+      // If we're at the bottom of the page
+      if (scrolledToBottom) {
+        // Find the last visible section
+        for (let i = navItems.length - 1; i >= 0; i--) {
+          const section = document.querySelector(navItems[i].href);
+          if (section) {
+            setActiveSection(navItems[i].href);
+            break;
+          }
+        }
+        return;
+      }
+
+      // Normal scroll behavior
+      let currentSection = navItems[0].href;
       navItems.forEach(item => {
         const section = document.querySelector(item.href);
         if (section) {
           const top = (section as HTMLElement).offsetTop;
           const bottom = top + (section as HTMLElement).offsetHeight;
+
+          // Consider a section active if we're within its bounds
           if (scrollPosition >= top && scrollPosition < bottom) {
-            setActiveSection(item.href);
+            currentSection = item.href;
           }
         }
       });
+
+      setActiveSection(currentSection);
     };
 
+    // Initial check
+    handleScroll();
+
+    // Add scroll listener
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [navItems]);
@@ -37,9 +63,8 @@ export default function TopNav() {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      const yOffset = -100; // Offset to account for fixed header
+      const yOffset = -100;
       const y = (element as HTMLElement).getBoundingClientRect().top + window.pageYOffset + yOffset;
-
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
@@ -58,7 +83,7 @@ export default function TopNav() {
             />
           </Link>
         </div>
-        <ul className="flex space-x-6 ">
+        <ul className="flex space-x-6">
           <Link href="/" className="text-lg hover:text-amber-300">
             Home
           </Link>
