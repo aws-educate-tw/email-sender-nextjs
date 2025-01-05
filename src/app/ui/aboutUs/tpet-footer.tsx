@@ -14,7 +14,7 @@ export default function TpetFooter() {
                 className="flex items-center gap-2 hover:text-neutral-100"
               >
                 <Mail className="w-5 h-5" />
-                awseducate.cloudambassador@gmail.com
+                dev@aws-educate.tw
               </a>
             </div>
             <h3 className="text-xl font-semibold mb-2">Social Media</h3>
