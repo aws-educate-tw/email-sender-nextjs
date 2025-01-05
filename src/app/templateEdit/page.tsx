@@ -38,7 +38,7 @@ export default function Page() {
           const doc = parser.parseFromString(htmlContent, "text/html");
           const bodyContent = doc.body.innerHTML; // Extract only the body content
 
-          console.log("Fetched HTML body content:", bodyContent);
+          // console.log("Fetched HTML body content:", bodyContent);
           setContent(bodyContent); // Update the TipTap content with the fetched HTML body
         } catch (error) {
           console.error("Error fetching HTML content:", error);
