@@ -28,7 +28,6 @@ interface Props {
 }
 
 export default function WebhookRecordsCard({ data }: Props) {
-
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyToClipboard = async (text: string, webhookId: string) => {
@@ -64,9 +63,7 @@ export default function WebhookRecordsCard({ data }: Props) {
                     </div>
                     <div className="flex flex-col justify-start">
                       <p className="text-md font-medium text-black">Display Name</p>
-                      <p className="text-sm font-medium text-neutral-500">
-                        {item.display_name}
-                      </p>
+                      <p className="text-sm font-medium text-neutral-500">{item.display_name}</p>
                     </div>
                   </div>
                   {/* Second Column */}
@@ -84,7 +81,7 @@ export default function WebhookRecordsCard({ data }: Props) {
                           {item.webhook_url}
                         </p>
                         <button
-                          onClick={(e) => {
+                          onClick={e => {
                             e.preventDefault();
                             copyToClipboard(item.webhook_url, item.webhook_id);
                           }}
@@ -97,7 +94,7 @@ export default function WebhookRecordsCard({ data }: Props) {
                           <HiClipboard className="h-4 w-4 mr-1" />
                           {copiedId === item.webhook_id ? "Copied" : "Copy"}
                         </button>
-                    </div>
+                      </div>
                     </div>
                   </div>
                   {/* Third Column */}
@@ -108,7 +105,7 @@ export default function WebhookRecordsCard({ data }: Props) {
                     <div className="flex flex-col justify-start">
                       <p className="text-md font-medium text-black">Webhook Type</p>
                       <p className="text-sm font-medium text-neutral-500 capitalize">
-                        {item.webhook_type.replace('_', ' ')}
+                        {item.webhook_type.replace("_", " ")}
                       </p>
                     </div>
                   </div>

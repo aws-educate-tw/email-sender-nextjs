@@ -57,7 +57,7 @@ export default function Page({ params }: PageProps) {
       }
 
       const result = await response.json();
-      
+
       if (result.status === "SUCCESS") {
         const {
           webhook_id,
@@ -74,7 +74,7 @@ export default function Page({ params }: PageProps) {
           surveycake_link,
           hash_key,
           iv_key,
-          webhook_name
+          webhook_name,
         } = result;
 
         setData({
@@ -92,7 +92,7 @@ export default function Page({ params }: PageProps) {
           surveycake_link,
           hash_key,
           iv_key,
-          webhook_name
+          webhook_name,
         });
       } else {
         setError(result.message || "Failed to fetch webhook details");
@@ -111,9 +111,7 @@ export default function Page({ params }: PageProps) {
   if (error) {
     return (
       <div className="p-6">
-        <div className="bg-red-50 text-red-500 p-4 rounded-lg">
-          Error: {error}
-        </div>
+        <div className="bg-red-50 text-red-500 p-4 rounded-lg">Error: {error}</div>
       </div>
     );
   }
@@ -121,9 +119,7 @@ export default function Page({ params }: PageProps) {
   if (!data) {
     return (
       <div className="p-6">
-        <div className="bg-yellow-50 text-yellow-700 p-4 rounded-lg">
-          No webhook details found
-        </div>
+        <div className="bg-yellow-50 text-yellow-700 p-4 rounded-lg">No webhook details found</div>
       </div>
     );
   }
@@ -137,7 +133,6 @@ export default function Page({ params }: PageProps) {
       console.error("Failed to copy:", err);
     }
   };
-  
 
   return (
     <div>
@@ -169,23 +164,23 @@ export default function Page({ params }: PageProps) {
               <span className="font-medium">Webhook URL:</span>
               <span className="break-all">{data.webhook_url}</span>
               <button
-              onClick={() => copyToClipboard(data.webhook_url, setIsCopied)}
-              className={`p-1 rounded transition-colors ${
-                isCopied ? "bg-green-200" : "hover:bg-gray-200"
-              }`}
+                onClick={() => copyToClipboard(data.webhook_url, setIsCopied)}
+                className={`p-1 rounded transition-colors ${
+                  isCopied ? "bg-green-200" : "hover:bg-gray-200"
+                }`}
               >
-              {isCopied ? (
-              <span className="flex items-center gap-1 text-green-700">
-                <HiClipboard className="h-5 w-5" />
-                Copied
-              </span>
-              ) : (
-              <span className="flex items-center gap-1 text-gray-700">
-                <HiClipboard className="h-5 w-5" />
-                Copy
-              </span>
-              )}
-            </button>
+                {isCopied ? (
+                  <span className="flex items-center gap-1 text-green-700">
+                    <HiClipboard className="h-5 w-5" />
+                    Copied
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-gray-700">
+                    <HiClipboard className="h-5 w-5" />
+                    Copy
+                  </span>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -202,8 +197,7 @@ export default function Page({ params }: PageProps) {
                 <span className="font-medium">Reply To:</span> {data.reply_to}
               </p>
               <p>
-                <span className="font-medium">Sender:</span>{" "}
-                {data.sender_local_part}@aws-educate.tw
+                <span className="font-medium">Sender:</span> {data.sender_local_part}@aws-educate.tw
               </p>
             </div>
             <div>
@@ -229,8 +223,7 @@ export default function Page({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="mb-2">
-                <span className="font-medium">Template File ID:</span>{" "}
-                {data.template_file_id}
+                <span className="font-medium">Template File ID:</span> {data.template_file_id}
               </p>
               <p>
                 <span className="font-medium">Surveycake Link:</span>{" "}
@@ -239,8 +232,8 @@ export default function Page({ params }: PageProps) {
             </div>
             <div>
               <p className="mb-2">
-                <span className="font-medium">Attachments:</span>{" "}
-                {data.attachment_file_ids.length} file(s)
+                <span className="font-medium">Attachments:</span> {data.attachment_file_ids.length}{" "}
+                file(s)
               </p>
             </div>
           </div>

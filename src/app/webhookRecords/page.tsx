@@ -133,9 +133,7 @@ export default function Page() {
             </button>
             <button
               className={`flex items-center gap-1 ${
-                !canGoNext
-                  ? "cursor-default text-gray-400"
-                  : "hover:text-gray-600 hover:underline"
+                !canGoNext ? "cursor-default text-gray-400" : "hover:text-gray-600 hover:underline"
               }`}
               onClick={handleNextPage}
               disabled={!canGoNext}
