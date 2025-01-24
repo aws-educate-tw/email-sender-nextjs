@@ -1,8 +1,19 @@
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRightIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const access_token = localStorage.getItem("access_token");
+    const expiryTime = localStorage.getItem("token_expiry_time");
+    const isValid = access_token && expiryTime && new Date().getTime() <= parseInt(expiryTime);
+    setIsAuthenticated(isValid ? true : false);
+  }, []);
+
   return (
     <main className="flex min-h-screen flex-col p-6">
       <div className="flex h-28 shrink-0 rounded-lg bg-sky-950 p-4 md:h-52 md:items-end">
@@ -37,7 +48,7 @@ export default function Page() {
           </div>
           <div className="flex flex-col gap-2 items-center md:flex-row md:items-start">
             <Link
-              href="login"
+              href={isAuthenticated ? "/sendEmail" : "/login"}
               className="flex items-center gap-2 rounded-lg bg-sky-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-sky-900 md:text-base"
             >
               <p className="animate-pulse">Let&apos;s Get Started</p>
