@@ -38,13 +38,13 @@ export default function Page() {
     try {
       const response = await submitLogin(JSON.stringify(formData));
 
-      console.log(response);
       alert(response.message);
 
       if (response.message === "Login successful") {
         localStorage.setItem("access_token", response.access_token);
 
-        const tokenExpiryTime = new Date().getTime() + 24 * 60 * 60 * 10000;
+        // Set token expiry time to 24 hours
+        const tokenExpiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
         localStorage.setItem("token_expiry_time", tokenExpiryTime.toString());
 
         router.push("/sendEmail");
