@@ -316,10 +316,7 @@ export default function CreateWebhookForm() {
                   value="no"
                   onChange={() => setIsGenerateCertificate(false)}
                   name="inline-radio-group"
-<<<<<<< HEAD
                   defaultChecked
-=======
->>>>>>> main
                   className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500"
                 />
                 <label htmlFor="inline-2-radio" className="ms-2 text-sm font-medium text-gray-900">
