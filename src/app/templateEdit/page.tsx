@@ -1,4 +1,5 @@
 "use client";
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import TipTap from "@/app/ui/tip-tap";
 import TemplateDropdown from "@/app/ui/template-dropdown";
@@ -17,6 +18,10 @@ const htmltemplateContent = `
     <p>Bill Wu</p>
     <p>AWS Educate Cloud Ambassador</p>
     <p>billwu0222@gmail.com</p>`;
+=======
+import { useState } from "react";
+import TipTap from "@/app/ui/tip-tap";
+>>>>>>> main
 
 export default function Page() {
   const [content, setContent] = useState(htmltemplateContent);
