@@ -10,7 +10,7 @@ import { Link } from "@tiptap/extension-link";
 import "./styles.scss";
 import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
-import { use, useState } from "react";
+import { useState } from "react";
 import NextStepLink from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";

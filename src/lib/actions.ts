@@ -201,7 +201,6 @@ export async function submitWebhookForm(data: string, access_token: string) {
 
   try {
     console.log("data", validation.data);
-
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/webhook`);
     const response = await fetch(url.toString(), {
