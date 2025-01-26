@@ -28,6 +28,12 @@ export default function SideNav() {
       </Link>
       <div className="flex grow flex-row flex-wrap justify-start gap-2 md:flex-col md:space-x-0 rounded-md">
         <Link
+          href="/aboutUs"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">About Us</p>
+        </Link>
+        <Link
           href="/templateEdit"
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
@@ -50,6 +56,12 @@ export default function SideNav() {
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
         >
           <p className="px-3 text-white">Webhook Service</p>
+        </Link>
+        <Link
+          href="/webhookRecords"
+          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
+        >
+          <p className="px-3 text-white">Webhook Records</p>
         </Link>
       </div>
       <div>

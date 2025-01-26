@@ -45,6 +45,7 @@ const webhookFormSchema = z.object({
   hash_key: z.string().min(1, "Hash key is required"),
   iv_key: z.string().min(1, "IV key is required"),
   webhook_name: z.string().min(1, "Webhook name is required"),
+  webhook_type: z.string().min(1, "Webhook type is required"),
 });
 
 export async function submitForm(data: string, access_token: string) {
@@ -211,18 +212,115 @@ export async function submitWebhookForm(data: string, access_token: string) {
       body: JSON.stringify(validation.data),
     });
 
+    // Deal with the error response
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("API responded with an error:", errorResponse);
+      return {
+        status: "error",
+        message: errorResponse.message || "Failed to create webhook.",
+      };
+    }
+
+    // Deal with the success response
     const result = await response.json();
     return {
-      status: result.status,
-      message: result.message,
-      webhook_id: result.webhook_id,
-      webhook_url: result.webhook_url,
-      errors: result.errors,
+      status: "success",
+      message: result.message || "Webhook created successfully.",
+      data: {
+        webhook_id: result.webhook_id,
+        webhook_url: result.webhook_url,
+      },
+    };
+  } catch (error: any) {
+    console.error("Error during API call:", error);
+    return {
+      status: "error",
+      message: "An unexpected error occurred while creating the webhook.",
+      debugInfo: error.message,
+    };
+  }
+}
+
+export async function fetchWebhookList(
+  access_token: string,
+  params: {
+    webhook_type: "surveycake" | "slack";
+    limit?: number;
+    page?: number;
+    sort_order?: "ASC" | "DESC";
+  }
+) {
+  try {
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const url = new URL(`${base_url}/webhooks`);
+
+    // 必要參數
+    url.searchParams.append("webhook_type", params.webhook_type);
+
+    // 可選參數
+    if (params.limit) {
+      url.searchParams.append("limit", params.limit.toString());
+    }
+    if (params.page) {
+      url.searchParams.append("page", params.page.toString());
+    }
+    if (params.sort_order) {
+      url.searchParams.append("sort_order", params.sort_order);
+    }
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return {
+      status: "success",
+      ...result,
     };
   } catch (error: any) {
     return {
       status: "error",
-      message: "Error: Failed to create webhook. Please try again.",
+      message: "Failed to fetch webhook list",
+      error: error.message,
+    };
+  }
+}
+
+export async function fetchWebhookDetails(access_token: string, webhookId: string) {
+  try {
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const url = new URL(`${base_url}/webhooks/${webhookId}`);
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return {
+      status: "success",
+      ...result,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message: "Failed to fetch webhook details",
       error: error.message,
     };
   }
