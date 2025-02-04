@@ -18,9 +18,10 @@ interface fileDataType {
 interface SelectDropdownProps {
   onSelect: (file_id: string, file_url: string) => void;
   fileExtension: string;
+  error?: string;
 }
 
-export default function SelectDropdown({ onSelect, fileExtension }: SelectDropdownProps) {
+export default function SelectDropdown({ onSelect, fileExtension, error }: SelectDropdownProps) {
   const [options, setOptions] = useState<fileDataType[] | null>(null);
   const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -123,7 +124,7 @@ export default function SelectDropdown({ onSelect, fileExtension }: SelectDropdo
       <div>
         <button
           type="button"
-          className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className={`inline-flex justify-between w-full rounded-md border ${error ? "border-red-500" : "border-gray-300"} shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
           id="options-menu"
           aria-expanded={isOpen}
           aria-haspopup="true"
