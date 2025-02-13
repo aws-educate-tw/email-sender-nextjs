@@ -13,6 +13,7 @@
         "format": ["PascalCase"]
       }
     ],
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/interface-name-prefix": "off"
   }
 }
