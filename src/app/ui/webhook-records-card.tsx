@@ -1,4 +1,4 @@
-import { CalendarDays, Mail, Link2, Webhook, Check } from "lucide-react";
+import { CalendarDays, Mail, Link2, Webhook } from "lucide-react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { HiClipboard } from "react-icons/hi";
 import { useState } from "react";
