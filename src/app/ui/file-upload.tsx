@@ -100,7 +100,7 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
             multiple
             accept={OnFileExtension}
           />
-          <style jsx>{`
+          <style>{`
             .custom-fileinput-label {
               background-color: #082f49;
             }
