@@ -48,11 +48,11 @@ interface DataType {
   created_year: string;
 }
 
-interface propsType {
+interface PropsType {
   data: DataType[] | null;
 }
 
-export default function EmailHistoryCard({ data }: propsType) {
+export default function EmailHistoryCard({ data }: PropsType) {
   // Early return for empty or undefined data
   if (!data || data.length === 0) {
     return <div className="w-full p-8 text-center text-gray-500">No email history found</div>;
