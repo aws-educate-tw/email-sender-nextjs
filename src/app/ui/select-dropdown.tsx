@@ -4,7 +4,7 @@ import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
-interface fileDataType {
+interface FileDataType {
   file_id: string;
   created_at: string;
   updated_at: string;
@@ -22,8 +22,8 @@ interface SelectDropdownProps {
 }
 
 export default function SelectDropdown({ onSelect, fileExtension, error }: SelectDropdownProps) {
-  const [options, setOptions] = useState<fileDataType[] | null>(null);
-  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(null);
+  const [options, setOptions] = useState<FileDataType[] | null>(null);
+  const [filteredOptions, setFilteredOptions] = useState<FileDataType[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

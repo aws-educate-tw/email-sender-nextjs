@@ -1,10 +1,10 @@
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 
-interface rowDataType {
+interface RowDataType {
   [key: string]: string;
 }
 
-interface dataType {
+interface DataType {
   bcc: string[];
   subject: string;
   cc: string[];
@@ -14,7 +14,7 @@ interface dataType {
   sender_local_part: string;
   status: string;
   spreadsheet_file_id: string;
-  row_data: rowDataType;
+  row_data: RowDataType;
   atatachment_file_ids: string[];
   is_generated_certficate: boolean;
   sender_username: string;
@@ -27,7 +27,7 @@ interface dataType {
   email_id: string;
 }
 
-export default function EmailDetailsTable({ data }: { data: dataType[] }) {
+export default function EmailDetailsTable({ data }: { data: DataType[] }) {
   return (
     <div className="overflow-x-auto shadow-lg rounded-md">
       <table className="w-full bg-white rounded-md">
@@ -51,7 +51,7 @@ export default function EmailDetailsTable({ data }: { data: dataType[] }) {
           </tr>
         </thead>
         <tbody>
-          {data.map((item: dataType, index: number) => (
+          {data.map((item: DataType, index: number) => (
             <tr key={index} className={`${index !== 0 ? "border-t border-gray-200" : ""}`}>
               <td className="py-2 px-4 text-sm text-gray-700 font-bold">{item.recipient_email}</td>
               <td className="py-2 px-4 text-sm text-gray-700">

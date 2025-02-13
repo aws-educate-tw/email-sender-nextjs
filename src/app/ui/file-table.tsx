@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 
-interface fileDataType {
+interface FileDataType {
   file_id: string;
   created_at: string;
   updated_at: string;
@@ -13,16 +13,16 @@ interface fileDataType {
 }
 
 interface FileTableProps {
-  files: fileDataType[] | null;
+  files: FileDataType[] | null;
   title: string;
   file_extension: string;
   loading: boolean;
   fetchFiles: (
     file_extension: string,
-    setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>,
+    setFiles: React.Dispatch<React.SetStateAction<FileDataType[] | null>>,
     setLastEvaluatedKey: React.Dispatch<React.SetStateAction<string | null>>
   ) => void;
-  setFiles: React.Dispatch<React.SetStateAction<fileDataType[] | null>>;
+  setFiles: React.Dispatch<React.SetStateAction<FileDataType[] | null>>;
   setLastEvaluatedKey: React.Dispatch<React.SetStateAction<string | null>>;
   lastEvaluatedKey: string | null;
 }
@@ -88,7 +88,7 @@ export default function FileTable({
               </th>
             </tr>
           </thead>
-          {files.map((file: fileDataType, index: number) => (
+          {files.map((file: FileDataType, index: number) => (
             <tbody key={index}>
               <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <td className="pl-6 py-4">
