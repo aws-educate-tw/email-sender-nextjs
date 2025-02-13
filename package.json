@@ -7,8 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "format": "prettier --write .",
-    "fix": "npm run format && npm run lint --fix"
+    "format:check": "prettier --check .",
+    "fix": "npm run format && npm run lint:fix",
+    "check": "npm run format:check && npm run lint"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.3",
