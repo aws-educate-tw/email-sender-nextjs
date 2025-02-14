@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime, formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
-interface fileDataType {
+interface FileDataType {
   file_id: string;
   created_at: string;
   updated_at: string;
@@ -19,12 +19,12 @@ interface AttachDropdownProps {
 }
 
 export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
-  const [options, setOptions] = useState<fileDataType[] | null>(null);
-  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(null);
+  const [options, setOptions] = useState<FileDataType[] | null>(null);
+  const [filteredOptions, setFilteredOptions] = useState<FileDataType[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<fileDataType[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<FileDataType[]>([]);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
@@ -92,7 +92,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (file: fileDataType | null) => {
+  const handleSelect = (file: FileDataType | null) => {
     if (!file) {
       setSelectedFiles([]);
       onSelect([]);

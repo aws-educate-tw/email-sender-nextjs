@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft, CalendarClock } from "lucide-react";
 
-interface fileDataType {
+interface FileDataType {
   file_id: string;
   created_at: string;
   updated_at: string;
@@ -20,7 +20,7 @@ interface TemplateDropdownProps {
 
 export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
   const fileExtension = "html";
-  const [options, setOptions] = useState<fileDataType[] | null>(null);
+  const [options, setOptions] = useState<FileDataType[] | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string>("Recent Templates");

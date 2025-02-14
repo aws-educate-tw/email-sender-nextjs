@@ -1,4 +1,3 @@
-import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import { Instagram, Mail } from "lucide-react";
 
 export default function TpetFooter() {

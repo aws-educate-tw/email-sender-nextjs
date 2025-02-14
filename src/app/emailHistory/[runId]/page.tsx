@@ -10,11 +10,11 @@ interface PageProps {
   };
 }
 
-interface rowDataType {
+interface RowDataType {
   [key: string]: string;
 }
 
-interface dataType {
+interface DataType {
   bcc: string[];
   subject: string;
   cc: string[];
@@ -24,7 +24,7 @@ interface dataType {
   sender_local_part: string;
   status: string;
   spreadsheet_file_id: string;
-  row_data: rowDataType;
+  row_data: RowDataType;
   atatachment_file_ids: string[];
   is_generated_certficate: boolean;
   sender_username: string;
@@ -38,7 +38,7 @@ interface dataType {
 }
 
 export default function Page({ params }: PageProps) {
-  const [data, setData] = useState<dataType[]>([]);
+  const [data, setData] = useState<DataType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);

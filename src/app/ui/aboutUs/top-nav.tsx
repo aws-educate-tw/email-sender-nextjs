@@ -17,7 +17,6 @@ export default function TopNav() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 120; // Offset for the fixed header
-      const viewportHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const scrolledToBottom = window.innerHeight + window.scrollY >= documentHeight - 50; // Added tolerance
 

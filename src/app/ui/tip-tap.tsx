@@ -165,7 +165,7 @@ export default function TipTap({ onChange, content }: any) {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <Toolbar editor={editor} content={content} />
+          <Toolbar editor={editor} />
         </div>
       </div>
       <div className="mt-1 flex justify-end gap-2">
