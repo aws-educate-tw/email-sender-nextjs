@@ -33,7 +33,6 @@ export default function TipTap({ onChange, content }: any) {
   };
 
   useEffect(() => {
-    console.log("checkLoginStatus function called");
     const access_token = localStorage.getItem("access_token");
     if (!access_token || isTokenExpired()) {
       router.push("/login");
@@ -87,7 +86,6 @@ export default function TipTap({ onChange, content }: any) {
         body: formData,
       });
       const result = await response.json();
-      console.log(result);
       setIsUploading(false);
       setIsFileNameEmpty(true);
       setShowNextStep(true);
