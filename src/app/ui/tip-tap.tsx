@@ -1,21 +1,20 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import Toolbar from "@/app/ui/tool-bar";
-import { Underline } from "@tiptap/extension-underline";
 import BulletList from "@tiptap/extension-bullet-list";
-import ListItem from "@tiptap/extension-list-item";
-import { Link } from "@tiptap/extension-link";
-import "./styles.scss";
 import Image from "@tiptap/extension-image";
-import ImageResize from "tiptap-extension-resize-image";
-import { useState } from "react";
-import NextStepLink from "next/link";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Link } from "@tiptap/extension-link";
+import ListItem from "@tiptap/extension-list-item";
+import { Underline } from "@tiptap/extension-underline";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { Toast } from "flowbite-react";
+import NextStepLink from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { HiCheck } from "react-icons/hi";
+import ImageResize from "tiptap-extension-resize-image";
+import "./styles.scss";
 
 export default function TipTap({ onChange, content }: any) {
   const [editorContent, setEditorContent] = useState(content);
@@ -135,6 +134,7 @@ export default function TipTap({ onChange, content }: any) {
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
       editor.commands.setContent(content);
+      setEditorContent(content);
     }
   }, [content, editor]);
 
