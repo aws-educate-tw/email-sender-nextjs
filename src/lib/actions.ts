@@ -34,19 +34,18 @@ const changePasswordSchema = z
 
 const webhookFormSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
-  display_name: z.string().min(1, "Display name is required"),
+  display_name: z.string().min(1, "Display name is required"), // This is actually optional.
   template_file_id: z.string().min(1, "Template file ID is required"),
-  is_generate_certificate: z.boolean(),
-  reply_to: z.string().email("Invalid email address"),
-  sender_local_part: z.string(),
-  attachment_file_ids: z.array(z.string()),
-  bcc: z.array(z.string().email("Invalid email address")),
-  cc: z.array(z.string().email("Invalid email address")),
-  surveycake_link: z.string(),
+  surveycake_link: z.string().min(1, "Surveycake link is required"),
   hash_key: z.string().min(1, "Hash key is required"),
   iv_key: z.string().min(1, "IV key is required"),
-  webhook_name: z.string().min(1, "Webhook name is required"),
   webhook_type: z.string().min(1, "Webhook type is required"),
+  webhook_name: z.string().optional(),
+  sender_local_part: z.string().optional(),
+  reply_to: z.string().email("Invalid email address").optional(),
+  bcc: z.array(z.string().email("Invalid email address")).optional(),
+  cc: z.array(z.string().email("Invalid email address")).optional(),
+  attachment_file_ids: z.array(z.string()).optional(),
 });
 
 export async function submitForm(data: string, access_token: string) {

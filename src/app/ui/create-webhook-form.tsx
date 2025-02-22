@@ -37,7 +37,6 @@ export default function CreateWebhookForm() {
   // 首先加入 state
   const [showAttachUpload, setShowAttachUpload] = useState<boolean>(false);
   const [attachment_file_ids, setAttachment_file_ids] = useState<string[]>([]);
-  const [isGenerateCertificate, setIsGenerateCertificate] = useState<boolean>(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showFailedToast, setShowFailedToast] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -67,23 +66,27 @@ export default function CreateWebhookForm() {
     if (!ref.current) return;
 
     // Extract form data
-    const formData = {
+    const formData: any = {
       subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement).value,
       display_name: (ref.current.querySelector("[id='display_name']") as HTMLInputElement).value,
       template_file_id: selectedHTML,
-      webhook_name: (ref.current.querySelector("[id='webhook_name']") as HTMLInputElement).value,
-      hash_key: (ref.current.querySelector("[id='hash_key']") as HTMLInputElement).value,
-      iv_key: (ref.current.querySelector("[id='iv_key']") as HTMLInputElement).value,
       surveycake_link: (ref.current.querySelector("[id='surveycake_link']") as HTMLInputElement)
         .value,
-      attachment_file_ids: attachment_file_ids,
-      reply_to: replyToEmail,
-      sender_local_part: localPart,
-      bcc: bccEmails,
-      cc: ccEmails,
-      is_generate_certificate: isGenerateCertificate,
+      hash_key: (ref.current.querySelector("[id='hash_key']") as HTMLInputElement).value,
+      iv_key: (ref.current.querySelector("[id='iv_key']") as HTMLInputElement).value,
       webhook_type: webhookType,
     };
+
+    if ((ref.current.querySelector("[id='webhook_name']") as HTMLInputElement).value) {
+      formData.webhook_name = (
+        ref.current.querySelector("[id='webhook_name']") as HTMLInputElement
+      ).value;
+    }
+    if (localPart) formData.sender_local_part = localPart;
+    if (replyToEmail) formData.reply_to = replyToEmail;
+    if (bccEmails.length > 0) formData.bcc = bccEmails;
+    if (ccEmails.length > 0) formData.cc = ccEmails;
+    if (attachment_file_ids.length > 0) formData.attachment_file_ids = attachment_file_ids;
 
     try {
       const response = await submitWebhookForm(
@@ -234,6 +237,136 @@ export default function CreateWebhookForm() {
 
           <div className="m-3">
             <label className="mb-2 flex text-sm font-medium gap-2">
+              Select template file:
+              <HelpTip message="Choose or upload template file for the webhook.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <div className="flex items-center gap-2">
+              <SelectDropdown
+                onSelect={handleHtmlSelect}
+                fileExtension="html"
+                error={errors.template_file_id}
+              />
+              <button
+                type="button"
+                onClick={() => setPreviewTemplate(true)}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                preview
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowTemplateUpload(true)}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                upload
+              </button>
+            </div>
+            {errors.template_file_id && (
+              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
+            )}
+          </div>
+
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              Surveycake Link:
+              <HelpTip message="Enter the Surveycake form URL if applicable.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <input
+              id="surveycake_link"
+              name="surveycake_link"
+              type="text"
+              placeholder="Enter Surveycake link"
+              disabled={isSubmitting}
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.surveycake_link ? "border-red-500" : "border-gray-200"
+              }`}
+            />
+            {errors.surveycake_link && (
+              <p className="text-red-500 text-sm">{errors.surveycake_link}</p>
+            )}
+          </div>
+
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              Hash Key:
+              <HelpTip message="Enter the hash key for webhook security.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <input
+              id="hash_key"
+              name="hash_key"
+              type="text"
+              placeholder="Enter hash key"
+              disabled={isSubmitting}
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.hash_key ? "border-red-500" : "border-gray-200"
+              }`}
+            />
+            {errors.hash_key && <p className="text-red-500 text-sm">{errors.hash_key}</p>}
+          </div>
+
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              IV Key:
+              <HelpTip message="Enter the initialization vector key.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <input
+              id="iv_key"
+              name="iv_key"
+              type="text"
+              placeholder="Enter IV key"
+              disabled={isSubmitting}
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.iv_key ? "border-red-500" : "border-gray-200"
+              }`}
+            />
+            {errors.iv_key && <p className="text-red-500 text-sm">{errors.iv_key}</p>}
+          </div>
+
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              Webhook Type:
+              <HelpTip message="Select the webhook type.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <WebhookTypeDropdown onSelect={handleWebhookTypeChange} />
+          </div>
+        </div>
+        <p className="text-2xl font-bold py-2 flex items-center gap-1">
+          Optional
+          {/* <ChevronDown size={24} /> */}
+        </p>
+        <div className="rounded-md bg-neutral-100 p-4">
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
+              Webhook Name:
+              <HelpTip message="Enter a name to identify your webhook.">
+                <Info size={16} color="gray" />
+              </HelpTip>
+            </label>
+            <input
+              id="webhook_name"
+              name="webhook_name"
+              type="text"
+              placeholder="Enter webhook name"
+              disabled={isSubmitting}
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                errors.webhook_name ? "border-red-500" : "border-gray-200"
+              }`}
+            />
+            {errors.webhook_name && <p className="text-red-500 text-sm">{errors.webhook_name}</p>}
+          </div>
+
+          <div className="m-3">
+            <label className="mb-2 flex text-sm font-medium gap-2">
               Sender Local Part:
               <HelpTip message="Enter the prefix for your email address. Example: if you enter 'john.doe', the email will be 'john.doe@aws-educate.tw'">
                 <Info size={16} color="gray" />
@@ -257,93 +390,6 @@ export default function CreateWebhookForm() {
             {errors.sender_local_part && (
               <p className="text-red-500 text-sm">{errors.sender_local_part}</p>
             )}
-          </div>
-
-          <div className="m-3">
-            <label className="mb-2 flex text-sm font-medium gap-2">
-              Select template file:
-              <HelpTip message="Choose or upload template file for the webhook.">
-                <Info size={16} color="gray" />
-              </HelpTip>
-            </label>
-            <div className="flex items-center gap-2">
-              <SelectDropdown onSelect={handleHtmlSelect} fileExtension="html" />
-              <button
-                type="button"
-                onClick={() => setPreviewTemplate(true)}
-                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-              >
-                preview
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowTemplateUpload(true)}
-                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-              >
-                upload
-              </button>
-            </div>
-            {errors.template_file_id && (
-              <p className="text-red-500 text-sm">{errors.template_file_id}</p>
-            )}
-          </div>
-
-          <div className="my-5 mx-3">
-            <label className="mb-2 flex text-sm font-medium gap-2">
-              Provide a certification of participation?
-              <HelpTip message="Select Yes or No if you want to provide a certification. Note: If you select Yes, the Excel file must include two columns: Name and Certificate Text.">
-                <Info size={16} color="gray" />
-              </HelpTip>
-            </label>
-            <div className="flex">
-              <div className="flex items-center me-4">
-                <input
-                  id="inline-radio"
-                  type="radio"
-                  value="yes"
-                  onChange={() => setIsGenerateCertificate(true)}
-                  name="inline-radio-group"
-                  className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500"
-                />
-                <label htmlFor="inline-radio" className="ms-2 text-sm font-medium text-gray-900">
-                  Yes
-                </label>
-              </div>
-              <div className="flex items-center me-4">
-                <input
-                  id="inline-2-radio"
-                  type="radio"
-                  value="no"
-                  onChange={() => setIsGenerateCertificate(false)}
-                  name="inline-radio-group"
-                  defaultChecked
-                  className="w-4 h-4 text-blue-600 bg-white border-gray-300 focus:ring-blue-500"
-                />
-                <label htmlFor="inline-2-radio" className="ms-2 text-sm font-medium text-gray-900">
-                  No
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className="m-3">
-            <label className="mb-2 flex text-sm font-medium gap-2">
-              Webhook Name:
-              <HelpTip message="Enter a name to identify your webhook.">
-                <Info size={16} color="gray" />
-              </HelpTip>
-            </label>
-            <input
-              id="webhook_name"
-              name="webhook_name"
-              type="text"
-              placeholder="Enter webhook name"
-              disabled={isSubmitting}
-              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                errors.webhook_name ? "border-red-500" : "border-gray-200"
-              }`}
-            />
-            {errors.webhook_name && <p className="text-red-500 text-sm">{errors.webhook_name}</p>}
           </div>
 
           <div className="m-3">
@@ -419,77 +465,6 @@ export default function CreateWebhookForm() {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="m-3">
-            <label className="mb-2 flex text-sm font-medium gap-2">
-              Surveycake Link:
-              <HelpTip message="Enter the Surveycake form URL if applicable.">
-                <Info size={16} color="gray" />
-              </HelpTip>
-            </label>
-            <input
-              id="surveycake_link"
-              name="surveycake_link"
-              type="text"
-              placeholder="Enter Surveycake link"
-              disabled={isSubmitting}
-              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                errors.surveycake_link ? "border-red-500" : "border-gray-200"
-              }`}
-            />
-            {errors.surveycake_link && (
-              <p className="text-red-500 text-sm">{errors.surveycake_link}</p>
-            )}
-          </div>
-
-          <div className="m-3">
-            <label className="mb-2 flex text-sm font-medium gap-2">
-              Hash Key:
-              <HelpTip message="Enter the hash key for webhook security.">
-                <Info size={16} color="gray" />
-              </HelpTip>
-            </label>
-            <input
-              id="hash_key"
-              name="hash_key"
-              type="text"
-              placeholder="Enter hash key"
-              disabled={isSubmitting}
-              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                errors.hash_key ? "border-red-500" : "border-gray-200"
-              }`}
-            />
-            {errors.hash_key && <p className="text-red-500 text-sm">{errors.hash_key}</p>}
-          </div>
-
-          <div className="m-3">
-            <label className="mb-2 flex text-sm font-medium gap-2">
-              IV Key:
-              <HelpTip message="Enter the initialization vector key.">
-                <Info size={16} color="gray" />
-              </HelpTip>
-            </label>
-            <input
-              id="iv_key"
-              name="iv_key"
-              type="text"
-              placeholder="Enter IV key"
-              disabled={isSubmitting}
-              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
-                errors.iv_key ? "border-red-500" : "border-gray-200"
-              }`}
-            />
-            {errors.iv_key && <p className="text-red-500 text-sm">{errors.iv_key}</p>}
-          </div>
-          <div className="m-3">
-            <label className="mb-2 flex text-sm font-medium gap-2">
-              Webhook Type:
-              <HelpTip message="Select the webhook type.">
-                <Info size={16} color="gray" />
-              </HelpTip>
-            </label>
-            <WebhookTypeDropdown onSelect={handleWebhookTypeChange} />
           </div>
         </div>
 
