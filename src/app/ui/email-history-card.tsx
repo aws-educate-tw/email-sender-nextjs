@@ -2,7 +2,7 @@ import { CalendarDays, User, FileText, Clock, Send, Sheet, Mail } from "lucide-r
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import Link from "next/link";
 
-interface fileType {
+interface FileType {
   file_url: string;
   uploaded_id: string | null;
   updated_at: string;
@@ -14,19 +14,19 @@ interface fileType {
   file_size: number;
 }
 
-interface senderType {
+interface SenderType {
   user_id: string;
   email: string;
   username: string;
   message?: string;
 }
 
-interface dataType {
+interface DataType {
   bcc: string[];
   subject: string;
   cc: string[];
   run_id: string;
-  attachment_files: fileType[];
+  attachment_files: FileType[];
   recipient_source: "DIRECT" | "SPREADSHEET";
   created_at: string;
   sender_local_part: string;
@@ -35,30 +35,30 @@ interface dataType {
   recipients: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
   is_generate_certificate: boolean;
-  spreadsheet_file: fileType | null;
+  spreadsheet_file: FileType | null;
   display_name: string;
   sender_id: string | null;
-  sender: senderType;
+  sender: SenderType;
   template_file_id: string;
   success_email_count: number;
   expected_email_send_count: number;
   reply_to: string;
-  template_file: fileType;
+  template_file: FileType;
   created_year_month_day: string;
   created_year: string;
 }
 
-interface propsType {
-  data: dataType[] | null;
+interface PropsType {
+  data: DataType[] | null;
 }
 
-export default function EmailHistoryCard({ data }: propsType) {
+export default function EmailHistoryCard({ data }: PropsType) {
   // Early return for empty or undefined data
   if (!data || data.length === 0) {
     return <div className="w-full p-8 text-center text-gray-500">No email history found</div>;
   }
 
-  const renderRecipientInfo = (item: dataType) => {
+  const renderRecipientInfo = (item: DataType) => {
     const isDirect = item.recipient_source === "DIRECT";
 
     return (

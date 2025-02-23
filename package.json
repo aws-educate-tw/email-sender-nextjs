@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write .",
-    "fix": "npm run format && npm run lint --fix"
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "fix": "npm run type-check && npm run format && npm run lint:fix",
+    "check": "npm run type-check && npm run format:check && npm run lint"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.3",
@@ -43,6 +47,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "eslint-config-prettier": "^9.1.0",

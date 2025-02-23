@@ -4,7 +4,7 @@ import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skelet
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "../ui/email-history-card";
 
-interface attachmentFilesType {
+interface AttachmentFilesType {
   file_url: string;
   uploaded_id: string;
   updated_at: string;
@@ -16,7 +16,7 @@ interface attachmentFilesType {
   file_size: number;
 }
 
-interface spreadsheetFileType {
+interface SpreadsheetFileType {
   file_url: string;
   uploaded_id: string;
   updated_at: string;
@@ -28,7 +28,7 @@ interface spreadsheetFileType {
   file_size: number;
 }
 
-interface templateFileType {
+interface TemplateFileType {
   file_url: string;
   uploaded_id: string;
   updated_at: string;
@@ -40,18 +40,18 @@ interface templateFileType {
   file_size: number;
 }
 
-interface senderType {
+interface SenderType {
   user_id: string;
   email: string;
   username: string;
 }
 
-interface dataType {
+interface DataType {
   bcc: string[];
   subject: string;
   cc: string[];
   run_id: string;
-  attachment_files: attachmentFilesType[];
+  attachment_files: AttachmentFilesType[];
   recipient_source: "DIRECT" | "SPREADSHEET";
   created_at: string;
   sender_local_part: string;
@@ -60,21 +60,21 @@ interface dataType {
   recipients: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
   is_generate_certificate: boolean;
-  spreadsheet_file: spreadsheetFileType | null;
+  spreadsheet_file: SpreadsheetFileType | null;
   display_name: string;
   sender_id: string | null;
-  sender: senderType;
+  sender: SenderType;
   template_file_id: string;
   success_email_count: number;
   expected_email_send_count: number;
   reply_to: string;
-  template_file: templateFileType;
+  template_file: TemplateFileType;
   created_year_month_day: string;
   created_year: string;
 }
 
 export default function Page() {
-  const [data, setData] = useState<dataType[] | null>(null);
+  const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);

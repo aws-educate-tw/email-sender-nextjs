@@ -6,12 +6,13 @@ const formSchema = z.object({
   display_name: z.string().min(1, "Display name is required"),
   template_file_id: z.string().min(1, "Template file ID is required"),
   spreadsheet_file_id: z.string().min(1, "Spreadsheet file ID is required"),
-  attachment_file_ids: z.array(z.string()),
-  is_generate_certificate: z.boolean(),
-  reply_to: z.string().email("Invalid email address"),
-  sender_local_part: z.string(),
-  bcc: z.array(z.string().email("Invalid email address")),
-  cc: z.array(z.string().email("Invalid email address")),
+  recipient_source: z.string().min(1, "Recipient source is required"),
+  sender_local_part: z.string().optional(),
+  reply_to: z.string().email("Invalid email address").optional(),
+  bcc: z.array(z.string().email("Invalid email address")).optional(),
+  cc: z.array(z.string().email("Invalid email address")).optional(),
+  attachment_file_ids: z.array(z.string()).optional(),
+  is_generate_certificate: z.boolean().optional(),
 });
 
 const loginSchema = z.object({
@@ -33,19 +34,18 @@ const changePasswordSchema = z
 
 const webhookFormSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
-  display_name: z.string().min(1, "Display name is required"),
+  display_name: z.string().min(1, "Display name is required"), // This is actually optional.
   template_file_id: z.string().min(1, "Template file ID is required"),
-  is_generate_certificate: z.boolean(),
-  reply_to: z.string().email("Invalid email address"),
-  sender_local_part: z.string(),
-  attachment_file_ids: z.array(z.string()),
-  bcc: z.array(z.string().email("Invalid email address")),
-  cc: z.array(z.string().email("Invalid email address")),
-  surveycake_link: z.string(),
+  surveycake_link: z.string().min(1, "Surveycake link is required"),
   hash_key: z.string().min(1, "Hash key is required"),
   iv_key: z.string().min(1, "IV key is required"),
-  webhook_name: z.string().min(1, "Webhook name is required"),
   webhook_type: z.string().min(1, "Webhook type is required"),
+  webhook_name: z.string().optional(),
+  sender_local_part: z.string().optional(),
+  reply_to: z.string().email("Invalid email address").optional(),
+  bcc: z.array(z.string().email("Invalid email address")).optional(),
+  cc: z.array(z.string().email("Invalid email address")).optional(),
+  attachment_file_ids: z.array(z.string()).optional(),
 });
 
 export async function submitForm(data: string, access_token: string) {
@@ -63,7 +63,7 @@ export async function submitForm(data: string, access_token: string) {
   }
 
   try {
-    console.log("data", validation.data);
+    // console.log("data", validation.data);
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(url.toString(), {
@@ -238,90 +238,6 @@ export async function submitWebhookForm(data: string, access_token: string) {
       status: "error",
       message: "An unexpected error occurred while creating the webhook.",
       debugInfo: error.message,
-    };
-  }
-}
-
-export async function fetchWebhookList(
-  access_token: string,
-  params: {
-    webhook_type: "surveycake" | "slack";
-    limit?: number;
-    page?: number;
-    sort_order?: "ASC" | "DESC";
-  }
-) {
-  try {
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/webhooks`);
-
-    // 必要參數
-    url.searchParams.append("webhook_type", params.webhook_type);
-
-    // 可選參數
-    if (params.limit) {
-      url.searchParams.append("limit", params.limit.toString());
-    }
-    if (params.page) {
-      url.searchParams.append("page", params.page.toString());
-    }
-    if (params.sort_order) {
-      url.searchParams.append("sort_order", params.sort_order);
-    }
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return {
-      status: "success",
-      ...result,
-    };
-  } catch (error: any) {
-    return {
-      status: "error",
-      message: "Failed to fetch webhook list",
-      error: error.message,
-    };
-  }
-}
-
-export async function fetchWebhookDetails(access_token: string, webhookId: string) {
-  try {
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/webhooks/${webhookId}`);
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return {
-      status: "success",
-      ...result,
-    };
-  } catch (error: any) {
-    return {
-      status: "error",
-      message: "Failed to fetch webhook details",
-      error: error.message,
     };
   }
 }

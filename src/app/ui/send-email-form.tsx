@@ -62,19 +62,23 @@ export default function SendEmailForm() {
     event.preventDefault();
     if (!ref.current) return;
 
-    const formData = {
+    const formData: any = {
       subject: (ref.current.querySelector("[id='subject']") as HTMLInputElement).value,
       display_name: (ref.current.querySelector("[id='display_name']") as HTMLInputElement).value,
       template_file_id: selectedHtmlFile,
       spreadsheet_file_id: selectedXlsxFile,
-      attachment_file_ids: attachment_file_ids,
-      is_generate_certificate: isGenerateCertificate,
-      reply_to: replyToEmail,
-      sender_local_part: localPart,
-      bcc: bccEmails,
-      cc: ccEmails,
+      recipient_source: "SPREADSHEET",
     };
-    console.log("form data", formData);
+
+    // Conditionally add optional fields only if they have a value
+    if (localPart) formData.sender_local_part = localPart;
+    if (replyToEmail) formData.reply_to = replyToEmail;
+    if (bccEmails.length > 0) formData.bcc = bccEmails;
+    if (ccEmails.length > 0) formData.cc = ccEmails;
+    if (attachment_file_ids.length > 0) formData.attachment_file_ids = attachment_file_ids;
+    if (isGenerateCertificate) formData.is_generate_certificate = isGenerateCertificate;
+
+    // console.log("Form data: ", formData);
 
     setIsSubmitting(true);
     try {
@@ -229,7 +233,11 @@ export default function SendEmailForm() {
               </HelpTip>
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown onSelect={handleHtmlSelect} fileExtension="html" />
+              <SelectDropdown
+                onSelect={handleHtmlSelect}
+                fileExtension="html"
+                error={errors.template_file_id}
+              />
               <button
                 type="button"
                 onClick={handlePreviewHtml}
@@ -317,7 +325,11 @@ export default function SendEmailForm() {
               </HelpTip>
             </label>
             <div className="flex items-center gap-2">
-              <SelectDropdown onSelect={handleXlsxSelect} fileExtension="xlsx" />
+              <SelectDropdown
+                onSelect={handleXlsxSelect}
+                fileExtension="xlsx"
+                error={errors.spreadsheet_file_id}
+              />
               <button
                 type="button"
                 onClick={handlePreviewXlsx}
@@ -426,6 +438,9 @@ export default function SendEmailForm() {
               />
               <div className="w-44 text-center text-sm">@aws-educate.tw</div>
             </div>
+            {errors.sender_local_part && (
+              <p className="text-red-500 text-sm">{errors.sender_local_part}</p>
+            )}
           </div>
           {/* Reply To */}
           <div className="m-3">
@@ -436,6 +451,7 @@ export default function SendEmailForm() {
               </HelpTip>
             </label>
             <EmailInput allowMultiple={false} onEmailsChange={handleReplyToEmailChange} />
+            {errors.reply_to && <p className="text-red-500 text-sm">{errors.reply_to}</p>}
           </div>
           {/* BCC */}
           <div className="m-3">

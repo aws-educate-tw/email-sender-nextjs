@@ -4,7 +4,7 @@ import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
-interface fileDataType {
+interface FileDataType {
   file_id: string;
   created_at: string;
   updated_at: string;
@@ -18,11 +18,12 @@ interface fileDataType {
 interface SelectDropdownProps {
   onSelect: (file_id: string, file_url: string) => void;
   fileExtension: string;
+  error?: string;
 }
 
-export default function SelectDropdown({ onSelect, fileExtension }: SelectDropdownProps) {
-  const [options, setOptions] = useState<fileDataType[] | null>(null);
-  const [filteredOptions, setFilteredOptions] = useState<fileDataType[] | null>(null);
+export default function SelectDropdown({ onSelect, fileExtension, error }: SelectDropdownProps) {
+  const [options, setOptions] = useState<FileDataType[] | null>(null);
+  const [filteredOptions, setFilteredOptions] = useState<FileDataType[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +124,7 @@ export default function SelectDropdown({ onSelect, fileExtension }: SelectDropdo
       <div>
         <button
           type="button"
-          className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className={`inline-flex justify-between w-full rounded-md border ${error ? "border-red-500" : "border-gray-300"} shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
           id="options-menu"
           aria-expanded={isOpen}
           aria-haspopup="true"

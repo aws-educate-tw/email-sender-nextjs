@@ -19,10 +19,9 @@ import {
 
 type Props = {
   editor: Editor | null;
-  content: string;
 };
 
-export default function ToolBar({ editor, content }: Props) {
+export default function ToolBar({ editor }: Props) {
   const setLink = useCallback(() => {
     if (!editor) return;
     const previousUrl = editor.getAttributes("link").href;
