@@ -4,7 +4,9 @@ import WebhookRecordsSkeleton from "@/app/ui/skeleton/webhook-records-skeleton";
 import { HiClipboard } from "react-icons/hi";
 import { Link2, Mail, Webhook, Save, Edit, X } from "lucide-react";
 import SelectDropdown from "@/app/ui/select-dropdown";
+import AttachDropdown from "@/app/ui/attach-dropdown";
 import IframePreview from "@/app/ui/iframe-preview";
+import { set } from "zod";
 
 interface PageProps {
   params: {
@@ -146,7 +148,7 @@ export default function Page({ params }: PageProps) {
     setSuccessMessage(null); // Clear any success message
   };
 
-  const handleTemplateFileSelect = (file_id: string, file_url: string) => {
+  const handleHtmlSelect = (file_id: string, file_url: string) => {
     if (!formData) return;
 
     setFormData({
@@ -158,6 +160,15 @@ export default function Page({ params }: PageProps) {
     // Clear any previous error
     setTemplateFileError(null);
     setHtmlPreviewLink(file_url);
+  };
+
+  const handleAttachSelect = (selectedFiles: { file_id: string; file_url: string }[]) => {
+    if (!formData) return;
+
+    setFormData({
+      ...formData,
+      attachment_file_ids: selectedFiles.map(file => file.file_id),
+    });
   };
 
   const saveWebhook = async () => {
@@ -486,7 +497,7 @@ export default function Page({ params }: PageProps) {
                   {isEditMode ? (
                     <div className="flex">
                       <SelectDropdown
-                        onSelect={handleTemplateFileSelect}
+                        onSelect={handleHtmlSelect}
                         fileExtension="html"
                         error={templateFileError || undefined}
                       />
@@ -563,13 +574,7 @@ export default function Page({ params }: PageProps) {
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">Attachments:</span>
                   {isEditMode ? (
-                    <textarea
-                      name="attachment_file_ids"
-                      value={formData.attachment_file_ids.join(", ")}
-                      onChange={e => handleArrayInputChange(e, "attachment_file_ids")}
-                      className="border border-gray-300 rounded-md p-2 w-full"
-                      placeholder="Enter file IDs separated by commas"
-                    />
+                    <AttachDropdown onSelect={handleAttachSelect} />
                   ) : (
                     <span>{data.attachment_file_ids.length} file(s)</span>
                   )}
