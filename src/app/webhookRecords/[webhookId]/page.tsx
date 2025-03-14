@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import WebhookRecordsSkeleton from "@/app/ui/skeleton/webhook-records-skeleton";
 import { HiClipboard } from "react-icons/hi";
 import { Link2, Mail, Webhook, Save, Edit, X } from "lucide-react";
+import SelectDropdown from "@/app/ui/select-dropdown";
 
 interface PageProps {
   params: {
@@ -16,6 +17,7 @@ interface WebhookDetails {
   subject: string;
   display_name: string;
   template_file_id: string;
+  template_file_url?: string; // Add this to store the file URL
   is_generate_certificate: boolean;
   reply_to: string;
   sender_local_part: string;
@@ -33,6 +35,7 @@ export default function Page({ params }: PageProps) {
   const [data, setData] = useState<WebhookDetails | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [templateFileError, setTemplateFileError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<WebhookDetails | null>(null);
@@ -139,11 +142,31 @@ export default function Page({ params }: PageProps) {
     setSuccessMessage(null); // Clear any success message
   };
 
+  const handleTemplateFileSelect = (file_id: string, file_url: string) => {
+    if (!formData) return;
+
+    setFormData({
+      ...formData,
+      template_file_id: file_id,
+      template_file_url: file_url,
+    });
+
+    // Clear any previous error
+    setTemplateFileError(null);
+  };
+
   const saveWebhook = async () => {
     if (!formData) return;
 
+    // Validate required fields
+    if (!formData.template_file_id) {
+      setTemplateFileError("Template file is required");
+      return;
+    }
+
     setIsSaving(true);
     setError(null);
+    setTemplateFileError(null);
     setSuccessMessage(null);
 
     try {
@@ -454,15 +477,18 @@ export default function Page({ params }: PageProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <span className="font-medium">Template File ID:</span>
+                  <span className="font-medium">Template File:</span>
                   {isEditMode ? (
-                    <input
-                      type="text"
-                      name="template_file_id"
-                      value={formData.template_file_id}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 rounded-md p-2 w-full"
-                    />
+                    <div>
+                      <SelectDropdown
+                        onSelect={handleTemplateFileSelect}
+                        fileExtension="html"
+                        error={templateFileError || undefined}
+                      />
+                      {templateFileError && (
+                        <p className="text-sm text-red-500 mt-1">{templateFileError}</p>
+                      )}
+                    </div>
                   ) : (
                     <span className="break-all">{data.template_file_id}</span>
                   )}
