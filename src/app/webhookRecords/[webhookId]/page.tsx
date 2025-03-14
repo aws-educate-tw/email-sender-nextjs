@@ -4,6 +4,7 @@ import WebhookRecordsSkeleton from "@/app/ui/skeleton/webhook-records-skeleton";
 import { HiClipboard } from "react-icons/hi";
 import { Link2, Mail, Webhook, Save, Edit, X } from "lucide-react";
 import SelectDropdown from "@/app/ui/select-dropdown";
+import IframePreview from "@/app/ui/iframe-preview";
 
 interface PageProps {
   params: {
@@ -17,7 +18,7 @@ interface WebhookDetails {
   subject: string;
   display_name: string;
   template_file_id: string;
-  template_file_url?: string; // Add this to store the file URL
+  template_file_url: string;
   is_generate_certificate: boolean;
   reply_to: string;
   sender_local_part: string;
@@ -41,6 +42,9 @@ export default function Page({ params }: PageProps) {
   const [formData, setFormData] = useState<WebhookDetails | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const [HtmlPreviewLink, setHtmlPreviewLink] = useState<string | null>("");
+  const [previewTemplate, setPreviewTemplate] = useState<boolean>(false);
 
   useEffect(() => {
     fetchWebhookDetails(params.webhookId);
@@ -153,6 +157,7 @@ export default function Page({ params }: PageProps) {
 
     // Clear any previous error
     setTemplateFileError(null);
+    setHtmlPreviewLink(file_url);
   };
 
   const saveWebhook = async () => {
@@ -479,7 +484,7 @@ export default function Page({ params }: PageProps) {
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">Template File:</span>
                   {isEditMode ? (
-                    <div>
+                    <div className="flex">
                       <SelectDropdown
                         onSelect={handleTemplateFileSelect}
                         fileExtension="html"
@@ -488,9 +493,53 @@ export default function Page({ params }: PageProps) {
                       {templateFileError && (
                         <p className="text-sm text-red-500 mt-1">{templateFileError}</p>
                       )}
+                      <button
+                        type="button"
+                        onClick={() => setPreviewTemplate(true)}
+                        className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+                      >
+                        preview
+                      </button>
                     </div>
                   ) : (
                     <span className="break-all">{data.template_file_id}</span>
+                  )}
+                  {previewTemplate && (
+                    <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50 p-20">
+                      <div className="bg-yellow-400 rounded-lg shadow-2xl p-8 pb-12 w-full h-full relative">
+                        <button
+                          onClick={() => setPreviewTemplate(false)}
+                          className="absolute top-8 right-8 text-white"
+                        >
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                            />
+                          </svg>
+                        </button>
+                        <div className="w-full h-full p-2 flex flex-col">
+                          <p className="text-2xl text-white">Preview Template</p>
+                          {HtmlPreviewLink ? (
+                            <IframePreview
+                              src={HtmlPreviewLink}
+                              title="Template Preview"
+                              width="100%"
+                              height="100%"
+                            />
+                          ) : (
+                            <div className="flex w-full h-full justify-center items-center">
+                              <p className="text-white">No preview available</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
 
