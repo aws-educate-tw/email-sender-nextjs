@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, KeyboardEvent, MouseEvent, useRef } from "react";
+import React, { useState, useEffect, KeyboardEvent, MouseEvent } from "react";
 
 interface EmailInputProps {
   allowMultiple?: boolean;

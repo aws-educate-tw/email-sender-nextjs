@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import WebhookRecordsSkeleton from "@/app/ui/skeleton/webhook-records-skeleton";
 import { HiClipboard } from "react-icons/hi";
-import { Link2, Mail, Webhook, Save, Edit, X } from "lucide-react";
+import { Link2, Mail, Webhook, Save, Edit } from "lucide-react";
 import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "@/app/ui/attach-dropdown";
 import IframePreview from "@/app/ui/iframe-preview";
@@ -155,21 +155,21 @@ export default function Page({ params }: PageProps) {
     });
   };
 
-  const handleCCEmailsChange = (emails: string[]) => {
-    if (!formData) return;
-
-    setFormData({
-      ...formData,
-      cc: emails,
-    });
-  };
-
   const handleReplyToChange = (emails: string[]) => {
     if (!formData) return;
 
     setFormData({
       ...formData,
       reply_to: emails[0],
+    });
+  };
+
+  const handleCCEmailsChange = (emails: string[]) => {
+    if (!formData) return;
+
+    setFormData({
+      ...formData,
+      cc: emails,
     });
   };
 
