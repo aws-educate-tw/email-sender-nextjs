@@ -276,7 +276,7 @@ export default function Page({ params }: PageProps) {
           </div>
         </div>
       ) : (
-        <div className="bg-neutral-100 rounded-lg shadow-lg p-4 md:p-6">
+        <div className="bg-neutral-100 rounded-lg p-4 md:p-6">
           {/* Basic Information */}
           <div className="flex flex-col gap-4">
             <div className="rounded-lg flex w-full items-center gap-2">
@@ -361,40 +361,28 @@ export default function Page({ params }: PageProps) {
                   <span className="font-medium">Webhook URL:</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {isEditMode ? (
-                    <input
-                      type="text"
-                      name="webhook_url"
-                      value={formData.webhook_url}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 rounded-md p-2 flex-1"
-                      disabled
-                    />
-                  ) : (
-                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40 w-full">
-                      {data.webhook_url}
-                    </span>
-                  )}
-                  {!isEditMode && (
-                    <button
-                      onClick={() => copyToClipboard(data.webhook_url)}
-                      className={`p-2 rounded transition-colors shrink-0 ${
-                        isCopied ? "bg-green-200" : "hover:bg-gray-200"
-                      }`}
-                    >
-                      {isCopied ? (
-                        <span className="flex items-center gap-1 text-green-700 whitespace-nowrap">
-                          <HiClipboard size={20} />
-                          <span className="hidden sm:inline">Copied</span>
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-gray-700 whitespace-nowrap">
-                          <HiClipboard size={20} />
-                          <span className="hidden sm:inline">Copy</span>
-                        </span>
-                      )}
-                    </button>
-                  )}
+                  <span className="break-all font-bold bg-white underline p-2 rounded-lg w-full">
+                    {data.webhook_url}
+                  </span>
+
+                  <button
+                    onClick={() => copyToClipboard(data.webhook_url)}
+                    className={`p-2 rounded transition-colors shrink-0 ${
+                      isCopied ? "bg-green-200" : "hover:bg-gray-200"
+                    }`}
+                  >
+                    {isCopied ? (
+                      <span className="flex items-center gap-1 text-green-700 whitespace-nowrap">
+                        <HiClipboard size={20} />
+                        <span className="hidden sm:inline">Copied</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-gray-700 whitespace-nowrap">
+                        <HiClipboard size={20} />
+                        <span className="hidden sm:inline">Copy</span>
+                      </span>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
