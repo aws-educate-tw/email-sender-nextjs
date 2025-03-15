@@ -164,6 +164,15 @@ export default function Page({ params }: PageProps) {
     });
   };
 
+  const handleReplyToChange = (emails: string[]) => {
+    if (!formData) return;
+
+    setFormData({
+      ...formData,
+      reply_to: emails[0],
+    });
+  };
+
   const handleBCCEmailsChange = (emails: string[]) => {
     if (!formData) return;
 
@@ -405,12 +414,10 @@ export default function Page({ params }: PageProps) {
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">Reply To:</span>
                   {isEditMode ? (
-                    <input
-                      type="email"
-                      name="reply_to"
-                      value={formData.reply_to}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 rounded-md p-2 w-full"
+                    <EmailInput
+                      allowMultiple={false}
+                      onEmailsChange={handleReplyToChange}
+                      initialEmails={formData.reply_to}
                     />
                   ) : (
                     <span className="break-all">{data.reply_to}</span>
