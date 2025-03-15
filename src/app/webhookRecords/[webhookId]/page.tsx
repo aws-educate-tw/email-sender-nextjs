@@ -6,7 +6,7 @@ import { Link2, Mail, Webhook, Save, Edit, X } from "lucide-react";
 import SelectDropdown from "@/app/ui/select-dropdown";
 import AttachDropdown from "@/app/ui/attach-dropdown";
 import IframePreview from "@/app/ui/iframe-preview";
-import { set } from "zod";
+import EmailInput from "@/app/ui/email-input";
 
 interface PageProps {
   params: {
@@ -123,22 +123,6 @@ export default function Page({ params }: PageProps) {
     }
   };
 
-  const handleArrayInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    field: keyof WebhookDetails
-  ) => {
-    if (!formData) return;
-
-    const value = e.target.value;
-    // Split by commas and trim whitespace
-    const arrayValues = value ? value.split(",").map(item => item.trim()) : [];
-
-    setFormData({
-      ...formData,
-      [field]: arrayValues,
-    });
-  };
-
   const toggleEditMode = () => {
     if (isEditMode) {
       // If canceling edit mode, reset form data to current data
@@ -168,6 +152,24 @@ export default function Page({ params }: PageProps) {
     setFormData({
       ...formData,
       attachment_file_ids: selectedFiles.map(file => file.file_id),
+    });
+  };
+
+  const handleCCEmailsChange = (emails: string[]) => {
+    if (!formData) return;
+
+    setFormData({
+      ...formData,
+      cc: emails,
+    });
+  };
+
+  const handleBCCEmailsChange = (emails: string[]) => {
+    if (!formData) return;
+
+    setFormData({
+      ...formData,
+      bcc: emails,
     });
   };
 
@@ -438,12 +440,10 @@ export default function Page({ params }: PageProps) {
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">CC:</span>
                   {isEditMode ? (
-                    <textarea
-                      name="cc"
-                      value={formData.cc.join(", ")}
-                      onChange={e => handleArrayInputChange(e, "cc")}
-                      className="border border-gray-300 rounded-md p-2 w-full min-h-24"
-                      placeholder="Enter emails separated by commas"
+                    <EmailInput
+                      allowMultiple={true}
+                      onEmailsChange={handleCCEmailsChange}
+                      initialEmails={formData.cc}
                     />
                   ) : (
                     <span className="break-all">
@@ -455,12 +455,10 @@ export default function Page({ params }: PageProps) {
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">BCC:</span>
                   {isEditMode ? (
-                    <textarea
-                      name="bcc"
-                      value={formData.bcc.join(", ")}
-                      onChange={e => handleArrayInputChange(e, "bcc")}
-                      className="border border-gray-300 rounded-md p-2 w-full min-h-24"
-                      placeholder="Enter emails separated by commas"
+                    <EmailInput
+                      allowMultiple={true}
+                      onEmailsChange={handleBCCEmailsChange}
+                      initialEmails={formData.bcc}
                     />
                   ) : (
                     <span className="break-all">

@@ -1,18 +1,25 @@
 "use client";
-import React, { useState, useEffect, KeyboardEvent, MouseEvent } from "react";
+import React, { useState, useEffect, KeyboardEvent, MouseEvent, useRef } from "react";
 
 interface EmailInputProps {
   allowMultiple?: boolean;
   onEmailsChange: (emails: string[]) => void;
+  initialEmails?: string[];
 }
 
-export default function EmailInput({ allowMultiple = true, onEmailsChange }: EmailInputProps) {
+export default function EmailInput({
+  allowMultiple = true,
+  onEmailsChange,
+  initialEmails = [],
+}: EmailInputProps) {
   const [email, setEmail] = useState("");
-  const [emails, setEmails] = useState<string[]>([]);
+  const [emails, setEmails] = useState<string[]>(initialEmails);
 
   useEffect(() => {
-    onEmailsChange(emails);
-  }, [emails, onEmailsChange]);
+    if (onEmailsChange) {
+      onEmailsChange(emails);
+    }
+  }, [emails]);
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Tab" || e.key === "Enter") && email.trim()) {
@@ -34,7 +41,6 @@ export default function EmailInput({ allowMultiple = true, onEmailsChange }: Ema
     e.preventDefault();
     setEmails(prevEmails => {
       const updatedEmails = prevEmails.filter((_, i) => i !== index);
-      onEmailsChange(updatedEmails); // Notify parent of the change
       return updatedEmails;
     });
   };
