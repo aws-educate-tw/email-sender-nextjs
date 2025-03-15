@@ -252,37 +252,6 @@ export default function Page({ params }: PageProps) {
           <div className="text-gray-500 italic">
             Details of your <strong>webhook</strong> are displayed here.
           </div>
-          {!isLoading && !error && data && (
-            <div className="flex gap-2">
-              {isEditMode ? (
-                <>
-                  <button
-                    onClick={saveWebhook}
-                    disabled={isSaving}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50"
-                  >
-                    <Save size={16} />
-                    {isSaving ? "Saving..." : "Save Changes"}
-                  </button>
-                  <button
-                    onClick={toggleEditMode}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                  >
-                    <X size={16} />
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={toggleEditMode}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                >
-                  <Edit size={16} />
-                  Edit Webhook
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
@@ -307,11 +276,45 @@ export default function Page({ params }: PageProps) {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-lg p-4 md:p-6">
+        <div className="bg-neutral-100 rounded-lg shadow-lg p-4 md:p-6">
           {/* Basic Information */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-sky-950">Basic Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
+            <div className="rounded-lg flex w-full items-center gap-2">
+              <h2 className="py-2 rounded-lg w-full text-start text-2xl font-semibold text-sky-950">
+                Basic Information
+              </h2>
+              {!isLoading && !error && data && (
+                <div className="flex gap-2 rounded-lg">
+                  {isEditMode ? (
+                    <>
+                      <button
+                        onClick={saveWebhook}
+                        disabled={isSaving}
+                        className="h-full bg-sky-950 hover:bg-sky-800 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <Save size={16} />
+                        {isSaving ? "Saving..." : "Save"}
+                      </button>
+                      <button
+                        onClick={toggleEditMode}
+                        className="hover:bg-gray-300 text-black p-2 rounded-md flex items-center gap-2"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={toggleEditMode}
+                      className="hover:bg-neutral-300 text-white p-2 rounded-md flex items-center gap-2"
+                    >
+                      <Edit size={20} className="text-black" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <Webhook size={20} className="text-sky-950 shrink-0" />
@@ -323,10 +326,12 @@ export default function Page({ params }: PageProps) {
                     name="webhook_name"
                     value={formData.webhook_name}
                     onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md p-2 w-full"
+                    className="border border-neutral-300 rounded-lg p-2 w-full"
                   />
                 ) : (
-                  <span className="break-all">{data.webhook_name}</span>
+                  <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                    {data.webhook_name}
+                  </span>
                 )}
               </div>
 
@@ -344,7 +349,9 @@ export default function Page({ params }: PageProps) {
                     className="border border-gray-300 rounded-md p-2 w-full"
                   />
                 ) : (
-                  <span className="break-all">{data.display_name}</span>
+                  <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                    {data.display_name}
+                  </span>
                 )}
               </div>
 
@@ -364,7 +371,9 @@ export default function Page({ params }: PageProps) {
                       disabled
                     />
                   ) : (
-                    <span className="break-all">{data.webhook_url}</span>
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40 w-full">
+                      {data.webhook_url}
+                    </span>
                   )}
                   {!isEditMode && (
                     <button
@@ -391,10 +400,14 @@ export default function Page({ params }: PageProps) {
             </div>
           </div>
 
+          <div className="border-b-2 border-neutral-300 mb-6 mt-8 mx-2"></div>
+
           {/* Email Settings */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-sky-950">Email Settings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
+            <h2 className="py-2 rounded-lg w-full text-start text-2xl font-semibold text-sky-950">
+              Email Settings
+            </h2>
+            <div className="gap-4">
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">Subject:</span>
@@ -407,12 +420,14 @@ export default function Page({ params }: PageProps) {
                       className="border border-gray-300 rounded-md p-2 w-full"
                     />
                   ) : (
-                    <span className="break-all">{data.subject}</span>
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.subject}
+                    </span>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <span className="font-medium">Reply To:</span>
+                  <span> Reply To:</span>
                   {isEditMode ? (
                     <EmailInput
                       allowMultiple={false}
@@ -420,30 +435,32 @@ export default function Page({ params }: PageProps) {
                       initialEmails={formData.reply_to}
                     />
                   ) : (
-                    <span className="break-all">{data.reply_to}</span>
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.reply_to}
+                    </span>
                   )}
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 ">
                   <span className="font-medium">Sender:</span>
                   {isEditMode ? (
-                    <div className="flex items-center">
+                    <div className="flex items-center bg-neutral-300 rounded-md">
                       <input
                         type="text"
                         name="sender_local_part"
                         value={formData.sender_local_part}
                         onChange={handleInputChange}
-                        className="border border-gray-300 rounded-md p-2 w-full"
+                        className="border border-gray-300 rounded-l-mdp-2 w-full outline-2"
                       />
-                      <span className="ml-2">@aws-educate.tw</span>
+                      <span className="w-44 text-center text-sm">@aws-educate.tw</span>
                     </div>
                   ) : (
-                    <span className="break-all">{data.sender_local_part}@aws-educate.tw</span>
+                    <span className="bg-white p-2 rounded-lg border border-neutral-300 opacity-40 text-wrap">
+                      {data.sender_local_part}@aws-educate.tw
+                    </span>
                   )}
                 </div>
-              </div>
 
-              <div className="space-y-4">
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">CC:</span>
                   {isEditMode ? (
@@ -453,49 +470,53 @@ export default function Page({ params }: PageProps) {
                       initialEmails={formData.cc}
                     />
                   ) : (
-                    <span className="break-all">
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
                       {data.cc.length > 0 ? data.cc.join(", ") : "None"}
                     </span>
                   )}
-                </div>
 
-                <div className="flex flex-col gap-2">
-                  <span className="font-medium">BCC:</span>
-                  {isEditMode ? (
-                    <EmailInput
-                      allowMultiple={true}
-                      onEmailsChange={handleBCCEmailsChange}
-                      initialEmails={formData.bcc}
-                    />
-                  ) : (
-                    <span className="break-all">
-                      {data.bcc.length > 0 ? data.bcc.join(", ") : "None"}
-                    </span>
-                  )}
-                </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-medium">BCC:</span>
+                    {isEditMode ? (
+                      <EmailInput
+                        allowMultiple={true}
+                        onEmailsChange={handleBCCEmailsChange}
+                        initialEmails={formData.bcc}
+                      />
+                    ) : (
+                      <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                        {data.bcc.length > 0 ? data.bcc.join(", ") : "None"}
+                      </span>
+                    )}
+                  </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Generate Certificate:</span>
-                  {isEditMode ? (
-                    <input
-                      type="checkbox"
-                      name="is_generate_certificate"
-                      checked={formData.is_generate_certificate}
-                      onChange={handleInputChange}
-                      className="h-5 w-5"
-                    />
-                  ) : (
-                    <span>{data.is_generate_certificate ? "Yes" : "No"}</span>
-                  )}
+                  <div className="flex flex-col items-start gap-2">
+                    <span className="font-medium">Generate Certificate:</span>
+                    {isEditMode ? (
+                      <input
+                        type="checkbox"
+                        name="is_generate_certificate"
+                        checked={formData.is_generate_certificate}
+                        onChange={handleInputChange}
+                        className="h-5 w-5"
+                      />
+                    ) : (
+                      <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                        {data.is_generate_certificate ? "Yes" : "No"}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
+          <div className="border-b-2 border-neutral-300 mb-6 mt-8 mx-2"></div>
+
           {/* Additional Settings */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-sky-950">Additional Settings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-2xl font-semibold mb-4 text-sky-950">Additional Settings</h2>
+            <div className="flex flex-col">
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">Template File:</span>
@@ -518,7 +539,9 @@ export default function Page({ params }: PageProps) {
                       </button>
                     </div>
                   ) : (
-                    <span className="break-all">{data.template_file_id}</span>
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.template_file_id}
+                    </span>
                   )}
                   {previewTemplate && (
                     <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50 p-20">
@@ -570,59 +593,75 @@ export default function Page({ params }: PageProps) {
                       className="border border-gray-300 rounded-md p-2 w-full"
                     />
                   ) : (
-                    <span className="break-all">{data.surveycake_link || "None"}</span>
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.surveycake_link || "None"}
+                    </span>
                   )}
                 </div>
-              </div>
 
-              <div className="space-y-4">
                 <div className="flex flex-col gap-2">
                   <span className="font-medium">Attachments:</span>
                   {isEditMode ? (
                     <AttachDropdown onSelect={handleAttachSelect} />
                   ) : (
-                    <span>{data.attachment_file_ids.length} file(s)</span>
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.attachment_file_ids.length} file(s)
+                    </span>
                   )}
                 </div>
 
-                {isEditMode && (
-                  <>
-                    <div className="flex flex-col gap-2">
-                      <span className="font-medium">Hash Key:</span>
-                      <input
-                        type="text"
-                        name="hash_key"
-                        value={formData.hash_key}
-                        onChange={handleInputChange}
-                        className="border border-gray-300 rounded-md p-2 w-full"
-                      />
-                    </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium">Hash Key:</span>
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      name="hash_key"
+                      value={formData.hash_key}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md p-2 w-full"
+                    />
+                  ) : (
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.hash_key}
+                    </span>
+                  )}
+                </div>
 
-                    <div className="flex flex-col gap-2">
-                      <span className="font-medium">IV Key:</span>
-                      <input
-                        type="text"
-                        name="iv_key"
-                        value={formData.iv_key}
-                        onChange={handleInputChange}
-                        className="border border-gray-300 rounded-md p-2 w-full"
-                      />
-                    </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium">IV Key:</span>
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      name="iv_key"
+                      value={formData.iv_key}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md p-2 w-full"
+                    />
+                  ) : (
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.iv_key}
+                    </span>
+                  )}
+                </div>
 
-                    <div className="flex flex-col gap-2">
-                      <span className="font-medium">Webhook Type:</span>
-                      <select
-                        name="webhook_type"
-                        value={formData.webhook_type}
-                        onChange={handleInputChange}
-                        className="border border-gray-300 rounded-md p-2 w-full"
-                      >
-                        <option value="surveycake">Surveycake</option>
-                        <option value="custom">Custom</option>
-                      </select>
-                    </div>
-                  </>
-                )}
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium">Webhook Type: </span>
+                  {isEditMode ? (
+                    <select
+                      name="webhook_type"
+                      value={formData.webhook_type}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md p-2 w-full"
+                    >
+                      <option value="surveycake">Surveycake</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  ) : (
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.webhook_type}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
