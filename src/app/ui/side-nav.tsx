@@ -3,9 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 // import { HomeIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 
 export default function SideNav() {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
   const signout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_expiry_time");
@@ -45,12 +49,41 @@ export default function SideNav() {
         >
           <p className="px-3 text-white">Send Email</p>
         </Link>
-        <Link
-          href="/emailHistory"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
+
+        <div
+          className="relative w-full"
+          onMouseEnter={() => setIsOpen(true)}
+          onMouseLeave={() => setIsOpen(false)}
         >
-          <p className="px-3 text-white">Email History</p>
-        </Link>
+          <div className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 cursor-pointer">
+            <p className="px-3 text-white">Sending History</p>
+          </div>
+
+          {/*category list: Email History, Webhook Sending, Postman Monitor */}
+
+          {isOpen && (
+            <div className="absolute left-full top-0 mt-0 w-48 bg-white rounded-md shadow-lg z-50">
+              {[
+            { href: "/emailHistory", label: "Email History" },
+            { href: "/webhookSending", label: "Webhook Sending" },
+            { href: "/postmanMonitor", label: "Postman Monitor" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`block px-4 py-2 text-gray-700 ${
+                hoveredItem === item.href ? "bg-gray-300" : "hover:bg-gray-200"
+              }`}
+              onMouseEnter={() => setHoveredItem(item.href)}
+              onMouseLeave={() => setHoveredItem(null)}
+            >
+              {item.label}
+            </Link>
+          ))}
+            </div>
+          )}
+        </div>
+    
         <Link
           href="/webhookService"
           className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
