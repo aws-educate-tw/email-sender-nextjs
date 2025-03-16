@@ -480,19 +480,9 @@ export default function Page({ params }: PageProps) {
 
                   <div className="flex flex-col items-start gap-2">
                     <span className="font-medium">Generate Certificate:</span>
-                    {isEditMode ? (
-                      <input
-                        type="checkbox"
-                        name="is_generate_certificate"
-                        checked={formData.is_generate_certificate}
-                        onChange={handleInputChange}
-                        className="h-5 w-5 rounded-full"
-                      />
-                    ) : (
-                      <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
-                        {data.is_generate_certificate ? "Yes" : "No"}
-                      </span>
-                    )}
+                    <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
+                      {data.is_generate_certificate ? "Yes" : "No"}
+                    </span>
                   </div>
                 </div>
               </div>
