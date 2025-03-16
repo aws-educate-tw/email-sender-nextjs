@@ -4,15 +4,27 @@ import React, { useState, useEffect, KeyboardEvent, MouseEvent } from "react";
 interface EmailInputProps {
   allowMultiple?: boolean;
   onEmailsChange: (emails: string[]) => void;
+  initialEmails?: string[] | string;
 }
 
-export default function EmailInput({ allowMultiple = true, onEmailsChange }: EmailInputProps) {
+export default function EmailInput({
+  allowMultiple = true,
+  onEmailsChange,
+  initialEmails = [],
+}: EmailInputProps) {
+  const normalizeInitialEmails = (input: string[] | string): string[] => {
+    if (typeof input === "string") {
+      return input.trim() ? [input.trim()] : [];
+    }
+    return input.map(email => email.trim()).filter(Boolean);
+  };
+
   const [email, setEmail] = useState("");
-  const [emails, setEmails] = useState<string[]>([]);
+  const [emails, setEmails] = useState<string[]>(normalizeInitialEmails(initialEmails));
 
   useEffect(() => {
     onEmailsChange(emails);
-  }, [emails, onEmailsChange]);
+  }, [emails]);
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Tab" || e.key === "Enter") && email.trim()) {
@@ -32,11 +44,7 @@ export default function EmailInput({ allowMultiple = true, onEmailsChange }: Ema
 
   const removeEmail = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault();
-    setEmails(prevEmails => {
-      const updatedEmails = prevEmails.filter((_, i) => i !== index);
-      onEmailsChange(updatedEmails); // Notify parent of the change
-      return updatedEmails;
-    });
+    setEmails(prevEmails => prevEmails.filter((_, i) => i !== index));
   };
 
   const validateEmail = (email: string) => {
@@ -45,7 +53,7 @@ export default function EmailInput({ allowMultiple = true, onEmailsChange }: Ema
   };
 
   return (
-    <div className="">
+    <div>
       <div className="bg-white rounded-md shadow-sm flex items-center flex-wrap border border-gray-200 p-2 gap-2 focus-within:border-blue-500 focus-within:outline-none focus-within:ring-1 focus-within:ring-blue-500">
         {emails.map((email, index) => (
           <div
