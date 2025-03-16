@@ -28,11 +28,13 @@ interface DataType {
   email_id: string;
 }
 
-export default function EmailDetailsTable({ data, onStatusChange }: {
-  data: DataType[],
-  onStatusChange: (status: string | null) => void
+export default function EmailDetailsTable({
+  data,
+  onStatusChange,
+}: {
+  data: DataType[];
+  onStatusChange: (status: string | null) => void;
 }) {
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownPosition = data.length > 3 ? "absolute" : "fixed";
 
@@ -40,14 +42,14 @@ export default function EmailDetailsTable({ data, onStatusChange }: {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.status-dropdown-container')) {
+      if (!target.closest(".status-dropdown-container")) {
         setIsDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -67,19 +69,27 @@ export default function EmailDetailsTable({ data, onStatusChange }: {
             </th>
             <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
               <div className="relative group status-dropdown-container z-50">
-                <div className="flex items-center gap-2 hover:cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+                <div
+                  className="flex items-center gap-2 hover:cursor-pointer"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
                   <span>Status</span>
                   <span className="text-xs">{isDropdownOpen ? "▲" : "▼"}</span>
                 </div>
 
                 {isDropdownOpen && (
-                  <div className="mt-1 bg-white border rounded shadow-lg z-10 w-32" style={{ position: dropdownPosition }}>
-                    {["All", "Success", "Failed"].map((status) => (
+                  <div
+                    className="mt-1 bg-white border rounded shadow-lg z-10 w-32"
+                    style={{ position: dropdownPosition }}
+                  >
+                    {["All", "Success", "Failed"].map(status => (
                       <button
                         key={status}
                         className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                         onClick={() => {
-                          status === "All" ? onStatusChange(null) : onStatusChange(status.toUpperCase());
+                          status === "All"
+                            ? onStatusChange(null)
+                            : onStatusChange(status.toUpperCase());
                           setIsDropdownOpen(false);
                         }}
                       >
@@ -106,8 +116,9 @@ export default function EmailDetailsTable({ data, onStatusChange }: {
                   <div className="flex flex-col justify-start">
                     {item.bcc.map((email, idx) => (
                       <div
-                        className={`py-1 ${idx !== 0 ? "border-dashed border-t-2 border-gray-200" : ""
-                          }`}
+                        className={`py-1 ${
+                          idx !== 0 ? "border-dashed border-t-2 border-gray-200" : ""
+                        }`}
                         key={idx}
                       >
                         {email}
@@ -123,8 +134,9 @@ export default function EmailDetailsTable({ data, onStatusChange }: {
                   <div className="flex flex-col justify-start">
                     {item.cc.map((email, idx) => (
                       <div
-                        className={`py-1 ${idx !== 0 ? "border-dashed border-t-2 border-gray-200" : ""
-                          }`}
+                        className={`py-1 ${
+                          idx !== 0 ? "border-dashed border-t-2 border-gray-200" : ""
+                        }`}
                         key={idx}
                       >
                         {email}
