@@ -432,13 +432,13 @@ export default function Page({ params }: PageProps) {
                 <div className="flex flex-col gap-2 ">
                   <span className="font-medium">Sender:</span>
                   {isEditMode ? (
-                    <div className="flex items-center bg-neutral-300 rounded-md">
+                    <div className="flex items-center bg-neutral-300 rounded-lg">
                       <input
                         type="text"
                         name="sender_local_part"
                         value={formData.sender_local_part}
                         onChange={handleInputChange}
-                        className="border border-gray-300 rounded-l-mdp-2 w-full outline-2"
+                        className="border border-gray-300 w-full outline-2 rounded-l-lg"
                       />
                       <span className="w-44 text-center text-sm">@aws-educate.tw</span>
                     </div>
