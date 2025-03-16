@@ -377,7 +377,7 @@ export default function Page({ params }: PageProps) {
                         <span className="hidden sm:inline">Copied</span>
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-gray-700 whitespace-nowrap">
+                      <span className="flex items-center gap-1 text-gray-700 whitespace-nowrap animate-bounce">
                         <HiClipboard size={20} />
                         <span className="hidden sm:inline">Copy</span>
                       </span>
