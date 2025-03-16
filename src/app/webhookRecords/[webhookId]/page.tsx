@@ -486,7 +486,7 @@ export default function Page({ params }: PageProps) {
                         name="is_generate_certificate"
                         checked={formData.is_generate_certificate}
                         onChange={handleInputChange}
-                        className="h-5 w-5"
+                        className="h-5 w-5 rounded-full"
                       />
                     ) : (
                       <span className="break-all bg-white p-2 rounded-lg border border-neutral-300 opacity-40">
