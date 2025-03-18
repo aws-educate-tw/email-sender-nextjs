@@ -105,7 +105,11 @@ export default function Page({ params }: PageProps) {
         {isLoading ? (
           <EmailDetailsTableSkeleton />
         ) : (
-          <EmailDetailsTable data={data} onStatusChange={status => setSelectedStatus(status)} />
+          <EmailDetailsTable
+            data={data}
+            selectedStatus={selectedStatus}
+            onStatusChange={status => setSelectedStatus(status)}
+          />
         )}
         <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
           <button

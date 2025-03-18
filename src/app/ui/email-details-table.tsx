@@ -30,14 +30,16 @@ interface DataType {
 
 export default function EmailDetailsTable({
   data,
+  selectedStatus,
   onStatusChange,
 }: {
   data: DataType[];
+  selectedStatus: string | null;
   onStatusChange: (status: string | null) => void;
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownPosition = data.length > 3 ? "absolute" : "fixed";
-  const statusOption = ['All', 'Success', 'Failed'];
+  const statusOption = ["All", "Success", "Failed"];
 
   // close dropdown when click another place
   useEffect(() => {
@@ -86,7 +88,12 @@ export default function EmailDetailsTable({
                     {statusOption.map(status => (
                       <button
                         key={status}
-                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                        className={
+                          (selectedStatus === null ? "ALL" : selectedStatus) ===
+                          status.toUpperCase()
+                            ? "block w-full text-left px-4 py-2 text-sm hover:bg-gray-200 bg-[#DDE0E5]"
+                            : "block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                        }
                         onClick={() => {
                           status === "All"
                             ? onStatusChange(null)
