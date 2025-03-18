@@ -37,6 +37,7 @@ export default function EmailDetailsTable({
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownPosition = data.length > 3 ? "absolute" : "fixed";
+  const statusOption = ['All', 'Success', 'Failed'];
 
   // close dropdown when click another place
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function EmailDetailsTable({
                     className="mt-1 bg-white border rounded shadow-lg z-10 w-32"
                     style={{ position: dropdownPosition }}
                   >
-                    {["All", "Success", "Failed"].map(status => (
+                    {statusOption.map(status => (
                       <button
                         key={status}
                         className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
