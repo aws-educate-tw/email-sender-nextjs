@@ -1,5 +1,6 @@
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { StatusDropdown } from "./status-dropdown";
 
 interface RowDataType {
   [key: string]: string;
@@ -38,8 +39,12 @@ export default function EmailDetailsTable({
   onStatusChange: (status: string | null) => void;
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownPosition = data.length > 3 ? "absolute" : "fixed";
+  const triggerRef = useRef<HTMLDivElement>(null);
   const statusOption = ["All", "Success", "Failed"];
+
+  const handleSelectStatus = (status: string) => {
+    status === "All" ? onStatusChange(null) : onStatusChange(status.toUpperCase());
+  };
 
   // close dropdown when click another place
   useEffect(() => {
@@ -71,7 +76,7 @@ export default function EmailDetailsTable({
               CC
             </th>
             <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
-              <div className="relative group status-dropdown-container z-50">
+              <div className="relative group status-dropdown-container z-50" ref={triggerRef}>
                 <div
                   className="flex items-center gap-2 hover:cursor-pointer"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -79,33 +84,6 @@ export default function EmailDetailsTable({
                   <span>Status</span>
                   <span className="text-xs">{isDropdownOpen ? "▲" : "▼"}</span>
                 </div>
-
-                {isDropdownOpen && (
-                  <div
-                    className="mt-1 bg-white border rounded shadow-lg z-10 w-32"
-                    style={{ position: dropdownPosition }}
-                  >
-                    {statusOption.map(status => (
-                      <button
-                        key={status}
-                        className={
-                          (selectedStatus === null ? "ALL" : selectedStatus) ===
-                          status.toUpperCase()
-                            ? "block w-full text-left px-4 py-2 text-sm hover:bg-gray-200 bg-[#DDE0E5]"
-                            : "block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                        }
-                        onClick={() => {
-                          status === "All"
-                            ? onStatusChange(null)
-                            : onStatusChange(status.toUpperCase());
-                          setIsDropdownOpen(false);
-                        }}
-                      >
-                        {status}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             </th>
             <th className="rounded-tr-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
@@ -181,6 +159,15 @@ export default function EmailDetailsTable({
           ))}
         </tbody>
       </table>
+
+      <StatusDropdown
+        isOpen={isDropdownOpen}
+        anchorRef={triggerRef}
+        options={statusOption}
+        selectedStatus={selectedStatus}
+        onSelect={handleSelectStatus}
+        onClose={() => setIsDropdownOpen(false)}
+      />
     </div>
   );
 }
