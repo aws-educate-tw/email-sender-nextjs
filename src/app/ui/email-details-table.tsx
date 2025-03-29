@@ -1,4 +1,6 @@
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import { useEffect, useRef, useState } from "react";
+import { StatusDropdown } from "./status-dropdown";
 
 interface RowDataType {
   [key: string]: string;
@@ -27,7 +29,38 @@ interface DataType {
   email_id: string;
 }
 
-export default function EmailDetailsTable({ data }: { data: DataType[] }) {
+export default function EmailDetailsTable({
+  data,
+  selectedStatus,
+  onStatusChange,
+}: {
+  data: DataType[];
+  selectedStatus: string | null;
+  onStatusChange: (status: string | null) => void;
+}) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const statusOption = ["All", "Success", "Failed"];
+
+  const handleSelectStatus = (status: string) => {
+    status === "All" ? onStatusChange(null) : onStatusChange(status.toUpperCase());
+  };
+
+  // close dropdown when click another place
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".status-dropdown-container")) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="overflow-x-auto shadow-lg rounded-md">
       <table className="w-full bg-white rounded-md">
@@ -43,7 +76,15 @@ export default function EmailDetailsTable({ data }: { data: DataType[] }) {
               CC
             </th>
             <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
-              Status
+              <div className="relative group status-dropdown-container z-50" ref={triggerRef}>
+                <div
+                  className="flex items-center gap-2 hover:cursor-pointer"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <span>Status</span>
+                  <span className="text-xs">{isDropdownOpen ? "▲" : "▼"}</span>
+                </div>
+              </div>
             </th>
             <th className="rounded-tr-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
               Sent At
@@ -118,6 +159,15 @@ export default function EmailDetailsTable({ data }: { data: DataType[] }) {
           ))}
         </tbody>
       </table>
+
+      <StatusDropdown
+        isOpen={isDropdownOpen}
+        anchorRef={triggerRef}
+        options={statusOption}
+        selectedStatus={selectedStatus}
+        onSelect={handleSelectStatus}
+        onClose={() => setIsDropdownOpen(false)}
+      />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface PageProps {
   params: {
@@ -43,6 +43,7 @@ export default function Page({ params }: PageProps) {
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
   const fetchFiles = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
@@ -85,8 +86,9 @@ export default function Page({ params }: PageProps) {
   );
 
   useEffect(() => {
-    fetchFiles(10, null, null);
-  }, [fetchFiles]);
+    setIsLoading(true);
+    fetchFiles(10, selectedStatus, null);
+  }, [fetchFiles, selectedStatus]);
 
   return (
     <>
@@ -100,7 +102,15 @@ export default function Page({ params }: PageProps) {
         </div>
       </div>
       <div className="">
-        {isLoading ? <EmailDetailsTableSkeleton /> : <EmailDetailsTable data={data} />}
+        {isLoading ? (
+          <EmailDetailsTableSkeleton />
+        ) : (
+          <EmailDetailsTable
+            data={data}
+            selectedStatus={selectedStatus}
+            onStatusChange={status => setSelectedStatus(status)}
+          />
+        )}
         <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
           <button
             className={`flex items-center gap-1 ${
@@ -109,7 +119,7 @@ export default function Page({ params }: PageProps) {
                 : "hover:text-gray-600 hover:underline"
             }`}
             onClick={() => {
-              fetchFiles(10, null, previousLastEvaluatedKey);
+              fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
             }}
             disabled={!currentLastEvaluatedKey}
           >
@@ -124,7 +134,7 @@ export default function Page({ params }: PageProps) {
             }`}
             onClick={() => {
               if (nextLastEvaluatedKey) {
-                fetchFiles(10, null, nextLastEvaluatedKey);
+                fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
               }
             }}
             disabled={!nextLastEvaluatedKey}
