@@ -1,55 +1,39 @@
 "use client";
+<<<<<<< HEAD
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+=======
+import { useCallback, useEffect, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
+import { DataType } from "../page";
+>>>>>>> 8cb01cc (feat: drop-down Email Sanding Details | SCRUM-271)
 
-interface PageProps {
+export interface PageProps {
   params: {
     runId: string;
   };
 }
 
-interface RowDataType {
-  [key: string]: string;
-}
-
-interface DataType {
-  bcc: string[];
-  subject: string;
-  cc: string[];
-  run_id: string;
-  created_at: string;
-  recipient_email: string;
-  sender_local_part: string;
-  status: string;
-  spreadsheet_file_id: string;
-  row_data: RowDataType;
-  atatachment_file_ids: string[];
-  is_generated_certficate: boolean;
-  sender_username: string;
-  display_name: string;
-  sender_id: string;
-  updated_at: string;
-  sent_at: string;
-  template_file_id: string;
-  reply_to: string;
-  email_id: string;
-}
-
 export default function Page({ params }: PageProps) {
   const [data, setData] = useState<DataType[]>([]);
+<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+=======
+  const [isOpen, setIsOpen] = useState(false);
+>>>>>>> 8cb01cc (feat: drop-down Email Sanding Details | SCRUM-271)
 
   const fetchFiles = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
       try {
         const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        const url = new URL(`${base_url}/runs/${params.runId}/emails`);
+        const url = new URL(`${base_url}/runs`);
         url.searchParams.append("limit", limit.toString());
         if (status) {
           url.searchParams.append("status", status);
@@ -73,11 +57,7 @@ export default function Page({ params }: PageProps) {
         }
 
         const result = await response.json();
-        setIsLoading(false);
         setData(result.data);
-        setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
-        setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
-        setNextLastEvaluatedKey(result.next_last_evaluated_key);
       } catch (error: any) {
         alert("Failed to fetch files: " + error.message);
       }
@@ -86,9 +66,14 @@ export default function Page({ params }: PageProps) {
   );
 
   useEffect(() => {
+// <<<<<<< HEAD
     setIsLoading(true);
     fetchFiles(10, selectedStatus, null);
   }, [fetchFiles, selectedStatus]);
+// =======
+  //   fetchFiles(1, null, null);
+  // }, [fetchFiles]);
+// >>>>>>> 8cb01cc (feat: drop-down Email Sanding Details | SCRUM-271)
 
   return (
     <>
@@ -101,6 +86,7 @@ export default function Page({ params }: PageProps) {
           <div className="h-10"></div>
         </div>
       </div>
+{/* <<<<<<< HEAD */}
       <div className="">
         {isLoading ? (
           <EmailDetailsTableSkeleton />
@@ -142,7 +128,21 @@ export default function Page({ params }: PageProps) {
             Next
             <ChevronRight size={20} />
           </button>
+{/* ======= */}
+      {/* <div className="border rounded-md shadow-md bg-white p-4 w-full mx-auto mb-6">
+        <div
+          onClick={() => setIsOpen(!isOpen)}
+          className="border rounded-lg px-4 py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+        >
+          <span className="font-medium text-gray-900">Email Information</span>
+          {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />} */}
+{/* >>>>>>> 8cb01cc (feat: drop-down Email Sanding Details | SCRUM-271) */}
         </div>
+        {isOpen && (
+          <div className="mt-4 space-y-2">
+            {data ? <EmailDetailsDropdown data={data[0]} /> : <p> </p>}
+          </div>
+        )}
       </div>
     </>
   );
