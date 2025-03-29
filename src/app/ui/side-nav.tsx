@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-// import { HomeIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 export default function SideNav() {
@@ -56,8 +55,6 @@ export default function SideNav() {
           <div className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 cursor-pointer">
             <p className="px-3 text-white">Sending History</p>
           </div>
-
-          {/*category list: Email History, Webhook Sending, Postman Monitor */}
 
           {isOpen && (
             <div className="absolute left-full top-0 mt-0 w-48 bg-white rounded-md shadow-lg z-50">
