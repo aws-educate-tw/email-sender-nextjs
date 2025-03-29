@@ -4,7 +4,7 @@ import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skelet
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "../ui/email-history-card";
 
-interface AttachmentFilesType {
+export interface AttachmentFilesType {
   file_url: string;
   uploaded_id: string;
   updated_at: string;
@@ -16,7 +16,7 @@ interface AttachmentFilesType {
   file_size: number;
 }
 
-interface SpreadsheetFileType {
+export interface SpreadsheetFileType {
   file_url: string;
   uploaded_id: string;
   updated_at: string;
@@ -28,7 +28,7 @@ interface SpreadsheetFileType {
   file_size: number;
 }
 
-interface TemplateFileType {
+export interface TemplateFileType {
   file_url: string;
   uploaded_id: string;
   updated_at: string;
@@ -40,13 +40,13 @@ interface TemplateFileType {
   file_size: number;
 }
 
-interface SenderType {
+export interface SenderType {
   user_id: string;
   email: string;
   username: string;
 }
 
-interface DataType {
+export interface DataType {
   bcc: string[];
   subject: string;
   cc: string[];
