@@ -1,0 +1,74 @@
+import { DataType } from "../emailHistory/page";
+
+interface EmailDetailsDropdownProps {
+  data: DataType;
+}
+
+export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps) {
+  if (!data) {
+    return (
+      <div className="w-full p-8 text-center text-gray-500">No email history details found</div>
+    );
+  }
+
+  console.log("EmailDetailsDropdown data: " + JSON.stringify(data, null, 2));
+  const emailData = data;
+  const emailDetails = [
+    { label: "Subject:", value: emailData.subject },
+    {
+      label: "From:",
+      value: `${emailData.display_name} <${emailData.sender_local_part}@aws-educate.tw>`,
+    },
+    {
+      label: "To:",
+      value:
+        emailData.recipient_source === "DIRECT"
+          ? "Direct recipients"
+          : "Recipients from sheet file",
+    },
+    {
+      label: "TemplateFile:",
+      value: emailData.template_file.file_name
+        ? emailData.template_file.file_name
+        : "No template file",
+    },
+    {
+      label: "SheetFile:",
+      value: emailData.spreadsheet_file
+        ? `${emailData.spreadsheet_file.file_name}`
+        : "No sheet file",
+    },
+    { label: "LocalPart:", value: emailData.sender_local_part },
+    { label: "ReplyTo:", value: emailData.reply_to },
+    {
+      label: "Bcc:",
+      value: emailData.bcc && emailData.bcc.length ? emailData.bcc.join(", ") : "No BCC recipients",
+    },
+    {
+      label: "Cc:",
+      value: emailData.cc && emailData.cc.length ? emailData.cc.join(", ") : "No CC recipients",
+    },
+    {
+      label: "AttachFiles:",
+      value:
+        emailData.attachment_file_ids && emailData.attachment_file_ids.length === 1
+          ? `${emailData.attachment_files[0].file_name}`
+          : emailData.attachment_file_ids && emailData.attachment_file_ids.length > 1
+            ? `${emailData.attachment_file_ids.length} AttachFiles`
+            : "No files attached",
+    },
+  ];
+
+  return (
+    <div className="">
+      <div className="mt-4 space-y-2">
+        {emailDetails.map((item, index) => (
+          <div key={index} className="flex text-sm">
+            <div className="w-40 font-medium text-gray-700">{item.label}</div>
+            <div className="flex-1 text-gray-800">{item.value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
