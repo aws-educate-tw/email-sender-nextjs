@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 export default function SideNav() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
