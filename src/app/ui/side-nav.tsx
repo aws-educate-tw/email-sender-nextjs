@@ -6,7 +6,7 @@ import { useState } from "react";
 export default function SideNav() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const signout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_expiry_time");
