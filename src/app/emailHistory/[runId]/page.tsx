@@ -75,7 +75,6 @@ export default function Page({ params }: PageProps) {
       }
 
       const result = await response.json();
-      console.log("Detailed data:", JSON.stringify(result, null, 2));
       setDetailedData(result.data[0] || null);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
@@ -110,7 +109,6 @@ export default function Page({ params }: PageProps) {
         }
 
         const result = await response.json();
-        console.log("Fetched files:", JSON.stringify(result, null, 2));
         setIsLoading(false);
         setData(result.data);
         setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
