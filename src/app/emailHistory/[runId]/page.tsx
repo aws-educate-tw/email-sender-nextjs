@@ -50,7 +50,7 @@ export default function Page({ params }: PageProps) {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const fetchDetailedFiles = async (limit: number, lastEvaluatedKey: string | null) => {
+  const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
@@ -80,7 +80,7 @@ export default function Page({ params }: PageProps) {
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     }
-  };
+  }, []); // make dependencies empty to avoid infinite loop
 
   const fetchFiles = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
@@ -108,7 +108,7 @@ export default function Page({ params }: PageProps) {
           const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
           throw new Error(errorMessage);
         }
-       
+
         const result = await response.json();
         console.log("Fetched files:", JSON.stringify(result, null, 2));
         setIsLoading(false);
@@ -116,7 +116,6 @@ export default function Page({ params }: PageProps) {
         setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
         setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
         setNextLastEvaluatedKey(result.next_last_evaluated_key);
-      
       } catch (error: any) {
         alert("Failed to fetch files: " + error.message);
       }
@@ -124,19 +123,28 @@ export default function Page({ params }: PageProps) {
     [params.runId]
   );
 
-// Fetch the detailed data when component mounts
-useEffect(() => {
-  fetchDetailedFiles(1, null);
-}, [fetchDetailedFiles]);
+  // Fetch the detailed data when component mounts
+  useEffect(() => {
+    fetchDetailedFiles(1, null);
+  }, [fetchDetailedFiles]);
 
-// Fetch the files when the component mounts or when selectedStatus changes
-useEffect(() => {
-  setIsLoading(true);
-  fetchFiles(10, selectedStatus, null);
-}, [fetchFiles, selectedStatus]);
+  // Fetch the files when the component mounts or when selectedStatus changes
+  useEffect(() => {
+    setIsLoading(true);
+    fetchFiles(10, selectedStatus, null);
+  }, [fetchFiles, selectedStatus]);
 
   return (
     <>
+      <div className="flex flex-col justify-center items-start">
+        <p className="text-4xl font-bold pt-2">Email Sending Details</p>
+        <div className="flex justify-between items-center w-full pb-4">
+          <p className="text-gray-500 italic">
+            Details of <strong>one of the runs</strong> is shown here.
+          </p>
+          <div className="h-10"></div>
+        </div>
+      </div>
       <div className="border rounded-md shadow-md bg-white p-4 w-full mx-auto mb-6">
         <div
           onClick={() => setIsOpen(!isOpen)}
@@ -151,15 +159,7 @@ useEffect(() => {
           </div>
         )}
       </div>
-      <div className="flex flex-col justify-center items-start">
-        <p className="text-4xl font-bold pt-2">Email Sending Details</p>
-        <div className="flex justify-between items-center w-full pb-4">
-          <p className="text-gray-500 italic">
-            Details of <strong>one of the runs</strong> is shown here.
-          </p>
-          <div className="h-10"></div>
-        </div>
-      </div>
+
       <div className="">
         {isLoading ? (
           <EmailDetailsTableSkeleton />
@@ -203,7 +203,6 @@ useEffect(() => {
           </button>
         </div>
       </div>
-      
     </>
   );
 }
