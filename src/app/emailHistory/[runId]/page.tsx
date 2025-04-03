@@ -1,15 +1,11 @@
 "use client";
-<<<<<<< HEAD
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-=======
-import { useCallback, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import { DataType } from "../page";
->>>>>>> 8cb01cc (feat: drop-down Email Sanding Details | SCRUM-271)
 
 export interface PageProps {
   params: {
@@ -19,15 +15,12 @@ export interface PageProps {
 
 export default function Page({ params }: PageProps) {
   const [data, setData] = useState<DataType[]>([]);
-<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-=======
   const [isOpen, setIsOpen] = useState(false);
->>>>>>> 8cb01cc (feat: drop-down Email Sanding Details | SCRUM-271)
 
   const fetchFiles = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
