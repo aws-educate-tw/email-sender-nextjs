@@ -5,7 +5,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
-import { DataType as DetailedDataType } from "../page";
 
 interface PageProps {
   params: {
@@ -17,7 +16,7 @@ interface RowDataType {
   [key: string]: string;
 }
 
-interface DataType {
+interface EmailSummaryDataType {
   bcc: string[];
   subject: string;
   cc: string[];
@@ -40,9 +39,78 @@ interface DataType {
   email_id: string;
 }
 
+interface AttachmentFilesType {
+  file_url: string;
+  uploaded_id: string;
+  updated_at: string;
+  file_name: string;
+  file_id: string;
+  s3_object_key: string;
+  created_at: string;
+  file_extension: string;
+  file_size: number;
+}
+
+interface SpreadsheetFileType {
+  file_url: string;
+  uploaded_id: string;
+  updated_at: string;
+  file_name: string;
+  file_id: string;
+  s3_object_key: string;
+  created_at: string;
+  file_extension: string;
+  file_size: number;
+}
+
+interface TemplateFileType {
+  file_url: string;
+  uploaded_id: string;
+  updated_at: string;
+  file_name: string;
+  file_id: string;
+  s3_object_key: string;
+  created_at: string;
+  file_extension: string;
+  file_size: number;
+}
+
+interface SenderType {
+  user_id: string;
+  email: string;
+  username: string;
+}
+
+interface EmailDetailedDataType {
+  bcc: string[];
+  subject: string;
+  cc: string[];
+  run_id: string;
+  attachment_files: AttachmentFilesType[];
+  recipient_source: "DIRECT" | "SPREADSHEET";
+  created_at: string;
+  sender_local_part: string;
+  spreadsheet_file_id: string | null;
+  created_year_month: string;
+  recipients: Array<{ email: string; template_variables: Record<string, any> }>;
+  attachment_file_ids: string[];
+  is_generate_certificate: boolean;
+  spreadsheet_file: SpreadsheetFileType | null;
+  display_name: string;
+  sender_id: string | null;
+  sender: SenderType;
+  template_file_id: string;
+  success_email_count: number;
+  expected_email_send_count: number;
+  reply_to: string;
+  template_file: TemplateFileType;
+  created_year_month_day: string;
+  created_year: string;
+}
+
 export default function Page({ params }: PageProps) {
-  const [data, setData] = useState<DataType[]>([]);
-  const [detailedData, setDetailedData] = useState<DetailedDataType | null>(null);
+  const [emailSummaryData, setData] = useState<EmailSummaryDataType[]>([]);
+  const [emailDetailedData, setDetailedData] = useState<EmailDetailedDataType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
@@ -153,7 +221,7 @@ export default function Page({ params }: PageProps) {
         </div>
         {isOpen && (
           <div className="mt-4 space-y-2">
-            {detailedData ? <EmailDetailsDropdown data={detailedData} /> : <p> </p>}
+            {emailDetailedData ? <EmailDetailsDropdown data={emailDetailedData} /> : <p> </p>}
           </div>
         )}
       </div>
@@ -163,7 +231,7 @@ export default function Page({ params }: PageProps) {
           <EmailDetailsTableSkeleton />
         ) : (
           <EmailDetailsTable
-            data={data}
+            data={emailSummaryData}
             selectedStatus={selectedStatus}
             onStatusChange={status => setSelectedStatus(status)}
           />
