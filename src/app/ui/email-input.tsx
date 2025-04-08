@@ -24,7 +24,7 @@ export default function EmailInput({
 
   useEffect(() => {
     onEmailsChange(emails);
-  }, [emails]);
+  }, [emails, onEmailsChange]);
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Tab" || e.key === "Enter") && email.trim()) {
