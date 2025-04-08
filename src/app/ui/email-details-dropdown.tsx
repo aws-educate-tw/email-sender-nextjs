@@ -108,11 +108,11 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
     { label: "LocalPart:", value: emailData.sender_local_part },
     { label: "ReplyTo:", value: emailData.reply_to },
     {
-      label: "Bcc:",
+      label: "BCC:",
       value: emailData.bcc && emailData.bcc.length ? emailData.bcc.join(", ") : "No BCC recipients",
     },
     {
-      label: "Cc:",
+      label: "CC:",
       value: emailData.cc && emailData.cc.length ? emailData.cc.join(", ") : "No CC recipients",
     },
     {
