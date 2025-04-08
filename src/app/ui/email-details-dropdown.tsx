@@ -78,7 +78,6 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
     );
   }
 
-  console.log("EmailDetailsDropdown data: " + JSON.stringify(data, null, 2));
   const emailData = data;
   const emailDetails = [
     { label: "Subject:", value: emailData.subject },
