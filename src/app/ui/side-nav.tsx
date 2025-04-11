@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-
 export default function SideNav() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  
+
   const [triggerWidth, setTriggerWidth] = useState(192);
   const [canFitRight, setCanFitRight] = useState(true);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -33,8 +32,7 @@ export default function SideNav() {
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, []);
-
+  }, [triggerWidth]);
 
   return (
     <div className="flex h-full flex-col px-5 py-4 md:px-3 bg-gray-200 gap-2 min-w-60">
@@ -79,7 +77,8 @@ export default function SideNav() {
             <p className="px-3 text-white">Sending History</p>
           </div>
 
-          {isOpen && triggerRef.current &&
+          {isOpen &&
+            triggerRef.current &&
             createPortal(
               <div
                 className={`
@@ -123,9 +122,7 @@ export default function SideNav() {
                 })}
               </div>,
               document.body
-            )
-          }
-
+            )}
         </div>
 
         <Link
