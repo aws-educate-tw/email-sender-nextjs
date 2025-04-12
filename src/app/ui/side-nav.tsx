@@ -99,7 +99,6 @@ export default function SideNav() {
                 {[
                   { href: "/emailHistory", label: "Email History" },
                   { href: "/webhookSending", label: "Webhook Sending" },
-                  { href: "/postmanMonitor", label: "Postman Monitor" },
                 ].map((item, index, arr) => {
                   const isFirst = index === 0;
                   const isLast = index === arr.length - 1;
