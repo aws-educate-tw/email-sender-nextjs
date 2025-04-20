@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 interface StatusDropdownProps {
@@ -21,7 +21,7 @@ export const StatusDropdown = ({
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
   // update dropdown position
-  const updatePosition = () => {
+  const updatePosition = useCallback(() => {
     if (anchorRef.current) {
       const anchorRect = anchorRef.current.getBoundingClientRect();
       setPosition({
@@ -29,14 +29,14 @@ export const StatusDropdown = ({
         left: anchorRect.left + window.scrollX,
       });
     }
-  };
+  }, [anchorRef]);
 
   // Initialize position when open dropdown
   useEffect(() => {
     if (isOpen && anchorRef.current) {
       updatePosition();
     }
-  }, [isOpen]);
+  }, [isOpen, anchorRef, updatePosition]);
 
   // listen for various events that might cause position changes
   useEffect(() => {
@@ -85,7 +85,7 @@ export const StatusDropdown = ({
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
-  }, [isOpen]);
+  }, [isOpen, anchorRef, updatePosition]);
 
   if (!isOpen || !anchorRef.current) return null;
 
