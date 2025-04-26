@@ -1,10 +1,9 @@
 "use client";
+import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 
 interface PageProps {
   params: {
@@ -117,6 +116,7 @@ export default function Page({ params }: PageProps) {
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
@@ -226,47 +226,66 @@ export default function Page({ params }: PageProps) {
         )}
       </div>
 
-      <div className="">
-        {isLoading ? (
-          <EmailDetailsTableSkeleton />
-        ) : (
-          <EmailDetailsTable
-            data={emailSummaryData}
-            selectedStatus={selectedStatus}
-            onStatusChange={status => setSelectedStatus(status)}
-          />
-        )}
-        <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
-          <button
-            className={`flex items-center gap-1 ${
-              !currentLastEvaluatedKey
-                ? "cursor-default text-gray-400"
-                : "hover:text-gray-600 hover:underline"
-            }`}
-            onClick={() => {
-              fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
-            }}
-            disabled={!currentLastEvaluatedKey}
-          >
-            <ChevronLeft size={20} />
-            Previous
-          </button>
-          <button
-            className={`flex items-center gap-1 ${
-              !nextLastEvaluatedKey
-                ? "cursor-default text-gray-400"
-                : "hover:text-gray-600 hover:underline"
-            }`}
-            onClick={() => {
-              if (nextLastEvaluatedKey) {
-                fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
-              }
-            }}
-            disabled={!nextLastEvaluatedKey}
-          >
-            Next
-            <ChevronRight size={20} />
-          </button>
+      <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
+        <div className="flex justify-between py-6 px-4">
+          <div>{/* Display selected recipients*/}</div>
+
+          <div className="flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52">
+            <div className="flex items-center pl-3">
+              <Search className="h-4 w-4 text-gray-400" />
+            </div>
+            <input
+              className="rounded-md border-transparent shadow-sm focus:border-transparent focus:ring-transparent w-full"
+              placeholder="Search recipients..."
+              type="text"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="">
+          {isLoading ? (
+            <EmailDetailsTableSkeleton />
+          ) : (
+            <EmailDetailsTable
+              data={emailSummaryData}
+              selectedStatus={selectedStatus}
+              onStatusChange={status => setSelectedStatus(status)}
+            />
+          )}
+          <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
+            <button
+              className={`flex items-center gap-1 ${
+                !currentLastEvaluatedKey
+                  ? "cursor-default text-gray-400"
+                  : "hover:text-gray-600 hover:underline"
+              }`}
+              onClick={() => {
+                fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
+              }}
+              disabled={!currentLastEvaluatedKey}
+            >
+              <ChevronLeft size={20} />
+              Previous
+            </button>
+            <button
+              className={`flex items-center gap-1 ${
+                !nextLastEvaluatedKey
+                  ? "cursor-default text-gray-400"
+                  : "hover:text-gray-600 hover:underline"
+              }`}
+              onClick={() => {
+                if (nextLastEvaluatedKey) {
+                  fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
+                }
+              }}
+              disabled={!nextLastEvaluatedKey}
+            >
+              Next
+              <ChevronRight size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </>

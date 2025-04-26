@@ -3,11 +3,11 @@ export default function EmailDetailsTableSkeleton() {
   const skeletonRows = Array.from({ length: 5 }); // Create an array with 5 empty slots
 
   return (
-    <div className="overflow-x-auto shadow-lg rounded-md">
-      <table className="w-full bg-white rounded-md">
+    <div className="overflow-x-auto border-b border-gray-200">
+      <table className="w-full bg-white">
         <thead>
           <tr>
-            <th className="rounded-tl-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
+            <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
               Recipient Email
             </th>
             <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
@@ -19,7 +19,7 @@ export default function EmailDetailsTableSkeleton() {
             <th className="py-2 px-4 w-24 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
               Status
             </th>
-            <th className="rounded-tr-md py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
+            <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
               Sent At
             </th>
           </tr>
