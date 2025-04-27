@@ -160,6 +160,10 @@ export default function EmailDetailsTable({
         </tbody>
       </table>
 
+      {data.length === 0 && (
+        <div className="p-6 text-center text-gray-400">No matching recipients found</div>
+      )}
+
       <StatusDropdown
         isOpen={isDropdownOpen}
         anchorRef={triggerRef}
