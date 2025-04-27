@@ -203,7 +203,7 @@ export default function Page({ params }: PageProps) {
         alert("Failed to fetch files: " + error.message);
       }
     },
-    [params.runId]
+    [fetchApi]
   );
 
   // Get all recipients data
@@ -223,7 +223,7 @@ export default function Page({ params }: PageProps) {
     } catch (error: any) {
       alert("Failed to fetch files hi: " + error.message);
     }
-  }, [params.runId, selectedStatus]);
+  }, [fetchApi, selectedStatus]);
 
   // Click Next button
   const handleNext = () => {
