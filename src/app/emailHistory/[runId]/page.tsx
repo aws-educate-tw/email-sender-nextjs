@@ -210,7 +210,7 @@ export default function Page({ params }: PageProps) {
   const storeAllData = useCallback(async () => {
     try {
       let result = await fetchApi(1000, selectedStatus, null);
-      let allData = result.data;
+      const allData = result.data;
       let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
 
       while (allDataNextLastEvaluatedKey) {
