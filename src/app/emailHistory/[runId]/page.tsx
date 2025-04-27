@@ -117,6 +117,11 @@ export default function Page({ params }: PageProps) {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const [emailAllData, setAllData] = useState<EmailSummaryDataType[]>([]);
+  const [filteredData, setFilteredData] = useState<EmailSummaryDataType[]>([]);
+  const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
+  const [sliceIndex, setSliceIndex] = useState([0, 10]);
 
   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
@@ -149,7 +154,7 @@ export default function Page({ params }: PageProps) {
     }
   }, []); // make dependencies empty to avoid infinite loop
 
-  const fetchFiles = useCallback(
+  const fetchApi = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
       try {
         const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -177,6 +182,18 @@ export default function Page({ params }: PageProps) {
         }
 
         const result = await response.json();
+        return result;
+      } catch (error: any) {
+        alert("Failed to fetch files: " + error.message);
+      }
+    },
+    [params.runId]
+  );
+
+  const fetchFiles = useCallback(
+    async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
+      try {
+        const result = await fetchApi(limit, status, lastEvaluatedKey);
         setIsLoading(false);
         setData(result.data);
         setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
@@ -189,6 +206,51 @@ export default function Page({ params }: PageProps) {
     [params.runId]
   );
 
+  // Get all recipients data
+  const storeAllData = useCallback(async () => {
+    try {
+      let result = await fetchApi(1000, selectedStatus, null);
+      let allData = result.data;
+      let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
+
+      while (allDataNextLastEvaluatedKey) {
+        result = await fetchApi(1000, selectedStatus, allDataNextLastEvaluatedKey);
+        allData.push(...result.data);
+        allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
+      }
+      setAllData(allData);
+      setIsDisabled(false);
+    } catch (error: any) {
+      alert("Failed to fetch files hi: " + error.message);
+    }
+  }, [params.runId, selectedStatus]);
+
+  // Click Next button
+  const handleNext = () => {
+    if (searchTerm) {
+      setSliceIndex([sliceIndex[0] + 10, sliceIndex[1] + 10]);
+    } else if (nextLastEvaluatedKey) {
+      fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
+    }
+  };
+
+  // Click Previous button
+  const handlePrevious = () => {
+    if (searchTerm) {
+      setSliceIndex([Math.max(sliceIndex[0] - 10, 0), Math.max(sliceIndex[1] - 10, 10)]);
+    } else {
+      fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
+    }
+  };
+
+  const isNextDisabled = () => {
+    return searchTerm ? sliceIndex[1] >= filteredData.length : !nextLastEvaluatedKey;
+  };
+
+  const isPreviousDisabled = () => {
+    return searchTerm ? sliceIndex[0] <= 0 : !currentLastEvaluatedKey;
+  };
+
   // Fetch the detailed data when component mounts
   useEffect(() => {
     fetchDetailedFiles(1, null);
@@ -199,6 +261,33 @@ export default function Page({ params }: PageProps) {
     setIsLoading(true);
     fetchFiles(10, selectedStatus, null);
   }, [fetchFiles, selectedStatus]);
+
+  // Fetch all recipients data when the component mounts or when selectedStatus changes
+  useEffect(() => {
+    setIsDisabled(true); // Prevent user from typing until all data is loaded
+    storeAllData();
+    setSearchTerm("");
+  }, [selectedStatus]);
+
+  // filter data with searchTerm
+  useEffect(() => {
+    if (emailAllData) {
+      setFilteredData(
+        emailAllData.filter(
+          data =>
+            data.recipient_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            data.bcc.some(bcc => bcc.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            data.cc.some(cc => cc.toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+      );
+      setSliceIndex([0, 10]);
+    }
+  }, [emailAllData, searchTerm]);
+
+  // filteredData pagination
+  useEffect(() => {
+    setSliceFilteredData(filteredData.slice(sliceIndex[0], sliceIndex[1]));
+  }, [filteredData, sliceIndex]);
 
   return (
     <>
@@ -239,6 +328,7 @@ export default function Page({ params }: PageProps) {
               placeholder="Search recipients..."
               type="text"
               value={searchTerm}
+              disabled={isDisabled}
               onChange={e => setSearchTerm(e.target.value)}
             />
           </div>
@@ -249,7 +339,7 @@ export default function Page({ params }: PageProps) {
             <EmailDetailsTableSkeleton />
           ) : (
             <EmailDetailsTable
-              data={emailSummaryData}
+              data={searchTerm ? sliceFilteredData : emailSummaryData}
               selectedStatus={selectedStatus}
               onStatusChange={status => setSelectedStatus(status)}
             />
@@ -257,30 +347,24 @@ export default function Page({ params }: PageProps) {
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
             <button
               className={`flex items-center gap-1 ${
-                !currentLastEvaluatedKey
+                isPreviousDisabled()
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
-              onClick={() => {
-                fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
-              }}
-              disabled={!currentLastEvaluatedKey}
+              onClick={handlePrevious}
+              disabled={isPreviousDisabled()}
             >
               <ChevronLeft size={20} />
               Previous
             </button>
             <button
               className={`flex items-center gap-1 ${
-                !nextLastEvaluatedKey
+                isNextDisabled()
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
-              onClick={() => {
-                if (nextLastEvaluatedKey) {
-                  fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
-                }
-              }}
-              disabled={!nextLastEvaluatedKey}
+              onClick={handleNext}
+              disabled={isNextDisabled()}
             >
               Next
               <ChevronRight size={20} />
