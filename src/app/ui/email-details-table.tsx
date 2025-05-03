@@ -1,6 +1,7 @@
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { StatusDropdown } from "./status-dropdown";
+import EmailTotalSummary from "./email-total-summary";
 
 interface RowDataType {
   [key: string]: string;
@@ -33,17 +34,48 @@ export default function EmailDetailsTable({
   data,
   selectedStatus,
   onStatusChange,
+  runId,
+  runDetails,
 }: {
   data: DataType[];
   selectedStatus: string | null;
   onStatusChange: (status: string | null) => void;
+  runId?: string;
+  runDetails?: {
+    totalEmailNum: number;
+    successEmailNum: number;
+    failedEmailNum: number;
+  };
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedRows, setSelectedRows] = useState<Record<number, boolean>>({});
   const triggerRef = useRef<HTMLDivElement>(null);
   const statusOption = ["All", "Success", "Failed"];
 
+  // Calculate summary information
+  const summaryInfo = useMemo(() => {
+    const totalEmailNum = data.length;
+    const successEmailNum = data.filter(item => item.status === "SUCCESS").length;
+    const failedEmailNum = data.filter(item => item.status === "FAILED").length;
+    const selectedEmailNum = Object.values(selectedRows).filter(Boolean).length;
+    
+    return {
+      selectedEmailNum,
+      totalEmailNum,
+      successEmailNum,
+      failedEmailNum
+    };
+  }, [data, selectedRows]);
+
   const handleSelectStatus = (status: string) => {
     status === "All" ? onStatusChange(null) : onStatusChange(status.toUpperCase());
+  };
+
+  // Handle individual row selection
+  const handleSelectRow = (index: number) => {
+    const newSelectedRows = { ...selectedRows };
+    newSelectedRows[index] = !selectedRows[index];
+    setSelectedRows(newSelectedRows);
   };
 
   // close dropdown when click another place
@@ -63,9 +95,21 @@ export default function EmailDetailsTable({
 
   return (
     <div className="overflow-x-auto border-b border-gray-200">
+        <thead></thead>
+      {/* Email Summary Component */}      
+      <div className="px-6 pt-6 pb-4">
+        <EmailTotalSummary 
+          selectedEmailNum={summaryInfo.selectedEmailNum}
+          runDetails={runDetails}
+        />
+      </div>
+
+      {/* Email Table */}
+    <div className="overflow-x-auto">
       <table className="w-full bg-white">
         <thead>
           <tr>
+            <th className="py-2 px-4 bg-gray-200 w-10"></th>
             <th className="py-2 px-4 bg-gray-200 text-left text-md font-medium text-gray-700 tracking-wider">
               Recipient Email
             </th>
@@ -94,6 +138,41 @@ export default function EmailDetailsTable({
         <tbody>
           {data.map((item: DataType, index: number) => (
             <tr key={index} className={`${index !== 0 ? "border-t border-gray-200" : ""}`}>
+              {/* Selected box */}
+              <td className="py-2 px-4 text-center">
+              <div className="relative">
+                  <input 
+                    type="checkbox" 
+                    id={`checkbox-${index}`}
+                    checked={selectedRows[index] || false}
+                    onChange={() => handleSelectRow(index)}
+                    className="sr-only"
+                  />
+                  <label 
+                    htmlFor={`checkbox-${index}`} 
+                    className={`flex items-center justify-center w-5 h-5 rounded border cursor-pointer ${
+                      selectedRows[index] 
+                        ? 'bg-gray-800 border-gray-800' 
+                        : 'border-gray-400 hover:border-gray-500'
+                    }`}
+                  >
+                    {selectedRows[index] && (
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-3 w-3 text-white" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
+                        <path 
+                          fillRule="evenodd" 
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
+                          clipRule="evenodd" 
+                        />
+                      </svg>
+                    )}
+                  </label>
+                </div>
+              </td>
               <td className="py-2 px-4 text-sm text-gray-700 font-bold">{item.recipient_email}</td>
               <td className="py-2 px-4 text-sm text-gray-700">
                 {item.bcc.length === 0 ? (
@@ -172,6 +251,7 @@ export default function EmailDetailsTable({
         onSelect={handleSelectStatus}
         onClose={() => setIsDropdownOpen(false)}
       />
+    </div>
     </div>
   );
 }
