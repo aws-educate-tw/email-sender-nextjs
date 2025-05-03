@@ -336,12 +336,17 @@ export default function Page({ params }: PageProps) {
         <div className="flex justify-between py-6 px-4">
           <div>{/* Display selected recipients*/}</div>
 
-          <div className="flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52">
+          <div
+            className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
+              ${isDisabled ? "bg-gray-100" : ""}`}
+          >
             <div className="flex items-center pl-3">
-              <Search className="h-4 w-4 text-gray-400" />
+              <Search className={`h-4 w-4 ${isDisabled ? "text-gray-300" : "text-gray-400"}`} />
             </div>
             <input
-              className="rounded-md border-transparent shadow-sm focus:border-transparent focus:ring-transparent w-full"
+              className={`rounded-md border-transparent shadow-sm w-full
+                focus:border-transparent focus:ring-transparent
+                disabled:cursor-wait disabled:bg-gray-100 disabled:placeholder-gray-300`}
               placeholder="Search recipients..."
               type="text"
               value={searchTerm}
