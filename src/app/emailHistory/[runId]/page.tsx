@@ -3,7 +3,7 @@ import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PageProps {
   params: {
@@ -206,22 +206,39 @@ export default function Page({ params }: PageProps) {
     [fetchApi]
   );
 
+  // Define a request id for fetching all recipients' data
+  const requestIdRef = useRef(0);
+
   // Get all recipients data
   const storeAllData = useCallback(async () => {
+    const currentRequestId = ++requestIdRef.current;
+
     try {
       let result = await fetchApi(1000, selectedStatus, null);
+
+      // only process the latest request
+      if (currentRequestId !== requestIdRef.current) return;
+
       const allData = result.data;
       let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
 
       while (allDataNextLastEvaluatedKey) {
         result = await fetchApi(1000, selectedStatus, allDataNextLastEvaluatedKey);
+
+        // only process the latest request
+        if (currentRequestId !== requestIdRef.current) return;
+
         allData.push(...result.data);
         allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
       }
-      setAllData(allData);
-      setIsDisabled(false);
+
+      // only process the latest request
+      if (currentRequestId === requestIdRef.current) {
+        setAllData(allData);
+        setIsDisabled(false);
+      }
     } catch (error: any) {
-      alert("Failed to fetch files hi: " + error.message);
+      alert("Failed to fetch files: " + error.message);
     }
   }, [fetchApi, selectedStatus]);
 
