@@ -151,11 +151,11 @@ export default function Page({ params }: PageProps) {
       if (result.data && Array.isArray(result.data)) {
         const matchingRun = result.data.find((run: EmailDetailedDataType) => run.run_id === params.runId);
         if (matchingRun) {
-          setRunDetails({
-            totalEmailNum: matchingRun.expected_email_send_count || 0,
-            successEmailNum: matchingRun.success_email_count || 0,
-            failedEmailNum: (matchingRun.expected_email_send_count || 0) - (matchingRun.success_email_count || 0)
-          });
+          // setRunDetails({
+          //   totalEmailNum: matchingRun.expected_email_send_count || 0,
+          //   successEmailNum: matchingRun.success_email_count || 0,
+          //   failedEmailNum: (matchingRun.expected_email_send_count || 0) - (matchingRun.success_email_count || 0)
+          // });
         }
       }
     } catch (error: any) {
