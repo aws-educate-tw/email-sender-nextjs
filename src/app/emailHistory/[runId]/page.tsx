@@ -284,7 +284,7 @@ export default function Page({ params }: PageProps) {
     setIsDisabled(true); // Prevent user from typing until all data is loaded
     storeAllData();
     setSearchTerm("");
-  }, [selectedStatus]);
+  }, [storeAllData, selectedStatus]);
 
   // filter data with searchTerm
   useEffect(() => {
