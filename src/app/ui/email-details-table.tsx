@@ -34,7 +34,6 @@ export default function EmailDetailsTable({
   data,
   selectedStatus,
   onStatusChange,
-  runId,
   runDetails,
 }: {
   data: DataType[];
