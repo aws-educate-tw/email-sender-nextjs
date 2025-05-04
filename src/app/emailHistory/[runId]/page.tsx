@@ -1,10 +1,9 @@
 "use client";
+import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PageProps {
   params: {
@@ -117,6 +116,12 @@ export default function Page({ params }: PageProps) {
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const [emailAllData, setAllData] = useState<EmailSummaryDataType[]>([]);
+  const [filteredData, setFilteredData] = useState<EmailSummaryDataType[]>([]);
+  const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
+  const [sliceIndex, setSliceIndex] = useState([0, 10]);
 
   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
@@ -149,7 +154,7 @@ export default function Page({ params }: PageProps) {
     }
   }, []); // make dependencies empty to avoid infinite loop
 
-  const fetchFiles = useCallback(
+  const fetchApi = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
       try {
         const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -177,6 +182,18 @@ export default function Page({ params }: PageProps) {
         }
 
         const result = await response.json();
+        return result;
+      } catch (error: any) {
+        alert("Failed to fetch files: " + error.message);
+      }
+    },
+    [params.runId]
+  );
+
+  const fetchFiles = useCallback(
+    async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
+      try {
+        const result = await fetchApi(limit, status, lastEvaluatedKey);
         setIsLoading(false);
         setData(result.data);
         setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
@@ -186,8 +203,70 @@ export default function Page({ params }: PageProps) {
         alert("Failed to fetch files: " + error.message);
       }
     },
-    [params.runId]
+    [fetchApi]
   );
+
+  // Define a request id for fetching all recipients' data
+  const requestIdRef = useRef(0);
+
+  // Get all recipients data
+  const storeAllData = useCallback(async () => {
+    const currentRequestId = ++requestIdRef.current;
+
+    try {
+      let result = await fetchApi(1000, selectedStatus, null);
+
+      // only process the latest request
+      if (currentRequestId !== requestIdRef.current) return;
+
+      const allData = result.data;
+      let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
+
+      while (allDataNextLastEvaluatedKey) {
+        result = await fetchApi(1000, selectedStatus, allDataNextLastEvaluatedKey);
+
+        // only process the latest request
+        if (currentRequestId !== requestIdRef.current) return;
+
+        allData.push(...result.data);
+        allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
+      }
+
+      // only process the latest request
+      if (currentRequestId === requestIdRef.current) {
+        setAllData(allData);
+        setIsDisabled(false);
+      }
+    } catch (error: any) {
+      alert("Failed to fetch files: " + error.message);
+    }
+  }, [fetchApi, selectedStatus]);
+
+  // Click Next button
+  const handleNext = () => {
+    if (searchTerm) {
+      setSliceIndex([sliceIndex[0] + 10, sliceIndex[1] + 10]);
+    } else if (nextLastEvaluatedKey) {
+      fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
+    }
+  };
+
+  // Click Previous button
+  const handlePrevious = () => {
+    if (searchTerm) {
+      setSliceIndex([Math.max(sliceIndex[0] - 10, 0), Math.max(sliceIndex[1] - 10, 10)]);
+    } else {
+      fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
+    }
+  };
+
+  const isNextDisabled = () => {
+    return searchTerm ? sliceIndex[1] >= filteredData.length : !nextLastEvaluatedKey;
+  };
+
+  const isPreviousDisabled = () => {
+    return searchTerm ? sliceIndex[0] <= 0 : !currentLastEvaluatedKey;
+  };
 
   // Fetch the detailed data when component mounts
   useEffect(() => {
@@ -199,6 +278,33 @@ export default function Page({ params }: PageProps) {
     setIsLoading(true);
     fetchFiles(10, selectedStatus, null);
   }, [fetchFiles, selectedStatus]);
+
+  // Fetch all recipients data when the component mounts or when selectedStatus changes
+  useEffect(() => {
+    setIsDisabled(true); // Prevent user from typing until all data is loaded
+    storeAllData();
+    setSearchTerm("");
+  }, [storeAllData, selectedStatus]);
+
+  // filter data with searchTerm
+  useEffect(() => {
+    if (emailAllData) {
+      setFilteredData(
+        emailAllData.filter(
+          data =>
+            data.recipient_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            data.bcc.some(bcc => bcc.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            data.cc.some(cc => cc.toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+      );
+      setSliceIndex([0, 10]);
+    }
+  }, [emailAllData, searchTerm]);
+
+  // filteredData pagination
+  useEffect(() => {
+    setSliceFilteredData(filteredData.slice(sliceIndex[0], sliceIndex[1]));
+  }, [filteredData, sliceIndex]);
 
   return (
     <>
@@ -226,47 +332,66 @@ export default function Page({ params }: PageProps) {
         )}
       </div>
 
-      <div className="">
-        {isLoading ? (
-          <EmailDetailsTableSkeleton />
-        ) : (
-          <EmailDetailsTable
-            data={emailSummaryData}
-            selectedStatus={selectedStatus}
-            onStatusChange={status => setSelectedStatus(status)}
-          />
-        )}
-        <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
-          <button
-            className={`flex items-center gap-1 ${
-              !currentLastEvaluatedKey
-                ? "cursor-default text-gray-400"
-                : "hover:text-gray-600 hover:underline"
-            }`}
-            onClick={() => {
-              fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
-            }}
-            disabled={!currentLastEvaluatedKey}
+      <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
+        <div className="flex justify-between py-6 px-4">
+          <div>{/* Display selected recipients*/}</div>
+
+          <div
+            className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
+              ${isDisabled ? "bg-gray-100" : ""}`}
           >
-            <ChevronLeft size={20} />
-            Previous
-          </button>
-          <button
-            className={`flex items-center gap-1 ${
-              !nextLastEvaluatedKey
-                ? "cursor-default text-gray-400"
-                : "hover:text-gray-600 hover:underline"
-            }`}
-            onClick={() => {
-              if (nextLastEvaluatedKey) {
-                fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
-              }
-            }}
-            disabled={!nextLastEvaluatedKey}
-          >
-            Next
-            <ChevronRight size={20} />
-          </button>
+            <div className="flex items-center pl-3">
+              <Search className={`h-4 w-4 ${isDisabled ? "text-gray-300" : "text-gray-400"}`} />
+            </div>
+            <input
+              className={`rounded-md border-transparent shadow-sm w-full
+                focus:border-transparent focus:ring-transparent
+                disabled:cursor-wait disabled:bg-gray-100 disabled:placeholder-gray-300`}
+              placeholder="Search recipients..."
+              type="text"
+              value={searchTerm}
+              disabled={isDisabled}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="">
+          {isLoading ? (
+            <EmailDetailsTableSkeleton />
+          ) : (
+            <EmailDetailsTable
+              data={searchTerm ? sliceFilteredData : emailSummaryData}
+              selectedStatus={selectedStatus}
+              onStatusChange={status => setSelectedStatus(status)}
+            />
+          )}
+          <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
+            <button
+              className={`flex items-center gap-1 ${
+                isPreviousDisabled()
+                  ? "cursor-default text-gray-400"
+                  : "hover:text-gray-600 hover:underline"
+              }`}
+              onClick={handlePrevious}
+              disabled={isPreviousDisabled()}
+            >
+              <ChevronLeft size={20} />
+              Previous
+            </button>
+            <button
+              className={`flex items-center gap-1 ${
+                isNextDisabled()
+                  ? "cursor-default text-gray-400"
+                  : "hover:text-gray-600 hover:underline"
+              }`}
+              onClick={handleNext}
+              disabled={isNextDisabled()}
+            >
+              Next
+              <ChevronRight size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </>
