@@ -2,8 +2,10 @@
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
+import EmailTotalSummary from "@/app/ui/email-total-summary";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface PageProps {
   params: {
@@ -122,14 +124,19 @@ export default function Page({ params }: PageProps) {
   const [filteredData, setFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
+  const [isCalculatingRunSummary, setIsCalculatingRunSummary] = useState(false);
+  const [selectedEmailNum, setSelectedEmailNum] = useState(0);
+  const [allEmailsData, setAllEmailsData] = useState<EmailSummaryDataType[]>([]);
 
-  const [runDetails, setRunDetails] = useState({
-    totalEmailNum: 0,
-    successEmailNum: 0,
-    failedEmailNum: 0,
+  const [runSummary, setRunSummary] = useState(() => {
+    return {
+      totalEmailNum: 0,
+      successEmailNum: 0,
+      failedEmailNum: 0,
+    };
   });
 
-  const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
+   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
@@ -154,16 +161,7 @@ export default function Page({ params }: PageProps) {
       }
 
       const result = await response.json();
-      if (result.data && Array.isArray(result.data)) {
-        const matchingRun = result.data.find((run: EmailDetailedDataType) => run.run_id === params.runId);
-        if (matchingRun) {
-          // setRunDetails({
-          //   totalEmailNum: matchingRun.expected_email_send_count || 0,
-          //   successEmailNum: matchingRun.success_email_count || 0,
-          //   failedEmailNum: (matchingRun.expected_email_send_count || 0) - (matchingRun.success_email_count || 0)
-          // });
-        }
-      }
+      setDetailedData(result.data[0] || null);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     }
@@ -255,6 +253,60 @@ export default function Page({ params }: PageProps) {
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     }
+
+    try {
+      setIsCalculatingRunSummary(true);
+      
+      // Always fetch all emails without status filter for summary calculation
+      let result = await fetchApi(1000, null, null);
+      if (!result || !result.data) {
+        throw new Error("Wrong response from API");
+      }
+
+      const allEmails: EmailSummaryDataType[] = [...result.data];
+      let nextKey = result.next_last_evaluated_key;
+
+      while (nextKey) {
+        result = await fetchApi(1000, null, nextKey);
+        
+        // only process the latest request
+        if (currentRequestId !== requestIdRef.current) return;
+        
+        if (!result || !result.data) break;
+        allEmails.push(...result.data);
+        nextKey = result.next_last_evaluated_key;
+      }
+
+      // Calculate summary
+      const totalEmailNum = allEmails.length;
+      const successEmailNum = allEmails.filter(email => email.status === "SUCCESS").length;
+      const failedEmailNum = totalEmailNum - successEmailNum;
+
+      // Update run summary
+      setRunSummary({
+        totalEmailNum,
+        successEmailNum,
+        failedEmailNum,
+      });
+
+      // If there's no status filter, use the complete dataset
+      // Otherwise, filter the data based on selected status
+      if (selectedStatus === null) {
+        setAllData(allEmails);
+        setIsDisabled(false);
+      } else {
+        const filteredEmails = allEmails.filter(email => email.status === selectedStatus);
+        setAllData(filteredEmails);
+        setIsDisabled(false);
+      }
+      
+      setAllEmailsData(allEmails); // Store all emails for future reference
+    } catch (error: any) {
+      alert("Failed to fetch files: " + error.message);
+    } finally {
+      setIsCalculatingRunSummary(false);
+    }
+
   }, [fetchApi, selectedStatus]);
 
   // Click Next button
@@ -282,11 +334,6 @@ export default function Page({ params }: PageProps) {
   const isPreviousDisabled = () => {
     return searchTerm ? sliceIndex[0] <= 0 : !currentLastEvaluatedKey;
   };
-
-  // Fetch the detailed data when component mounts
-  useEffect(() => {
-    fetchDetailedFiles(1, null);
-  }, [fetchDetailedFiles]);
 
   // Fetch the files when the component mounts or when selectedStatus changes
   useEffect(() => {
@@ -321,6 +368,15 @@ export default function Page({ params }: PageProps) {
     setSliceFilteredData(filteredData.slice(sliceIndex[0], sliceIndex[1]));
   }, [filteredData, sliceIndex]);
 
+  // Fetch the detailed data when component mounts
+  useEffect(() => {
+    fetchDetailedFiles(1, null);
+  }, [fetchDetailedFiles]);
+
+  const handleSelectedEmailsChange = useCallback((count: number) => {
+    setSelectedEmailNum(count);
+  }, []);
+
   return (
     <>
       <div className="flex flex-col justify-center items-start">
@@ -349,8 +405,12 @@ export default function Page({ params }: PageProps) {
 
       <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
         <div className="flex justify-between py-6 px-4">
-          <div>{/* Display selected recipients*/}</div>
+          {/* Selected recipients */}
+          <div className="flex-grow">
+            <EmailTotalSummary selectedEmailNum={selectedEmailNum} runSummary={runSummary} />
+          </div>
 
+          {/* Search input */}
           <div
             className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
               ${isDisabled ? "bg-gray-100" : ""}`}
@@ -379,6 +439,9 @@ export default function Page({ params }: PageProps) {
               data={searchTerm ? sliceFilteredData : emailSummaryData}
               selectedStatus={selectedStatus}
               onStatusChange={status => setSelectedStatus(status)}
+              runSummary={runSummary}
+              onSelectedRowsChange={handleSelectedEmailsChange}
+              allEmailIds={emailAllData.map(email => email.email_id)} // 添加這行，傳遞所有郵件ID
             />
           )}
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
