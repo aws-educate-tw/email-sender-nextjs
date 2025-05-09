@@ -47,8 +47,8 @@ export default function EmailDetailsTable({
   };
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedRows, setSelectedRows] = useState<Record<number, boolean>>({});
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
+  const triggerRef = useRef<HTMLDivElement | null>(null);
   const statusOption = ["All", "Success", "Failed"];
 
   // Calculate summary information
@@ -71,7 +71,7 @@ export default function EmailDetailsTable({
   };
 
   // Handle individual row selection
-  const handleSelectRow = (index: number) => {
+  const handleSelectRow = (index: string) => {
     const newSelectedRows = { ...selectedRows };
     newSelectedRows[index] = !selectedRows[index];
     setSelectedRows(newSelectedRows);
