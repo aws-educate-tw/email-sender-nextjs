@@ -5,7 +5,6 @@ import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-ske
 import EmailTotalSummary from "@/app/ui/email-total-summary";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
 interface PageProps {
   params: {
@@ -124,9 +123,9 @@ export default function Page({ params }: PageProps) {
   const [filteredData, setFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
-  const [isCalculatingRunSummary, setIsCalculatingRunSummary] = useState(false);
+  const [, setIsCalculatingRunSummary] = useState(false);
   const [selectedEmailNum, setSelectedEmailNum] = useState(0);
-  const [allEmailsData, setAllEmailsData] = useState<EmailSummaryDataType[]>([]);
+  const [, setAllEmailsData] = useState<EmailSummaryDataType[]>([]);
 
   const [runSummary, setRunSummary] = useState(() => {
     return {
@@ -136,7 +135,7 @@ export default function Page({ params }: PageProps) {
     };
   });
 
-   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
+  const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
@@ -256,7 +255,7 @@ export default function Page({ params }: PageProps) {
 
     try {
       setIsCalculatingRunSummary(true);
-      
+
       // Always fetch all emails without status filter for summary calculation
       let result = await fetchApi(1000, null, null);
       if (!result || !result.data) {
@@ -268,10 +267,10 @@ export default function Page({ params }: PageProps) {
 
       while (nextKey) {
         result = await fetchApi(1000, null, nextKey);
-        
+
         // only process the latest request
         if (currentRequestId !== requestIdRef.current) return;
-        
+
         if (!result || !result.data) break;
         allEmails.push(...result.data);
         nextKey = result.next_last_evaluated_key;
@@ -299,14 +298,13 @@ export default function Page({ params }: PageProps) {
         setAllData(filteredEmails);
         setIsDisabled(false);
       }
-      
+
       setAllEmailsData(allEmails); // Store all emails for future reference
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
       setIsCalculatingRunSummary(false);
     }
-
   }, [fetchApi, selectedStatus]);
 
   // Click Next button
