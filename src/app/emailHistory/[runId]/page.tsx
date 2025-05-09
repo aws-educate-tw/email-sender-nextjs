@@ -123,6 +123,12 @@ export default function Page({ params }: PageProps) {
   const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
 
+  const [runDetails, setRunDetails] = useState({
+    totalEmailNum: 0,
+    successEmailNum: 0,
+    failedEmailNum: 0,
+  });
+
   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
