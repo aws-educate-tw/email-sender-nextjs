@@ -5,6 +5,7 @@ import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-ske
 import { fetchRunDetails } from "@/lib/actions";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface PageProps {
   params: {
@@ -126,6 +127,9 @@ export default function Page({ params }: PageProps) {
   const [filteredData, setFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
+  const [isCalculatingRunSummary, setIsCalculatingRunSummary] = useState(false);
+  const [selectedEmailNum, setSelectedEmailNum] = useState(0);
+  const [allEmailsData, setAllEmailsData] = useState<EmailSummaryDataType[]>([]);
 
   const fetchApi = useCallback(
     async (
@@ -239,6 +243,60 @@ export default function Page({ params }: PageProps) {
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     }
+
+    try {
+      setIsCalculatingRunSummary(true);
+      
+      // Always fetch all emails without status filter for summary calculation
+      let result = await fetchApi(1000, null, null);
+      if (!result || !result.data) {
+        throw new Error("Wrong response from API");
+      }
+
+      const allEmails: EmailSummaryDataType[] = [...result.data];
+      let nextKey = result.next_last_evaluated_key;
+
+      while (nextKey) {
+        result = await fetchApi(1000, null, nextKey);
+        
+        // only process the latest request
+        if (currentRequestId !== requestIdRef.current) return;
+        
+        if (!result || !result.data) break;
+        allEmails.push(...result.data);
+        nextKey = result.next_last_evaluated_key;
+      }
+
+      // Calculate summary
+      const totalEmailNum = allEmails.length;
+      const successEmailNum = allEmails.filter(email => email.status === "SUCCESS").length;
+      const failedEmailNum = totalEmailNum - successEmailNum;
+
+      // Update run summary
+      setRunSummary({
+        totalEmailNum,
+        successEmailNum,
+        failedEmailNum,
+      });
+
+      // If there's no status filter, use the complete dataset
+      // Otherwise, filter the data based on selected status
+      if (selectedStatus === null) {
+        setAllData(allEmails);
+        setIsDisabled(false);
+      } else {
+        const filteredEmails = allEmails.filter(email => email.status === selectedStatus);
+        setAllData(filteredEmails);
+        setIsDisabled(false);
+      }
+      
+      setAllEmailsData(allEmails); // Store all emails for future reference
+    } catch (error: any) {
+      alert("Failed to fetch files: " + error.message);
+    } finally {
+      setIsCalculatingRunSummary(false);
+    }
+
   }, [fetchApi, selectedStatus]);
 
   // Click Next button
@@ -296,6 +354,15 @@ export default function Page({ params }: PageProps) {
   useEffect(() => {
     setSliceFilteredData(filteredData.slice(sliceIndex[0], sliceIndex[1]));
   }, [filteredData, sliceIndex]);
+
+  // Fetch the detailed data when component mounts
+  useEffect(() => {
+    fetchDetailedFiles(1, null);
+  }, [fetchDetailedFiles]);
+
+  const handleSelectedEmailsChange = useCallback((count: number) => {
+    setSelectedEmailNum(count);
+  }, []);
 
   return (
     <>
@@ -356,6 +423,9 @@ export default function Page({ params }: PageProps) {
               data={searchTerm ? sliceFilteredData : emailSummaryData}
               selectedStatus={selectedStatus}
               onStatusChange={status => setSelectedStatus(status)}
+              runSummary={runSummary}
+              onSelectedRowsChange={handleSelectedEmailsChange}
+              allEmailIds={emailAllData.map(email => email.email_id)} // 添加這行，傳遞所有郵件ID
             />
           )}
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
