@@ -61,7 +61,7 @@ export default function EmailDetailsTable({
       allEmailIds.length > 0 &&
       data.length > 0 &&
       (!runSummary || allEmailIds.length >= runSummary.totalEmailNum)
-    ); 
+    );
   }, [allEmailIds, data, runSummary]);
 
   const availableEmailIds = useMemo(() => {
@@ -100,7 +100,7 @@ export default function EmailDetailsTable({
   // Handle select all rows
   const handleSelectAll = () => {
     const newSelectedState = !isAllSelected;
-    let newSelectedRows: Record<string, boolean> = {};
+    const newSelectedRows: Record<string, boolean> = {};
 
     if (newSelectedState) {
       // Select all available emails across all pages
