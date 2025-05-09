@@ -2,7 +2,7 @@ import React from "react";
 
 interface EmailTotalSummaryProps {
   selectedEmailNum: number;
-  runDetails?: {
+  runSummary?: {
     totalEmailNum: number;
     successEmailNum: number;
     failedEmailNum: number;
@@ -11,14 +11,24 @@ interface EmailTotalSummaryProps {
 
 export default function EmailTotalSummary({
   selectedEmailNum,
-  runDetails = { totalEmailNum: 0, successEmailNum: 0, failedEmailNum: 0 },
+  runSummary = { totalEmailNum: 0, successEmailNum: 0, failedEmailNum: 0 },
 }: EmailTotalSummaryProps) {
+  const formatNumber = (num: number, isTotalZero: boolean): string => {
+    if (isTotalZero) {
+      return "-";
+    }
+    return num.toString();
+  };
+
+  const isTotalZero = runSummary.totalEmailNum === 0;
+
   return (
     <div className="flex items-center space-x-6 text-gray-700 py-3">
       <div className="text-xl font-bold">{selectedEmailNum} recipients selected</div>
       <div className="text-base text-gray-500">
-        Total: {runDetails.totalEmailNum} | Success: {runDetails.successEmailNum} | Failed:{" "}
-        {runDetails.failedEmailNum}
+        Total: {formatNumber(runSummary.totalEmailNum, isTotalZero)} | Success:{" "}
+        {formatNumber(runSummary.successEmailNum, isTotalZero)} | Failed:{" "}
+        {formatNumber(runSummary.failedEmailNum, isTotalZero)}
       </div>
     </div>
   );
