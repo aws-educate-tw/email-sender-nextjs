@@ -2,23 +2,44 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
 export default function SideNav() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
+  const [triggerWidth, setTriggerWidth] = useState(192);
+  const [canFitRight, setCanFitRight] = useState(true);
+  const triggerRef = useRef<HTMLDivElement>(null);
+
   const signout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_expiry_time");
     router.push("/");
   };
+
+  useEffect(() => {
+    const update = () => {
+      if (triggerRef.current) {
+        const rect = triggerRef.current.getBoundingClientRect();
+        const rightSpace = window.innerWidth - rect.right;
+        setTriggerWidth(triggerRef.current.offsetWidth);
+        setCanFitRight(rightSpace > triggerWidth + 10); // 預留空間
+      }
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [triggerWidth]);
+
   return (
     <div className="flex h-full flex-col px-5 py-4 md:px-3 bg-gray-200 gap-2 min-w-60">
       <Link
         className="flex h-20 min-w-48 items-end justify-start rounded-md bg-sky-950 p-4 md:h-40"
         href="/"
       >
-        {/* <p className="text-white text-2xl">aws educate</p> */}
         <Image
           src="/aws-educate-logo.png"
           alt="the logo of aws educate"
@@ -47,36 +68,60 @@ export default function SideNav() {
           <p className="px-3 text-white">Send Email</p>
         </Link>
 
-        <div
-          className="relative w-full"
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
-        >
-          <div className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 cursor-pointer">
+        <div className="relative w-full" ref={triggerRef}>
+          <div
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+            className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 cursor-pointer"
+          >
             <p className="px-3 text-white">Sending History</p>
           </div>
 
-          {isOpen && (
-            <div className="absolute left-full top-0 mt-0 w-48 bg-white rounded-md shadow-lg z-50">
-              {[
-                { href: "/emailHistory", label: "Email History" },
-                { href: "/webhookSending", label: "Webhook Sending" },
-                { href: "/postmanMonitor", label: "Postman Monitor" },
-              ].map(item => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`block px-4 py-2 text-gray-700 ${
-                    hoveredItem === item.href ? "bg-gray-300" : "hover:bg-gray-200"
-                  }`}
-                  onMouseEnter={() => setHoveredItem(item.href)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          )}
+          {isOpen &&
+            triggerRef.current &&
+            createPortal(
+              <div
+                className={`
+                  fixed z-[9999] bg-white rounded-md shadow-lg
+                `}
+                style={{
+                  top: canFitRight
+                    ? triggerRef.current.getBoundingClientRect().top
+                    : triggerRef.current.getBoundingClientRect().bottom,
+                  left: canFitRight
+                    ? triggerRef.current.getBoundingClientRect().right
+                    : triggerRef.current.getBoundingClientRect().left,
+                  width: triggerWidth,
+                }}
+                onMouseEnter={() => setIsOpen(true)}
+                onMouseLeave={() => setIsOpen(false)}
+              >
+                {[
+                  { href: "/emailHistory", label: "Email History" },
+                  { href: "/webhookSending", label: "Webhook Sending" },
+                ].map((item, index, arr) => {
+                  const isFirst = index === 0;
+                  const isLast = index === arr.length - 1;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`block px-4 py-2 text-gray-700 hover:bg-gray-200 transition-colors duration-150
+                        ${hoveredItem === item.href ? "bg-gray-300" : ""}
+                        ${isFirst ? "rounded-t-md" : ""}
+                        ${isLast ? "rounded-b-md" : ""}
+                      `}
+                      onMouseEnter={() => setHoveredItem(item.href)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>,
+              document.body
+            )}
         </div>
 
         <Link
