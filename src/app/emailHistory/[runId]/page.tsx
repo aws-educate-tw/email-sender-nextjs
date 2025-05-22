@@ -128,7 +128,6 @@ export default function Page({ params }: PageProps) {
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
   const [, setIsCalculatingRunSummary] = useState(false);
   const [selectedEmailNum, setSelectedEmailNum] = useState(0);
-  const [, setAllEmailsData] = useState<EmailSummaryDataType[]>([]);
 
   const fetchApi = useCallback(
     async (
@@ -208,6 +207,27 @@ export default function Page({ params }: PageProps) {
     [fetchApi]
   );
 
+  const fetchRunSummary = useCallback(async () => {
+    try {
+      setIsCalculatingRunSummary(true);
+
+      try {
+        const result = await fetchApi("runDetails", null, null, null);
+        setRunSummary({
+          totalEmailNum: result.expected_email_send_count || 0,
+          successEmailNum: result.success_email_count || 0,
+          failedEmailNum: result.failed_email_count || 0,
+        });
+      } catch (error: any) {
+        console.error("Failed to fetch run summary: " + error.message);
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch run summary:", error.message);
+    } finally {
+      setIsCalculatingRunSummary(false);
+    }
+  }, [fetchApi]);
+
   // Define a request id for fetching all recipients' data
   const requestIdRef = useRef(0);
 
@@ -241,59 +261,6 @@ export default function Page({ params }: PageProps) {
       }
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
-    }
-
-    try {
-      setIsCalculatingRunSummary(true);
-
-      // Always fetch all emails without status filter for summary calculation
-      let result = await fetchApi(1000, null, null);
-      if (!result || !result.data) {
-        throw new Error("Wrong response from API");
-      }
-
-      const allEmails: EmailSummaryDataType[] = [...result.data];
-      let nextKey = result.next_last_evaluated_key;
-
-      while (nextKey) {
-        result = await fetchApi(1000, null, nextKey);
-
-        // only process the latest request
-        if (currentRequestId !== requestIdRef.current) return;
-
-        if (!result || !result.data) break;
-        allEmails.push(...result.data);
-        nextKey = result.next_last_evaluated_key;
-      }
-
-      // Calculate summary
-      const totalEmailNum = allEmails.length;
-      const successEmailNum = allEmails.filter(email => email.status === "SUCCESS").length;
-      const failedEmailNum = totalEmailNum - successEmailNum;
-
-      // Update run summary
-      setRunSummary({
-        totalEmailNum,
-        successEmailNum,
-        failedEmailNum,
-      });
-
-      // If there's no status filter, use the complete dataset
-      // Otherwise, filter the data based on selected status
-      if (selectedStatus === null) {
-        setAllData(allEmails);
-        setIsDisabled(false);
-      } else {
-        const filteredEmails = allEmails.filter(email => email.status === selectedStatus);
-        setAllData(filteredEmails);
-        setIsDisabled(false);
-      }
-
-      setAllEmailsData(allEmails); // Store all emails for future reference
-    } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
-    } finally {
-      setIsCalculatingRunSummary(false);
     }
   }, [fetchApi, selectedStatus]);
 
@@ -358,6 +325,11 @@ export default function Page({ params }: PageProps) {
     fetchDetailedFiles(1, null);
   }, [fetchDetailedFiles]);
 
+  // Fetch the run summary when component mounts
+  useEffect(() => {
+    fetchRunSummary();
+  }, [fetchRunSummary]);
+
   const handleSelectedEmailsChange = useCallback((count: number) => {
     setSelectedEmailNum(count);
   }, []);
@@ -421,9 +393,8 @@ export default function Page({ params }: PageProps) {
               data={searchTerm ? sliceFilteredData : emailSummaryData}
               selectedStatus={selectedStatus}
               onStatusChange={status => setSelectedStatus(status)}
-              runSummary={runSummary}
               onSelectedRowsChange={handleSelectedEmailsChange}
-              allEmailIds={emailAllData.map(email => email.email_id)} // 添加這行，傳遞所有郵件ID
+              allEmailIds={emailAllData.map(email => email.email_id)}
             />
           )}
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
