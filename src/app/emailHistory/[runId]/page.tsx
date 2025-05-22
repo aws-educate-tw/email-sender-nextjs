@@ -2,6 +2,7 @@
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
+// import EmailTotalSummary from "@/app/ui/email-total-summary";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -123,43 +124,26 @@ export default function Page({ params }: PageProps) {
   const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
 
-  const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
-    try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/runs`);
-
-      url.searchParams.append("limit", limit.toString());
-      if (lastEvaluatedKey) {
-        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-      }
-
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(url.toString(), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
-      setDetailedData(result.data[0] || null);
-    } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
-    }
-  }, []); // make dependencies empty to avoid infinite loop
-
   const fetchApi = useCallback(
-    async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
+    async (
+      apiType: "emails" | "runDetails",
+      limit: number | null,
+      status: string | null,
+      lastEvaluatedKey: string | null
+    ) => {
       try {
-        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        const url = new URL(`${base_url}/runs/${params.runId}/emails`);
-        url.searchParams.append("limit", limit.toString());
+        const base_url = "http://localhost:5000"; // process.env.NEXT_PUBLIC_API_ENDPOINT;
+        let url: URL;
+
+        if (apiType === "emails") {
+          url = new URL(`${base_url}/runs/${params.runId}/emails`);
+        } else {
+          url = new URL(`${base_url}/runs/${params.runId}`);
+        }
+
+        if (limit !== null && limit !== undefined) {
+          url.searchParams.append("limit", limit.toString());
+        }
         if (status) {
           url.searchParams.append("status", status);
         }
@@ -190,10 +174,22 @@ export default function Page({ params }: PageProps) {
     [params.runId]
   );
 
+  const fetchDetailedFiles = useCallback(
+    async (limit: number, lastEvaluatedKey: string | null) => {
+      try {
+        const result = await fetchApi("runDetails", limit, status, lastEvaluatedKey);
+        setDetailedData(result);
+      } catch (error: any) {
+        alert("Failed to fetch files: " + error.message);
+      }
+    },
+    [fetchApi]
+  );
+
   const fetchFiles = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
       try {
-        const result = await fetchApi(limit, status, lastEvaluatedKey);
+        const result = await fetchApi("emails", limit, status, lastEvaluatedKey);
         setIsLoading(false);
         setData(result.data);
         setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
@@ -214,7 +210,7 @@ export default function Page({ params }: PageProps) {
     const currentRequestId = ++requestIdRef.current;
 
     try {
-      let result = await fetchApi(1000, selectedStatus, null);
+      let result = await fetchApi("emails", 10000, selectedStatus, null);
 
       // only process the latest request
       if (currentRequestId !== requestIdRef.current) return;
@@ -223,7 +219,7 @@ export default function Page({ params }: PageProps) {
       let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
 
       while (allDataNextLastEvaluatedKey) {
-        result = await fetchApi(1000, selectedStatus, allDataNextLastEvaluatedKey);
+        result = await fetchApi("emails", 10000, selectedStatus, allDataNextLastEvaluatedKey);
 
         // only process the latest request
         if (currentRequestId !== requestIdRef.current) return;
@@ -334,8 +330,9 @@ export default function Page({ params }: PageProps) {
 
       <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
         <div className="flex justify-between py-6 px-4">
-          <div>{/* Display selected recipients*/}</div>
-
+          {/* Selected recipients */}
+          <div className="flex-grow">{/* EmailTotalSummary in SCRUM-270 */}</div>
+          {/* Search input */}
           <div
             className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
               ${isDisabled ? "bg-gray-100" : ""}`}
