@@ -125,7 +125,6 @@ export default function Page({ params }: PageProps) {
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
   const [, setIsCalculatingRunSummary] = useState(false);
   const [selectedEmailNum, setSelectedEmailNum] = useState(0);
-  const [, setAllEmailsData] = useState<EmailSummaryDataType[]>([]);
 
   const [runSummary, setRunSummary] = useState(() => {
     return {
@@ -137,7 +136,7 @@ export default function Page({ params }: PageProps) {
 
   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const base_url = "http://localhost:5000"; // "https://da86d2e4-4bc6-482a-91c2-5d3e5932f2f7.mock.pstmn.io/{environment}"; //process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
 
       url.searchParams.append("limit", limit.toString());
@@ -167,11 +166,25 @@ export default function Page({ params }: PageProps) {
   }, []); // make dependencies empty to avoid infinite loop
 
   const fetchApi = useCallback(
-    async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
+    async (
+      apiType: "emails" | "runDetails",
+      limit: number | null,
+      status: string | null,
+      lastEvaluatedKey: string | null
+    ) => {
       try {
-        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        const url = new URL(`${base_url}/runs/${params.runId}/emails`);
-        url.searchParams.append("limit", limit.toString());
+        const base_url = "http://localhost:5000"; // process.env.NEXT_PUBLIC_API_ENDPOINT;
+        let url: URL;
+
+        if (apiType === "emails") {
+          url = new URL(`${base_url}/runs/${params.runId}/emails`);
+        } else {
+          url = new URL(`${base_url}/runs/${params.runId}`);
+        }
+
+        if (limit !== null && limit !== undefined) {
+          url.searchParams.append("limit", limit.toString());
+        }
         if (status) {
           url.searchParams.append("status", status);
         }
@@ -205,7 +218,7 @@ export default function Page({ params }: PageProps) {
   const fetchFiles = useCallback(
     async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
       try {
-        const result = await fetchApi(limit, status, lastEvaluatedKey);
+        const result = await fetchApi("emails", limit, status, lastEvaluatedKey);
         setIsLoading(false);
         setData(result.data);
         setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
@@ -218,6 +231,27 @@ export default function Page({ params }: PageProps) {
     [fetchApi]
   );
 
+  const fetchRunSummary = useCallback(async () => {
+    try {
+      setIsCalculatingRunSummary(true);
+
+      try {
+        const result = await fetchApi("runDetails", null, null, null);
+        setRunSummary({
+          totalEmailNum: result.expected_email_send_count || 0,
+          successEmailNum: result.success_email_count || 0,
+          failedEmailNum: result.failed_email_count || 0,
+        });
+      } catch (error: any) {
+        console.error("Failed to fetch run summary: " + error.message);
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch run summary:", error.message);
+    } finally {
+      setIsCalculatingRunSummary(false);
+    }
+  }, [fetchApi]);
+
   // Define a request id for fetching all recipients' data
   const requestIdRef = useRef(0);
 
@@ -226,7 +260,7 @@ export default function Page({ params }: PageProps) {
     const currentRequestId = ++requestIdRef.current;
 
     try {
-      let result = await fetchApi(1000, selectedStatus, null);
+      let result = await fetchApi("emails", 10000, selectedStatus, null);
 
       // only process the latest request
       if (currentRequestId !== requestIdRef.current) return;
@@ -235,7 +269,7 @@ export default function Page({ params }: PageProps) {
       let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
 
       while (allDataNextLastEvaluatedKey) {
-        result = await fetchApi(1000, selectedStatus, allDataNextLastEvaluatedKey);
+        result = await fetchApi("emails", 10000, selectedStatus, allDataNextLastEvaluatedKey);
 
         // only process the latest request
         if (currentRequestId !== requestIdRef.current) return;
@@ -251,59 +285,6 @@ export default function Page({ params }: PageProps) {
       }
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
-    }
-
-    try {
-      setIsCalculatingRunSummary(true);
-
-      // Always fetch all emails without status filter for summary calculation
-      let result = await fetchApi(1000, null, null);
-      if (!result || !result.data) {
-        throw new Error("Wrong response from API");
-      }
-
-      const allEmails: EmailSummaryDataType[] = [...result.data];
-      let nextKey = result.next_last_evaluated_key;
-
-      while (nextKey) {
-        result = await fetchApi(1000, null, nextKey);
-
-        // only process the latest request
-        if (currentRequestId !== requestIdRef.current) return;
-
-        if (!result || !result.data) break;
-        allEmails.push(...result.data);
-        nextKey = result.next_last_evaluated_key;
-      }
-
-      // Calculate summary
-      const totalEmailNum = allEmails.length;
-      const successEmailNum = allEmails.filter(email => email.status === "SUCCESS").length;
-      const failedEmailNum = totalEmailNum - successEmailNum;
-
-      // Update run summary
-      setRunSummary({
-        totalEmailNum,
-        successEmailNum,
-        failedEmailNum,
-      });
-
-      // If there's no status filter, use the complete dataset
-      // Otherwise, filter the data based on selected status
-      if (selectedStatus === null) {
-        setAllData(allEmails);
-        setIsDisabled(false);
-      } else {
-        const filteredEmails = allEmails.filter(email => email.status === selectedStatus);
-        setAllData(filteredEmails);
-        setIsDisabled(false);
-      }
-
-      setAllEmailsData(allEmails); // Store all emails for future reference
-    } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
-    } finally {
-      setIsCalculatingRunSummary(false);
     }
   }, [fetchApi, selectedStatus]);
 
@@ -371,6 +352,11 @@ export default function Page({ params }: PageProps) {
     fetchDetailedFiles(1, null);
   }, [fetchDetailedFiles]);
 
+  // Fetch the run summary when component mounts
+  useEffect(() => {
+    fetchRunSummary();
+  }, [fetchRunSummary]);
+
   const handleSelectedEmailsChange = useCallback((count: number) => {
     setSelectedEmailNum(count);
   }, []);
@@ -405,9 +391,15 @@ export default function Page({ params }: PageProps) {
         <div className="flex justify-between py-6 px-4">
           {/* Selected recipients */}
           <div className="flex-grow">
-            <EmailTotalSummary selectedEmailNum={selectedEmailNum} runSummary={runSummary} />
+            <EmailTotalSummary
+              selectedEmailNum={selectedEmailNum}
+              runSummary={{
+                totalEmailNum: runSummary.totalEmailNum,
+                successEmailNum: runSummary.successEmailNum,
+                failedEmailNum: runSummary.failedEmailNum,
+              }}
+            />
           </div>
-
           {/* Search input */}
           <div
             className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
@@ -437,9 +429,8 @@ export default function Page({ params }: PageProps) {
               data={searchTerm ? sliceFilteredData : emailSummaryData}
               selectedStatus={selectedStatus}
               onStatusChange={status => setSelectedStatus(status)}
-              runSummary={runSummary}
               onSelectedRowsChange={handleSelectedEmailsChange}
-              allEmailIds={emailAllData.map(email => email.email_id)} // 添加這行，傳遞所有郵件ID
+              allEmailIds={emailAllData.map(email => email.email_id)}
             />
           )}
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
