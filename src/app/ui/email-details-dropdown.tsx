@@ -1,6 +1,7 @@
 interface AttachmentFilesType {
   file_url: string;
-  uploaded_id: string;
+  uploaded_id?: string;
+  uploader_id?: string;
   updated_at: string;
   file_name: string;
   file_id: string;
@@ -12,7 +13,8 @@ interface AttachmentFilesType {
 
 interface SpreadsheetFileType {
   file_url: string;
-  uploaded_id: string;
+  uploaded_id?: string;
+  uploader_id?: string;
   updated_at: string;
   file_name: string;
   file_id: string;
@@ -24,7 +26,8 @@ interface SpreadsheetFileType {
 
 interface TemplateFileType {
   file_url: string;
-  uploaded_id: string;
+  uploaded_id?: string;
+  uploader_id?: string;
   updated_at: string;
   file_name: string;
   file_id: string;
@@ -50,8 +53,8 @@ interface DataType {
   created_at: string;
   sender_local_part: string;
   spreadsheet_file_id: string | null;
-  created_year_month: string;
-  recipients: Array<{ email: string; template_variables: Record<string, any> }>;
+  created_year_month?: string;
+  recipients?: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
   is_generate_certificate: boolean;
   spreadsheet_file: SpreadsheetFileType | null;
@@ -61,10 +64,11 @@ interface DataType {
   template_file_id: string;
   success_email_count: number;
   expected_email_send_count: number;
+  failed_email_count?: number;
   reply_to: string;
   template_file: TemplateFileType;
-  created_year_month_day: string;
-  created_year: string;
+  created_year_month_day?: string;
+  created_year?: string;
 }
 
 interface EmailDetailsDropdownProps {
@@ -87,25 +91,22 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
     },
     {
       label: "To:",
-      value:
-        emailData.recipient_source === "DIRECT"
-          ? "Direct recipients"
-          : "Recipients from sheet file",
+      value: "Recipients from sheet file",
     },
     {
       label: "TemplateFile:",
-      value: emailData.template_file.file_name
-        ? emailData.template_file.file_name
+      value: emailData.template_file?.file_name
+        ? `${emailData.template_file.file_name} (${emailData.template_file.file_size})`
         : "No template file",
     },
     {
       label: "SheetFile:",
       value: emailData.spreadsheet_file
-        ? `${emailData.spreadsheet_file.file_name}`
+        ? `${emailData.spreadsheet_file.file_name} (${emailData.spreadsheet_file.file_size})`
         : "No sheet file",
     },
     { label: "LocalPart:", value: emailData.sender_local_part },
-    { label: "ReplyTo:", value: emailData.reply_to },
+    { label: "Reply To:", value: emailData.reply_to },
     {
       label: "BCC:",
       value: emailData.bcc && emailData.bcc.length ? emailData.bcc.join(", ") : "No BCC recipients",
@@ -115,13 +116,15 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
       value: emailData.cc && emailData.cc.length ? emailData.cc.join(", ") : "No CC recipients",
     },
     {
-      label: "AttachFiles:",
+      label: "Attachments:",
       value:
-        emailData.attachment_file_ids && emailData.attachment_file_ids.length === 1
-          ? `${emailData.attachment_files[0].file_name}`
-          : emailData.attachment_file_ids && emailData.attachment_file_ids.length > 1
-            ? `${emailData.attachment_file_ids.length} AttachFiles`
-            : "No files attached",
+        emailData.attachment_files && emailData.attachment_files.length > 0
+          ? `${emailData.attachment_files.length} file(s) attached`
+          : "No files attached",
+    },
+    {
+      label: "ProvideCertificate:",
+      value: emailData.is_generate_certificate ? "Yes" : "No",
     },
   ];
 
