@@ -132,7 +132,7 @@ export default function Page({ params }: PageProps) {
       lastEvaluatedKey: string | null
     ) => {
       try {
-        const base_url = "http://localhost:5000"; // process.env.NEXT_PUBLIC_API_ENDPOINT;
+        const base_url = "http://35.164.160.30:5000"; // process.env.NEXT_PUBLIC_API_ENDPOINT;
         let url: URL;
 
         if (apiType === "emails") {
