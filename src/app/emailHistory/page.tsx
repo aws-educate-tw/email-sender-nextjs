@@ -86,7 +86,7 @@ export default function Page() {
 
   const fetchFiles = async (limit: number, lastEvaluatedKey: string | null) => {
     try {
-      const base_url = "http://35.164.160.30:5000" //process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const base_url = "http://35.164.160.30:5000"; //process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
 
       url.searchParams.append("limit", limit.toString());
