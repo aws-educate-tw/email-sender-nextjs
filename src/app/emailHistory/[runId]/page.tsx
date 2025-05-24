@@ -136,7 +136,7 @@ export default function Page({ params }: PageProps) {
 
   const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
     try {
-      const base_url = "http://localhost:5000"; // "https://da86d2e4-4bc6-482a-91c2-5d3e5932f2f7.mock.pstmn.io/{environment}"; //process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const base_url = "http://35.164.160.30:5000"; // "https://da86d2e4-4bc6-482a-91c2-5d3e5932f2f7.mock.pstmn.io/{environment}"; //process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
 
       url.searchParams.append("limit", limit.toString());
@@ -173,7 +173,7 @@ export default function Page({ params }: PageProps) {
       lastEvaluatedKey: string | null
     ) => {
       try {
-        const base_url = "http://localhost:5000"; // process.env.NEXT_PUBLIC_API_ENDPOINT;
+        const base_url = "http://35.164.160.30:5000"; // process.env.NEXT_PUBLIC_API_ENDPOINT;
         let url: URL;
 
         if (apiType === "emails") {
