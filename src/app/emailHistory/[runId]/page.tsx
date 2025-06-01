@@ -163,9 +163,7 @@ export default function Page({ params }: PageProps) {
           throw new Error(errorMessage);
         }
 
-        console.log(apiType);
         const result = await response.json();
-        console.log("API Response:", JSON.stringify(result, null, 2));
         return result;
       } catch (error: any) {
         alert("Failed to fetch files: " + error.message);
@@ -174,17 +172,19 @@ export default function Page({ params }: PageProps) {
     [params.runId]
   );
 
-  const fetchDetailedFiles = useCallback(
-    async (limit: number) => {
-      try {
-        const result = await fetchApi("runDetails", limit, status, 1);
-        setDetailedData(result);
-      } catch (error: any) {
-        alert("Failed to fetch files: " + error.message);
+  const fetchDetailedFiles = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No access token found");
       }
-    },
-    [fetchApi]
-  );
+
+      const result = await fetchRunDetails(params.runId, token);
+      setDetailedData(result);
+    } catch (error: any) {
+      alert("Failed to fetch files: " + error.message);
+    }
+  }, [params.runId]);
 
   const fetchFiles = useCallback(
     async (limit: number, status: string | null, page: number | 1) => {
@@ -261,7 +261,7 @@ export default function Page({ params }: PageProps) {
 
   // Fetch the detailed data when component mounts
   useEffect(() => {
-    fetchDetailedFiles(1);
+    fetchDetailedFiles();
   }, [fetchDetailedFiles]);
 
   // Fetch the files when the component mounts or when selectedStatus changes
