@@ -56,7 +56,7 @@ interface DataType {
   created_year_month?: string;
   recipients?: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
-  is_generate_certificate: boolean;
+  is_generated_certificate: boolean;
   spreadsheet_file: SpreadsheetFileType | null;
   display_name: string;
   sender_id: string | null;
@@ -124,7 +124,7 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
     },
     {
       label: "ProvideCertificate:",
-      value: emailData.is_generate_certificate ? "Yes" : "No",
+      value: emailData.is_generated_certificate ? "Yes" : "No",
     },
   ];
 
