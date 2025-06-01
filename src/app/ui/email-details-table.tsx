@@ -34,8 +34,11 @@ export default function EmailDetailsTable({
   selectedStatus,
   onStatusChange,
   runSummary,
+  selectedRows,
   onSelectedRowsChange,
+  onRowSelectionChange,
   allEmailIds = [],
+  isDisabled = false,
 }: {
   data: DataType[];
   selectedStatus: string | null;
@@ -46,23 +49,26 @@ export default function EmailDetailsTable({
     successEmailNum: number;
     failedEmailNum: number;
   };
+  selectedRows: Record<string, boolean>;
   onSelectedRowsChange?: (count: number) => void;
+  onRowSelectionChange?: (newSelectedRows: Record<string, boolean>) => void;
   allEmailIds?: string[];
+  isDisabled?: boolean;
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const [isAllSelected, setIsAllSelected] = useState(false);
   const triggerRef = useRef<HTMLDivElement | null>(null);
   const statusOption = ["All", "Success", "Failed"];
 
   const hasAllEmailData = useMemo(() => {
     return (
+      !isDisabled &&
       allEmailIds &&
       allEmailIds.length > 0 &&
       data.length > 0 &&
       (!runSummary || allEmailIds.length >= runSummary.totalEmailNum)
     );
-  }, [allEmailIds, data, runSummary]);
+  }, [allEmailIds, data, runSummary, isDisabled]);
 
   const availableEmailIds = useMemo(() => {
     return allEmailIds && allEmailIds.length > 0 ? allEmailIds : data.map(item => item.email_id);
@@ -91,7 +97,7 @@ export default function EmailDetailsTable({
   const handleSelectRow = (index: string) => {
     const newSelectedRows = { ...selectedRows };
     newSelectedRows[index] = !selectedRows[index];
-    setSelectedRows(newSelectedRows);
+    onRowSelectionChange?.(newSelectedRows);
 
     const allEmailsSelected = availableEmailIds.every(id => newSelectedRows[id] === true);
     setIsAllSelected(allEmailsSelected);
@@ -99,18 +105,24 @@ export default function EmailDetailsTable({
 
   // Handle select all rows
   const handleSelectAll = () => {
+    if (isDisabled || !hasAllEmailData) return;
     const newSelectedState = !isAllSelected;
     const newSelectedRows: Record<string, boolean> = {};
 
     if (newSelectedState) {
-      // Select all available emails across all pages
-      availableEmailIds.forEach(emailId => {
+      allEmailIds.forEach(emailId => {
         newSelectedRows[emailId] = true;
       });
     }
 
-    setSelectedRows(newSelectedRows);
+    onRowSelectionChange?.(newSelectedRows);
     setIsAllSelected(newSelectedState);
+
+    const selectedCount = newSelectedState ? allEmailIds.length : 0;
+
+    if (onSelectedRowsChange) {
+      onSelectedRowsChange(selectedCount);
+    }
   };
 
   useEffect(() => {
@@ -144,19 +156,19 @@ export default function EmailDetailsTable({
                   <input
                     type="checkbox"
                     id="select-all-checkbox"
-                    disabled={!hasAllEmailData}
+                    disabled={isDisabled || !hasAllEmailData}
                     checked={isAllSelected}
                     onChange={handleSelectAll}
                     className="sr-only"
                   />
                   <label
                     htmlFor="select-all-checkbox"
-                    className={`flex items-center justify-center w-5 h-5 rounded border cursor-pointer ${
-                      !hasAllEmailData
-                        ? "bg-gray-400 border-gray-400 cursor-not-allowed"
+                    className={`flex items-center justify-center w-5 h-5 rounded border ${
+                      isDisabled || !hasAllEmailData
+                        ? "bg-gray-300 border-gray-300 cursor-not-allowed opacity-50"
                         : isAllSelected
-                          ? "bg-gray-800 border-gray-800"
-                          : "border-gray-400 hover:border-gray-500"
+                          ? "bg-gray-800 border-gray-800 cursor-pointer"
+                          : "border-gray-400 hover:border-gray-500 cursor-pointer"
                     }`}
                   >
                     {isAllSelected && (
