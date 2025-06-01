@@ -17,7 +17,7 @@ interface DataType {
   status: string;
   spreadsheet_file_id: string;
   row_data: RowDataType;
-  atatachment_file_ids: string[];
+  attachment_file_ids: string[];
   is_generated_certficate: boolean;
   sender_username: string;
   display_name: string;
