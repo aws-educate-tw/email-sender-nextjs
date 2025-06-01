@@ -3,8 +3,9 @@ import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
 import EmailTotalSummary from "@/app/ui/email-total-summary";
+import { fetchEmails, fetchRunDetails, storeAllEmails } from "@/lib/actions";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface PageProps {
   params: {
@@ -112,9 +113,12 @@ export default function Page({ params }: PageProps) {
   const [emailSummaryData, setData] = useState<EmailSummaryDataType[]>([]);
   const [emailDetailedData, setDetailedData] = useState<EmailDetailedDataType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
-  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [, setTotalItems] = useState(0);
+  const [, setTotalPages] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -125,6 +129,7 @@ export default function Page({ params }: PageProps) {
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
   const [, setIsCalculatingRunSummary] = useState(false);
   const [selectedEmailNum, setSelectedEmailNum] = useState(0);
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
 
   const [runSummary, setRunSummary] = useState(() => {
     return {
@@ -134,15 +139,18 @@ export default function Page({ params }: PageProps) {
     };
   });
 
-  const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
+  const handleRowSelectionChange = useCallback((newSelectedRows: Record<string, boolean>) => {
+    setSelectedRows(newSelectedRows);
+    const selectedCount = Object.values(newSelectedRows).filter(Boolean).length;
+    setSelectedEmailNum(selectedCount);
+  }, []);
+
+  const fetchDetailedFiles = useCallback(async (limit: number) => {
     try {
-      const base_url = "http://35.164.160.30:5000"; // "https://da86d2e4-4bc6-482a-91c2-5d3e5932f2f7.mock.pstmn.io/{environment}"; //process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/runs`);
 
       url.searchParams.append("limit", limit.toString());
-      if (lastEvaluatedKey) {
-        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-      }
 
       const token = localStorage.getItem("access_token");
       const response = await fetch(url.toString(), {
@@ -165,49 +173,25 @@ export default function Page({ params }: PageProps) {
     }
   }, []); // make dependencies empty to avoid infinite loop
 
-  const fetchApi = useCallback(
-    async (
-      apiType: "emails" | "runDetails",
-      limit: number | null,
-      status: string | null,
-      lastEvaluatedKey: string | null
-    ) => {
+  const fetchFiles = useCallback(
+    async (limit: number, status: string | null, page: number) => {
+      setIsLoading(true);
       try {
-        const base_url = "http://35.164.160.30:5000"; // process.env.NEXT_PUBLIC_API_ENDPOINT;
-        let url: URL;
-
-        if (apiType === "emails") {
-          url = new URL(`${base_url}/runs/${params.runId}/emails`);
-        } else {
-          url = new URL(`${base_url}/runs/${params.runId}`);
-        }
-
-        if (limit !== null && limit !== undefined) {
-          url.searchParams.append("limit", limit.toString());
-        }
-        if (status) {
-          url.searchParams.append("status", status);
-        }
-        if (lastEvaluatedKey) {
-          url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-        }
-
         const token = localStorage.getItem("access_token");
-        const response = await fetch(url.toString(), {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-          throw new Error(errorMessage);
+        if (!token) {
+          throw new Error("No access token found");
         }
 
-        const result = await response.json();
-        return result;
+        const result = await fetchEmails(params.runId, limit, page, status, token);
+
+        setIsLoading(false);
+        setData(result.data);
+        setPage(result.pagination.page);
+        setLimit(result.pagination.limit);
+        setTotalItems(result.pagination.total_items);
+        setTotalPages(result.pagination.total_pages);
+        setHasNextPage(result.pagination.has_next_page);
+        setHasPreviousPage(result.pagination.has_previous_page);
       } catch (error: any) {
         alert("Failed to fetch files: " + error.message);
       }
@@ -215,85 +199,33 @@ export default function Page({ params }: PageProps) {
     [params.runId]
   );
 
-  const fetchFiles = useCallback(
-    async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
-      try {
-        const result = await fetchApi("emails", limit, status, lastEvaluatedKey);
-        setIsLoading(false);
-        setData(result.data);
-        setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
-        setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
-        setNextLastEvaluatedKey(result.next_last_evaluated_key);
-      } catch (error: any) {
-        alert("Failed to fetch files: " + error.message);
-      }
-    },
-    [fetchApi]
-  );
-
   const fetchRunSummary = useCallback(async () => {
-    try {
-      setIsCalculatingRunSummary(true);
-
-      try {
-        const result = await fetchApi("runDetails", null, null, null);
-        setRunSummary({
-          totalEmailNum: result.expected_email_send_count || 0,
-          successEmailNum: result.success_email_count || 0,
-          failedEmailNum: result.failed_email_count || 0,
-        });
-      } catch (error: any) {
-        console.error("Failed to fetch run summary: " + error.message);
-      }
-    } catch (error: any) {
-      console.error("Failed to fetch run summary:", error.message);
-    } finally {
-      setIsCalculatingRunSummary(false);
-    }
-  }, [fetchApi]);
-
-  // Define a request id for fetching all recipients' data
-  const requestIdRef = useRef(0);
-
-  // Get all recipients data
-  const storeAllData = useCallback(async () => {
-    const currentRequestId = ++requestIdRef.current;
+    setIsCalculatingRunSummary(true);
 
     try {
-      let result = await fetchApi("emails", 10000, selectedStatus, null);
-
-      // only process the latest request
-      if (currentRequestId !== requestIdRef.current) return;
-
-      const allData = result.data;
-      let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
-
-      while (allDataNextLastEvaluatedKey) {
-        result = await fetchApi("emails", 10000, selectedStatus, allDataNextLastEvaluatedKey);
-
-        // only process the latest request
-        if (currentRequestId !== requestIdRef.current) return;
-
-        allData.push(...result.data);
-        allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No access token found");
       }
 
-      // only process the latest request
-      if (currentRequestId === requestIdRef.current) {
-        setAllData(allData);
-        setIsDisabled(false);
-      }
+      const result = await fetchRunDetails(params.runId, token);
+
+      setRunSummary({
+        successEmailNum: result.success_email_count || 0,
+        failedEmailNum: result.failed_email_count || 0,
+        totalEmailNum: result.success_email_count + result.failed_email_count || 0,
+      });
     } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
+      console.error("Failed to fetch run summary: " + error.message);
     }
-  }, [fetchApi, selectedStatus]);
+  }, [params.runId]);
 
   // Click Next button
   const handleNext = () => {
     if (searchTerm) {
       setSliceIndex([sliceIndex[0] + 10, sliceIndex[1] + 10]);
-    } else if (nextLastEvaluatedKey) {
-      fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
+    } else if (hasNextPage) {
+      fetchFiles(limit, selectedStatus, page + 1);
     }
   };
 
@@ -301,31 +233,46 @@ export default function Page({ params }: PageProps) {
   const handlePrevious = () => {
     if (searchTerm) {
       setSliceIndex([Math.max(sliceIndex[0] - 10, 0), Math.max(sliceIndex[1] - 10, 10)]);
-    } else {
-      fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
+    } else if (hasPreviousPage) {
+      fetchFiles(limit, selectedStatus, page - 1);
     }
   };
 
   const isNextDisabled = () => {
-    return searchTerm ? sliceIndex[1] >= filteredData.length : !nextLastEvaluatedKey;
+    return searchTerm ? sliceIndex[1] >= filteredData.length : !hasNextPage;
   };
 
   const isPreviousDisabled = () => {
-    return searchTerm ? sliceIndex[0] <= 0 : !currentLastEvaluatedKey;
+    return searchTerm ? sliceIndex[0] <= 0 : !hasPreviousPage;
   };
 
   // Fetch the files when the component mounts or when selectedStatus changes
   useEffect(() => {
     setIsLoading(true);
-    fetchFiles(10, selectedStatus, null);
-  }, [fetchFiles, selectedStatus]);
+    fetchFiles(10, selectedStatus, page);
+  }, [fetchFiles, selectedStatus, page]);
 
-  // Fetch all recipients data when the component mounts or when selectedStatus changes
   useEffect(() => {
     setIsDisabled(true); // Prevent user from typing until all data is loaded
-    storeAllData();
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          throw new Error("No access token found");
+        }
+
+        const allData = await storeAllEmails(params.runId, selectedStatus, token);
+        setAllData(allData);
+        setIsDisabled(false);
+      } catch (error) {
+        console.error("Error fetching all emails:", error);
+        setIsDisabled(false);
+      }
+    };
+
+    fetchData();
     setSearchTerm("");
-  }, [storeAllData, selectedStatus]);
+  }, [selectedStatus, params.runId]);
 
   // filter data with searchTerm
   useEffect(() => {
@@ -349,7 +296,7 @@ export default function Page({ params }: PageProps) {
 
   // Fetch the detailed data when component mounts
   useEffect(() => {
-    fetchDetailedFiles(1, null);
+    fetchDetailedFiles(1);
   }, [fetchDetailedFiles]);
 
   // Fetch the run summary when component mounts
@@ -431,6 +378,9 @@ export default function Page({ params }: PageProps) {
               onStatusChange={status => setSelectedStatus(status)}
               onSelectedRowsChange={handleSelectedEmailsChange}
               allEmailIds={emailAllData.map(email => email.email_id)}
+              isDisabled={isDisabled}
+              selectedRows={selectedRows}
+              onRowSelectionChange={handleRowSelectionChange}
             />
           )}
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
