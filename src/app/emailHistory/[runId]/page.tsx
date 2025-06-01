@@ -2,7 +2,7 @@
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
-// import EmailTotalSummary from "@/app/ui/email-total-summary";
+import { fetchRunDetails } from "@/lib/actions";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -27,7 +27,7 @@ interface EmailSummaryDataType {
   status: string;
   spreadsheet_file_id: string;
   row_data: RowDataType;
-  atatachment_file_ids: string[];
+  attachment_file_ids: string[];
   is_generated_certficate: boolean;
   sender_username: string;
   display_name: string;
@@ -94,7 +94,7 @@ interface EmailDetailedDataType {
   created_year_month: string;
   recipients: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
-  is_generate_certificate: boolean;
+  is_generated_certificate: boolean;
   spreadsheet_file: SpreadsheetFileType | null;
   display_name: string;
   sender_id: string | null;
@@ -114,8 +114,8 @@ export default function Page({ params }: PageProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [, setTotalItems] = useState(0);
+  const [, setTotalPages] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
@@ -140,7 +140,7 @@ export default function Page({ params }: PageProps) {
 
         if (apiType === "emails") {
           url = new URL(`${base_url}/runs/${params.runId}/emails`);
-          url.searchParams.append("page", (page).toString());
+          url.searchParams.append("page", page.toString());
         } else {
           url = new URL(`${base_url}/runs/${params.runId}`);
         }
@@ -148,7 +148,7 @@ export default function Page({ params }: PageProps) {
         if (status) {
           url.searchParams.append("status", status);
         }
-        
+
         const token = localStorage.getItem("access_token");
         const response = await fetch(url.toString(), {
           method: "GET",
@@ -257,14 +257,6 @@ export default function Page({ params }: PageProps) {
     } else if (hasPreviousPage) {
       fetchFiles(limit, selectedStatus, page - 1);
     }
-  };
-
-  const isNextDisabled = () => {
-    return searchTerm ? sliceIndex[1] >= filteredData.length : !hasNextPage;
-  };
-
-  const isPreviousDisabled = () => {
-    return searchTerm ? sliceIndex[0] <= 0 : !hasPreviousPage;
   };
 
   // Fetch the detailed data when component mounts
