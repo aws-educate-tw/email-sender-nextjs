@@ -2,6 +2,7 @@
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
+import { fetchRunDetails } from "@/lib/actions";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -26,7 +27,7 @@ interface EmailSummaryDataType {
   status: string;
   spreadsheet_file_id: string;
   row_data: RowDataType;
-  atatachment_file_ids: string[];
+  attachment_file_ids: string[];
   is_generated_certficate: boolean;
   sender_username: string;
   display_name: string;
@@ -93,7 +94,7 @@ interface EmailDetailedDataType {
   created_year_month: string;
   recipients: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
-  is_generate_certificate: boolean;
+  is_generated_certificate: boolean;
   spreadsheet_file: SpreadsheetFileType | null;
   display_name: string;
   sender_id: string | null;
@@ -111,9 +112,12 @@ export default function Page({ params }: PageProps) {
   const [emailSummaryData, setData] = useState<EmailSummaryDataType[]>([]);
   const [emailDetailedData, setDetailedData] = useState<EmailDetailedDataType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
-  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [, setTotalItems] = useState(0);
+  const [, setTotalPages] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -123,48 +127,26 @@ export default function Page({ params }: PageProps) {
   const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
 
-  const fetchDetailedFiles = useCallback(async (limit: number, lastEvaluatedKey: string | null) => {
-    try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/runs`);
-
-      url.searchParams.append("limit", limit.toString());
-      if (lastEvaluatedKey) {
-        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-      }
-
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(url.toString(), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
-      setDetailedData(result.data[0] || null);
-    } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
-    }
-  }, []); // make dependencies empty to avoid infinite loop
-
   const fetchApi = useCallback(
-    async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
+    async (
+      apiType: "emails" | "runDetails",
+      limit: number | null,
+      status: string | null,
+      page: number
+    ) => {
       try {
         const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        const url = new URL(`${base_url}/runs/${params.runId}/emails`);
-        url.searchParams.append("limit", limit.toString());
+        let url: URL;
+
+        if (apiType === "emails") {
+          url = new URL(`${base_url}/runs/${params.runId}/emails`);
+          url.searchParams.append("page", page.toString());
+        } else {
+          url = new URL(`${base_url}/runs/${params.runId}`);
+        }
+
         if (status) {
           url.searchParams.append("status", status);
-        }
-        if (lastEvaluatedKey) {
-          url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
         }
 
         const token = localStorage.getItem("access_token");
@@ -190,15 +172,32 @@ export default function Page({ params }: PageProps) {
     [params.runId]
   );
 
+  const fetchDetailedFiles = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No access token found");
+      }
+
+      const result = await fetchRunDetails(params.runId, token);
+      setDetailedData(result);
+    } catch (error: any) {
+      alert("Failed to fetch files: " + error.message);
+    }
+  }, [params.runId]);
+
   const fetchFiles = useCallback(
-    async (limit: number, status: string | null, lastEvaluatedKey: string | null) => {
+    async (limit: number, status: string | null, page: number | 1) => {
       try {
-        const result = await fetchApi(limit, status, lastEvaluatedKey);
+        const result = await fetchApi("emails", limit, status, page);
         setIsLoading(false);
         setData(result.data);
-        setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
-        setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
-        setNextLastEvaluatedKey(result.next_last_evaluated_key);
+        setPage(result.pagination.page);
+        setLimit(result.pagination.limit);
+        setTotalItems(result.pagination.total_items);
+        setTotalPages(result.pagination.total_pages);
+        setHasNextPage(result.pagination.has_next_page);
+        setHasPreviousPage(result.pagination.has_previous_page);
       } catch (error: any) {
         alert("Failed to fetch files: " + error.message);
       }
@@ -214,7 +213,7 @@ export default function Page({ params }: PageProps) {
     const currentRequestId = ++requestIdRef.current;
 
     try {
-      let result = await fetchApi(1000, selectedStatus, null);
+      let result = await fetchApi("emails", 1000, selectedStatus, 1);
 
       // only process the latest request
       if (currentRequestId !== requestIdRef.current) return;
@@ -223,7 +222,7 @@ export default function Page({ params }: PageProps) {
       let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
 
       while (allDataNextLastEvaluatedKey) {
-        result = await fetchApi(1000, selectedStatus, allDataNextLastEvaluatedKey);
+        result = await fetchApi("emails", 1000, selectedStatus, allDataNextLastEvaluatedKey);
 
         // only process the latest request
         if (currentRequestId !== requestIdRef.current) return;
@@ -246,8 +245,8 @@ export default function Page({ params }: PageProps) {
   const handleNext = () => {
     if (searchTerm) {
       setSliceIndex([sliceIndex[0] + 10, sliceIndex[1] + 10]);
-    } else if (nextLastEvaluatedKey) {
-      fetchFiles(10, selectedStatus, nextLastEvaluatedKey);
+    } else if (hasNextPage) {
+      fetchFiles(limit, selectedStatus, page + 1);
     }
   };
 
@@ -255,29 +254,21 @@ export default function Page({ params }: PageProps) {
   const handlePrevious = () => {
     if (searchTerm) {
       setSliceIndex([Math.max(sliceIndex[0] - 10, 0), Math.max(sliceIndex[1] - 10, 10)]);
-    } else {
-      fetchFiles(10, selectedStatus, previousLastEvaluatedKey);
+    } else if (hasPreviousPage) {
+      fetchFiles(limit, selectedStatus, page - 1);
     }
-  };
-
-  const isNextDisabled = () => {
-    return searchTerm ? sliceIndex[1] >= filteredData.length : !nextLastEvaluatedKey;
-  };
-
-  const isPreviousDisabled = () => {
-    return searchTerm ? sliceIndex[0] <= 0 : !currentLastEvaluatedKey;
   };
 
   // Fetch the detailed data when component mounts
   useEffect(() => {
-    fetchDetailedFiles(1, null);
+    fetchDetailedFiles();
   }, [fetchDetailedFiles]);
 
   // Fetch the files when the component mounts or when selectedStatus changes
   useEffect(() => {
     setIsLoading(true);
-    fetchFiles(10, selectedStatus, null);
-  }, [fetchFiles, selectedStatus]);
+    fetchFiles(10, selectedStatus, page);
+  }, [fetchFiles, selectedStatus, page]);
 
   // Fetch all recipients data when the component mounts or when selectedStatus changes
   useEffect(() => {
@@ -334,8 +325,9 @@ export default function Page({ params }: PageProps) {
 
       <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
         <div className="flex justify-between py-6 px-4">
-          <div>{/* Display selected recipients*/}</div>
-
+          {/* Selected recipients */}
+          <div className="flex-grow">{/* EmailTotalSummary in SCRUM-270 */}</div>
+          {/* Search input */}
           <div
             className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
               ${isDisabled ? "bg-gray-100" : ""}`}
@@ -369,24 +361,24 @@ export default function Page({ params }: PageProps) {
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
             <button
               className={`flex items-center gap-1 ${
-                isPreviousDisabled()
+                !hasPreviousPage
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={handlePrevious}
-              disabled={isPreviousDisabled()}
+              disabled={!hasPreviousPage}
             >
               <ChevronLeft size={20} />
               Previous
             </button>
             <button
               className={`flex items-center gap-1 ${
-                isNextDisabled()
+                !hasNextPage
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={handleNext}
-              disabled={isNextDisabled()}
+              disabled={!hasNextPage}
             >
               Next
               <ChevronRight size={20} />
