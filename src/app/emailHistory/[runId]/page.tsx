@@ -3,7 +3,6 @@ import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
 import EmailTotalSummary from "@/app/ui/email-total-summary";
-import { fetchEmails, fetchRunDetails, storeAllEmails } from "@/lib/actions";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -109,6 +108,18 @@ interface EmailDetailedDataType {
   created_year: string;
 }
 
+interface EmailsResponse {
+  data: any[];
+  pagination: {
+    page: number;
+    limit: number;
+    total_items: number;
+    total_pages: number;
+    has_next_page: boolean;
+    has_previous_page: boolean;
+  };
+}
+
 export default function Page({ params }: PageProps) {
   const [emailSummaryData, setData] = useState<EmailSummaryDataType[]>([]);
   const [emailDetailedData, setDetailedData] = useState<EmailDetailedDataType | null>(null);
@@ -138,6 +149,110 @@ export default function Page({ params }: PageProps) {
       failedEmailNum: 0,
     };
   });
+
+  async function fetchEmails(
+    runId: string,
+    limit: number,
+    page: number,
+    status: string | null = null,
+    access_token: string
+  ): Promise<EmailsResponse> {
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const url = new URL(`${base_url}/runs/${runId}/emails`);
+
+    url.searchParams.append("page", page.toString());
+
+    if (limit) {
+      url.searchParams.append("limit", limit.toString());
+    }
+
+    if (status) {
+      url.searchParams.append("status", status);
+    }
+
+    let retries = 0;
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 second delay between retries
+
+    while (retries < maxRetries) {
+      try {
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status} - ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        retries++;
+        console.error(`Attempt ${retries}/${maxRetries} failed:`, error);
+
+        if (retries >= maxRetries) {
+          console.error("All retry attempts failed");
+          throw error;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+      }
+    }
+    throw new Error("Failed to fetch emails after maximum retry attempts");
+  }
+
+  async function fetchRunDetails(runId: string, access_token: string) {
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const url = new URL(`${base_url}/runs/${runId}`);
+
+    return fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status} - ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .catch(error => {
+        console.error("Failed to fetch run details:", error);
+        throw error;
+      });
+  }
+
+  async function storeAllEmails(
+    runId: string,
+    status: string | null = null,
+    access_token: string
+  ): Promise<any[]> {
+    try {
+      // First fetch to get pagination info
+      let result = await fetchEmails(runId, 10, 1, status, access_token);
+
+      const allData = [...result.data];
+      let currentPage = result.pagination.page;
+      const totalPages = result.pagination.total_pages;
+
+      // Fetch remaining pages if needed
+      while (totalPages > currentPage) {
+        currentPage += 1;
+        result = await fetchEmails(runId, 10, currentPage, status, access_token);
+        allData.push(...result.data);
+      }
+
+      return allData;
+    } catch (error) {
+      console.error("Failed to fetch all emails:", error);
+      throw error;
+    }
+  }
 
   const handleRowSelectionChange = useCallback((newSelectedRows: Record<string, boolean>) => {
     setSelectedRows(newSelectedRows);
@@ -239,7 +354,8 @@ export default function Page({ params }: PageProps) {
   }, [fetchFiles, selectedStatus, page]);
 
   useEffect(() => {
-    setIsDisabled(true); // Prevent user from typing until all data is loaded
+    setIsDisabled(true);
+
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("access_token");
