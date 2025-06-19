@@ -2,7 +2,8 @@
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
-import { fetchRunDetails } from "@/lib/actions";
+import EmailTotalSummary from "@/app/ui/email-total-summary";
+import { fetchEmails, fetchRunDetails, storeAllEmails } from "@/lib/actions";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -113,7 +114,7 @@ export default function Page({ params }: PageProps) {
   const [emailDetailedData, setDetailedData] = useState<EmailDetailedDataType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [, setLimit] = useState(10);
   const [, setTotalItems] = useState(0);
   const [, setTotalPages] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -130,29 +131,38 @@ export default function Page({ params }: PageProps) {
   const [selectedEmailNum, setSelectedEmailNum] = useState(0);
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
 
-  const fetchApi = useCallback(
-    async (
-      apiType: "emails" | "runDetails",
-      limit: number | null,
-      status: string | null,
-      page: number
-    ) => {
+  const [runSummary, setRunSummary] = useState(() => {
+    return {
+      totalEmailNum: 0,
+      successEmailNum: 0,
+      failedEmailNum: 0,
+    };
+  });
+
+  const handleRowSelectionChange = useCallback((newSelectedRows: Record<string, boolean>) => {
+    setSelectedRows(newSelectedRows);
+    const selectedCount = Object.values(newSelectedRows).filter(Boolean).length;
+    setSelectedEmailNum(selectedCount);
+  }, []);
+
+  const fetchDetailedFiles = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No access token found");
+      }
+
+      const result = await fetchRunDetails(params.runId, token);
+      setDetailedData(result);
+    } catch (error: any) {
+      alert("Failed to fetch files: " + error.message);
+    }
+  }, [params.runId]);
+
+  const fetchFiles = useCallback(
+    async (limit: number, status: string | null, page: number) => {
+      setIsLoading(true);
       try {
-        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        let url: URL;
-
-        if (apiType === "emails") {
-          url = new URL(`${base_url}/runs/${params.runId}/emails`);
-          url.searchParams.append("page", page.toString());
-        } else {
-          url = new URL(`${base_url}/runs/${params.runId}`);
-        }
-
-        if (status) {
-          url.searchParams.append("status", status);
-        }
-
-
         const token = localStorage.getItem("access_token");
         if (!token) {
           throw new Error("No access token found");
@@ -175,59 +185,13 @@ export default function Page({ params }: PageProps) {
     [params.runId]
   );
 
-  const fetchDetailedFiles = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("No access token found");
-      }
-
-      const result = await fetchRunDetails(params.runId, token);
-      setDetailedData(result);
-    } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
-    }
-  }, [params.runId]);
-
-  const fetchFiles = useCallback(
-    async (limit: number, status: string | null, page: number | 1) => {
-      try {
-        const result = await fetchApi("emails", limit, status, page);
-        setIsLoading(false);
-        setData(result.data);
-        setPage(result.pagination.page);
-        setLimit(result.pagination.limit);
-        setTotalItems(result.pagination.total_items);
-        setTotalPages(result.pagination.total_pages);
-        setHasNextPage(result.pagination.has_next_page);
-        setHasPreviousPage(result.pagination.has_previous_page);
-      } catch (error: any) {
-        alert("Failed to fetch files: " + error.message);
-      }
-    },
-    [fetchApi]
-  );
-
   const fetchRunSummary = useCallback(async () => {
     setIsCalculatingRunSummary(true);
 
     try {
-      let result = await fetchApi("emails", 1000, selectedStatus, 1);
-
-      // only process the latest request
-      if (currentRequestId !== requestIdRef.current) return;
-
-      const allData = result.data;
-      let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
-
-      while (allDataNextLastEvaluatedKey) {
-        result = await fetchApi("emails", 1000, selectedStatus, allDataNextLastEvaluatedKey);
-
-        // only process the latest request
-        if (currentRequestId !== requestIdRef.current) return;
-
-        allData.push(...result.data);
-        allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No access token found");
       }
 
       const result = await fetchRunDetails(params.runId, token);
@@ -247,7 +211,7 @@ export default function Page({ params }: PageProps) {
     if (searchTerm) {
       setSliceIndex([sliceIndex[0] + 10, sliceIndex[1] + 10]);
     } else if (hasNextPage) {
-      fetchFiles(limit, selectedStatus, page + 1);
+      setPage(prevPage => prevPage + 1);
     }
   };
 
@@ -256,14 +220,17 @@ export default function Page({ params }: PageProps) {
     if (searchTerm) {
       setSliceIndex([Math.max(sliceIndex[0] - 10, 0), Math.max(sliceIndex[1] - 10, 10)]);
     } else if (hasPreviousPage) {
-      fetchFiles(limit, selectedStatus, page - 1);
+      setPage(prevPage => prevPage - 1);
     }
   };
 
-  // Fetch the detailed data when component mounts
-  useEffect(() => {
-    fetchDetailedFiles();
-  }, [fetchDetailedFiles]);
+  const isNextDisabled = () => {
+    return searchTerm ? sliceIndex[1] >= filteredData.length : !hasNextPage;
+  };
+
+  const isPreviousDisabled = () => {
+    return searchTerm ? sliceIndex[0] <= 0 : !hasPreviousPage;
+  };
 
   // Fetch the files when the component mounts or when selectedStatus changes
   useEffect(() => {
@@ -315,7 +282,7 @@ export default function Page({ params }: PageProps) {
 
   // Fetch the detailed data when component mounts
   useEffect(() => {
-    fetchDetailedFiles(1);
+    fetchDetailedFiles();
   }, [fetchDetailedFiles]);
 
   // Fetch the run summary when component mounts
@@ -356,7 +323,16 @@ export default function Page({ params }: PageProps) {
       <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
         <div className="flex justify-between py-6 px-4">
           {/* Selected recipients */}
-          <div className="flex-grow">{/* EmailTotalSummary in SCRUM-270 */}</div>
+          <div className="flex-grow">
+            <EmailTotalSummary
+              selectedEmailNum={selectedEmailNum}
+              runSummary={{
+                totalEmailNum: runSummary.totalEmailNum,
+                successEmailNum: runSummary.successEmailNum,
+                failedEmailNum: runSummary.failedEmailNum,
+              }}
+            />
+          </div>
           {/* Search input */}
           <div
             className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
@@ -396,24 +372,24 @@ export default function Page({ params }: PageProps) {
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
             <button
               className={`flex items-center gap-1 ${
-                !hasPreviousPage
+                isPreviousDisabled()
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={handlePrevious}
-              disabled={!hasPreviousPage}
+              disabled={isPreviousDisabled()}
             >
               <ChevronLeft size={20} />
               Previous
             </button>
             <button
               className={`flex items-center gap-1 ${
-                !hasNextPage
+                isNextDisabled()
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={handleNext}
-              disabled={!hasNextPage}
+              disabled={isNextDisabled()}
             >
               Next
               <ChevronRight size={20} />
