@@ -1,11 +1,7 @@
 interface AttachmentFilesType {
   file_url: string;
-<<<<<<< HEAD
   uploaded_id?: string;
   uploader_id?: string;
-=======
-  uploaded_id: string;
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
   updated_at: string;
   file_name: string;
   file_id: string;
@@ -17,12 +13,8 @@ interface AttachmentFilesType {
 
 interface SpreadsheetFileType {
   file_url: string;
-<<<<<<< HEAD
   uploaded_id?: string;
   uploader_id?: string;
-=======
-  uploaded_id: string;
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
   updated_at: string;
   file_name: string;
   file_id: string;
@@ -34,12 +26,8 @@ interface SpreadsheetFileType {
 
 interface TemplateFileType {
   file_url: string;
-<<<<<<< HEAD
   uploaded_id?: string;
   uploader_id?: string;
-=======
-  uploaded_id: string;
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
   updated_at: string;
   file_name: string;
   file_id: string;
@@ -65,13 +53,8 @@ interface DataType {
   created_at: string;
   sender_local_part: string;
   spreadsheet_file_id: string | null;
-<<<<<<< HEAD
   created_year_month?: string;
   recipients?: Array<{ email: string; template_variables: Record<string, any> }>;
-=======
-  created_year_month: string;
-  recipients: Array<{ email: string; template_variables: Record<string, any> }>;
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
   attachment_file_ids: string[];
   is_generated_certificate: boolean;
   spreadsheet_file: SpreadsheetFileType | null;
@@ -81,18 +64,11 @@ interface DataType {
   template_file_id: string;
   success_email_count: number;
   expected_email_send_count: number;
-<<<<<<< HEAD
   failed_email_count?: number;
   reply_to: string;
   template_file: TemplateFileType;
   created_year_month_day?: string;
   created_year?: string;
-=======
-  reply_to: string;
-  template_file: TemplateFileType;
-  created_year_month_day: string;
-  created_year: string;
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
 }
 
 interface EmailDetailsDropdownProps {
@@ -115,42 +91,22 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
     },
     {
       label: "To:",
-<<<<<<< HEAD
       value: "Recipients from sheet file",
     },
     {
       label: "TemplateFile:",
       value: emailData.template_file?.file_name
         ? `${emailData.template_file.file_name} (${emailData.template_file.file_size})`
-=======
-      value:
-        emailData.recipient_source === "DIRECT"
-          ? "Direct recipients"
-          : "Recipients from sheet file",
-    },
-    {
-      label: "TemplateFile:",
-      value: emailData.template_file.file_name
-        ? emailData.template_file.file_name
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
         : "No template file",
     },
     {
       label: "SheetFile:",
       value: emailData.spreadsheet_file
-<<<<<<< HEAD
         ? `${emailData.spreadsheet_file.file_name} (${emailData.spreadsheet_file.file_size})`
         : "No sheet file",
     },
     { label: "LocalPart:", value: emailData.sender_local_part },
     { label: "Reply To:", value: emailData.reply_to },
-=======
-        ? `${emailData.spreadsheet_file.file_name}`
-        : "No sheet file",
-    },
-    { label: "LocalPart:", value: emailData.sender_local_part },
-    { label: "ReplyTo:", value: emailData.reply_to },
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
     {
       label: "BCC:",
       value: emailData.bcc && emailData.bcc.length ? emailData.bcc.join(", ") : "No BCC recipients",
@@ -160,7 +116,6 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
       value: emailData.cc && emailData.cc.length ? emailData.cc.join(", ") : "No CC recipients",
     },
     {
-<<<<<<< HEAD
       label: "Attachments:",
       value:
         emailData.attachment_files && emailData.attachment_files.length > 0
@@ -170,15 +125,6 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
     {
       label: "ProvideCertificate:",
       value: emailData.is_generated_certificate ? "Yes" : "No",
-=======
-      label: "AttachFiles:",
-      value:
-        emailData.attachment_file_ids && emailData.attachment_file_ids.length === 1
-          ? `${emailData.attachment_files[0].file_name}`
-          : emailData.attachment_file_ids && emailData.attachment_file_ids.length > 1
-            ? `${emailData.attachment_file_ids.length} AttachFiles`
-            : "No files attached",
->>>>>>> df7b3e0d3758d2ac29326e993ef4b79fec6a661c
     },
   ];
 
