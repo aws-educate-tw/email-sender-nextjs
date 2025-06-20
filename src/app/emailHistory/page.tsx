@@ -117,7 +117,6 @@ export default function Page() {
       } catch (error: any) {
         if (retryCount < maxRetries) {
           retryCount++;
-          console.log(`Attempt ${retryCount} failed. Retrying in 15 seconds...`);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           return attemptFetch();
         } else {
