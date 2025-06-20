@@ -85,37 +85,58 @@ export default function Page() {
   }, []);
 
   const fetchFiles = async (limit: number, lastEvaluatedKey: string | null) => {
+    let retryCount = 0;
+    const maxRetries = 5;
+    const retryDelay = 15000; // 15 seconds in milliseconds
+
+    const attemptFetch = async (): Promise<any> => {
+      try {
+        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+        const url = new URL(`${base_url}/runs`);
+
+        url.searchParams.append("limit", limit.toString());
+        if (lastEvaluatedKey) {
+          url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
+        }
+
+        const token = localStorage.getItem("access_token");
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
+          throw new Error(errorMessage);
+        }
+
+        return await response.json();
+      } catch (error: any) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Attempt ${retryCount} failed. Retrying in 15 seconds...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          return attemptFetch();
+        } else {
+          throw new Error(`Failed after ${maxRetries} attempts: ${error.message}`);
+        }
+      }
+    };
+
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/runs`);
-
-      url.searchParams.append("limit", limit.toString());
-      if (lastEvaluatedKey) {
-        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-      }
-
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(url.toString(), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
+      setIsLoading(true);
+      const result = await attemptFetch();
       setIsLoading(false);
       setData(result.data);
       setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
       setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
       setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
+      setIsLoading(false);
+      console.error("Please contact TPET Team member: ", error.message);
     }
   };
 
