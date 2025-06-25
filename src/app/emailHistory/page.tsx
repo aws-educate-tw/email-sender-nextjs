@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "../ui/email-history-card";
+import RotatingLoaderAnimation from "../ui/rotating-loader-animation";
 
 interface AttachmentFilesType {
   file_url: string;
@@ -79,6 +80,9 @@ export default function Page() {
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState<boolean>(false);
+  const [retryCount, setRetryCount] = useState<number>(0);
+  const [retryError, setRetryError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFiles(10, null);
@@ -88,6 +92,9 @@ export default function Page() {
     let retryCount = 0;
     const maxRetries = 5;
     const retryDelay = 15000; // 15 seconds in milliseconds
+
+    setRetryCount(0);
+    setRetryError(null);
 
     const attemptFetch = async (): Promise<any> => {
       try {
@@ -117,9 +124,13 @@ export default function Page() {
       } catch (error: any) {
         if (retryCount < maxRetries) {
           retryCount++;
+          setRetryCount(retryCount);
+          setIsRetrying(true);
+
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           return attemptFetch();
         } else {
+          setIsRetrying(false);
           throw new Error(`Failed after ${maxRetries} attempts: ${error.message}`);
         }
       }
@@ -129,13 +140,18 @@ export default function Page() {
       setIsLoading(true);
       const result = await attemptFetch();
       setIsLoading(false);
+      setIsRetrying(false);
       setData(result.data);
       setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
       setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
       setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       setIsLoading(false);
-      console.error("Please contact TPET Team member: ", error.message);
+      setIsRetrying(false);
+      setRetryError(error.message);
+      alert(
+        `Failed to load data: ${error.message}\n\nPlease try again or contact TPET Team member if the problem persists.`
+      );
     }
   };
 
@@ -152,7 +168,33 @@ export default function Page() {
       </div>
       <div>
         <div className="w-full p-3 flex flex-col gap-3 bg-neutral-100 shadow-md rounded-md">
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center p-4">
+              <RotatingLoaderAnimation
+                size={32}
+                color="#4b5563"
+                text="Loading email history..."
+                className="my-4"
+              />
+            </div>
+          )}
+
           {isLoading ? <EmailHistoryCardLoading /> : <EmailHistoryCard data={data} />}
+
+          {isRetrying && (
+            <div className="flex flex-col items-center justify-center p-4">
+              <RotatingLoaderAnimation
+                size={32}
+                color="#1a56db"
+                text={`Retrying... Attempt ${retryCount} of 5`}
+                className="my-4"
+              />
+              <p className="text-sm text-gray-500">
+                Connection issues detected. Automatically retrying...
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
               className={`flex items-center gap-1 ${
