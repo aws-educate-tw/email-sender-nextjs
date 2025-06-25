@@ -80,8 +80,6 @@ export default function Page() {
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
-  const [isRetrying, setIsRetrying] = useState<boolean>(false);
-  const [retryCount, setRetryCount] = useState<number>(0);
 
   useEffect(() => {
     fetchFiles(10, null);
@@ -91,8 +89,6 @@ export default function Page() {
     let retryCount = 0;
     const maxRetries = 5;
     const retryDelay = 15000; // 15 seconds in milliseconds
-
-    setRetryCount(0);
 
     const attemptFetch = async (): Promise<any> => {
       try {
@@ -122,13 +118,10 @@ export default function Page() {
       } catch (error: any) {
         if (retryCount < maxRetries) {
           retryCount++;
-          setRetryCount(retryCount);
-          setIsRetrying(true);
 
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           return attemptFetch();
         } else {
-          setIsRetrying(false);
           throw new Error(`Failed after ${maxRetries} attempts: ${error.message}`);
         }
       }
@@ -138,14 +131,12 @@ export default function Page() {
       setIsLoading(true);
       const result = await attemptFetch();
       setIsLoading(false);
-      setIsRetrying(false);
       setData(result.data);
       setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
       setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
       setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       setIsLoading(false);
-      setIsRetrying(false);
       alert(
         `Failed to load data: ${error.message}\n\nPlease try again or contact TPET Team member if the problem persists.`
       );
