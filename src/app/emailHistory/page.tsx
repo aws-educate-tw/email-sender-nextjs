@@ -82,7 +82,6 @@ export default function Page() {
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState<boolean>(false);
   const [retryCount, setRetryCount] = useState<number>(0);
-  const [retryError, setRetryError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFiles(10, null);
@@ -94,7 +93,6 @@ export default function Page() {
     const retryDelay = 15000; // 15 seconds in milliseconds
 
     setRetryCount(0);
-    setRetryError(null);
 
     const attemptFetch = async (): Promise<any> => {
       try {
@@ -148,7 +146,6 @@ export default function Page() {
     } catch (error: any) {
       setIsLoading(false);
       setIsRetrying(false);
-      setRetryError(error.message);
       alert(
         `Failed to load data: ${error.message}\n\nPlease try again or contact TPET Team member if the problem persists.`
       );
