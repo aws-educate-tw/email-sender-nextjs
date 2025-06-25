@@ -178,20 +178,6 @@ export default function Page() {
 
           {isLoading ? <EmailHistoryCardLoading /> : <EmailHistoryCard data={data} />}
 
-          {isRetrying && (
-            <div className="flex flex-col items-center justify-center p-4">
-              <RotatingLoaderAnimation
-                size={32}
-                color="#1a56db"
-                text={`Retrying... Attempt ${retryCount} of 5`}
-                className="my-4"
-              />
-              <p className="text-sm text-gray-500">
-                Connection issues detected. Automatically retrying...
-              </p>
-            </div>
-          )}
-
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
               className={`flex items-center gap-1 ${
