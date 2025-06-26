@@ -27,10 +27,14 @@ export default function EmailServiceChooseTemplate() {
 
   // Render the appropriate component based on the current step
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container">
       {currentStep === "choose" && (
         <EmailServiceChooseTemplateChoose
-          onNext={(templateType) => handleChooseTemplateNext(templateType)} 
+          onNext={() => {
+            // Since EmailServiceChooseTemplateChoose expects onNext to take no arguments,
+            // we'll call handleChooseTemplateNext with a default value
+            handleChooseTemplateNext("new");
+          }}
         />
       )}
 
