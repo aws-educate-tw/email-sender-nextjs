@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import EmailServiceBreadcrumb from "@/app/ui/email-service-breadcrumb";
-import { EmailServiceChooseTemplate } from "@/app/ui/email-service-choose-template";
+import EmailServiceChooseTemplate from "@/app/ui/email-service-choose-template";
 import { EmailServiceRecipients } from "@/app/ui/email-service-recipients";
 import { EmailServiceSetting } from "@/app/ui/email-service-setting";
 import { EmailServiceReview } from "@/app/ui/email-service-review";
