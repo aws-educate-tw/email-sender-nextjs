@@ -16,7 +16,7 @@ export const EmailServiceChooseTemplateChoose: React.FC<TemplateProps> = ({ onNe
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
         <div
           className={`bg-white p-8 rounded-lg flex flex-col items-center cursor-pointer transition-all ${
             selectedTemplate === "new"

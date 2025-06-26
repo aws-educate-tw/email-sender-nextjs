@@ -26,7 +26,7 @@ export default function EmailServiceBreadcrumb({
   };
 
   return (
-    <div className="w-full bg-white rounded-xl p-4 mb-8">
+    <div className="w-full bg-white rounded-xl p-4">
       <nav className="flex justify-between" aria-label="Process steps">
         <div className="flex items-center w-full space-x-2 md:space-x-4">
           <button
