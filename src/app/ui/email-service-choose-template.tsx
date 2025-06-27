@@ -1,11 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { EmailServiceChooseTemplateChoose } from "./email-service-choose-template-choose";
 import EmailServiceChooseTemplateCreateNew from "./email-service-choose-template-create-new";
+import { EmailServiceChooseTemplateHistoryTemplate } from "./email-service-choose-template-history-template";
 
-export default function EmailServiceChooseTemplate() {
+interface EmailServiceChooseTemplateProps {
+  onNext: () => void;
+  initialStep?: "choose" | "create-new" | "use-history";
+}
+
+export default function EmailServiceChooseTemplate({
+  onNext,
+  initialStep = "choose",
+}: EmailServiceChooseTemplateProps) {
+  // Important: Remove the useState initialization with initialStep and set it directly in the useEffect
   const [currentStep, setCurrentStep] = useState<"choose" | "create-new" | "use-history">("choose");
+
+  // This effect will run both on mount and when initialStep changes
+  useEffect(() => {
+    console.log("EmailServiceChooseTemplate: initialStep changed to", initialStep);
+    setCurrentStep(initialStep);
+  }, [initialStep]);
 
   const handleChooseTemplateNext = (templateType: "new" | "history") => {
     if (templateType === "new") {
@@ -19,21 +35,26 @@ export default function EmailServiceChooseTemplate() {
     setCurrentStep("choose");
   };
 
-  const handleCreateNewNext = () => {
-    // Navigate to the next step after template creation
-    console.log("Template created, move to next step");
-    // setCurrentStep("next-step");
+  const handleHistoryTemplateBack = () => {
+    setCurrentStep("choose");
   };
+
+  const handleCreateNewNext = () => {
+    // Move to the next main step (recipients)
+    onNext();
+  };
+
+  console.log("EmailServiceChooseTemplate: rendering with currentStep", currentStep);
 
   // Render the appropriate component based on the current step
   return (
     <div className="container">
       {currentStep === "choose" && (
         <EmailServiceChooseTemplateChoose
-          onNext={() => {
-            // Since EmailServiceChooseTemplateChoose expects onNext to take no arguments,
-            // we'll call handleChooseTemplateNext with a default value
-            handleChooseTemplateNext("new");
+          onNext={selectedTemplate => {
+            console.log("EmailServiceChooseTemplateChoose: selected", selectedTemplate);
+            // Pass the selected template type to the handler
+            handleChooseTemplateNext(selectedTemplate);
           }}
         />
       )}
@@ -45,7 +66,14 @@ export default function EmailServiceChooseTemplate() {
         />
       )}
 
-      {/* Add other steps here as needed */}
+      {currentStep === "use-history" && (
+        <EmailServiceChooseTemplateHistoryTemplate
+          onNext={() => {
+            onNext(); // Call parent's onNext to move to next main step
+          }}
+          onBack={handleHistoryTemplateBack}
+        />
+      )}
     </div>
   );
 }

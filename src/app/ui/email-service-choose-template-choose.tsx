@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FileText, Clock } from "lucide-react";
 
 interface TemplateProps {
-  onNext: () => void;
+  onNext: (templateType: "new" | "history") => void;
 }
 
 export const EmailServiceChooseTemplateChoose: React.FC<TemplateProps> = ({ onNext }) => {
@@ -10,7 +10,7 @@ export const EmailServiceChooseTemplateChoose: React.FC<TemplateProps> = ({ onNe
 
   const handleNext = () => {
     if (selectedTemplate) {
-      onNext();
+      onNext(selectedTemplate);
     }
   };
 

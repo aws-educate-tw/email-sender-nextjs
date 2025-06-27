@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import EmailServiceBreadcrumb from "@/app/ui/email-service-breadcrumb";
@@ -14,16 +14,37 @@ export default function Page() {
   const breadcrumbItems = [{ label: "Email Service", href: "/emailService", active: true }];
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<Step>("template");
-  const [templateChoice, setTemplateChoice] = useState<"new" | "history" | null>(null);
+  const [templateSubStep, setTemplateSubStep] = useState<"choose" | "create-new" | "use-history">(
+    "choose"
+  );
 
-  const handleStepChange = (step: Step) => {
+  // Add a key to force re-mount of the component when breadcrumb is clicked
+  const [templateKey, setTemplateKey] = useState<number>(0);
+
+  const handleStepChange = useCallback((step: Step) => {
+    console.log("Breadcrumb clicked:", step);
     setCurrentStep(step);
-  };
+
+    // Reset template sub-step when navigating to template step via breadcrumb
+    if (step === "template") {
+      console.log("Resetting templateSubStep to choose");
+      setTemplateSubStep("choose");
+      // Increment key to force re-mount
+      setTemplateKey(prev => prev + 1);
+    }
+  }, []);
 
   const renderStepContent = () => {
     switch (currentStep) {
       case "template":
-        return <EmailServiceChooseTemplate onNext={() => setCurrentStep("recipients")} />;
+        console.log("Rendering template step with substep:", templateSubStep, "key:", templateKey);
+        return (
+          <EmailServiceChooseTemplate
+            onNext={() => setCurrentStep("recipients")}
+            initialStep={templateSubStep}
+            key={`template-${templateKey}`} // Use templateKey to force re-mount
+          />
+        );
       case "recipients":
         return <EmailServiceRecipients onNext={() => setCurrentStep("setting")} />;
       case "setting":
