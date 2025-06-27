@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowRight, Plus, Upload, Pencil, Trash2, X } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -162,31 +162,10 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     setRecipients(importedRecipients);
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isEditingTitle &&
-        titleInputRef.current &&
-        !titleInputRef.current.contains(event.target as Node) &&
-        editButtonRef.current &&
-        !editButtonRef.current.contains(event.target as Node)
-      ) {
-        saveTitle();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isEditingTitle, editingTitle]);
-
-  // Focus input when editing starts
-  useEffect(() => {
-    if (isEditingTitle && titleInputRef.current) {
-      titleInputRef.current.focus();
-    }
-  }, [isEditingTitle]);
+  const saveTitle = useCallback(() => {
+    setSheetTitle(editingTitle);
+    setIsEditingTitle(false);
+  }, [editingTitle]);
 
   const toggleEditTitle = () => {
     if (!isEditingTitle) {
@@ -195,11 +174,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     } else {
       saveTitle();
     }
-  };
-
-  const saveTitle = () => {
-    setSheetTitle(editingTitle);
-    setIsEditingTitle(false);
   };
 
   const addRecipient = () => {
@@ -253,6 +227,32 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
       closeAddColumnModal();
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isEditingTitle &&
+        titleInputRef.current &&
+        !titleInputRef.current.contains(event.target as Node) &&
+        editButtonRef.current &&
+        !editButtonRef.current.contains(event.target as Node)
+      ) {
+        saveTitle();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isEditingTitle, editingTitle, saveTitle]);
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
+  }, [isEditingTitle]);
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
