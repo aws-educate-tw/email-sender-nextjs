@@ -272,6 +272,7 @@ export async function fetchHistoryTemplates(
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/files`);
 
+    url.searchParams.append("extension", "html");
     url.searchParams.append("limit", limit.toString());
     if (lastEvaluatedKey) {
       url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
