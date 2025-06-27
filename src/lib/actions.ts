@@ -262,3 +262,51 @@ export async function submitWebhookForm(data: string, access_token: string) {
 //     return false;
 //   }
 // };
+
+export async function fetchHistoryTemplates(
+  token: string,
+  limit: number = 10,
+  lastEvaluatedKey: string | null = null
+) {
+  try {
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const url = new URL(`${base_url}/files`);
+
+    url.searchParams.append("limit", limit.toString());
+    if (lastEvaluatedKey) {
+      url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
+    }
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
+      throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
+    return {
+      status: "success",
+      message: "Templates fetched successfully",
+      templates: result.data || [],
+      previousLastEvaluatedKey: result.previous_last_evaluated_key,
+      currentLastEvaluatedKey: result.current_last_evaluated_key,
+      nextLastEvaluatedKey: result.next_last_evaluated_key,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message: error.message || "Failed to fetch templates",
+      templates: [],
+      previousLastEvaluatedKey: null,
+      currentLastEvaluatedKey: null,
+      nextLastEvaluatedKey: null,
+    };
+  }
+}
