@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ArrowRight, Plus, Upload, Pencil, Trash2, X } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface RecipientsProps {
   onNext: () => void;
@@ -9,7 +10,7 @@ interface Recipient {
   id: string;
   name: string;
   email: string;
-  [key: string]: string; // Add dynamic columns
+  [key: string]: string; // dynamic columns
 }
 
 interface Column {
@@ -28,12 +29,139 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
   const [customColumns, setCustomColumns] = useState<Column[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState("");
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const editButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle click outside to save title
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImportError("");
+
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+
+    const file = e.target.files[0];
+
+    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+      setImportError("Please select a valid Excel file (.xlsx or .xls)");
+      return;
+    }
+
+    setIsImporting(true);
+
+    try {
+      const data = await readExcelFile(file);
+
+      processExcelData(data);
+      setSheetTitle(file.name.replace(/\.[^/.]+$/, ""));
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Error importing Excel file:", error);
+      setImportError("Failed to import Excel file. Please check the format and try again.");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const readExcelFile = (file: File): Promise<any[]> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        try {
+          if (!e.target?.result) {
+            reject("Failed to read file");
+            return;
+          }
+
+          const wb = XLSX.read(e.target.result, { type: "binary" });
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+
+          const data = XLSX.utils.sheet_to_json(ws);
+          resolve(data as any[]);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      reader.onerror = error => {
+        reject(error);
+      };
+
+      reader.readAsBinaryString(file);
+    });
+  };
+
+  const processExcelData = (data: any[]) => {
+    if (data.length === 0) {
+      setImportError("No data found in the Excel file");
+      return;
+    }
+
+    const firstRow = data[0];
+    const headers = Object.keys(firstRow);
+
+    if (!headers.includes("name") && !headers.includes("Name")) {
+      setImportError("Excel file must contain a 'name' or 'Name' column");
+      return;
+    }
+
+    if (!headers.includes("email") && !headers.includes("Email")) {
+      setImportError("Excel file must contain an 'email' or 'Email' column");
+      return;
+    }
+
+    const nameColumn = headers.includes("name") ? "name" : "Name";
+    const emailColumn = headers.includes("email") ? "email" : "Email";
+
+    const newCustomColumns: Column[] = [];
+    headers.forEach(header => {
+      const lowerHeader = header.toLowerCase();
+      if (lowerHeader !== "name" && lowerHeader !== "email") {
+        newCustomColumns.push({
+          id: Date.now() + Math.random().toString(36).substring(2),
+          name: header,
+          tempValue: "",
+        });
+      }
+    });
+
+    setCustomColumns(newCustomColumns);
+
+    const importedRecipients = data.map((row: any) => {
+      const recipient: Recipient = {
+        id: Date.now() + Math.random().toString(36).substring(2),
+        name: row[nameColumn] || "",
+        email: row[emailColumn] || "",
+      };
+
+      headers.forEach(header => {
+        const lowerHeader = header.toLowerCase();
+        if (lowerHeader !== "name" && lowerHeader !== "email") {
+          recipient[header] = row[header] !== undefined ? String(row[header]) : "";
+        }
+      });
+
+      return recipient;
+    });
+
+    setRecipients(importedRecipients);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -111,12 +239,11 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
       const newColumn: Column = {
         id: Date.now().toString(),
         name: newColumnName.trim(),
-        tempValue: "", // Initialize with empty value
+        tempValue: "",
       };
 
       setCustomColumns([...customColumns, newColumn]);
 
-      // Add the new column to existing recipients with empty values
       const updatedRecipients = recipients.map(recipient => ({
         ...recipient,
         [newColumnName]: "",
@@ -153,10 +280,48 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
             <Pencil className="w-5 h-5 text-gray-600" />
           </button>
         </div>
-        <button className="bg-white border border-gray-300 rounded px-4 py-2 flex items-center hover:bg-gray-100 transition-colors duration-200">
-          <Upload className="mr-2 w-4 h-4" /> Import Sheet
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          className="hidden"
+          onChange={handleFileSelect}
+        />
+        <button
+          className="bg-white border border-gray-300 rounded px-4 py-2 flex items-center hover:bg-gray-100 transition-colors duration-200"
+          onClick={triggerFileInput}
+          disabled={isImporting}
+        >
+          {isImporting ? (
+            <>
+              <div className="animate-spin mr-2 h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
+              Importing...
+            </>
+          ) : (
+            <>
+              <Upload className="mr-2 w-4 h-4" /> Import Sheet
+            </>
+          )}
         </button>
       </div>
+
+      {/* 顯示導入錯誤 */}
+      {importError && (
+        <div className="mx-6 mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
+          <p className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {importError}
+          </p>
+        </div>
+      )}
 
       <div className="px-6 pb-2">
         <div className="flex flex-wrap gap-2">
