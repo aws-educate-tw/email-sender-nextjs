@@ -25,9 +25,9 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-2">
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
       <div className="p-6 pb-4">
-        <h2 className="text-2xl font-bold mb-4">Enter your subject and display name</h2>
+        <h2 className="font-bold mb-4">Enter your subject and display name</h2>
 
         <div className="mt-6">
           <h3 className="text-xl font-bold mb-4">Required</h3>

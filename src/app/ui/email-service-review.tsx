@@ -1,5 +1,6 @@
 import React from "react";
 import { Send, Mail } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface ReviewProps {
   onSubmit: () => void;
@@ -7,7 +8,7 @@ interface ReviewProps {
 
 export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm mt-2 p-6">
+    <Card>
       <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
         <Mail className="w-6 h-6" /> Email Details
       </h2>
@@ -131,6 +132,6 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
           Send Email <Send className="ml-2 w-4 h-4" />
         </button>
       </div>
-    </div>
+    </Card>
   );
 };
