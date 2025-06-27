@@ -56,8 +56,8 @@ export default function Page() {
 
   return (
     <EmailProvider>
-      <div className="container pt-0">
-        <h1 className="text-2xl font-black mt-0 mb-6">Email Service</h1>
+      <div className="flex flex-col justify-center items-start">
+        <p className="text-4xl font-bold pt-2">Email Service</p>
         <EmailServiceBreadcrumb
           currentStep={currentStep}
           onStepClick={handleStepChange}
