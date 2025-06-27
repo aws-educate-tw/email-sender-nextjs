@@ -22,7 +22,6 @@ interface HistoryTemplateProps {
 
 export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplateProps> = ({
   onNext,
-  onBack,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
@@ -32,10 +31,10 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
   const [error, setError] = useState<string | null>(null);
 
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
+  const [, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
-  const { updateEmailData } = useEmailContext();
+  const { updateTemplate } = useEmailContext();
 
   useEffect(() => {
     if (templates.length > 0) {
@@ -82,16 +81,21 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
     fetchTemplates();
   }, []);
 
-  const handleSelectTemplate = (templateId: string) => {
-    setSelectedTemplate(templateId);
+  const handleSelectTemplate = (template: TemplateItem) => {
+    updateTemplate(template.file_id, template.file_name, undefined, template.file_url);
+    setSelectedTemplate(template.file_id);
   };
 
-  const handleUseTemplate = (template: TemplateItem) => {
-    updateEmailData({
-      templateFile: template.file_id,
-    });
-    setSelectedTemplate(template.file_id);
-    onNext();
+  const handlePrevious = () => {
+    if (previousLastEvaluatedKey) {
+      fetchTemplates(10, previousLastEvaluatedKey);
+    }
+  };
+
+  const handleNext = () => {
+    if (nextLastEvaluatedKey) {
+      fetchTemplates(10, nextLastEvaluatedKey);
+    }
   };
 
   return (
@@ -167,10 +171,9 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
                   {filteredTemplates.map(template => (
                     <tr
                       key={template.file_id}
-                      className={`border-t hover:bg-gray-50 cursor-pointer ${
-                        selectedTemplate === template.file_id ? "bg-blue-50" : ""
+                      className={`border-t hover:bg-gray-50 ${
+                        selectedTemplate === template.file_id ? "bg-blue-50/10" : ""
                       }`}
-                      onClick={() => handleSelectTemplate(template.file_id)}
                     >
                       <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
                         {template.file_name}
@@ -182,15 +185,18 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
                         {formatFileSize(template.file_size)}
                       </td>
                       <td className="py-2 px-4 border-b border-gray-200 text-right">
-                        <button
-                          className="px-4 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-                          onClick={e => {
-                            e.stopPropagation();
-                            handleUseTemplate(template);
-                          }}
-                        >
-                          Use
-                        </button>
+                        {selectedTemplate === template.file_id ? (
+                          <button className="px-4 py-1 bg-green-500 text-white font-medium rounded hover:bg-green-600">
+                            Selected
+                          </button>
+                        ) : (
+                          <button
+                            className="px-4 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
+                            onClick={() => handleSelectTemplate(template)}
+                          >
+                            Use
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -201,16 +207,12 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
             <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
               <button
                 className={`flex items-center gap-1 ${
-                  !currentLastEvaluatedKey
+                  !previousLastEvaluatedKey
                     ? "cursor-default text-gray-400"
                     : "hover:text-gray-600 hover:underline"
                 }`}
-                onClick={() => {
-                  if (previousLastEvaluatedKey) {
-                    fetchTemplates(10, previousLastEvaluatedKey);
-                  }
-                }}
-                disabled={!currentLastEvaluatedKey}
+                onClick={handlePrevious}
+                disabled={!previousLastEvaluatedKey}
               >
                 <ChevronLeft size={20} />
                 Previous
@@ -221,11 +223,7 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
                     ? "cursor-default text-gray-400"
                     : "hover:text-gray-600 hover:underline"
                 }`}
-                onClick={() => {
-                  if (nextLastEvaluatedKey) {
-                    fetchTemplates(10, nextLastEvaluatedKey);
-                  }
-                }}
+                onClick={handleNext}
                 disabled={!nextLastEvaluatedKey}
               >
                 Next
@@ -236,14 +234,6 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
         )}
 
         <div className="flex justify-between mt-6">
-          {onBack && (
-            <button
-              className="px-6 py-2 rounded text-gray-700 border border-gray-300 hover:bg-gray-100"
-              onClick={onBack}
-            >
-              Back
-            </button>
-          )}
           <div>
             <button
               className={`px-6 py-2 rounded text-white ${
