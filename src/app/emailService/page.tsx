@@ -1,18 +1,16 @@
 "use client";
-import React, { useState, useCallback, useEffect, useRef } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import React, { useState, useCallback } from "react";
 import EmailServiceBreadcrumb from "@/app/ui/email-service-breadcrumb";
 import EmailServiceChooseTemplate from "@/app/ui/email-service-choose-template";
 import { EmailServiceRecipients } from "@/app/ui/email-service-recipients";
 import { EmailServiceSetting } from "@/app/ui/email-service-setting";
 import { EmailServiceReview } from "@/app/ui/email-service-review";
+import { EmailProvider } from "@/app/context/EmailContext";
 
 type Step = "template" | "recipients" | "setting" | "review";
 
 export default function Page() {
   const breadcrumbItems = [{ label: "Email Service", href: "/emailService", active: true }];
-  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<Step>("template");
   const [templateSubStep, setTemplateSubStep] = useState<"choose" | "create-new" | "use-history">(
     "choose"
@@ -57,15 +55,17 @@ export default function Page() {
   };
 
   return (
-    <div className="container pt-0">
-      <h1 className="text-2xl font-black mt-0 mb-6">Email Service</h1>
-      <EmailServiceBreadcrumb
-        currentStep={currentStep}
-        onStepClick={handleStepChange}
-        items={breadcrumbItems}
-      />
+    <EmailProvider>
+      <div className="container pt-0">
+        <h1 className="text-2xl font-black mt-0 mb-6">Email Service</h1>
+        <EmailServiceBreadcrumb
+          currentStep={currentStep}
+          onStepClick={handleStepChange}
+          items={breadcrumbItems}
+        />
 
-      {renderStepContent()}
-    </div>
+        {renderStepContent()}
+      </div>
+    </EmailProvider>
   );
 }
