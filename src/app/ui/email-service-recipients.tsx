@@ -443,7 +443,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
         </button>
       </div>
 
-      {/* Add Column Modal */}
       {isAddingColumn && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div ref={modalRef} className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
@@ -458,7 +457,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
               <label className="block mb-2 font-medium">Column Name</label>
               <input
                 type="text"
-                className="w-full p-3 border-2 border-gray-300 rounded-md focus:border-gray-500 focus:outline-none"
+                className="w-full p-3 border-2 border-gray-300 rounded-md focus:border-gray-700 focus:outline-none focus:ring-0"
                 placeholder="Enter column name"
                 value={newColumnName}
                 onChange={e => setNewColumnName(e.target.value)}
