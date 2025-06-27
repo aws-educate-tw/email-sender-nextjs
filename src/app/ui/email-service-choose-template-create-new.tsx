@@ -96,8 +96,21 @@ const templatePresets: TemplatePreset[] = [
   },
 ];
 
-const ToolbarButton = ({ icon, onClick }: { icon: React.ReactNode; onClick: () => void }) => (
-  <button className="p-2 mx-1 rounded hover:bg-gray-100 transition-colors" onClick={onClick}>
+const ToolbarButton = ({
+  icon,
+  onClick,
+  label,
+}: {
+  icon: React.ReactNode;
+  onClick: () => void;
+  label: string;
+}) => (
+  <button
+    className="p-2 mx-1 rounded hover:bg-gray-100 transition-colors"
+    onClick={onClick}
+    title={label}
+    aria-label={label}
+  >
     {icon}
   </button>
 );
@@ -115,7 +128,7 @@ export default function EmailServiceChooseTemplateCreateNew({
     if (!emailContent) {
       setEmailContent(DEFAULT_TEMPLATE_CONTENT);
     }
-  }, []);
+  }, [emailContent]);
 
   const handleFormatAction = (action: string) => {
     console.log(`Format action: ${action}`);
@@ -160,51 +173,77 @@ export default function EmailServiceChooseTemplateCreateNew({
             />
 
             <div className="flex flex-wrap items-center rounded-md p-1 bg-gray-50 mb-4">
-              {" "}
-              <ToolbarButton icon={<Link size={18} />} onClick={() => handleFormatAction("link")} />
-              <ToolbarButton icon={<Bold size={18} />} onClick={() => handleFormatAction("bold")} />
+              <ToolbarButton
+                icon={<Link size={18} />}
+                onClick={() => handleFormatAction("link")}
+                label="Insert link"
+              />
+              <ToolbarButton
+                icon={<Bold size={18} />}
+                onClick={() => handleFormatAction("bold")}
+                label="Bold text"
+              />
               <ToolbarButton
                 icon={<Italic size={18} />}
                 onClick={() => handleFormatAction("italic")}
+                label="Italic text"
               />
               <ToolbarButton
                 icon={<Underline size={18} />}
                 onClick={() => handleFormatAction("underline")}
+                label="Underline text"
               />
               <ToolbarButton
                 icon={<Strikethrough size={18} />}
                 onClick={() => handleFormatAction("strikethrough")}
+                label="Strikethrough text"
               />
               <ToolbarButton
                 icon={<Heading1 size={18} />}
                 onClick={() => handleFormatAction("h1")}
+                label="Heading 1"
               />
               <ToolbarButton
                 icon={<Heading2 size={18} />}
                 onClick={() => handleFormatAction("h2")}
+                label="Heading 2"
               />
               <ToolbarButton
                 icon={<Heading3 size={18} />}
                 onClick={() => handleFormatAction("h3")}
+                label="Heading 3"
               />
               <ToolbarButton
                 icon={<List size={18} />}
                 onClick={() => handleFormatAction("bulletList")}
+                label="Bullet list"
               />
               <ToolbarButton
                 icon={<ListOrdered size={18} />}
                 onClick={() => handleFormatAction("numberedList")}
+                label="Numbered list"
               />
               <ToolbarButton
                 icon={<Quote size={18} />}
                 onClick={() => handleFormatAction("quote")}
+                label="Quote"
               />
               <ToolbarButton
-                icon={<Image size={18} />}
+                // eslint-disable-next-line jsx-a11y/alt-text
+                icon={<Image size={18} aria-hidden="true" />}
                 onClick={() => handleFormatAction("image")}
+                label="Insert image"
               />
-              <ToolbarButton icon={<Undo size={18} />} onClick={() => handleFormatAction("undo")} />
-              <ToolbarButton icon={<Redo size={18} />} onClick={() => handleFormatAction("redo")} />
+              <ToolbarButton
+                icon={<Undo size={18} />}
+                onClick={() => handleFormatAction("undo")}
+                label="Undo"
+              />
+              <ToolbarButton
+                icon={<Redo size={18} />}
+                onClick={() => handleFormatAction("redo")}
+                label="Redo"
+              />
             </div>
 
             <textarea
