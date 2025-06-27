@@ -56,7 +56,7 @@ export default function Page() {
 
   return (
     <EmailProvider>
-      <div className="flex flex-col justify-center items-start">
+      <div className="container pt-0 ">
         <p className="text-4xl font-bold pt-2">Email Service</p>
         <EmailServiceBreadcrumb
           currentStep={currentStep}
