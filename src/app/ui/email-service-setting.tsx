@@ -83,28 +83,15 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
                 Select your template file <Info size={16} className="ml-1 text-gray-400" />
               </label>
               <div className="flex gap-2">
-                <div className="relative flex-grow">
-                  <select
-                    className="w-full p-3 border border-gray-300 rounded appearance-none bg-white pr-8 focus:outline-none focus:ring-gray-400 focus:border-gray-400"
-                    value={emailData.templateFile || ""}
-                    onChange={e => updateEmailData({ templateFile: e.target.value })}
-                  >
-                    <option value="" disabled>
-                      Select a html file
-                    </option>
-                    <option value="template1.html">template1.html</option>
-                    <option value="template2.html">template2.html</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 20 20">
-                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                    </svg>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-white border border-gray-300 rounded">
+                <SelectDropdown
+                  onSelect={fileId => updateEmailData({ templateFile: fileId })}
+                  fileExtension="html"
+                  error=""
+                />
+                <button className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50">
                   preview
                 </button>
-                <button className="px-4 py-2 bg-white border border-gray-300 rounded">
+                <button className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50">
                   upload
                 </button>
               </div>
@@ -201,6 +188,16 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
                 Attach files <Info size={16} className="ml-1 text-gray-400" />
               </label>
               <div className="flex gap-2">
+                <SelectDropdown
+                  onSelect={fileId => updateEmailData({ templateFile: fileId })}
+                  fileExtension="html"
+                  error=""
+                />
+                <button className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                  upload
+                </button>
+              </div>
+              {/* <div className="flex gap-2">
                 <div className="relative flex-grow">
                   <select className="w-full p-3 border border-gray-300 rounded appearance-none bg-white pr-8 focus:outline-none focus:ring-gray-400 focus:border-gray-400">
                     <option>Attach your files</option>
@@ -214,7 +211,7 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
                 <button className="px-4 py-2 bg-white border border-gray-300 rounded">
                   upload
                 </button>
-              </div>
+              </div> */}
             </div>
 
             <div>
