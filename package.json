@@ -44,6 +44,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "tiptap-extension-resize-image": "^1.1.7",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.4"
   },
   "devDependencies": {
