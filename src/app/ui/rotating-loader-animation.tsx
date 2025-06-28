@@ -1,32 +1,10 @@
-import { CSSProperties } from "react";
+import React from "react";
 
-interface RotatingLoaderProps {
-  size?: number;
-  color?: string;
-  thickness?: number;
-  text?: string;
-  className?: string;
-}
-
-export default function RotatingLoaderAnimation({
-  size = 24,
-  color = "#1a56db",
-  thickness = 3,
-  text,
-  className = "",
-}: RotatingLoaderProps) {
-  const spinnerStyle: CSSProperties = {
-    width: `${size}px`,
-    height: `${size}px`,
-    borderWidth: `${thickness}px`,
-    borderColor: `rgba(156, 163, 175, 0.2)`,
-    borderTopColor: color,
-  };
-
+export default function RotatingLoaderAnimation() {
   return (
-    <div className={`flex flex-col items-center justify-center ${className}`}>
-      <div className="animate-spin rounded-full border-solid" style={spinnerStyle} />
-      {text && <p className="mt-2 text-sm text-gray-600">{text}</p>}
+    <div className="flex flex-col items-center justify-center my-4">
+      <div className="w-8 h-8 border-4 border-gray-200 border-t-gray-600 animate-spin rounded-full" />
+      <p className="mt-2 text-sm text-gray-600">Loading email history...</p>
     </div>
   );
 }

@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import EmailHistoryCard from "../ui/email-history-card";
-import RotatingLoaderAnimation from "../ui/rotating-loader-animation";
+import EmailHistoryCard from "@/app/ui/email-history-card";
+import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
 
 interface AttachmentFilesType {
   file_url: string;
@@ -158,12 +158,7 @@ export default function Page() {
         <div className="w-full p-3 flex flex-col gap-3 bg-neutral-100 shadow-md rounded-md">
           {isLoading && (
             <div className="flex flex-col items-center justify-center p-4">
-              <RotatingLoaderAnimation
-                size={32}
-                color="#4b5563"
-                text="Loading email history..."
-                className="my-4"
-              />
+              <RotatingLoaderAnimation />
             </div>
           )}
 
