@@ -3,7 +3,7 @@ import React, { useRef, useState, FormEvent } from "react";
 import { submitForm } from "@/lib/actions";
 import HelpTip from "@/app/ui/help-tip";
 import SelectDropdown from "@/app/ui/select-dropdown";
-import AttachDropdown from "./attach-dropdown";
+import AttachDropdown from "@/app/ui/attach-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";

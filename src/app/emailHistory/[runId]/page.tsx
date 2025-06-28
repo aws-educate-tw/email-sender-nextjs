@@ -2,9 +2,9 @@
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
-import { fetchRunDetails } from "@/lib/actions";
+import EmailTotalSummary from "@/app/ui/email-total-summary";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface PageProps {
   params: {
@@ -108,12 +108,24 @@ interface EmailDetailedDataType {
   created_year: string;
 }
 
+interface EmailsResponse {
+  data: any[];
+  pagination: {
+    page: number;
+    limit: number;
+    total_items: number;
+    total_pages: number;
+    has_next_page: boolean;
+    has_previous_page: boolean;
+  };
+}
+
 export default function Page({ params }: PageProps) {
   const [emailSummaryData, setData] = useState<EmailSummaryDataType[]>([]);
   const [emailDetailedData, setDetailedData] = useState<EmailDetailedDataType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [, setLimit] = useState(10);
   const [, setTotalItems] = useState(0);
   const [, setTotalPages] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -126,51 +138,129 @@ export default function Page({ params }: PageProps) {
   const [filteredData, setFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceFilteredData, setSliceFilteredData] = useState<EmailSummaryDataType[]>([]);
   const [sliceIndex, setSliceIndex] = useState([0, 10]);
+  const [, setIsCalculatingRunSummary] = useState(false);
+  const [selectedEmailNum, setSelectedEmailNum] = useState(0);
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
 
-  const fetchApi = useCallback(
+  const [runSummary, setRunSummary] = useState(() => {
+    return {
+      totalEmailNum: 0,
+      successEmailNum: 0,
+      failedEmailNum: 0,
+    };
+  });
+
+  const fetchEmails = useCallback(
     async (
-      apiType: "emails" | "runDetails",
-      limit: number | null,
-      status: string | null,
-      page: number
-    ) => {
-      try {
-        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        let url: URL;
+      runId: string,
+      limit: number,
+      page: number,
+      status: string | null = null,
+      access_token: string
+    ): Promise<EmailsResponse> => {
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const url = new URL(`${base_url}/runs/${runId}/emails`);
 
-        if (apiType === "emails") {
-          url = new URL(`${base_url}/runs/${params.runId}/emails`);
-          url.searchParams.append("page", page.toString());
-        } else {
-          url = new URL(`${base_url}/runs/${params.runId}`);
+      url.searchParams.append("page", page.toString());
+
+      if (limit) {
+        url.searchParams.append("limit", limit.toString());
+      }
+
+      if (status) {
+        url.searchParams.append("status", status);
+      }
+
+      let retries = 0;
+      const maxRetries = 3;
+      const retryDelay = 1000; // 1 second delay between retries
+
+      while (retries < maxRetries) {
+        try {
+          const response = await fetch(url.toString(), {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${access_token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`Request failed: ${response.status} - ${response.statusText}`);
+          }
+
+          return await response.json();
+        } catch (error) {
+          retries++;
+          console.error(`Attempt ${retries}/${maxRetries} failed:`, error);
+
+          if (retries >= maxRetries) {
+            console.error("All retry attempts failed");
+            throw error;
+          }
+
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
+      }
+      throw new Error("Failed to fetch emails after maximum retry attempts");
+    },
+    []
+  );
 
-        if (status) {
-          url.searchParams.append("status", status);
-        }
+  async function fetchRunDetails(runId: string, access_token: string) {
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const url = new URL(`${base_url}/runs/${runId}`);
 
-        const token = localStorage.getItem("access_token");
-        const response = await fetch(url.toString(), {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+    return fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+    })
+      .then(response => {
         if (!response.ok) {
-          const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-          throw new Error(errorMessage);
+          throw new Error(`Request failed: ${response.status} - ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .catch(error => {
+        console.error("Failed to fetch run details:", error);
+        throw error;
+      });
+  }
+
+  const storeAllEmails = useCallback(
+    async (runId: string, status: string | null = null, access_token: string): Promise<any[]> => {
+      try {
+        // First fetch to get pagination info
+        let result = await fetchEmails(runId, 10, 1, status, access_token);
+
+        const allData = [...result.data];
+        let currentPage = result.pagination.page;
+        const totalPages = result.pagination.total_pages;
+
+        // Fetch remaining pages if needed
+        while (totalPages > currentPage) {
+          currentPage += 1;
+          result = await fetchEmails(runId, 10, currentPage, status, access_token);
+          allData.push(...result.data);
         }
 
-        const result = await response.json();
-        return result;
-      } catch (error: any) {
-        alert("Failed to fetch files: " + error.message);
+        return allData;
+      } catch (error) {
+        console.error("Failed to fetch all emails:", error);
+        throw error;
       }
     },
-    [params.runId]
+    [fetchEmails]
   );
+
+  const handleRowSelectionChange = useCallback((newSelectedRows: Record<string, boolean>) => {
+    setSelectedRows(newSelectedRows);
+    const selectedCount = Object.values(newSelectedRows).filter(Boolean).length;
+    setSelectedEmailNum(selectedCount);
+  }, []);
 
   const fetchDetailedFiles = useCallback(async () => {
     try {
@@ -187,9 +277,16 @@ export default function Page({ params }: PageProps) {
   }, [params.runId]);
 
   const fetchFiles = useCallback(
-    async (limit: number, status: string | null, page: number | 1) => {
+    async (limit: number, status: string | null, page: number) => {
+      setIsLoading(true);
       try {
-        const result = await fetchApi("emails", limit, status, page);
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          throw new Error("No access token found");
+        }
+
+        const result = await fetchEmails(params.runId, limit, page, status, token);
+
         setIsLoading(false);
         setData(result.data);
         setPage(result.pagination.page);
@@ -202,51 +299,36 @@ export default function Page({ params }: PageProps) {
         alert("Failed to fetch files: " + error.message);
       }
     },
-    [fetchApi]
+    [params.runId, fetchEmails]
   );
 
-  // Define a request id for fetching all recipients' data
-  const requestIdRef = useRef(0);
-
-  // Get all recipients data
-  const storeAllData = useCallback(async () => {
-    const currentRequestId = ++requestIdRef.current;
+  const fetchRunSummary = useCallback(async () => {
+    setIsCalculatingRunSummary(true);
 
     try {
-      let result = await fetchApi("emails", 1000, selectedStatus, 1);
-
-      // only process the latest request
-      if (currentRequestId !== requestIdRef.current) return;
-
-      const allData = result.data;
-      let allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
-
-      while (allDataNextLastEvaluatedKey) {
-        result = await fetchApi("emails", 1000, selectedStatus, allDataNextLastEvaluatedKey);
-
-        // only process the latest request
-        if (currentRequestId !== requestIdRef.current) return;
-
-        allData.push(...result.data);
-        allDataNextLastEvaluatedKey = result.next_last_evaluated_key;
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No access token found");
       }
 
-      // only process the latest request
-      if (currentRequestId === requestIdRef.current) {
-        setAllData(allData);
-        setIsDisabled(false);
-      }
+      const result = await fetchRunDetails(params.runId, token);
+
+      setRunSummary({
+        successEmailNum: result.success_email_count || 0,
+        failedEmailNum: result.failed_email_count || 0,
+        totalEmailNum: result.success_email_count + result.failed_email_count || 0,
+      });
     } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
+      console.error("Failed to fetch run summary: " + error.message);
     }
-  }, [fetchApi, selectedStatus]);
+  }, [params.runId]);
 
   // Click Next button
   const handleNext = () => {
     if (searchTerm) {
       setSliceIndex([sliceIndex[0] + 10, sliceIndex[1] + 10]);
     } else if (hasNextPage) {
-      fetchFiles(limit, selectedStatus, page + 1);
+      setPage(prevPage => prevPage + 1);
     }
   };
 
@@ -255,14 +337,17 @@ export default function Page({ params }: PageProps) {
     if (searchTerm) {
       setSliceIndex([Math.max(sliceIndex[0] - 10, 0), Math.max(sliceIndex[1] - 10, 10)]);
     } else if (hasPreviousPage) {
-      fetchFiles(limit, selectedStatus, page - 1);
+      setPage(prevPage => prevPage - 1);
     }
   };
 
-  // Fetch the detailed data when component mounts
-  useEffect(() => {
-    fetchDetailedFiles();
-  }, [fetchDetailedFiles]);
+  const isNextDisabled = () => {
+    return searchTerm ? sliceIndex[1] >= filteredData.length : !hasNextPage;
+  };
+
+  const isPreviousDisabled = () => {
+    return searchTerm ? sliceIndex[0] <= 0 : !hasPreviousPage;
+  };
 
   // Fetch the files when the component mounts or when selectedStatus changes
   useEffect(() => {
@@ -270,12 +355,28 @@ export default function Page({ params }: PageProps) {
     fetchFiles(10, selectedStatus, page);
   }, [fetchFiles, selectedStatus, page]);
 
-  // Fetch all recipients data when the component mounts or when selectedStatus changes
   useEffect(() => {
-    setIsDisabled(true); // Prevent user from typing until all data is loaded
-    storeAllData();
+    setIsDisabled(true);
+
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          throw new Error("No access token found");
+        }
+
+        const allData = await storeAllEmails(params.runId, selectedStatus, token);
+        setAllData(allData);
+        setIsDisabled(false);
+      } catch (error) {
+        console.error("Error fetching all emails:", error);
+        setIsDisabled(false);
+      }
+    };
+
+    fetchData();
     setSearchTerm("");
-  }, [storeAllData, selectedStatus]);
+  }, [selectedStatus, params.runId, storeAllEmails]);
 
   // filter data with searchTerm
   useEffect(() => {
@@ -296,6 +397,20 @@ export default function Page({ params }: PageProps) {
   useEffect(() => {
     setSliceFilteredData(filteredData.slice(sliceIndex[0], sliceIndex[1]));
   }, [filteredData, sliceIndex]);
+
+  // Fetch the detailed data when component mounts
+  useEffect(() => {
+    fetchDetailedFiles();
+  }, [fetchDetailedFiles]);
+
+  // Fetch the run summary when component mounts
+  useEffect(() => {
+    fetchRunSummary();
+  }, [fetchRunSummary]);
+
+  const handleSelectedEmailsChange = useCallback((count: number) => {
+    setSelectedEmailNum(count);
+  }, []);
 
   return (
     <>
@@ -326,7 +441,16 @@ export default function Page({ params }: PageProps) {
       <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
         <div className="flex justify-between py-6 px-4">
           {/* Selected recipients */}
-          <div className="flex-grow">{/* EmailTotalSummary in SCRUM-270 */}</div>
+          <div className="flex-grow">
+            <EmailTotalSummary
+              selectedEmailNum={selectedEmailNum}
+              runSummary={{
+                totalEmailNum: runSummary.totalEmailNum,
+                successEmailNum: runSummary.successEmailNum,
+                failedEmailNum: runSummary.failedEmailNum,
+              }}
+            />
+          </div>
           {/* Search input */}
           <div
             className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
@@ -356,29 +480,34 @@ export default function Page({ params }: PageProps) {
               data={searchTerm ? sliceFilteredData : emailSummaryData}
               selectedStatus={selectedStatus}
               onStatusChange={status => setSelectedStatus(status)}
+              onSelectedRowsChange={handleSelectedEmailsChange}
+              allEmailIds={emailAllData.map(email => email.email_id)}
+              isDisabled={isDisabled}
+              selectedRows={selectedRows}
+              onRowSelectionChange={handleRowSelectionChange}
             />
           )}
           <div className="flex justify-end gap-8 pt-3 pb-4 px-2">
             <button
               className={`flex items-center gap-1 ${
-                !hasPreviousPage
+                isPreviousDisabled()
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={handlePrevious}
-              disabled={!hasPreviousPage}
+              disabled={isPreviousDisabled()}
             >
               <ChevronLeft size={20} />
               Previous
             </button>
             <button
               className={`flex items-center gap-1 ${
-                !hasNextPage
+                isNextDisabled()
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={handleNext}
-              disabled={!hasNextPage}
+              disabled={isNextDisabled()}
             >
               Next
               <ChevronRight size={20} />

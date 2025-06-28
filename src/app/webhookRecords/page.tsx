@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import WebhookRecordsCardSkeleton from "@/app/ui/skeleton/webhook-records-card-skeleton";
-import WebhookRecordsCard from "../ui/webhook-records-card";
+import WebhookRecordsCard from "@/app/ui/webhook-records-card";
 
 interface WebhookData {
   webhook_id: string;

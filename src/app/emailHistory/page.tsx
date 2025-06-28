@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import EmailHistoryCard from "../ui/email-history-card";
+import EmailHistoryCard from "@/app/ui/email-history-card";
+import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
 
 interface AttachmentFilesType {
   file_url: string;
@@ -85,37 +86,60 @@ export default function Page() {
   }, []);
 
   const fetchFiles = async (limit: number, lastEvaluatedKey: string | null) => {
+    let retryCount = 0;
+    const maxRetries = 5;
+    const retryDelay = 15000; // 15 seconds in milliseconds
+
+    const attemptFetch = async (): Promise<any> => {
+      try {
+        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+        const url = new URL(`${base_url}/runs`);
+
+        url.searchParams.append("limit", limit.toString());
+        if (lastEvaluatedKey) {
+          url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
+        }
+
+        const token = localStorage.getItem("access_token");
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
+          throw new Error(errorMessage);
+        }
+
+        return await response.json();
+      } catch (error: any) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          return attemptFetch();
+        } else {
+          throw new Error(`Failed after ${maxRetries} attempts: ${error.message}`);
+        }
+      }
+    };
+
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/runs`);
-
-      url.searchParams.append("limit", limit.toString());
-      if (lastEvaluatedKey) {
-        url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-      }
-
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(url.toString(), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
+      setIsLoading(true);
+      const result = await attemptFetch();
       setIsLoading(false);
       setData(result.data);
       setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
       setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
       setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
-      alert("Failed to fetch files: " + error.message);
+      setIsLoading(false);
+      alert(
+        `Failed to load data: ${error.message}\n\nPlease try again or contact TPET Team member if the problem persists.`
+      );
     }
   };
 
@@ -132,7 +156,14 @@ export default function Page() {
       </div>
       <div>
         <div className="w-full p-3 flex flex-col gap-3 bg-neutral-100 shadow-md rounded-md">
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center p-4">
+              <RotatingLoaderAnimation />
+            </div>
+          )}
+
           {isLoading ? <EmailHistoryCardLoading /> : <EmailHistoryCard data={data} />}
+
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
               className={`flex items-center gap-1 ${
