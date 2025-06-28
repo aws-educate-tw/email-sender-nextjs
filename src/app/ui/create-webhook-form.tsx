@@ -3,7 +3,7 @@ import React, { useRef, useState, FormEvent } from "react";
 import { submitWebhookForm } from "@/lib/actions";
 import HelpTip from "@/app/ui/help-tip";
 import SelectDropdown from "@/app/ui/select-dropdown";
-import AttachDropdown from "./attach-dropdown";
+import AttachDropdown from "@/app/ui/attach-dropdown";
 import WebhookTypeDropdown from "@/app/ui/webhook-type-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
