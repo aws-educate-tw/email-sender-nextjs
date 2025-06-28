@@ -3,6 +3,7 @@ import { ArrowRight, Info } from "lucide-react";
 import { useEmailContext } from "@/app/context/EmailContext";
 import SelectDropdown from "@/app/ui/select-dropdown";
 import IframePreview from "@/app/ui/iframe-preview";
+import HelpTip from "@/app/ui/help-tip";
 
 interface SettingProps {
   onNext: () => void;
@@ -54,7 +55,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
           <div className="bg-gray-50 p-6 rounded-lg space-y-6">
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                Subject of the email <Info size={16} className="ml-1 text-gray-400" />
+                Subject of the email
+                <HelpTip message="Enter the email subject that recipients will see.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <input
                 type="text"
@@ -67,7 +71,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                Name of the sender <Info size={16} className="ml-1 text-gray-400" />
+                Name of the sender
+                <HelpTip message="Enter the sender's name as it will appear to recipients.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <input
                 type="text"
@@ -80,7 +87,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                Select your template file <Info size={16} className="ml-1 text-gray-400" />
+                Select your template file
+                <HelpTip message="Choose or upload a .html file that contains the email content.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <div className="flex gap-2">
                 <SelectDropdown
@@ -99,7 +109,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                Select your sheet file <Info size={16} className="ml-1 text-gray-400" />
+                Select your sheet file
+                <HelpTip message="Choose or upload a .xlsx file containing the list of recipients.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <div className="flex gap-2">
                 <SelectDropdown onSelect={handleXlsxSelect} fileExtension="xlsx" error="" />
@@ -128,7 +141,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
           <div className="space-y-6">
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                Sender Local Part <Info size={16} className="ml-1 text-gray-400" />
+                Sender Local Part
+                <HelpTip message="Enter the prefix for your email address (e.g., if you enter john.doe, the email will be john.doe@aws-educate.tw). This setting will affect the forwarding rules.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <div className="flex">
                 <input
@@ -146,7 +162,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                Reply To <Info size={16} className="ml-1 text-gray-400" />
+                Reply To
+                <HelpTip message="The email address where replies from recipients will be sent. You can set this to match the Sender Local Part or customize it.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <input
                 type="email"
@@ -159,7 +178,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                BCC <Info size={16} className="ml-1 text-gray-400" />
+                BCC
+                <HelpTip message="Add email addresses to send blind carbon copies.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <input
                 type="text"
@@ -172,7 +194,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                CC <Info size={16} className="ml-1 text-gray-400" />
+                CC
+                <HelpTip message="Add email addresses to send carbon copies. Recipients will see these addresses.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <input
                 type="text"
@@ -185,7 +210,10 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
-                Attach files <Info size={16} className="ml-1 text-gray-400" />
+                Attach files
+                <HelpTip message="Attach any files you want to include with the email. Note: It is recommended that the total size of attachments does not exceed 5MB.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <div className="flex gap-2">
                 <SelectDropdown
@@ -217,7 +245,9 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
                 Provide a certification of participation?{" "}
-                <Info size={16} className="ml-1 text-gray-400" />
+                <HelpTip message="Select Yes or No if you want to provide a certification. Note: If you select Yes, the Excel file must include two columns: Name and Certificate Text.">
+                  <Info size={16} className="ml-1 text-gray-400" />
+                </HelpTip>
               </label>
               <div className="flex gap-4">
                 <label className="inline-flex items-center">
