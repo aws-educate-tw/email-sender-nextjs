@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Send, Mail, ExternalLink } from "lucide-react";
+import { Send, Mail } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useEmailContext } from "@/app/context/EmailContext";
 import IframePreview from "@/app/ui/iframe-preview";
+import { submitForm } from "@/lib/actions";
 
 interface ReviewProps {
   onSubmit: () => void;
@@ -14,6 +15,58 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showFullPreview, setShowFullPreview] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [, setFormErrors] = useState<{ [key: string]: string }>({});
+
+  const handleSendEmail = async () => {
+    setIsSubmitting(true);
+
+    const formData: any = {
+      subject: emailData.subject,
+      display_name: emailData.senderName,
+      template_file_id: emailData.templateId,
+      spreadsheet_file_id: emailData.sheetFileId,
+      recipient_source: "SPREADSHEET",
+    };
+
+    if (emailData.localPart) formData.sender_local_part = emailData.localPart;
+    if (emailData.replyTo) formData.reply_to = emailData.replyTo;
+    if (emailData.bcc) formData.bcc = emailData.bcc.split(",").map(email => email.trim());
+    if (emailData.cc) formData.cc = emailData.cc.split(",").map(email => email.trim());
+    if (emailData.attachments.length > 0) {
+      formData.attachment_file_ids = emailData.attachments.map(file =>
+        "id" in file ? (file as any).id : file.name
+      );
+    }
+    if (emailData.provideCertification === "yes") {
+      formData.is_generate_certificate = true;
+    }
+
+    try {
+      const response = await submitForm(
+        JSON.stringify(formData),
+        localStorage.getItem("access_token") ?? ""
+      );
+
+      if (response.status === "error" && response.errors) {
+        const newErrors: { [key: string]: string } = {};
+        response.errors.forEach(err => {
+          newErrors[err.path] = err.message;
+        });
+        setFormErrors(newErrors);
+        alert("Error: " + response.message);
+      } else {
+        alert(response.status + ": " + response.message);
+        setFormErrors({});
+
+        if (onSubmit) onSubmit();
+      }
+    } catch (error: any) {
+      alert("Failed to send email: " + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const loadTemplatePreview = async () => {
@@ -36,7 +89,7 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
 
           const content = await response.text();
           setTemplatePreview(content);
-        } else if (emailData.templateFile) {
+        } else if (emailData.templateId) {
           setError("Template content not available. Please select a template first.");
         } else {
           setError("No template selected.");
@@ -50,7 +103,7 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
     };
 
     loadTemplatePreview();
-  }, [emailData.templateContent, emailData.templateUrl, emailData.templateFile]);
+  }, [emailData.templateContent, emailData.templateUrl, emailData.templateId]);
 
   const getDisplayValue = (value: string | null | File[] | undefined) => {
     if (!value || (Array.isArray(value) && value.length === 0)) {
@@ -58,16 +111,15 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
     }
 
     if (Array.isArray(value)) {
-      // Handle attachments
       return value.length > 0 ? value.map(file => file.name).join(", ") : "No files attached";
     }
 
     return value;
   };
 
-  const handleOpenFullPreview = () => {
-    setShowFullPreview(true);
-  };
+  // const handleOpenFullPreview = () => {
+  //   setShowFullPreview(true);
+  // };
 
   const handleCloseFullPreview = () => {
     setShowFullPreview(false);
@@ -101,13 +153,13 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
           <div className="grid grid-cols-[180px_1fr] items-center">
             <p className="font-semibold text-gray-800">Template:</p>
             <p className="text-gray-600">
-              {emailData.templateName || getDisplayValue(emailData.templateFile)}
+              {emailData.templateName || getDisplayValue(emailData.templateId)}
             </p>
           </div>
 
           <div className="grid grid-cols-[180px_1fr] items-center">
             <p className="font-semibold text-gray-800">Sheet file:</p>
-            <p className="text-gray-600">{getDisplayValue(emailData.sheetFile)}</p>
+            <p className="text-gray-600">{getDisplayValue(emailData.sheetFileId)}</p>
           </div>
 
           <div className="grid grid-cols-[180px_1fr] items-center">
@@ -151,17 +203,6 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
       </div>
 
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-xl font-bold">Template Preview</h3>
-          {!isLoading && !error && templatePreview && (
-            <button
-              onClick={handleOpenFullPreview}
-              className="flex items-center text-gray-700 hover:text-gray-900 text-sm"
-            >
-              <ExternalLink size={16} className="mr-1" /> View full preview
-            </button>
-          )}
-        </div>
         <div className="border rounded-lg overflow-hidden">
           <div className="p-6 bg-[#f5f5f4] whitespace-pre-wrap min-h-[300px] max-h-[400px] overflow-auto">
             {isLoading ? (
@@ -238,9 +279,38 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
       <div className="flex justify-end mt-8">
         <button
           className="px-6 py-2 bg-[#1a2f4a] text-white rounded flex items-center hover:bg-[#1a2f4a]/90"
-          onClick={onSubmit}
+          onClick={handleSendEmail}
+          disabled={isSubmitting}
         >
-          Send Email <Send className="ml-2 w-4 h-4" />
+          {isSubmitting ? (
+            <>
+              Sending...
+              <svg
+                className="animate-spin ml-2 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l-1.497-1.32A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </>
+          ) : (
+            <>
+              Send Email <Send className="ml-2 w-4 h-4" />
+            </>
+          )}
         </button>
       </div>
     </Card>
