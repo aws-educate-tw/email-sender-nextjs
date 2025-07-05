@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -69,7 +68,9 @@ export default function EmailServiceChooseTemplateCreateNew({
   const [templateName, setTemplateName] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [content, setContent] = useState(DEFAULT_TEMPLATE_CONTENT);
-  const { updateTemplate } = useEmailContext();
+  const [templateId, settemplateId] = useState<string | undefined>(undefined);
+  const [templateUrl, settemplateUrl] = useState<string | undefined>(undefined);
+  const { updateTemplate, updateEmailData } = useEmailContext();
 
   // Set template content when preset is selected
   useEffect(() => {
@@ -86,18 +87,20 @@ export default function EmailServiceChooseTemplateCreateNew({
     setContent(newContent);
   };
 
-  const handleSaveTemplate = () => {
-    console.log("Saving template:", { templateName, emailContent: content });
-  };
-
   const handleNextClick = () => {
-    const tempId = `new-template-${Date.now()}`;
+    const tempId = templateId || `new-template-${Date.now()}`;
+
     updateTemplate(
       tempId,
       templateName || "Untitled Template",
       content || DEFAULT_TEMPLATE_CONTENT,
-      undefined
+      templateUrl
     );
+
+    if (templateId) {
+      updateEmailData({ templateId: templateId });
+    }
+
     onNext("new");
   };
 
@@ -105,57 +108,63 @@ export default function EmailServiceChooseTemplateCreateNew({
     setSelectedTemplate(presetId);
   };
 
-  return (
-    <Card className="w-full max-w-full mt-2">
-      <div className="w-full p-6">
-        <h2 className="text-2xl font-semibold mb-6">Create New Template</h2>
+  const handleSaveContent = (savedContent: string, fileId?: string, fileUrl?: string) => {
+    // Update the content after save
+    setContent(savedContent);
 
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-9">
+    // Save the file ID and URL if provided
+    if (fileId) {
+      settemplateId(fileId);
+      console.log("Template file ID saved:", fileId);
+    }
+
+    if (fileUrl) {
+      settemplateUrl(fileUrl);
+    }
+  };
+
+  return (
+    <Card>
+      <div className="w-full max-w-full mt-2 space-y-6">
+        {/* Header */}
+        <h2 className="text-2xl font-semibold">Create New Template</h2>
+
+        {/* Template Name and Select container */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-grow">
             <Input
               placeholder="Template Name"
               value={templateName}
               onChange={e => setTemplateName(e.target.value)}
-              className="w-full mb-6"
+              className="w-full"
             />
-
-            <TipTap content={content} onChange={handleContentChange} />
           </div>
 
-          <div className="col-span-3 flex flex-col space-y-6">
-            <div>
-              <Select value={selectedTemplate} onValueChange={handleSelectPreset}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a template" />
-                </SelectTrigger>
-                <SelectContent>
-                  {templatePresets.map(preset => (
-                    <SelectItem key={preset.id} value={preset.id}>
-                      {preset.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="mt-auto space-y-4">
-              <Button
-                variant="default"
-                className="bg-[#1a2f4a] text-white hover:bg-[#1a2f4a]/90 w-full"
-                onClick={handleSaveTemplate}
-              >
-                Save Template
-              </Button>
-
-              <Button
-                variant="default"
-                className="bg-[#1a2f4a] text-white hover:bg-[#1a2f4a]/90 w-full"
-                onClick={handleNextClick}
-              >
-                Next
-              </Button>
-            </div>
+          <div className="w-[200px]">
+            <Select value={selectedTemplate} onValueChange={handleSelectPreset}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a template" />
+              </SelectTrigger>
+              <SelectContent>
+                {templatePresets.map(preset => (
+                  <SelectItem key={preset.id} value={preset.id}>
+                    {preset.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+        </div>
+
+        {/* TipTap Editor Container */}
+        <div className="bg-white rounded-lg">
+          <TipTap
+            content={content}
+            onChange={handleContentChange}
+            onNext={handleNextClick}
+            templateName={templateName}
+            onSave={handleSaveContent}
+          />
         </div>
       </div>
     </Card>
