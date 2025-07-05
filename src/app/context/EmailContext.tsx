@@ -3,13 +3,13 @@ import React, { createContext, useState, useContext } from "react";
 export interface EmailData {
   subject: string;
   senderName: string;
-  templateFile: string | null;
   templateContent: string | null;
   templateName: string | null;
   templateUrl: string | null;
-  sheetFile: string | null;
+  templateId?: string | null;
   sheetFileName?: string | null;
   sheetFileUrl?: string | null;
+  sheetFileId?: string | null;
   localPart: string;
   replyTo: string;
   bcc: string;
@@ -21,11 +21,11 @@ export interface EmailData {
 export const defaultEmailData: EmailData = {
   subject: "",
   senderName: "",
-  templateFile: null,
+  templateId: null,
   templateContent: null,
   templateName: null,
   templateUrl: null,
-  sheetFile: null,
+  sheetFileId: null,
   sheetFileName: null,
   sheetFileUrl: null,
   localPart: "",
@@ -52,14 +52,14 @@ export const EmailProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updateTemplate = (
-    templateFile: string,
+    templateId: string,
     templateName: string,
     templateContent?: string,
     templateUrl?: string
   ) => {
     setEmailData(prevData => ({
       ...prevData,
-      templateFile,
+      templateId,
       templateName,
       templateContent: templateContent || null,
       templateUrl: templateUrl || null,
