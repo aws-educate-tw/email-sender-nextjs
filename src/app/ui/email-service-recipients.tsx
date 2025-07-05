@@ -10,7 +10,6 @@ import { ArrowRight, Upload, Pencil, X, Check } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useEmailContext } from "@/app/context/EmailContext";
 import { RecipientTable } from "./email-service-recipients-table";
-import { useRouter } from "next/navigation";
 import FileUpload from "@/app/ui/file-upload";
 
 interface RecipientsProps {
@@ -34,49 +33,55 @@ interface TemplateVariablesResponse {
   [key: string]: any;
 }
 
-const EnhancedFileUpload = forwardRef(({ OnFileExtension, onUploadSuccess }, ref) => {
-  const [files, setFiles] = useState<File[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+interface EnhancedFileUploadProps {
+  OnFileExtension: string;
+  onUploadSuccess?: (files: any[]) => void;
+}
 
-  useImperativeHandle(ref, () => ({
-    uploadFile: async file => {
-      const formData = new FormData();
-      formData.append("file", file);
+const EnhancedFileUpload = forwardRef<any, EnhancedFileUploadProps>(
+  ({ OnFileExtension, onUploadSuccess }, ref) => {
+    const [, setIsSubmitting] = useState<boolean>(false);
 
-      setIsSubmitting(true);
+    useImperativeHandle(ref, () => ({
+      uploadFile: async (file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
 
-      try {
-        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        const url = new URL(`${base_url}/upload-multiple-file`);
-        const response = await fetch(url.toString(), {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          body: formData,
-        });
+        setIsSubmitting(true);
 
-        if (!response.ok) {
-          const errorMessage = `Upload failed: ${response.status} - ${response.statusText}`;
-          throw new Error(errorMessage);
+        try {
+          const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+          const url = new URL(`${base_url}/upload-multiple-file`);
+          const response = await fetch(url.toString(), {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorMessage = `Upload failed: ${response.status} - ${response.statusText}`;
+            throw new Error(errorMessage);
+          }
+
+          const result = await response.json();
+          if (onUploadSuccess && result.files) {
+            onUploadSuccess(result.files);
+          }
+          return result.files;
+        } catch (error) {
+          console.error("Upload error:", error);
+          throw error;
+        } finally {
+          setIsSubmitting(false);
         }
+      },
+    }));
 
-        const result = await response.json();
-        if (onUploadSuccess && result.files) {
-          onUploadSuccess(result.files);
-        }
-        return result.files;
-      } catch (error) {
-        console.error("Upload error:", error);
-        throw error;
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-  }));
-
-  return <FileUpload OnFileExtension={OnFileExtension} />;
-});
+    return <FileUpload OnFileExtension={OnFileExtension} />;
+  }
+);
 
 EnhancedFileUpload.displayName = "EnhancedFileUpload";
 
@@ -92,17 +97,13 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
   const [importError, setImportError] = useState("");
   const [isLoadingVariables, setIsLoadingVariables] = useState(false);
   const [activeColumnMenu, setActiveColumnMenu] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setMenuPosition] = useState({ top: 0, left: 0 });
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [fileData, setFileData] = useState<any>(null);
-  const [xlsxFile, setXlsxFile] = useState<File | null>(null);
-  const router = useRouter();
+  const [xlsxFile] = useState<File | null>(null);
   const [lastUploadedRecipients, setLastUploadedRecipients] = useState<string>("");
   const [recipientsChanged, setRecipientsChanged] = useState<boolean>(false);
 
   const [uploadButtonFlash, setUploadButtonFlash] = useState(false);
-  const fileUploadRef = useRef<any>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const [showXlsxUpload, setShowXlsxUpload] = useState<boolean>(false);
@@ -204,55 +205,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     });
   };
 
-  const saveRecipientsSheet = async () => {
-    if (recipients.length === 0) {
-      alert("No recipients to save");
-      return;
-    }
-
-    setIsSaving(true);
-
-    try {
-      const worksheet = XLSX.utils.json_to_sheet(
-        recipients.map(recipient => {
-          const result: { [key: string]: string } = {};
-          customColumns.forEach(column => {
-            result[column.name] = recipient[column.name] || "";
-          });
-          return result;
-        })
-      );
-
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Recipients");
-
-      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-
-      const file = new File([blob], `${sheetTitle}.xlsx`, {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${sheetTitle}.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setShowXlsxUpload(true);
-      setIsSaving(false);
-    } catch (error: any) {
-      alert("Failed to create recipients sheet: " + error.message);
-      console.error("Error creating recipients sheet:", error);
-      setIsSaving(false);
-    }
-  };
-
   useEffect(() => {
     const fetchTemplateVariables = async () => {
       if (emailData.templateId) {
@@ -306,7 +258,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     };
 
     fetchTemplateVariables();
-  }, [emailData.templateId]);
+  });
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setImportError("");
@@ -392,7 +344,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     });
 
     const newColumns: Column[] = [];
-    const columnNameMapping: Record<string, string> = {}; // 用於記錄 Excel 欄位與實際欄位的對應關係
+    const columnNameMapping: Record<string, string> = {};
 
     excelHeaders.forEach(excelHeader => {
       const existingColumn = Array.from(existingColumnMap.entries()).find(
@@ -400,9 +352,9 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
       );
 
       if (existingColumn) {
-        const [_, column] = existingColumn;
+        const [, column] = existingColumn;
         newColumns.push(column);
-        columnNameMapping[excelHeader] = column.name; // 記錄對應關係
+        columnNameMapping[excelHeader] = column.name;
       } else {
         const newColumn: Column = {
           id: `col-${Date.now()}-${Math.random().toString(36).substring(2)}`,
@@ -410,8 +362,8 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
           tempValue: "",
         };
         newColumns.push(newColumn);
-        columnNameMapping[excelHeader] = excelHeader; // 新欄位名稱保持一致
-        existingColumnMap.set(excelHeader.toLowerCase(), newColumn); // 更新對照表
+        columnNameMapping[excelHeader] = excelHeader;
+        existingColumnMap.set(excelHeader.toLowerCase(), newColumn);
       }
     });
 
@@ -553,31 +505,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     setActiveColumnMenu(null);
   };
 
-  const handleUploadSuccess = (files: any[]) => {
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-
-    if (file) {
-      updateEmailData({
-        sheetFile: file.file_id,
-        sheetFileName: file.file_name,
-        sheetFileUrl: file.file_url,
-      });
-
-      setTimeout(() => {
-        if (
-          confirm(
-            "Recipients sheet uploaded successfully! Do you want to proceed to the next step?"
-          )
-        ) {
-          onNext();
-        }
-      }, 500);
-    }
-  };
-
-  // Close column menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (columnMenuRef.current && !columnMenuRef.current.contains(event.target as Node)) {
@@ -838,13 +765,14 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
             </div>
             <FileUpload
               OnFileExtension=".xlsx"
-              onFileSelect={(file_id, file_url, file_name) => {
+              onFileSelect={(file_id: string, file_url: string, file_name: string) => {
                 handleXlsxSelect(file_id, file_url, file_name);
                 setShowXlsxUpload(false);
                 setUploadSuccess(true);
                 setUploadButtonFlash(true);
                 setTimeout(() => setUploadButtonFlash(false), 2000);
               }}
+              {...({} as any)}
             />
           </div>
         </div>
