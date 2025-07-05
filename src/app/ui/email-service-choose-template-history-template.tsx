@@ -24,17 +24,22 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
   onNext,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [filteredTemplates, setFilteredTemplates] = useState<TemplateItem[]>([]);
   const [error, setError] = useState<string | null>(null);
-
+  const { emailData, updateTemplate, updateEmailData } = useEmailContext();
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
-  const { updateTemplate } = useEmailContext();
+  // Initialize selected template from context when component mounts
+  useEffect(() => {
+    if (emailData.templateId) {
+      setSelectedTemplate(emailData.templateId);
+    }
+  }, [emailData.templateId]);
 
   useEffect(() => {
     if (templates.length > 0) {
@@ -82,8 +87,13 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
   }, []);
 
   const handleSelectTemplate = (template: TemplateItem) => {
-    updateTemplate(template.file_id, template.file_name, undefined, template.file_url);
+    updateTemplate(template.file_id, template.file_name, template.file_url);
     setSelectedTemplate(template.file_id);
+    updateEmailData({
+      templateName: template.file_name,
+      templateUrl: template.file_url,
+      templateId: template.file_id,
+    });
   };
 
   const handlePrevious = () => {
@@ -99,8 +109,8 @@ export const EmailServiceChooseTemplateHistoryTemplate: React.FC<HistoryTemplate
   };
 
   return (
-    <Card className="w-full max-w-full mt-2">
-      <div className="bg-white rounded-lg p-6 mt-2">
+    <Card>
+      <div className="bg-white rounded-lg">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">History Templates</h2>
           <div className="relative">
