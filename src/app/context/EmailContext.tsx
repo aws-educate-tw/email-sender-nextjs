@@ -8,6 +8,8 @@ export interface EmailData {
   templateName: string | null;
   templateUrl: string | null;
   sheetFile: string | null;
+  sheetFileName?: string | null;
+  sheetFileUrl?: string | null;
   localPart: string;
   replyTo: string;
   bcc: string;
@@ -24,6 +26,8 @@ export const defaultEmailData: EmailData = {
   templateName: null,
   templateUrl: null,
   sheetFile: null,
+  sheetFileName: null,
+  sheetFileUrl: null,
   localPart: "",
   replyTo: "",
   bcc: "",
@@ -35,12 +39,7 @@ export const defaultEmailData: EmailData = {
 interface EmailContextType {
   emailData: EmailData;
   updateEmailData: (data: Partial<EmailData>) => void;
-  updateTemplate: (
-    templateFile: string,
-    templateName: string,
-    templateContent?: string,
-    templateUrl?: string
-  ) => void;
+  updateTemplate: (id: string, name: string, content: string, url?: string) => void;
 }
 
 const EmailContext = createContext<EmailContextType | undefined>(undefined);
