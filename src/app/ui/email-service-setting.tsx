@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { ArrowRight, Info } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowRight, Info, ChevronDown } from "lucide-react";
 import { useEmailContext } from "@/app/context/EmailContext";
-import SelectDropdown from "@/app/ui/select-dropdown";
 import IframePreview from "@/app/ui/iframe-preview";
 import HelpTip from "@/app/ui/help-tip";
 
@@ -14,17 +13,35 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
   const [showXlsxUpload, setShowXlsxUpload] = useState<boolean>(false);
   const [previewXlsx, setPreviewXlsx] = useState<boolean>(false);
   const [xlsxPreviewLink, setXlsxPreviewLink] = useState<string | null>("");
+  const [selectedTemplateFile, setSelectedTemplateFile] = useState<string | null>(null);
+  const [selectedSheetFile, setSelectedSheetFile] = useState<string | null>(null);
+  const [previewHtml, setPreviewHtml] = useState<boolean>(false);
+  const [templatePreviewLink, setTemplatePreviewLink] = useState<string | null>(null);
 
-  // const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (e.target.files) {
-  //     const filesArray = Array.from(e.target.files);
-  //     updateEmailData({ attachments: [...emailData.attachments, ...filesArray] });
-  //   }
-  // };
+  useEffect(() => {
+    setSelectedSheetFile(emailData.sheetFileName || null);
+    setSelectedTemplateFile(emailData.templateName);
+    setTemplatePreviewLink(emailData.templateUrl || null);
+    setXlsxPreviewLink(emailData.sheetFileUrl || null);
+  }, [
+    emailData.templateId,
+    emailData.sheetFileId,
+    emailData.templateName,
+    emailData.sheetFileName,
+    emailData.templateUrl,
+    emailData.sheetFileUrl,
+  ]);
 
-  const handleXlsxSelect = (file_id: string, file_url: string) => {
-    updateEmailData({ sheetFile: file_id });
-    setXlsxPreviewLink(file_url);
+  const handlePreviewTemplate = () => {
+    console.log("嘗試預覽模板:", {
+      selectedTemplateFile,
+      templatePreviewLink,
+    });
+    setPreviewHtml(true);
+  };
+
+  const handlePreviewTemplateClose = () => {
+    setPreviewHtml(false);
   };
 
   const handlePreviewXlsx = () => {
@@ -36,13 +53,33 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
     setPreviewXlsx(false);
   };
 
-  const handleXlsxOpenUpload = () => {
-    setShowXlsxUpload(true);
-  };
+  // const handleXlsxOpenUpload = () => {
+  //   setShowXlsxUpload(true);
+  // };
 
   const handleXlsxCloseUpload = () => {
     setShowXlsxUpload(false);
   };
+
+  const DisabledSelect = ({
+    value,
+    placeholder,
+    isActive,
+  }: {
+    value?: string | null;
+    placeholder: string;
+    isActive: boolean;
+  }) => (
+    <div
+      className={`flex-1 flex items-center justify-between p-3 border rounded cursor-not-allowed bg-gray-50 ${
+        isActive ? "text-gray-400 border-gray-300" : "text-gray-400 border-gray-300"
+      }`}
+      title={!isActive ? "Please upload in previous step" : ""}
+    >
+      <span>{value || placeholder}</span>
+      <ChevronDown className="h-4 w-4 opacity-50" />
+    </div>
+  );
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
@@ -93,18 +130,33 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
                 </HelpTip>
               </label>
               <div className="flex gap-2">
-                <SelectDropdown
-                  onSelect={fileId => updateEmailData({ templateFile: fileId })}
-                  fileExtension="html"
-                  error=""
+                <DisabledSelect
+                  value={emailData.templateName || selectedTemplateFile}
+                  placeholder="Please upload in previous step"
+                  isActive={!!(emailData.templateName || selectedTemplateFile)}
                 />
-                <button className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                <button
+                  onClick={handlePreviewTemplate}
+                  className={`px-4 py-2 border rounded ${
+                    emailData.templateName || selectedTemplateFile
+                      ? "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                      : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+                  disabled={!(emailData.templateName || selectedTemplateFile)} // 只檢查模板名稱，不檢查預覽鏈接
+                  title={
+                    !(emailData.templateName || selectedTemplateFile)
+                      ? "Template file not selected"
+                      : "Preview template"
+                  }
+                >
                   preview
                 </button>
-                <button className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                  upload
-                </button>
               </div>
+              {!selectedTemplateFile && (
+                <p className="text-gray-500 text-sm mt-1 flex items-center">
+                  <Info size={12} className="mr-1" /> Template uploaded in previous step
+                </p>
+              )}
             </div>
 
             <div>
@@ -115,22 +167,30 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
                 </HelpTip>
               </label>
               <div className="flex gap-2">
-                <SelectDropdown onSelect={handleXlsxSelect} fileExtension="xlsx" error="" />
+                <DisabledSelect
+                  value={selectedSheetFile}
+                  placeholder="Please upload in previous step"
+                  isActive={!!selectedSheetFile}
+                />
                 <button
                   type="button"
                   onClick={handlePreviewXlsx}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50"
+                  className={`px-4 py-2 border rounded ${
+                    selectedSheetFile && xlsxPreviewLink
+                      ? "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                      : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+                  disabled={!selectedSheetFile || !xlsxPreviewLink}
+                  title={!selectedSheetFile ? "Sheet file not selected" : "Preview sheet"}
                 >
                   preview
                 </button>
-                <button
-                  type="button"
-                  onClick={handleXlsxOpenUpload}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  upload
-                </button>
               </div>
+              {!selectedSheetFile && (
+                <p className="text-gray-500 text-sm mt-1 flex items-center">
+                  <Info size={12} className="mr-1" /> Recipients uploaded in previous step
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -207,7 +267,7 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
                 onChange={e => updateEmailData({ cc: e.target.value })}
               />
             </div>
-
+            {/* 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
                 Attach files
@@ -217,30 +277,17 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
               </label>
               <div className="flex gap-2">
                 <SelectDropdown
-                  onSelect={fileId => updateEmailData({ templateFile: fileId })}
-                  fileExtension="html"
+                  onSelect={(fileId, fileUrl, fileName) =>
+                    updateEmailData({ attachments: [...(emailData.attachments || []), fileId] })
+                  }
+                  fileExtension="*"
                   error=""
                 />
-                <button className="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                <button className="px-4 py-2 bg-white border-gray-300 rounded hover:bg-gray-50">
                   upload
                 </button>
               </div>
-              {/* <div className="flex gap-2">
-                <div className="relative flex-grow">
-                  <select className="w-full p-3 border border-gray-300 rounded appearance-none bg-white pr-8 focus:outline-none focus:ring-gray-400 focus:border-gray-400">
-                    <option>Attach your files</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 20 20">
-                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                    </svg>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-white border border-gray-300 rounded">
-                  upload
-                </button>
-              </div> */}
-            </div>
+            </div> */}
 
             <div>
               <label className="block mb-2 flex items-center text-gray-700">
@@ -278,7 +325,7 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
         </div>
       </div>
 
-      <div className="flex justify-end p-6 border-gray-200">
+      <div className="flex justify-end p-6">
         <button
           className="px-6 py-2 bg-[#1a2f4a] text-white rounded flex items-center hover:bg-[#2c4a72]"
           onClick={onNext}
@@ -286,6 +333,42 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
           Next <ArrowRight className="ml-2 w-4 h-4" />
         </button>
       </div>
+
+      {/* Template Preview Modal */}
+      {previewHtml && (
+        <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50 p-20">
+          <div className="bg-yellow-400 rounded-lg shadow-2xl p-8 pb-12 w-full h-full relative">
+            <button
+              onClick={handlePreviewTemplateClose}
+              className="absolute top-8 right-8 text-white hover:text-gray-300 transition-colors"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                />
+              </svg>
+            </button>
+            <div className="w-full h-full p-2 flex flex-col">
+              <p className="text-2xl text-white font-medium mb-4">Preview Template</p>
+              {templatePreviewLink ? (
+                <IframePreview
+                  src={templatePreviewLink}
+                  title="Template Preview"
+                  width="100%"
+                  height="100%"
+                />
+              ) : (
+                <div className="flex w-full h-full justify-center items-center bg-gray-100 rounded">
+                  <p className="text-gray-500">No preview available</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Excel Preview Modal */}
       {previewXlsx && (
         <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50 p-20">
           <div className="bg-green-700 rounded-lg shadow-2xl p-8 pb-12 w-full h-full relative">
@@ -316,7 +399,7 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
         </div>
       )}
 
-      {/* 上傳 xlsx 的模態視窗 - 這裡需要引入 FileUpload 組件 */}
+      {/* Upload Excel Modal */}
       {showXlsxUpload && (
         <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-2xl p-8 pb-20 w-full max-w-screen-lg relative">
@@ -330,8 +413,7 @@ export const EmailServiceSetting: React.FC<SettingProps> = ({ onNext }) => {
             </button>
             <div className="text-2xl font-bold mb-6">Upload Excel File</div>
             <p className="mb-8">Please upload your .xlsx file containing recipient information.</p>
-            {/* 這裡需要引入 FileUpload 組件 */}
-            {/* <FileUpload OnFileExtension=".xlsx" /> */}
+            {/* Import the FileUpload component here */}
             <p className="text-gray-500 mt-4">
               Note: Import the FileUpload component and add it here
             </p>
