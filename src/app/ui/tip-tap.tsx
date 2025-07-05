@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import { Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import { useRouter } from "next/navigation";
-import NextStepLink from "next/link";
 import {
   Bold,
   Italic,
@@ -28,6 +27,7 @@ import {
   Undo,
   Redo,
   Link as LinkIcon,
+  Check,
 } from "lucide-react";
 import cn from "classnames";
 import "./styles.scss";
@@ -56,13 +56,20 @@ const ToolbarButton = ({
   </button>
 );
 
-export default function TipTap({ onChange, content }: any) {
+interface TipTapProps {
+  onChange: (content: string) => void;
+  content: string;
+  onNext?: () => void;
+  templateName?: string;
+  onSave?: (content: string, fileId?: string, fileUrl?: string) => void; // Updated callback signature
+}
+
+export default function TipTap({ onChange, content, onNext, templateName, onSave }: TipTapProps) {
   const [editorContent, setEditorContent] = useState(content);
   const [, setIsFocused] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [showNextStep, setShowNextStep] = useState(false);
-  const [isFileNameEmpty, setIsFileNameEmpty] = useState(true);
   const [showToast, setShowToast] = useState(false);
+  const [saveButtonState, setSaveButtonState] = useState<"idle" | "saved" | "error">("idle");
 
   const router = useRouter();
 
@@ -177,9 +184,16 @@ export default function TipTap({ onChange, content }: any) {
   };
 
   const handleUpload = async () => {
-    const saveFileNameInput = document.getElementById("save_file_name") as HTMLInputElement;
-    // Remove the leading and trailing white spaces
-    const saveFileName = saveFileNameInput?.value.trim();
+    if (!templateName || templateName.trim() === "") {
+      console.error("Template name is required");
+      setSaveButtonState("error");
+      setTimeout(() => {
+        setSaveButtonState("idle");
+      }, 3000);
+      return;
+    }
+
+    const saveFileName = templateName.trim();
 
     const preserveEmptyLines = (content: string): string => {
       return (
@@ -225,19 +239,44 @@ export default function TipTap({ onChange, content }: any) {
       const result = await response.json();
       console.log(result);
       setIsUploading(false);
-      setIsFileNameEmpty(true);
-      setShowNextStep(true);
       setShowToast(true);
+
+      // Show "Saved" button state
+      setSaveButtonState("saved");
+      setTimeout(() => {
+        setSaveButtonState("idle");
+      }, 3000);
+
       setTimeout(() => setShowToast(false), 5000);
+
+      // Extract file_id from the response and pass it to the onSave callback
+      const fileId = result?.files?.[0]?.file_id;
+      const fileUrl = result?.files?.[0]?.file_url;
+
+      // Call the onSave callback if provided
+      if (onSave) {
+        onSave(formattedContent, fileId, fileUrl);
+      }
     } catch (error) {
       console.error("Upload failed:", error);
+      setSaveButtonState("error");
+      setTimeout(() => {
+        setSaveButtonState("idle");
+      }, 3000);
     }
   };
 
-  // Update the state of file name based on the input value
-  const handleFileNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.trim();
-    setIsFileNameEmpty(value === "");
+  const handleSaveTemplate = () => {
+    if (saveButtonState === "saved") return;
+    handleUpload();
+  };
+
+  const handleNextClick = () => {
+    if (onNext) {
+      onNext();
+    } else {
+      router.push("/sendEmail");
+    }
   };
 
   return (
@@ -256,144 +295,143 @@ export default function TipTap({ onChange, content }: any) {
         </div>
       )}
 
-      <div className="w-full">
-        {/* Toolbar similar to email-service-choose-template-create-new.tsx */}
-        <div className="flex flex-wrap items-center rounded-md p-1 bg-gray-50 mb-4">
-          <ToolbarButton
-            icon={<LinkIcon size={18} />}
-            onClick={() => handleFormatAction("link")}
-            label="Insert link"
-            isActive={editor?.isActive("link")}
-          />
-          <ToolbarButton
-            icon={<Bold size={18} />}
-            onClick={() => handleFormatAction("bold")}
-            label="Bold text"
-            isActive={editor?.isActive("bold")}
-          />
-          <ToolbarButton
-            icon={<Italic size={18} />}
-            onClick={() => handleFormatAction("italic")}
-            label="Italic text"
-            isActive={editor?.isActive("italic")}
-          />
-          <ToolbarButton
-            icon={<UnderlineIcon size={18} />}
-            onClick={() => handleFormatAction("underline")}
-            label="Underline text"
-            isActive={editor?.isActive("underline")}
-          />
-          <ToolbarButton
-            icon={<Strikethrough size={18} />}
-            onClick={() => handleFormatAction("strikethrough")}
-            label="Strikethrough text"
-            isActive={editor?.isActive("strike")}
-          />
-          <ToolbarButton
-            icon={<Heading1 size={18} />}
-            onClick={() => handleFormatAction("h1")}
-            label="Heading 1"
-            isActive={editor?.isActive("heading", { level: 1 })}
-          />
-          <ToolbarButton
-            icon={<Heading2 size={18} />}
-            onClick={() => handleFormatAction("h2")}
-            label="Heading 2"
-            isActive={editor?.isActive("heading", { level: 2 })}
-          />
-          <ToolbarButton
-            icon={<Heading3 size={18} />}
-            onClick={() => handleFormatAction("h3")}
-            label="Heading 3"
-            isActive={editor?.isActive("heading", { level: 3 })}
-          />
-          <ToolbarButton
-            icon={<List size={18} />}
-            onClick={() => handleFormatAction("bulletList")}
-            label="Bullet list"
-            isActive={editor?.isActive("bulletList")}
-          />
-          <ToolbarButton
-            icon={<ListOrdered size={18} />}
-            onClick={() => handleFormatAction("numberedList")}
-            label="Numbered list"
-            isActive={editor?.isActive("orderedList")}
-          />
-          <ToolbarButton
-            icon={<Quote size={18} />}
-            onClick={() => handleFormatAction("quote")}
-            label="Quote"
-            isActive={editor?.isActive("blockquote")}
-          />
-          <ToolbarButton
-            icon={<ImageIcon size={18} aria-hidden="true" />}
-            onClick={() => handleFormatAction("image")}
-            label="Insert image"
-          />
-          <ToolbarButton
-            icon={<Undo size={18} />}
-            onClick={() => handleFormatAction("undo")}
-            label="Undo"
-          />
-          <ToolbarButton
-            icon={<Redo size={18} />}
-            onClick={() => handleFormatAction("redo")}
-            label="Redo"
-          />
+      <div className="relative">
+        {/* Right-side floating buttons */}
+        <div className="absolute right-0 top-0 flex flex-col gap-3 w-[200px] ml-4">
+          {isUploading ? (
+            <button
+              className="w-full rounded-md bg-gray-500 px-4 py-3 text-base font-medium text-white transition-colors"
+              disabled
+            >
+              Saving...
+            </button>
+          ) : (
+            <>
+              {saveButtonState === "saved" ? (
+                <button
+                  className="w-full flex items-center justify-center rounded-md bg-green-600 hover:bg-green-700 px-4 py-3 text-base font-medium text-white transition-colors"
+                  disabled
+                >
+                  <Check className="mr-2" size={20} /> Saved
+                </button>
+              ) : (
+                <button
+                  onClick={handleSaveTemplate}
+                  disabled={!templateName || templateName.trim() === ""}
+                  className={cn(
+                    "w-full flex items-center justify-center rounded-md px-4 py-3 text-base font-medium text-white transition-colors",
+                    saveButtonState === "error"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 disabled:bg-gray-400"
+                  )}
+                >
+                  Save Template
+                </button>
+              )}
+
+              <button
+                onClick={handleNextClick}
+                className="w-full rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-3 text-base font-medium text-white transition-colors"
+              >
+                Next
+              </button>
+            </>
+          )}
         </div>
 
-        {/* Editor Content */}
-        <EditorContent
-          editor={editor}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-        />
-      </div>
-
-      {/* File upload controls */}
-      <div className="mt-4 flex justify-end gap-2">
-        {isUploading ? (
-          <button
-            onClick={handleUpload}
-            className="flex items-center rounded-lg bg-gray-500 px-4 py-2 text-sm font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
-            disabled
-          >
-            Saving...
-          </button>
-        ) : (
-          <div className="flex flex-col">
-            <div className="flex gap-2">
-              <div className="flex items-center rounded-md border border-gray-200 overflow-hidden focus-within:border-gray-300">
-                <input
-                  id="save_file_name"
-                  name="save_file_name"
-                  type="text"
-                  placeholder="Enter template name"
-                  onChange={handleFileNameChange}
-                  className="py-2 pl-4 pr-0 font-medium w-64 focus:outline-none border-none"
-                />
-                <div className="px-3 flex h-10 items-center justify-center font-medium bg-neutral-100 text-gray-500">
-                  .html
-                </div>
-              </div>
-              <button
-                onClick={handleUpload}
-                disabled={isFileNameEmpty}
-                className="flex whitespace-nowrap items-center rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-2 text-sm font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-400"
-              >
-                Save Template
-              </button>
-              {showNextStep && (
-                <NextStepLink
-                  href="/sendEmail"
-                  className="flex items-center rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-2 text-sm font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
-                >
-                  Next Step &rarr;
-                </NextStepLink>
-              )}
-            </div>
+        <div className="pr-[220px]">
+          {/* Toolbar */}
+          <div className="flex flex-wrap items-center rounded-md p-1 bg-gray-50 mb-4">
+            <ToolbarButton
+              icon={<LinkIcon size={18} />}
+              onClick={() => handleFormatAction("link")}
+              label="Insert link"
+              isActive={editor?.isActive("link")}
+            />
+            <ToolbarButton
+              icon={<Bold size={18} />}
+              onClick={() => handleFormatAction("bold")}
+              label="Bold text"
+              isActive={editor?.isActive("bold")}
+            />
+            <ToolbarButton
+              icon={<Italic size={18} />}
+              onClick={() => handleFormatAction("italic")}
+              label="Italic text"
+              isActive={editor?.isActive("italic")}
+            />
+            <ToolbarButton
+              icon={<UnderlineIcon size={18} />}
+              onClick={() => handleFormatAction("underline")}
+              label="Underline text"
+              isActive={editor?.isActive("underline")}
+            />
+            <ToolbarButton
+              icon={<Strikethrough size={18} />}
+              onClick={() => handleFormatAction("strikethrough")}
+              label="Strikethrough text"
+              isActive={editor?.isActive("strike")}
+            />
+            <ToolbarButton
+              icon={<Heading1 size={18} />}
+              onClick={() => handleFormatAction("h1")}
+              label="Heading 1"
+              isActive={editor?.isActive("heading", { level: 1 })}
+            />
+            <ToolbarButton
+              icon={<Heading2 size={18} />}
+              onClick={() => handleFormatAction("h2")}
+              label="Heading 2"
+              isActive={editor?.isActive("heading", { level: 2 })}
+            />
+            <ToolbarButton
+              icon={<Heading3 size={18} />}
+              onClick={() => handleFormatAction("h3")}
+              label="Heading 3"
+              isActive={editor?.isActive("heading", { level: 3 })}
+            />
+            <ToolbarButton
+              icon={<List size={18} />}
+              onClick={() => handleFormatAction("bulletList")}
+              label="Bullet list"
+              isActive={editor?.isActive("bulletList")}
+            />
+            <ToolbarButton
+              icon={<ListOrdered size={18} />}
+              onClick={() => handleFormatAction("numberedList")}
+              label="Numbered list"
+              isActive={editor?.isActive("orderedList")}
+            />
+            <ToolbarButton
+              icon={<Quote size={18} />}
+              onClick={() => handleFormatAction("quote")}
+              label="Quote"
+              isActive={editor?.isActive("blockquote")}
+            />
+            <ToolbarButton
+              icon={<ImageIcon size={18} aria-hidden="true" />}
+              onClick={() => handleFormatAction("image")}
+              label="Insert image"
+            />
+            <ToolbarButton
+              icon={<Undo size={18} />}
+              onClick={() => handleFormatAction("undo")}
+              label="Undo"
+            />
+            <ToolbarButton
+              icon={<Redo size={18} />}
+              onClick={() => handleFormatAction("redo")}
+              label="Redo"
+            />
           </div>
-        )}
+
+          {/* Editor Content */}
+          <EditorContent
+            editor={editor}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          />
+        </div>
       </div>
     </>
   );
