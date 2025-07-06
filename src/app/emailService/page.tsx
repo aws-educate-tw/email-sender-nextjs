@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import EmailServiceBreadcrumb from "@/app/ui/email-service-breadcrumb";
 import EmailServiceChooseTemplate from "@/app/ui/email-service-choose-template";
 import { EmailServiceRecipients } from "@/app/ui/email-service-recipients";
@@ -7,47 +7,49 @@ import { EmailServiceSetting } from "@/app/ui/email-service-setting";
 import { EmailServiceReview } from "@/app/ui/email-service-review";
 import { EmailProvider } from "@/app/context/EmailContext";
 
-type Step = "template" | "recipients" | "setting" | "review";
+type Step = "template" | "recipients" | "settings" | "confirmation";
 
 export default function Page() {
-  const breadcrumbItems = [{ label: "Email Service", href: "/emailService", active: true }];
   const [currentStep, setCurrentStep] = useState<Step>("template");
   const [templateSubStep, setTemplateSubStep] = useState<"choose" | "create-new" | "use-history">(
     "choose"
   );
-
-  // Add a key to force re-mount of the component when breadcrumb is clicked
   const [templateKey, setTemplateKey] = useState<number>(0);
 
-  const handleStepChange = useCallback((step: Step) => {
-    console.log("Breadcrumb clicked:", step);
-    setCurrentStep(step);
+  // 監聽 hash 變化
+  useEffect(() => {
+    const updateStepFromHash = () => {
+      const hash = window.location.hash.replace("#", "") as Step;
+      const steps: Step[] = ["template", "recipients", "settings", "confirmation"];
+      if (steps.includes(hash)) {
+        setCurrentStep(hash);
+        if (hash === "template") {
+          setTemplateSubStep("choose");
+          setTemplateKey(prev => prev + 1); // re-mount
+        }
+      }
+    };
 
-    // Reset template sub-step when navigating to template step via breadcrumb
-    if (step === "template") {
-      console.log("Resetting templateSubStep to choose");
-      setTemplateSubStep("choose");
-      // Increment key to force re-mount
-      setTemplateKey(prev => prev + 1);
-    }
+    updateStepFromHash(); // 初始載入
+    window.addEventListener("hashchange", updateStepFromHash);
+    return () => window.removeEventListener("hashchange", updateStepFromHash);
   }, []);
 
   const renderStepContent = () => {
     switch (currentStep) {
       case "template":
-        console.log("Rendering template step with substep:", templateSubStep, "key:", templateKey);
         return (
           <EmailServiceChooseTemplate
-            onNext={() => setCurrentStep("recipients")}
+            onNext={() => (window.location.hash = "recipients")}
             initialStep={templateSubStep}
-            key={`template-${templateKey}`} // Use templateKey to force re-mount
+            key={`template-${templateKey}`}
           />
         );
       case "recipients":
-        return <EmailServiceRecipients onNext={() => setCurrentStep("setting")} />;
-      case "setting":
-        return <EmailServiceSetting onNext={() => setCurrentStep("review")} />;
-      case "review":
+        return <EmailServiceRecipients onNext={() => (window.location.hash = "settings")} />;
+      case "settings":
+        return <EmailServiceSetting onNext={() => (window.location.hash = "confirmation")} />;
+      case "confirmation":
         return <EmailServiceReview onSubmit={() => alert("Email sent successfully!")} />;
       default:
         return null;
@@ -56,14 +58,9 @@ export default function Page() {
 
   return (
     <EmailProvider>
-      <div className="container pt-0 ">
+      <div className="container pt-0">
         <p className="text-4xl font-bold pt-2">Email Service</p>
-        <EmailServiceBreadcrumb
-          currentStep={currentStep}
-          onStepClick={handleStepChange}
-          items={breadcrumbItems}
-        />
-
+        <EmailServiceBreadcrumb currentStep={currentStep} />
         {renderStepContent()}
       </div>
     </EmailProvider>
