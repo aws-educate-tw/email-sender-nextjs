@@ -6,7 +6,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { ArrowRight, Upload, Pencil, X, Check } from "lucide-react";
+import { ArrowRight, Upload, Pencil, X, Check, Save } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useEmailContext } from "@/app/context/EmailContext";
 import { RecipientTable } from "./email-service-recipients-table";
@@ -88,7 +88,7 @@ EnhancedFileUpload.displayName = "EnhancedFileUpload";
 export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) => {
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [sheetTitle, setSheetTitle] = useState("Enter the file name");
+  const [sheetTitle, setSheetTitle] = useState("");
   const [editingTitle, setEditingTitle] = useState("Enter the file name");
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
@@ -226,28 +226,34 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
           const data: TemplateVariablesResponse = await response.json();
 
           if (data.variables && Array.isArray(data.variables)) {
-            const standardColumns = allColumns.filter(col => col.isStandard);
+            setAllColumns(prevAllColumns => {
+              const standardColumns = prevAllColumns.filter(col => col.isStandard);
 
-            const templateVarColumns = data.variables.map(varName => ({
-              id: `var-${Date.now()}-${Math.random().toString(36).substring(2)}`,
-              name: varName,
-              tempValue: "",
-            }));
+              const templateVarColumns = data.variables.map(varName => ({
+                id: `var-${Date.now()}-${Math.random().toString(36).substring(2)}`,
+                name: varName,
+                tempValue: "",
+              }));
 
-            setAllColumns([...standardColumns, ...templateVarColumns]);
+              const newColumns = [...standardColumns, ...templateVarColumns];
 
-            if (recipients.length > 0) {
-              const updatedRecipients = recipients.map(recipient => {
-                const updatedRecipient = { ...recipient };
-                templateVarColumns.forEach(column => {
-                  if (!updatedRecipient[column.name]) {
-                    updatedRecipient[column.name] = "";
-                  }
-                });
-                return updatedRecipient;
+              setRecipients(prevRecipients => {
+                if (prevRecipients.length > 0) {
+                  return prevRecipients.map(recipient => {
+                    const updatedRecipient = { ...recipient };
+                    templateVarColumns.forEach(column => {
+                      if (!updatedRecipient[column.name]) {
+                        updatedRecipient[column.name] = "";
+                      }
+                    });
+                    return updatedRecipient;
+                  });
+                }
+                return prevRecipients;
               });
-              setRecipients(updatedRecipients);
-            }
+
+              return newColumns;
+            });
           }
         } catch (error) {
           console.error("Failed to fetch template variables:", error);
@@ -258,7 +264,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     };
 
     fetchTemplateVariables();
-  });
+  }, [emailData.templateId]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setImportError("");
@@ -392,7 +398,9 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
   };
 
   const saveTitle = useCallback(() => {
-    setSheetTitle(editingTitle);
+    if (editingTitle.trim() !== "") {
+      setSheetTitle(editingTitle);
+    }
     setIsEditingTitle(false);
   }, [editingTitle]);
 
@@ -589,20 +597,23 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
       <div className="flex items-center justify-between p-6 pb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl">File Name:</h2>
+          <h2 className="text-l">File Name:</h2>
           {isEditingTitle ? (
             <input
               ref={titleInputRef}
               type="text"
-              className="text-2xl font-bold border-2 border-gray-300 rounded-md p-1 ml-2 focus:border-gray-500 focus:outline-none focus:ring-0"
+              className="text-l font-bold border-2 border-gray-300 rounded-md p-1 ml-2 focus:border-gray-500 focus:outline-none focus:ring-0"
               value={editingTitle}
+              placeholder="Enter the file name"
               onChange={e => setEditingTitle(e.target.value)}
               onKeyDown={e => {
                 if (e.key === "Enter") saveTitle();
               }}
             />
           ) : (
-            <h2 className="text-xl font-bold ml-2">{sheetTitle}</h2>
+            <h2 className="text-l font-bold ml-2">
+              {sheetTitle || <span className="text-gray-400">Enter the file name</span>}
+            </h2>
           )}
           <button
             ref={editButtonRef}
@@ -779,19 +790,23 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
       )}
 
       {/* Footer buttons */}
-      <div className="flex justify-end p-6 gap-4">
+      <div className="flex justify-end p-6 gap-4 items-center">
+        {!sheetTitle && <p className="text-red-500 font-medium mr-4">Please enter a file name</p>}
         <button
           className={`px-6 py-2 rounded flex items-center transition-colors duration-300 ${
             uploadButtonFlash
               ? "bg-green-500 text-white"
               : isUploading
                 ? "bg-gray-200 text-gray-700"
-                : recipientsChanged || lastUploadedRecipients === "" // 如果收件人變更或從未上傳過
-                  ? "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed" // 未變更時禁用
+                : !sheetTitle
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : recipientsChanged || lastUploadedRecipients === ""
+                    ? "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
           }`}
           onClick={handleXlsxOpenUpload}
           disabled={
+            !sheetTitle ||
             recipients.length === 0 ||
             isUploading ||
             (!recipientsChanged && lastUploadedRecipients !== "")
@@ -808,18 +823,18 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
             </>
           ) : (
             <>
-              <Upload className="mr-2 w-4 h-4" /> Save
+              <Save className="mr-2 w-4 h-4" /> Save
             </>
           )}
         </button>
         <button
           className={`px-6 py-2 rounded flex items-center ${
-            sheetTitle === "Enter the file name"
-              ? "bg-gray-300 text-gray-100 cursor-not-allowed"
+            !sheetTitle
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-[#1a2f4a] text-white hover:bg-[#2c4a72] transition-colors duration-200"
           }`}
           onClick={onNext}
-          disabled={sheetTitle === "Enter the file name"}
+          disabled={!sheetTitle}
         >
           Next <ArrowRight className="ml-2 w-4 h-4" />
         </button>
