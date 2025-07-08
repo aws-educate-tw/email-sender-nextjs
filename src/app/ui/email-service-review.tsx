@@ -239,7 +239,7 @@ export const EmailServiceReview: React.FC<ReviewProps> = () => {
                 />
               ) : (
                 <IframePreview
-                  htmlContent={templatePreview}
+                  src={`data:text/html;charset=utf-8,${encodeURIComponent(templatePreview)}`}
                   title="Email Template Preview"
                   width="100%"
                   height="350px"
@@ -273,9 +273,12 @@ export const EmailServiceReview: React.FC<ReviewProps> = () => {
                   height="100%"
                 />
               ) : templatePreview ? (
-                <div className="bg-white w-full h-full overflow-auto p-4">
-                  <div dangerouslySetInnerHTML={{ __html: templatePreview }} />
-                </div>
+                <IframePreview
+                  src={`data:text/html;charset=utf-8,${encodeURIComponent(templatePreview)}`}
+                  title="Email Template Preview"
+                  width="100%"
+                  height="100%"
+                />
               ) : (
                 <div className="flex w-full h-full justify-center items-center">
                   <p className="text-white">No preview available</p>
