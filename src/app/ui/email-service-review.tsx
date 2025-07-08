@@ -9,7 +9,7 @@ interface ReviewProps {
   onSubmit: () => void;
 }
 
-export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
+export const EmailServiceReview: React.FC<ReviewProps> = () => {
   const { emailData } = useEmailContext();
   const [templatePreview, setTemplatePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -59,7 +59,7 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
         alert(response.status + ": " + response.message);
         setFormErrors({});
 
-        if (onSubmit) onSubmit();
+        // if (onSubmit) onSubmit();
       }
     } catch (error: any) {
       alert("Failed to send email: " + error.message);
@@ -117,10 +117,6 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
     return value;
   };
 
-  // const handleOpenFullPreview = () => {
-  //   setShowFullPreview(true);
-  // };
-
   const handleCloseFullPreview = () => {
     setShowFullPreview(false);
   };
@@ -159,7 +155,7 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
 
           <div className="grid grid-cols-[180px_1fr] items-center">
             <p className="font-semibold text-gray-800">Sheet file:</p>
-            <p className="text-gray-600">{getDisplayValue(emailData.sheetFileId)}</p>
+            <p className="text-gray-600">{getDisplayValue(emailData.sheetFileName)}</p>
           </div>
 
           <div className="grid grid-cols-[180px_1fr] items-center">
@@ -234,7 +230,21 @@ export const EmailServiceReview: React.FC<ReviewProps> = ({ onSubmit }) => {
                 <p>{error}</p>
               </div>
             ) : templatePreview ? (
-              <div dangerouslySetInnerHTML={{ __html: templatePreview }} />
+              emailData.templateUrl ? (
+                <IframePreview
+                  src={emailData.templateUrl}
+                  title="Email Template Preview"
+                  width="100%"
+                  height="350px"
+                />
+              ) : (
+                <IframePreview
+                  htmlContent={templatePreview}
+                  title="Email Template Preview"
+                  width="100%"
+                  height="350px"
+                />
+              )
             ) : (
               <p className="text-gray-500 italic">No template preview available</p>
             )}
