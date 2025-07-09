@@ -117,6 +117,19 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
 
   const [templateFileName, setTemplateFileName] = useState<string>("Unkown File Name");
 
+  // 新增處理欄位重新排序的函數
+  const handleReorderColumns = useCallback(
+    (newColumns: Column[]) => {
+      // 更新欄位順序
+      const standardColumns = allColumns.filter(col => col.isStandard);
+      setAllColumns([...standardColumns, ...newColumns]);
+
+      // 標記為已變更
+      setRecipientsChanged(true);
+    },
+    [allColumns]
+  );
+
   // This function is for xlsx file uploading after clicking the upload button.
   const handleXlsxOpenUpload = async () => {
     if (recipients.length === 0) {
@@ -436,21 +449,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     }
   };
 
-  const handleColumnDotClick = (event: React.MouseEvent, columnId: string) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    // Position the menu near the clicked dot
-    const rect = event.currentTarget.getBoundingClientRect();
-    setMenuPosition({
-      top: rect.bottom + window.scrollY,
-      left: rect.left + window.scrollX,
-    });
-
-    // Toggle the menu
-    setActiveColumnMenu(activeColumnMenu === columnId ? null : columnId);
-  };
-
   const handleDeleteColumn = (columnId: string) => {
     // Find the column to delete
     const columnToDelete = allColumns.find(col => col.id === columnId);
@@ -467,45 +465,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
         delete updatedRecipient[columnToDelete.name];
         return updatedRecipient;
       });
-      setRecipients(updatedRecipients);
-    }
-
-    setActiveColumnMenu(null);
-  };
-
-  const handleMoveColumn = (columnId: string, direction: "left" | "right") => {
-    // Filter out standard columns for movement operations
-    const nonStandardColumns = allColumns.filter(col => !col.isStandard);
-    const columnIndex = nonStandardColumns.findIndex(col => col.id === columnId);
-
-    if (columnIndex === -1) return;
-
-    // Cannot move leftmost column further left or rightmost column further right
-    if (
-      (direction === "left" && columnIndex === 0) ||
-      (direction === "right" && columnIndex === nonStandardColumns.length - 1)
-    ) {
-      return;
-    }
-
-    const targetIndex = direction === "left" ? columnIndex - 1 : columnIndex + 1;
-
-    // Create a copy of the non-standard columns
-    const updatedNonStandardColumns = [...nonStandardColumns];
-
-    // Perform the swap
-    [updatedNonStandardColumns[columnIndex], updatedNonStandardColumns[targetIndex]] = [
-      updatedNonStandardColumns[targetIndex],
-      updatedNonStandardColumns[columnIndex],
-    ];
-
-    // Combine standard and updated non-standard columns
-    const standardColumns = allColumns.filter(col => col.isStandard);
-    setAllColumns([...standardColumns, ...updatedNonStandardColumns]);
-
-    // Force re-render by creating new recipient objects
-    if (recipients.length > 0) {
-      const updatedRecipients = recipients.map(recipient => ({ ...recipient }));
       setRecipients(updatedRecipients);
     }
 
@@ -553,6 +512,31 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
       closeAddColumnModal();
     }
   };
+
+  const handleAddColumnWithName = useCallback(
+    (columnName: string) => {
+      const newColumn: Column = {
+        id: `col-${Date.now()}-${Math.random().toString(36).substring(2)}`,
+        name: columnName,
+        tempValue: "",
+      };
+
+      setAllColumns(prev => [...prev, newColumn]);
+
+      // 為現有的收件人新增這個欄位
+      if (recipients.length > 0) {
+        const updatedRecipients = recipients.map(recipient => ({
+          ...recipient,
+          [columnName]: "",
+        }));
+        setRecipients(updatedRecipients);
+      }
+
+      // 標記為已變更
+      setRecipientsChanged(true);
+    },
+    [recipients]
+  );
 
   useEffect(() => {
     if (lastUploadedRecipients && recipients.length > 0) {
@@ -701,18 +685,13 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
         customColumns={customColumns}
         recipients={recipients}
         setRecipients={setRecipients}
-        onAddColumn={openAddColumnModal}
-        onAddRecipient={addRecipient}
-        onColumnValueChange={(columnId, value) => {
-          const updatedColumns = allColumns.map(c =>
-            c.id === columnId ? { ...c, tempValue: value } : c
-          );
-          setAllColumns(updatedColumns);
-        }}
-        onColumnDotClick={handleColumnDotClick}
         onDeleteColumn={handleDeleteColumn}
-        onMoveColumn={handleMoveColumn}
-        activeColumnMenu={activeColumnMenu}
+        onReorderColumns={handleReorderColumns}
+        onAddColumnWithName={handleAddColumnWithName} // 新增這個
+        onUpdateRecipientValue={(recipientId, columnName, value) => {
+          // 這個是可選的，如果你需要在主組件中追蹤變更
+          setRecipientsChanged(true);
+        }}
       />
 
       {/* Add column modal */}

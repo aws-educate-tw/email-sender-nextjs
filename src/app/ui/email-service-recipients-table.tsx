@@ -1,5 +1,13 @@
-import React, { useState, useRef } from "react";
-import { Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState } from "react";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Trash2, Plus, GripVertical } from "lucide-react";
 
 interface RecipientTableProps {
   customColumns: Array<{
@@ -22,38 +30,61 @@ interface RecipientTableProps {
   onAddColumn?: () => void;
   onAddRecipient?: () => void;
   onColumnValueChange?: (columnId: string, value: string) => void;
-  onColumnDotClick?: (event: React.MouseEvent, columnId: string) => void;
   onDeleteColumn?: (columnId: string) => void;
-  onMoveColumn?: (columnId: string, direction: "left" | "right") => void;
-  activeColumnMenu?: string | null;
+  onReorderColumns?: (newOrder: Array<{ id: string; name: string; tempValue?: string }>) => void;
+  onAddColumnWithName?: (columnName: string) => void;
+  onUpdateRecipientValue?: (recipientId: string, columnName: string, value: string) => void;
 }
 
-// Fixed Column Icon component - based on the new UI design
-const ColumnIcon = ({
-  onClick,
-  isClickable = false,
+// 可排序的欄位名稱標籤
+function SortableColumnTag({
+  column,
+  onDelete,
 }: {
-  onClick?: (e: React.MouseEvent) => void;
-  isClickable?: boolean;
-}) => {
+  column: { id: string; name: string; tempValue?: string };
+  onDelete?: (columnId: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
   return (
     <div
-      className={`flex items-center justify-center ${isClickable ? "cursor-pointer hover:bg-gray-100 rounded" : ""}`}
-      onClick={onClick}
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 px-3 py-2 bg-blue-100 border border-blue-200 rounded-lg transition-all ${
+        isDragging ? "shadow-lg scale-105" : "hover:bg-blue-150"
+      }`}
     >
-      <div className="relative w-2 h-2 flex items-center justify-center">
-        <div className="grid grid-cols-2 gap-[1px]">
-          <div className="w-[3px] h-[3px] rounded-full bg-gray-400"></div>
-          <div className="w-[3px] h-[3px] rounded-full bg-gray-400"></div>
-          <div className="w-[3px] h-[3px] rounded-full bg-gray-400"></div>
-          <div className="w-[3px] h-[3px] rounded-full bg-gray-400"></div>
-          <div className="w-[3px] h-[3px] rounded-full bg-gray-400"></div>
-          <div className="w-[3px] h-[3px] rounded-full bg-gray-400"></div>
-        </div>
+      {/* 拖拉手柄 */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-blue-200 transition-colors"
+      >
+        <GripVertical className="w-4 h-4 text-blue-600" />
       </div>
+
+      {/* 欄位名稱 */}
+      <span className="text-blue-800 font-medium select-none">{column.name}</span>
+
+      {/* 刪除按鈕 */}
+      <button
+        className="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors ml-1"
+        onClick={() => onDelete && onDelete(column.id)}
+        title="刪除欄位"
+      >
+        ×
+      </button>
     </div>
   );
-};
+}
 
 export const RecipientTable: React.FC<RecipientTableProps> = ({
   customColumns,
@@ -62,152 +93,210 @@ export const RecipientTable: React.FC<RecipientTableProps> = ({
   onAddColumn,
   onAddRecipient,
   onColumnValueChange,
-  onColumnDotClick,
   onDeleteColumn,
-  onMoveColumn,
-  activeColumnMenu,
+  onReorderColumns,
+  onAddColumnWithName,
+  onUpdateRecipientValue,
 }) => {
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
-  const columnMenuRef = useRef<HTMLDivElement>(null);
+  const [newColumnName, setNewColumnName] = useState("");
+  const sensors = useSensors(useSensor(PointerSensor));
 
-  // ColumnMenu component to display when a column dot is clicked
-  const ColumnMenu = ({ columnId }: { columnId: string }) => {
-    return (
-      <div
-        ref={columnMenuRef}
-        className="absolute bg-white shadow-md rounded-md border border-gray-200 z-10 py-1 w-36"
-        style={{ top: `${menuPosition.top}px`, left: `${menuPosition.left}px` }}
-      >
-        <button
-          className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center text-red-600"
-          onClick={() => onDeleteColumn && onDeleteColumn(columnId)}
-        >
-          <Trash2 className="w-4 h-4 mr-2" /> Delete
-        </button>
-        <button
-          className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center"
-          onClick={() => onMoveColumn && onMoveColumn(columnId, "left")}
-        >
-          <ChevronLeft className="w-4 h-4 mr-2" /> Move Left
-        </button>
-        <button
-          className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center"
-          onClick={() => onMoveColumn && onMoveColumn(columnId, "right")}
-        >
-          <ChevronRight className="w-4 h-4 mr-2" /> Move Right
-        </button>
-      </div>
-    );
-  };
+  // 處理拖拉結束事件
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
 
-  // Handle column dot click and position the menu
-  const handleColumnDotClick = (event: React.MouseEvent, columnId: string) => {
-    event.preventDefault();
-    event.stopPropagation();
+    if (active.id !== over?.id) {
+      const oldIndex = customColumns.findIndex(col => col.id === active.id);
+      const newIndex = customColumns.findIndex(col => col.id === over.id);
 
-    // Position the menu near the clicked dot
-    const rect = event.currentTarget.getBoundingClientRect();
-    setMenuPosition({
-      top: rect.bottom + window.scrollY,
-      left: rect.left + window.scrollX,
-    });
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newColumns = arrayMove(customColumns, oldIndex, newIndex);
 
-    // Pass the event to parent
-    if (onColumnDotClick) {
-      onColumnDotClick(event, columnId);
+        // 通知父組件更新欄位順序
+        if (onReorderColumns) {
+          onReorderColumns(newColumns);
+        }
+      }
     }
   };
 
+  // 新增欄位
+  const handleAddColumn = () => {
+    const trimmedName = newColumnName.trim();
+    if (trimmedName && !customColumns.some(col => col.name === trimmedName)) {
+      if (onAddColumnWithName) {
+        onAddColumnWithName(trimmedName);
+      }
+      setNewColumnName("");
+    }
+  };
+
+  // 處理輸入框按鍵
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleAddColumn();
+    } else if (e.key === "Escape") {
+      setNewColumnName("");
+    }
+  };
+
+  // 新增空白資料列
+  const handleAddRow = () => {
+    const newRecipient: any = {
+      id: `recipient-${Date.now()}-${Math.random().toString(36).substring(2)}`,
+    };
+
+    // 為每個欄位初始化空值
+    customColumns.forEach(column => {
+      newRecipient[column.name] = "";
+    });
+
+    setRecipients(prev => [...prev, newRecipient]);
+  };
+
+  // 更新收件人資料
+  const handleCellValueChange = (recipientId: string, columnName: string, value: string) => {
+    setRecipients(prev =>
+      prev.map(recipient =>
+        recipient.id === recipientId ? { ...recipient, [columnName]: value } : recipient
+      )
+    );
+
+    // 同時通知父組件（如果需要）
+    if (onUpdateRecipientValue) {
+      onUpdateRecipientValue(recipientId, columnName, value);
+    }
+  };
+
+  // 刪除收件人
+  const handleDeleteRecipient = (recipientId: string) => {
+    setRecipients(prev => prev.filter(r => r.id !== recipientId));
+  };
+
+  // 取得欄位 ID 列表用於 SortableContext
+  const columnIds = customColumns.map(col => col.id);
+
   return (
     <>
-      {/* Input fields section */}
+      {/* 欄位管理區域 */}
       <div className="px-6 pb-4">
-        <div className="flex flex-wrap items-center gap-2 mt-2 mb-6">
-          {customColumns.map(column => (
-            <React.Fragment key={column.id}>
-              <div className="flex items-center px-2">
-                <ColumnIcon isClickable={true} onClick={e => handleColumnDotClick(e, column.id)} />
-              </div>
-              <input
-                type="text"
-                className="w-44 p-3 border-2 border-gray-300 focus:border-gray-400 rounded-md focus:outline-none focus:ring-0"
-                placeholder={column.name}
-                value={column.tempValue || ""}
-                onChange={e => {
-                  if (onColumnValueChange) {
-                    onColumnValueChange(column.id, e.target.value);
-                  }
-                }}
-              />
-            </React.Fragment>
-          ))}
+        <div className="space-y-4">
+          {/* 欄位名稱標籤 */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">欄位</h3>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
+                <div className="flex flex-wrap gap-2">
+                  {customColumns.map(column => (
+                    <SortableColumnTag key={column.id} column={column} onDelete={onDeleteColumn} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
 
-          <button
-            className="h-12 w-12 p-3 border border-gray-300 rounded flex items-center justify-center text-gray-500 hover:bg-gray-50"
-            onClick={onAddColumn}
-          >
-            <Plus size={20} />
-          </button>
-
-          <button
-            className="h-12 bg-[#1a2f4a] text-white px-4 py-2 rounded flex items-center"
-            onClick={onAddRecipient}
-          >
-            <Plus className="mr-2 w-4 h-4" /> Add
-          </button>
+          {/* 新增欄位輸入框 */}
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={newColumnName}
+              onChange={e => setNewColumnName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-48 p-2 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="輸入新欄位名稱..."
+            />
+            <button
+              onClick={handleAddColumn}
+              disabled={
+                !newColumnName.trim() ||
+                customColumns.some(col => col.name === newColumnName.trim())
+              }
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              新增欄位
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Recipients table */}
+      {/* 收件人表格 */}
       <div className="px-6">
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: `repeat(${customColumns.length + 1}, 1fr)` }}
-        >
-          {customColumns.map(column => (
+        {customColumns.length > 0 ? (
+          <>
+            {/* 表格標題 */}
             <div
-              key={column.id}
-              className={"py-3 px-4 border-b border-gray-200 font-medium text-black"}
+              className="grid gap-px bg-gray-200 rounded-t-lg overflow-hidden"
+              style={{ gridTemplateColumns: `repeat(${customColumns.length}, 1fr) auto` }}
             >
-              {column.name}
-            </div>
-          ))}
-          <div className="py-3 px-4 border-b border-gray-200 font-medium">Action</div>
-        </div>
-
-        {recipients.map(recipient => (
-          <div
-            key={recipient.id}
-            className="grid"
-            style={{ gridTemplateColumns: `repeat(${customColumns.length + 1}, 1fr)` }}
-          >
-            {customColumns.map(column => (
-              <div key={column.id} className={"py-3 px-4 border-b border-gray-200 text-black"}>
-                {recipient[column.name]}
+              {customColumns.map(column => (
+                <div
+                  key={column.id}
+                  className="py-3 px-4 bg-gray-50 font-medium text-gray-700 text-sm"
+                >
+                  {column.name}
+                </div>
+              ))}
+              <div className="py-3 px-4 bg-gray-50 font-medium text-gray-700 text-sm text-center">
+                操作
               </div>
-            ))}
-
-            <div className="py-3 px-4 border-b border-gray-200 flex items-center">
-              <button
-                className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded-md transition-colors duration-200"
-                onClick={() => {
-                  setRecipients(recipients.filter(r => r.id !== recipient.id));
-                }}
-                aria-label="Delete recipient"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
             </div>
-          </div>
-        ))}
 
-        {recipients.length === 0 && (
-          <div className="py-4 text-center text-gray-500">No recipients added yet</div>
+            {/* 表格內容 */}
+            <div className="bg-gray-200 rounded-b-lg overflow-hidden">
+              {recipients.map((recipient, rowIndex) => (
+                <div
+                  key={recipient.id}
+                  className="grid gap-px"
+                  style={{ gridTemplateColumns: `repeat(${customColumns.length}, 1fr) auto` }}
+                >
+                  {customColumns.map(column => (
+                    <div key={column.id} className="bg-white">
+                      <input
+                        type="text"
+                        value={recipient[column.name] || ""}
+                        onChange={e =>
+                          handleCellValueChange(recipient.id, column.name, e.target.value)
+                        }
+                        className="w-full py-3 px-4 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                        placeholder={`輸入 ${column.name}...`}
+                      />
+                    </div>
+                  ))}
+
+                  <div className="bg-white py-3 px-4 flex items-center justify-center">
+                    <button
+                      className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded-md transition-colors"
+                      onClick={() => handleDeleteRecipient(recipient.id)}
+                      title="刪除這列"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 新增資料列按鈕 */}
+            <button
+              onClick={handleAddRow}
+              className="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              新增資料列
+            </button>
+          </>
+        ) : (
+          <div className="py-12 text-center text-gray-500">
+            <p className="text-lg">尚未建立任何欄位</p>
+            <p className="text-sm mt-1">請先在上方新增欄位名稱</p>
+          </div>
         )}
       </div>
-
-      {/* Display the column menu when a column is active */}
-      {activeColumnMenu && <ColumnMenu columnId={activeColumnMenu} />}
     </>
   );
 };
