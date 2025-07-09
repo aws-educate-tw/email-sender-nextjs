@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { EmailServiceChooseTemplateChoose } from "./email-service-choose-template-choose";
-import EmailServiceChooseTemplateCreateNew from "./email-service-choose-template-create-new";
-import { EmailServiceChooseTemplateHistoryTemplate } from "./email-service-choose-template-history-template";
+import { EmailServiceChooseTemplateChoose } from "@/app/ui/emailService/email-service-choose-template-choose";
+import EmailServiceChooseTemplateCreateNew from "@/app/ui/emailService/email-service-choose-template-create-new";
+import { EmailServiceChooseTemplateHistoryTemplate } from "@/app/ui/emailService/email-service-choose-template-history-template";
 
 interface EmailServiceChooseTemplateProps {
   onNext: () => void;
@@ -31,9 +31,9 @@ export default function EmailServiceChooseTemplate({
     }
   };
 
-  const handleCreateNewBack = () => {
-    setCurrentStep("choose");
-  };
+  // const handleCreateNewBack = () => {
+  //   setCurrentStep("choose");
+  // };
 
   const handleHistoryTemplateBack = () => {
     setCurrentStep("choose");
@@ -61,7 +61,7 @@ export default function EmailServiceChooseTemplate({
 
       {currentStep === "create-new" && (
         <EmailServiceChooseTemplateCreateNew
-          onBack={handleCreateNewBack}
+          // onBack={handleCreateNewBack}
           onNext={handleCreateNewNext}
         />
       )}

@@ -425,30 +425,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     }
   };
 
-  const addRecipient = () => {
-    const allFieldsHaveValues = customColumns.every(
-      column => column.tempValue !== undefined && column.tempValue.trim() !== ""
-    );
-
-    if (allFieldsHaveValues) {
-      const newRecipient: Recipient = {
-        id: Date.now().toString(),
-      };
-
-      customColumns.forEach(column => {
-        newRecipient[column.name] = column.tempValue || "";
-      });
-
-      setRecipients([...recipients, newRecipient]);
-      setRecipientsChanged(true);
-
-      const clearedColumns = allColumns.map(c => ({ ...c, tempValue: "" }));
-      setAllColumns(clearedColumns);
-    } else {
-      alert("請填寫所有欄位");
-    }
-  };
-
   const handleDeleteColumn = (columnId: string) => {
     // Find the column to delete
     const columnToDelete = allColumns.find(col => col.id === columnId);
@@ -483,11 +459,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const openAddColumnModal = () => {
-    setNewColumnName("");
-    setIsAddingColumn(true);
-  };
 
   const closeAddColumnModal = () => {
     setIsAddingColumn(false);
@@ -689,7 +660,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
         onReorderColumns={handleReorderColumns}
         onAddColumnWithName={handleAddColumnWithName} // 新增這個
         onUpdateRecipientValue={(recipientId, columnName, value) => {
-          // 這個是可選的，如果你需要在主組件中追蹤變更
           setRecipientsChanged(true);
         }}
       />

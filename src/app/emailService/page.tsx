@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import EmailServiceBreadcrumb from "@/app/ui/email-service-breadcrumb";
-import EmailServiceChooseTemplate from "@/app/ui/email-service-choose-template";
-import { EmailServiceRecipients } from "@/app/ui/email-service-recipients";
-import { EmailServiceSetting } from "@/app/ui/email-service-setting";
-import { EmailServiceReview } from "@/app/ui/email-service-review";
+import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
+import EmailServiceChooseTemplate from "@/app/ui/emailService/email-service-choose-template";
+import { EmailServiceRecipients } from "@/app/ui/emailService/email-service-recipients";
+import { EmailServiceSetting } from "@/app/ui/emailService/email-service-setting";
+import { EmailServiceReview } from "@/app/ui/emailService/email-service-review";
 import { EmailProvider } from "@/app/context/EmailContext";
 
 type Step = "template" | "recipients" | "settings" | "confirmation";

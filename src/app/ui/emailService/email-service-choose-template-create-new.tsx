@@ -14,7 +14,7 @@ import { Card } from "@/components/ui/card";
 import { useEmailContext } from "@/app/context/EmailContext";
 
 interface EmailServiceChooseTemplateCreateNewProps {
-  onBack: () => void;
+  // onBack: () => void;
   onNext: (templateType: "new" | "history") => void;
 }
 
