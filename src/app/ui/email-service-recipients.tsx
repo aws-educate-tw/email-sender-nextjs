@@ -115,6 +115,9 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
   const fileInputRef = useRef<HTMLInputElement>(null);
   const columnMenuRef = useRef<HTMLDivElement>(null);
 
+  const [templateFileName, setTemplateFileName] = useState<string>("Unkown File Name");
+
+  // This function is for xlsx file uploading after clicking the upload button.
   const handleXlsxOpenUpload = async () => {
     if (recipients.length === 0) {
       alert("No recipients to save. Please add recipients first.");
@@ -193,18 +196,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     }
   };
 
-  const handleXlsxCloseUpload = () => {
-    setShowXlsxUpload(false);
-  };
-
-  const handleXlsxSelect = (file_id: string, file_url: string, file_name: string) => {
-    updateEmailData({
-      sheetFileId: file_id,
-      sheetFileName: file_name,
-      sheetFileUrl: file_url,
-    });
-  };
-
+  // This part is for template variables fetching
   useEffect(() => {
     const fetchTemplateVariables = async () => {
       if (emailData.templateId) {
@@ -224,6 +216,10 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
           }
 
           const data: TemplateVariablesResponse = await response.json();
+
+          if (data.file_name) {
+            setTemplateFileName(data.file_name);
+          }
 
           if (data.variables && Array.isArray(data.variables)) {
             setAllColumns(prevAllColumns => {
@@ -266,45 +262,13 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     fetchTemplateVariables();
   }, [emailData.templateId]);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setImportError("");
-
-    if (!e.target.files || e.target.files.length === 0) {
-      return;
-    }
-
-    const file = e.target.files[0];
-
-    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
-      setImportError("Please select a valid Excel file (.xlsx or .xls)");
-      return;
-    }
-
-    setIsImporting(true);
-
-    try {
-      const data = await readExcelFile(file);
-
-      processExcelData(data);
-      setSheetTitle(file.name.replace(/\.[^/.]+$/, ""));
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error) {
-      console.error("Error importing Excel file:", error);
-      setImportError("Failed to import Excel file. Please check the format and try again.");
-    } finally {
-      setIsImporting(false);
-    }
-  };
-
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
 
+  // This function is for Excel file reading, it is used is handleImportSheet
   const readExcelFile = (file: File): Promise<any[]> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -335,6 +299,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     });
   };
 
+  // This function deals with the column name and value updates.
   const processExcelData = (data: any[]) => {
     if (data.length === 0) {
       setImportError("No data found in the Excel file");
@@ -395,6 +360,40 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     });
 
     setRecipients([...recipients, ...importedRecipients]);
+  };
+
+  // This function is attached to the Import Sheet button to handle xlsx files.
+  const handleImportSheet = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImportError("");
+
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+
+    const file = e.target.files[0];
+
+    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+      setImportError("Please select a valid Excel file (.xlsx or .xls)");
+      return;
+    }
+
+    setIsImporting(true);
+
+    try {
+      const data = await readExcelFile(file);
+
+      processExcelData(data);
+      setSheetTitle(file.name.replace(/\.[^/.]+$/, ""));
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Error importing Excel file:", error);
+      setImportError("Failed to import Excel file. Please check the format and try again.");
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   const saveTitle = useCallback(() => {
@@ -595,6 +594,11 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
+      <div>
+        <p>
+          You have selected this template file: <strong>{templateFileName}</strong>
+        </p>
+      </div>
       <div className="flex items-center justify-between p-6 pb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-l">File Name:</h2>
@@ -656,7 +660,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
             type="file"
             accept=".xlsx,.xls"
             className="hidden"
-            onChange={handleFileSelect}
+            onChange={handleImportSheet}
           />
           <button
             className="bg-white border border-gray-300 rounded px-4 py-2 flex items-center hover:bg-gray-100 transition-colors duration-200"
@@ -748,43 +752,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
                 Add Column
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Sheet Upload Modal */}
-      {showXlsxUpload && (
-        <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-2xl p-8 pb-20 w-full max-w-screen-lg relative">
-            <button onClick={handleXlsxCloseUpload} className="absolute top-8 right-8 text-black">
-              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  fill="currentColor"
-                  d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
-                />
-              </svg>
-            </button>
-            <div className="mb-4">
-              <h2 className="text-xl font-bold">Upload Recipients Sheet</h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Upload your recipients sheet file to continue.
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <p className="font-medium text-gray-700">Selected file: {xlsxFile?.name}</p>
-            </div>
-            <FileUpload
-              OnFileExtension=".xlsx"
-              onFileSelect={(file_id: string, file_url: string, file_name: string) => {
-                handleXlsxSelect(file_id, file_url, file_name);
-                setShowXlsxUpload(false);
-                setUploadSuccess(true);
-                setUploadButtonFlash(true);
-                setTimeout(() => setUploadButtonFlash(false), 2000);
-              }}
-              {...({} as any)}
-            />
           </div>
         </div>
       )}
