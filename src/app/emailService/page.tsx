@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
 import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-template-editor";
-import { EmailServiceRecipients } from "@/app/ui/emailService/email-service-recipients";
+import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
 import { EmailServiceSetting } from "@/app/ui/emailService/email-service-setting";
 import { EmailServiceReview } from "@/app/ui/emailService/email-service-review";
 import { EmailProvider } from "@/app/context/EmailContext";
@@ -22,6 +22,8 @@ type StartMode = "new" | "edit-existing" | "resend";
 export default function Page() {
   const [currentStep, setCurrentStep] = useState<Step>("start-option");
   const [startMode, setStartMode] = useState<StartMode | null>(null);
+  const [templateFileId, setTemplateFileId] = useState<string | null>(null);
+  const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const updateStepFromHash = () => {
@@ -49,6 +51,11 @@ export default function Page() {
     return () => window.removeEventListener("hashchange", updateStepFromHash);
   }, []);
 
+  // useEffect(() => {
+  //   console.log("templateFileId:", templateFileId);
+  //   console.log("templateFileUrl:", templateFileUrl);
+  // }, [templateFileId, templateFileUrl]);
+
   const handleStart = (mode: StartMode) => {
     setStartMode(mode);
     if (mode === "new") {
@@ -73,9 +80,22 @@ export default function Page() {
       case "select-template":
         return <EmailServiceTemplateSelector onSelect={handleTemplateSelected} />;
       case "template-edit":
-        return <EmailServiceTemplateEditor onNext={() => (window.location.hash = "recipients")} />;
+        return (
+          <EmailServiceTemplateEditor
+            onNext={() => (window.location.hash = "recipients")}
+            onSave={(fileId, fileUrl) => {
+              setTemplateFileId(fileId);
+              setTemplateFileUrl(fileUrl);
+            }}
+          />
+        );
       case "recipients":
-        return <EmailServiceRecipients onNext={() => (window.location.hash = "settings")} />;
+        return (
+          <EmailServiceRecipients
+            onNext={() => (window.location.hash = "settings")}
+            templateFileId={templateFileId}
+          />
+        );
       case "settings":
         return <EmailServiceSetting onNext={() => (window.location.hash = "confirmation")} />;
       case "confirmation":
@@ -100,7 +120,7 @@ export default function Page() {
 
   return (
     <EmailProvider>
-      <div className="container pt-0">
+      <div className="">
         <p className="text-4xl font-bold pt-2">Email Service</p>
         {currentStep !== "start-option" && (
           <EmailServiceBreadcrumb currentStep={currentStep} steps={visibleSteps} />

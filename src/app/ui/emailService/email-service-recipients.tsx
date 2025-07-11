@@ -8,12 +8,12 @@ import React, {
 } from "react";
 import { ArrowRight, Upload, Pencil, X, Check, Save } from "lucide-react";
 import * as XLSX from "xlsx";
-import { useEmailContext } from "@/app/context/EmailContext";
 import { RecipientTable } from "./email-service-recipients-table";
 import FileUpload from "@/app/ui/file-upload";
 
 interface RecipientsProps {
   onNext: () => void;
+  templateFileId?: string | null;
 }
 
 interface Recipient {
@@ -85,7 +85,7 @@ const EnhancedFileUpload = forwardRef<any, EnhancedFileUploadProps>(
 
 EnhancedFileUpload.displayName = "EnhancedFileUpload";
 
-export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) => {
+export default function EmailServiceRecipients({ onNext, templateFileId }: RecipientsProps) {
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [sheetTitle, setSheetTitle] = useState("");
@@ -107,7 +107,6 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
   const [isUploading, setIsUploading] = useState(false);
 
   const [showXlsxUpload, setShowXlsxUpload] = useState<boolean>(false);
-  const { emailData, updateEmailData } = useEmailContext();
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const editButtonRef = useRef<HTMLButtonElement>(null);
@@ -188,11 +187,11 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
 
         const uploadedFile = result.files[0];
 
-        updateEmailData({
-          sheetFileId: uploadedFile.file_id,
-          sheetFileName: uploadedFile.file_name,
-          sheetFileUrl: uploadedFile.file_url,
-        });
+        // updateEmailData({
+        //   sheetFileId: uploadedFile.file_id,
+        //   sheetFileName: uploadedFile.file_name,
+        //   sheetFileUrl: uploadedFile.file_url,
+        // });
 
         setUploadSuccess(true);
         setUploadButtonFlash(true);
@@ -212,11 +211,11 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
   // This part is for template variables fetching
   useEffect(() => {
     const fetchTemplateVariables = async () => {
-      if (emailData.templateId) {
+      if (templateFileId) {
         setIsLoadingVariables(true);
         try {
           const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-          const url = `${base_url}/files/${emailData.templateId}/template-variables`;
+          const url = `${base_url}/files/${templateFileId}/template-variables`;
 
           const response = await fetch(url, {
             headers: {
@@ -273,7 +272,7 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
     };
 
     fetchTemplateVariables();
-  }, [emailData.templateId]);
+  }, [templateFileId]);
 
   const triggerFileInput = () => {
     if (fileInputRef.current) {
@@ -757,4 +756,4 @@ export const EmailServiceRecipients: React.FC<RecipientsProps> = ({ onNext }) =>
       </div>
     </div>
   );
-};
+}

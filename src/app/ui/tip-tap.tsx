@@ -106,7 +106,7 @@ export default function TipTap({ onChange, content, onNext, templateName, onSave
     editorProps: {
       attributes: {
         class:
-          "w-full h-[400px] border border-gray-200 rounded-md p-3 font-sans text-sm overflow-auto bg-white outline-none focus:border-gray-300",
+          "w-full h-[60vh] border border-gray-300 rounded-md p-4 font-sans text-sm overflow-auto bg-white focus:outline-none focus:ring-2 focus:ring-blue-500",
       },
     },
     content: content,
@@ -183,105 +183,105 @@ export default function TipTap({ onChange, content, onNext, templateName, onSave
     }
   };
 
-  const handleUpload = async () => {
-    if (!templateName || templateName.trim() === "") {
-      console.error("Template name is required");
-      setSaveButtonState("error");
-      setTimeout(() => {
-        setSaveButtonState("idle");
-      }, 3000);
-      return;
-    }
+  // const handleUpload = async () => {
+  //   if (!templateName || templateName.trim() === "") {
+  //     console.error("Template name is required");
+  //     setSaveButtonState("error");
+  //     setTimeout(() => {
+  //       setSaveButtonState("idle");
+  //     }, 3000);
+  //     return;
+  //   }
 
-    const saveFileName = templateName.trim();
+  //   const saveFileName = templateName.trim();
 
-    const preserveEmptyLines = (content: string): string => {
-      return (
-        content
-          // 將已有的空段落轉換為包含 &nbsp; 的格式
-          .replace(/<p>\s*<\/p>/g, "<p>&nbsp;</p>")
-          // 處理連續空行，但保留它們
-          .replace(/(<p>&nbsp;<\/p>)+/g, match => match)
-          // 確保段落之間有換行符號
-          .replace(/<\/p><p>/g, "</p>\n<p>")
-      );
-    };
+  //   const preserveEmptyLines = (content: string): string => {
+  //     return (
+  //       content
+  //         // 將已有的空段落轉換為包含 &nbsp; 的格式
+  //         .replace(/<p>\s*<\/p>/g, "<p>&nbsp;</p>")
+  //         // 處理連續空行，但保留它們
+  //         .replace(/(<p>&nbsp;<\/p>)+/g, match => match)
+  //         // 確保段落之間有換行符號
+  //         .replace(/<\/p><p>/g, "</p>\n<p>")
+  //     );
+  //   };
 
-    const formattedContent = preserveEmptyLines(editorContent);
+  //   const formattedContent = preserveEmptyLines(editorContent);
 
-    const html = `
-    <!DOCTYPE html>
-    <html lang="zh-TW">
-    <head>
-        <meta charset="UTF-8">
-        <title>加入 AWS Educate Taiwan 雲端校園大使證照陪跑計畫</title>
-    </head>
-    <body>
-        ${formattedContent}
-    </body>
-    </html>`;
-    const blob = new Blob([html], { type: "text/html" });
-    const fileName = `${saveFileName}.html`;
-    const formData = new FormData();
-    formData.append("file", blob, fileName);
+  //   const html = `
+  //   <!DOCTYPE html>
+  //   <html lang="zh-TW">
+  //   <head>
+  //       <meta charset="UTF-8">
+  //       <title>加入 AWS Educate Taiwan 雲端校園大使證照陪跑計畫</title>
+  //   </head>
+  //   <body>
+  //       ${formattedContent}
+  //   </body>
+  //   </html>`;
+  //   const blob = new Blob([html], { type: "text/html" });
+  //   const fileName = `${saveFileName}.html`;
+  //   const formData = new FormData();
+  //   formData.append("file", blob, fileName);
 
-    try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/upload-multiple-file`);
-      setIsUploading(true);
-      const response = await fetch(url.toString(), {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: formData,
-      });
-      const result = await response.json();
-      console.log(result);
-      setIsUploading(false);
-      setShowToast(true);
+  //   try {
+  //     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+  //     const url = new URL(`${base_url}/upload-multiple-file`);
+  //     setIsUploading(true);
+  //     const response = await fetch(url.toString(), {
+  //       method: "POST",
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+  //       },
+  //       body: formData,
+  //     });
+  //     const result = await response.json();
+  //     console.log(result);
+  //     setIsUploading(false);
+  //     setShowToast(true);
 
-      // Show "Saved" button state
-      setSaveButtonState("saved");
-      setTimeout(() => {
-        setSaveButtonState("idle");
-      }, 3000);
+  //     // Show "Saved" button state
+  //     setSaveButtonState("saved");
+  //     setTimeout(() => {
+  //       setSaveButtonState("idle");
+  //     }, 3000);
 
-      setTimeout(() => setShowToast(false), 5000);
+  //     setTimeout(() => setShowToast(false), 5000);
 
-      // Extract file_id from the response and pass it to the onSave callback
-      const fileId = result?.files?.[0]?.file_id;
-      const fileUrl = result?.files?.[0]?.file_url;
+  //     // Extract file_id from the response and pass it to the onSave callback
+  //     const fileId = result?.files?.[0]?.file_id;
+  //     const fileUrl = result?.files?.[0]?.file_url;
 
-      // Call the onSave callback if provided
-      if (onSave) {
-        onSave(formattedContent, fileId, fileUrl);
-      }
-    } catch (error) {
-      console.error("Upload failed:", error);
-      setSaveButtonState("error");
-      setTimeout(() => {
-        setSaveButtonState("idle");
-      }, 3000);
-    }
-  };
+  //     // Call the onSave callback if provided
+  //     if (onSave) {
+  //       onSave(formattedContent, fileId, fileUrl);
+  //     }
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //     setSaveButtonState("error");
+  //     setTimeout(() => {
+  //       setSaveButtonState("idle");
+  //     }, 3000);
+  //   }
+  // };
 
-  const handleSaveTemplate = () => {
-    if (saveButtonState === "saved") return;
-    handleUpload();
-  };
+  // const handleSaveTemplate = () => {
+  //   if (saveButtonState === "saved") return;
+  //   handleUpload();
+  // };
 
-  const handleNextClick = () => {
-    if (onNext) {
-      onNext();
-    } else {
-      router.push("/sendEmail");
-    }
-  };
+  // const handleNextClick = () => {
+  //   if (onNext) {
+  //     onNext();
+  //   } else {
+  //     router.push("/emailService/recipients");
+  //   }
+  // };
 
   return (
     <>
-      {showToast && (
+      {/* {showToast && (
         <div className="fixed top-4 right-6 z-50">
           <Toast
             className="bg-green-400 drop-shadow-lg transition-opacity hover: cursor-pointer"
@@ -293,55 +293,12 @@ export default function TipTap({ onChange, content, onNext, templateName, onSave
             <div className="ml-3 font-medium text-white">File uploaded successfully.</div>
           </Toast>
         </div>
-      )}
+      )} */}
 
-      <div className="relative">
-        {/* Right-side floating buttons */}
-        <div className="absolute right-0 top-0 flex flex-col gap-3 w-[200px] ml-4">
-          {isUploading ? (
-            <button
-              className="w-full rounded-md bg-gray-500 px-4 py-3 text-base font-medium text-white transition-colors"
-              disabled
-            >
-              Saving...
-            </button>
-          ) : (
-            <>
-              {saveButtonState === "saved" ? (
-                <button
-                  className="w-full flex items-center justify-center rounded-md bg-green-600 hover:bg-green-700 px-4 py-3 text-base font-medium text-white transition-colors"
-                  disabled
-                >
-                  <Check className="mr-2" size={20} /> Saved
-                </button>
-              ) : (
-                <button
-                  onClick={handleSaveTemplate}
-                  disabled={!templateName || templateName.trim() === ""}
-                  className={cn(
-                    "w-full flex items-center justify-center rounded-md px-4 py-3 text-base font-medium text-white transition-colors",
-                    saveButtonState === "error"
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 disabled:bg-gray-400"
-                  )}
-                >
-                  Save Template
-                </button>
-              )}
-
-              <button
-                onClick={handleNextClick}
-                className="w-full rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-3 text-base font-medium text-white transition-colors"
-              >
-                Next
-              </button>
-            </>
-          )}
-        </div>
-
-        <div className="pr-[220px]">
+      <div className="flex-col">
+        <div className="pb-4">
           {/* Toolbar */}
-          <div className="flex flex-wrap items-center rounded-md p-1 bg-gray-50 mb-4">
+          <div className="flex flex-wrap items-center rounded-md p-1 bg-gray-200 mb-4">
             <ToolbarButton
               icon={<LinkIcon size={18} />}
               onClick={() => handleFormatAction("link")}
@@ -432,6 +389,47 @@ export default function TipTap({ onChange, content, onNext, templateName, onSave
             onBlur={() => setIsFocused(false)}
           />
         </div>
+        {/* <div className="flex justify-end gap-3">
+          {isUploading ? (
+            <button
+              className="rounded-md bg-gray-500 px-4 py-3 text-base font-medium text-white transition-colors"
+              disabled
+            >
+              Saving...
+            </button>
+          ) : (
+            <>
+              {saveButtonState === "saved" ? (
+                <button
+                  className="flex items-center justify-center rounded-md bg-green-600 hover:bg-green-700 px-4 py-3 text-base font-medium text-white transition-colors"
+                  disabled
+                >
+                  <Check className="mr-2" size={20} /> Saved
+                </button>
+              ) : (
+                <button
+                  onClick={handleSaveTemplate}
+                  disabled={!templateName || templateName.trim() === ""}
+                  className={cn(
+                    "flex items-center justify-center rounded-md px-4 py-3 text-base font-medium text-white transition-colors",
+                    saveButtonState === "error"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 disabled:bg-gray-400"
+                  )}
+                >
+                  Save Template
+                </button>
+              )}
+
+              <button
+                onClick={handleNextClick}
+                className="rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-3 text-base font-medium text-white transition-colors"
+              >
+                Next
+              </button>
+            </>
+          )}
+        </div> */}
       </div>
     </>
   );
