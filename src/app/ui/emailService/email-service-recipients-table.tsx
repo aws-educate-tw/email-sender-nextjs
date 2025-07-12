@@ -86,7 +86,7 @@ function SortableColumnTag({
   );
 }
 
-export const RecipientTable: React.FC<RecipientTableProps> = ({
+export default function RecipientsTable({
   customColumns,
   recipients,
   setRecipients,
@@ -94,7 +94,7 @@ export const RecipientTable: React.FC<RecipientTableProps> = ({
   onReorderColumns,
   onAddColumnWithName,
   onUpdateRecipientValue,
-}) => {
+}: RecipientTableProps) {
   const [newColumnName, setNewColumnName] = useState("");
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -177,7 +177,29 @@ export const RecipientTable: React.FC<RecipientTableProps> = ({
     <>
       {/* 欄位管理區域 */}
       <div className="px-6 pb-4">
-        <div className="space-y-4">
+        <div className="">
+          {/* 新增欄位輸入框 */}
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={newColumnName}
+              onChange={e => setNewColumnName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full px-3 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="輸入新欄位名稱..."
+            />
+            <button
+              onClick={handleAddColumn}
+              disabled={
+                !newColumnName.trim() ||
+                customColumns.some(col => col.name === newColumnName.trim())
+              }
+              className="flex items-center text-nowrap p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              新增欄位
+            </button>
+          </div>
           {/* 欄位名稱標籤 */}
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-2">欄位</h3>
@@ -194,29 +216,6 @@ export const RecipientTable: React.FC<RecipientTableProps> = ({
                 </div>
               </SortableContext>
             </DndContext>
-          </div>
-
-          {/* 新增欄位輸入框 */}
-          <div className="flex gap-2 items-center">
-            <input
-              type="text"
-              value={newColumnName}
-              onChange={e => setNewColumnName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-48 p-2 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="輸入新欄位名稱..."
-            />
-            <button
-              onClick={handleAddColumn}
-              disabled={
-                !newColumnName.trim() ||
-                customColumns.some(col => col.name === newColumnName.trim())
-              }
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              新增欄位
-            </button>
           </div>
         </div>
       </div>
@@ -296,4 +295,4 @@ export const RecipientTable: React.FC<RecipientTableProps> = ({
       </div>
     </>
   );
-};
+}

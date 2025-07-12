@@ -8,8 +8,9 @@ import React, {
 } from "react";
 import { ArrowRight, Upload, Pencil, X, Check, Save } from "lucide-react";
 import * as XLSX from "xlsx";
-import { RecipientTable } from "./email-service-recipients-table";
+import RecipientsTable from "./email-service-recipients-table";
 import FileUpload from "@/app/ui/file-upload";
+import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";
 
 interface RecipientsProps {
   onNext: () => void;
@@ -115,6 +116,7 @@ export default function EmailServiceRecipients({ onNext, templateFileId }: Recip
   const columnMenuRef = useRef<HTMLDivElement>(null);
 
   const [templateFileName, setTemplateFileName] = useState<string>("Unkown File Name");
+  const [templateVariables, setTemplateVariables] = useState<string[]>([]);
 
   // 新增處理欄位重新排序的函數
   const handleReorderColumns = useCallback(
@@ -210,68 +212,34 @@ export default function EmailServiceRecipients({ onNext, templateFileId }: Recip
 
   // This part is for template variables fetching
   useEffect(() => {
-    const fetchTemplateVariables = async () => {
-      if (templateFileId) {
-        setIsLoadingVariables(true);
-        try {
-          const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-          const url = `${base_url}/files/${templateFileId}/template-variables`;
-
-          const response = await fetch(url, {
+    if (!templateFileId) return;
+    const fetchVariables = async () => {
+      setIsLoadingVariables(true);
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/files/${templateFileId}/template-variables`,
+          {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("access_token")}`,
             },
-          });
-
-          if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
           }
-
-          const data: TemplateVariablesResponse = await response.json();
-
-          if (data.file_name) {
-            setTemplateFileName(data.file_name);
-          }
-
-          if (data.variables && Array.isArray(data.variables)) {
-            setAllColumns(prevAllColumns => {
-              const standardColumns = prevAllColumns.filter(col => col.isStandard);
-
-              const templateVarColumns = data.variables.map(varName => ({
-                id: `var-${Date.now()}-${Math.random().toString(36).substring(2)}`,
-                name: varName,
-                tempValue: "",
-              }));
-
-              const newColumns = [...standardColumns, ...templateVarColumns];
-
-              setRecipients(prevRecipients => {
-                if (prevRecipients.length > 0) {
-                  return prevRecipients.map(recipient => {
-                    const updatedRecipient = { ...recipient };
-                    templateVarColumns.forEach(column => {
-                      if (!updatedRecipient[column.name]) {
-                        updatedRecipient[column.name] = "";
-                      }
-                    });
-                    return updatedRecipient;
-                  });
-                }
-                return prevRecipients;
-              });
-
-              return newColumns;
-            });
-          }
-        } catch (error) {
-          console.error("Failed to fetch template variables:", error);
-        } finally {
-          setIsLoadingVariables(false);
-        }
+        );
+        const data = await res.json();
+        setTemplateFileName(data.file_name || "Unknown File");
+        setTemplateVariables(data.variables || []);
+        // 自動建立變數欄位
+        const variableColumns = data.variables.map((v: string) => ({
+          id: `var-${v}`,
+          name: v,
+        }));
+        setAllColumns(prev => [...prev.filter(col => col.isStandard), ...variableColumns]);
+      } catch (err) {
+        console.error("Failed to load variables:", err);
+      } finally {
+        setIsLoadingVariables(false);
       }
     };
-
-    fetchTemplateVariables();
+    fetchVariables();
   }, [templateFileId]);
 
   const triggerFileInput = () => {
@@ -547,213 +515,190 @@ export default function EmailServiceRecipients({ onNext, templateFileId }: Recip
   const customColumns = allColumns.filter(col => !col.isStandard);
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
-      <div>
-        <p>
-          You have selected this template file: <strong>{templateFileName}</strong>
-        </p>
-      </div>
-      <div className="flex items-center justify-between p-6 pb-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-l">File Name:</h2>
-          {isEditingTitle ? (
+    <>
+      <TemplateVariablesInfo
+        templateFileName={templateFileName}
+        templateVariables={templateVariables}
+        isLoading={isLoadingVariables}
+      />
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
+        <div className="flex items-center justify-between p-6 pb-4">
+          {/* This part is for file name editing */}
+          <div className="flex items-center gap-2">
+            <h2 className="text-l">File Name:</h2>
+            {isEditingTitle ? (
+              <input
+                ref={titleInputRef}
+                type="text"
+                className="text-l font-bold border-2 border-gray-300 rounded-md p-1 ml-2 focus:border-gray-500 focus:outline-none focus:ring-0"
+                value={editingTitle}
+                placeholder="Enter the file name"
+                onChange={e => setEditingTitle(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === "Enter") saveTitle();
+                }}
+              />
+            ) : (
+              <h2 className="text-l font-bold ml-2">
+                {sheetTitle || <span className="text-gray-400">Enter the file name</span>}
+              </h2>
+            )}
+            <button
+              ref={editButtonRef}
+              className="ml-2 p-2 rounded-md hover:bg-gray-100 transition-colors duration-200"
+              onClick={toggleEditTitle}
+            >
+              <Pencil className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
             <input
-              ref={titleInputRef}
-              type="text"
-              className="text-l font-bold border-2 border-gray-300 rounded-md p-1 ml-2 focus:border-gray-500 focus:outline-none focus:ring-0"
-              value={editingTitle}
-              placeholder="Enter the file name"
-              onChange={e => setEditingTitle(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === "Enter") saveTitle();
-              }}
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleImportSheet}
             />
-          ) : (
-            <h2 className="text-l font-bold ml-2">
-              {sheetTitle || <span className="text-gray-400">Enter the file name</span>}
-            </h2>
-          )}
-          <button
-            ref={editButtonRef}
-            className="ml-2 p-2 rounded-md hover:bg-gray-100 transition-colors duration-200"
-            onClick={toggleEditTitle}
-          >
-            <Pencil className="w-5 h-5 text-gray-600" />
-          </button>
+            <button
+              className="bg-white border border-gray-300 rounded px-4 py-2 flex items-center hover:bg-gray-100 transition-colors duration-200"
+              onClick={triggerFileInput}
+              disabled={isImporting}
+            >
+              {isImporting ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 w-4 h-4" /> Import Sheet
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {isLoadingVariables && (
-            <div className="text-sm text-gray-500 flex items-center px-3 py-2 rounded-lg">
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-gray-600"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
+        {importError && (
+          <div className="mx-6 mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
+            <p className="flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
-              <span>Loading template variables...</span>
-            </div>
-          )}
+              {importError}
+            </p>
+          </div>
+        )}
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls"
-            className="hidden"
-            onChange={handleImportSheet}
-          />
+        <RecipientsTable
+          customColumns={customColumns}
+          recipients={recipients}
+          setRecipients={setRecipients}
+          onDeleteColumn={handleDeleteColumn}
+          onReorderColumns={handleReorderColumns}
+          onAddColumnWithName={handleAddColumnWithName} // 新增這個
+          onUpdateRecipientValue={(recipientId, columnName, value) => {
+            setRecipientsChanged(true);
+          }}
+        />
+
+        {/* Add column modal */}
+        {isAddingColumn && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div ref={modalRef} className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold">Add New Column</h3>
+                <button onClick={closeAddColumnModal} className="text-gray-500 hover:text-gray-700">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <label className="block mb-2 font-medium">Column Name</label>
+                <input
+                  type="text"
+                  className="w-full p-3 border-2 border-gray-300 rounded-md focus:border-gray-700 focus:outline-none focus:ring-0"
+                  placeholder="Enter column name"
+                  value={newColumnName}
+                  onChange={e => setNewColumnName(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  className="px-5 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
+                  onClick={closeAddColumnModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-5 py-2 bg-[#1a2f4a] text-white rounded-md hover:bg-[#2c4a72]"
+                  onClick={addColumn}
+                >
+                  Add Column
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Footer buttons */}
+        <div className="flex justify-end p-6 gap-4 items-center">
+          {!sheetTitle && <p className="text-red-500 font-medium mr-4">Please enter a file name</p>}
           <button
-            className="bg-white border border-gray-300 rounded px-4 py-2 flex items-center hover:bg-gray-100 transition-colors duration-200"
-            onClick={triggerFileInput}
-            disabled={isImporting}
+            className={`px-6 py-2 rounded flex items-center transition-colors duration-300 ${
+              uploadButtonFlash
+                ? "bg-green-500 text-white"
+                : isUploading
+                  ? "bg-gray-200 text-gray-700"
+                  : !sheetTitle
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : recipientsChanged || lastUploadedRecipients === ""
+                      ? "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                      : "bg-gray-200 text-gray-500 cursor-not-allowed"
+            }`}
+            onClick={handleXlsxOpenUpload}
+            disabled={
+              !sheetTitle ||
+              recipients.length === 0 ||
+              isUploading ||
+              (!recipientsChanged && lastUploadedRecipients !== "")
+            }
           >
-            {isImporting ? (
+            {isUploading ? (
               <>
                 <div className="animate-spin mr-2 h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
-                Importing...
+                Saving...
+              </>
+            ) : uploadSuccess && uploadButtonFlash ? (
+              <>
+                <Check className="mr-2 w-4 h-4" /> Saved
               </>
             ) : (
               <>
-                <Upload className="mr-2 w-4 h-4" /> Import Sheet
+                <Save className="mr-2 w-4 h-4" /> Save
               </>
             )}
           </button>
+          <button
+            className={`px-6 py-2 rounded flex items-center ${
+              !sheetTitle
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-[#1a2f4a] text-white hover:bg-[#2c4a72] transition-colors duration-200"
+            }`}
+            onClick={onNext}
+            disabled={!sheetTitle}
+          >
+            Next <ArrowRight className="ml-2 w-4 h-4" />
+          </button>
         </div>
       </div>
-
-      {importError && (
-        <div className="mx-6 mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-          <p className="flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            {importError}
-          </p>
-        </div>
-      )}
-
-      <RecipientTable
-        customColumns={customColumns}
-        recipients={recipients}
-        setRecipients={setRecipients}
-        onDeleteColumn={handleDeleteColumn}
-        onReorderColumns={handleReorderColumns}
-        onAddColumnWithName={handleAddColumnWithName} // 新增這個
-        onUpdateRecipientValue={(recipientId, columnName, value) => {
-          setRecipientsChanged(true);
-        }}
-      />
-
-      {/* Add column modal */}
-      {isAddingColumn && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div ref={modalRef} className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">Add New Column</h3>
-              <button onClick={closeAddColumnModal} className="text-gray-500 hover:text-gray-700">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="mb-6">
-              <label className="block mb-2 font-medium">Column Name</label>
-              <input
-                type="text"
-                className="w-full p-3 border-2 border-gray-300 rounded-md focus:border-gray-700 focus:outline-none focus:ring-0"
-                placeholder="Enter column name"
-                value={newColumnName}
-                onChange={e => setNewColumnName(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <button
-                className="px-5 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
-                onClick={closeAddColumnModal}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-5 py-2 bg-[#1a2f4a] text-white rounded-md hover:bg-[#2c4a72]"
-                onClick={addColumn}
-              >
-                Add Column
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Footer buttons */}
-      <div className="flex justify-end p-6 gap-4 items-center">
-        {!sheetTitle && <p className="text-red-500 font-medium mr-4">Please enter a file name</p>}
-        <button
-          className={`px-6 py-2 rounded flex items-center transition-colors duration-300 ${
-            uploadButtonFlash
-              ? "bg-green-500 text-white"
-              : isUploading
-                ? "bg-gray-200 text-gray-700"
-                : !sheetTitle
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : recipientsChanged || lastUploadedRecipients === ""
-                    ? "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
-          }`}
-          onClick={handleXlsxOpenUpload}
-          disabled={
-            !sheetTitle ||
-            recipients.length === 0 ||
-            isUploading ||
-            (!recipientsChanged && lastUploadedRecipients !== "")
-          }
-        >
-          {isUploading ? (
-            <>
-              <div className="animate-spin mr-2 h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
-              Saving...
-            </>
-          ) : uploadSuccess && uploadButtonFlash ? (
-            <>
-              <Check className="mr-2 w-4 h-4" /> Saved
-            </>
-          ) : (
-            <>
-              <Save className="mr-2 w-4 h-4" /> Save
-            </>
-          )}
-        </button>
-        <button
-          className={`px-6 py-2 rounded flex items-center ${
-            !sheetTitle
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-[#1a2f4a] text-white hover:bg-[#2c4a72] transition-colors duration-200"
-          }`}
-          onClick={onNext}
-          disabled={!sheetTitle}
-        >
-          Next <ArrowRight className="ml-2 w-4 h-4" />
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
