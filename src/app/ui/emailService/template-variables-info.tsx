@@ -24,10 +24,10 @@ export default function TemplateVariablesInfo({
         </div>
         <div className="flex items-center gap-2">
           <Tag className="w-8 h-8 text-sky-950" />
-          <h4 className="font-medium text-gray-900">提取的變量</h4>
+          <h4 className="font-medium text-gray-900">Extracted Template Variables</h4>
           {!isLoading && (
             <span className="text-white bg-sky-950 text-xs font-medium px-2 py-1 rounded-full">
-              {templateVariables.length} 個變量
+              {templateVariables.length} 個 Variables
             </span>
           )}
         </div>
@@ -57,7 +57,7 @@ export default function TemplateVariablesInfo({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <span className="text-sm font-medium">正在加載模板變量...</span>
+              <span className="text-sm font-medium">正在加載 Template Variables...</span>
             </div>
           </div>
         ) : templateVariables.length === 0 ? (
@@ -77,7 +77,7 @@ export default function TemplateVariablesInfo({
                 />
               </svg>
             </div>
-            <p className="text-gray-500 text-sm">未找到模板變量</p>
+            <p className="text-gray-500 text-sm">未找到 Template Variables</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
