@@ -7,13 +7,16 @@ import React, {
   useImperativeHandle,
 } from "react";
 import { Pencil } from "lucide-react";
+import * as XLSX from "xlsx";
 import ExcelEditor from "@/app/ui/emailService/excel-editor";
 import FileUpload from "@/app/ui/file-upload";
 import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";
+import { on } from "events";
 
 interface TemplateProps {
   onNext: () => void;
   templateFileId?: string | null;
+  onSave?: (spreadsheetFileId: string, spreadsheetFileUrl: string) => void;
 }
 
 interface Excel {
@@ -85,7 +88,7 @@ const EnhancedFileUpload = forwardRef<any, EnhancedFileUploadProps>(
 
 EnhancedFileUpload.displayName = "EnhancedFileUpload";
 
-export default function EmailServiceRecipients({ onNext, templateFileId }: TemplateProps) {
+export default function EmailServiceRecipients({ onNext, templateFileId, onSave }: TemplateProps) {
   const [excel, setExcel] = useState<Excel[]>([]);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [sheetTitle, setSheetTitle] = useState("");
@@ -176,6 +179,73 @@ export default function EmailServiceRecipients({ onNext, templateFileId }: Templ
 
   const customColumns = allColumns.filter(col => !col.isStandard);
 
+  const handleUploadExcelData = async () => {
+    if (!sheetTitle || excel.length === 0) {
+      alert("請輸入檔案名稱並上傳至少一筆資料");
+      return;
+    }
+
+    try {
+      // 1. 建立 Excel 檔案
+      const worksheet = XLSX.utils.json_to_sheet(excel);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const file = new File([blob], `${sheetTitle}.xlsx`, {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      // 2. 上傳 API
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const url = new URL(`${base_url}/upload-multiple-file`);
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`上傳失敗: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("✅ 上傳成功：", result.files);
+
+      const spreadsheetFileId = result?.files?.[0]?.file_id;
+      const spreadsheetFileUrl = result?.files?.[0]?.file_url;
+
+      if (onSave) {
+        console.log("📥 Sending to EmailServiceRecipients:", spreadsheetFileId, spreadsheetFileUrl);
+        onSave(spreadsheetFileId, spreadsheetFileUrl);
+      }
+
+      // ✅ 記錄或更新最後上傳狀態
+      setLastUploadedRecipients(JSON.stringify(excel));
+      alert("上傳成功");
+    } catch (error: any) {
+      console.error("❌ 上傳失敗:", error);
+      alert("上傳失敗：" + error.message);
+    }
+  };
+
+  const handleNextClick = () => {
+    if (onNext) {
+      onNext();
+    } else {
+      window.location.href = "/emailService";
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -220,6 +290,18 @@ export default function EmailServiceRecipients({ onNext, templateFileId }: Templ
             <Pencil className="w-5 h-5 text-gray-600" />
           </button>
         </div>
+        <button
+          onClick={handleUploadExcelData}
+          className="mt-4 px-6 py-2 bg-[#1a2f4a] text-white rounded hover:bg-[#2c4a72]"
+        >
+          Save
+        </button>
+        <button
+          onClick={handleNextClick}
+          className="mt-4 px-6 py-2 bg-[#1a2f4a] text-white rounded hover:bg-[#2c4a72]"
+        >
+          Next
+        </button>
 
         {/* Add column modal */}
         {/* // {isAddingColumn && (

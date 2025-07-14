@@ -25,6 +25,9 @@ export default function Page() {
   const [templateFileId, setTemplateFileId] = useState<string | null>(null);
   const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
 
+  const [spreadsheetFileId, setSpreadsheetFileId] = useState<string | null>(null);
+  const [spreadsheetFileUrl, setSpreadsheetFileUrl] = useState<string | null>(null);
+
   useEffect(() => {
     const updateStepFromHash = () => {
       const hash = window.location.hash.replace("#", "") as Step;
@@ -94,6 +97,10 @@ export default function Page() {
           <EmailServiceRecipients
             onNext={() => (window.location.hash = "settings")}
             templateFileId={templateFileId}
+            onSave={(spreadsheetFileId, spreadsheetFileUrl) => {
+              setSpreadsheetFileId(spreadsheetFileId);
+              setSpreadsheetFileUrl(spreadsheetFileUrl);
+            }}
           />
         );
       case "settings":
@@ -104,6 +111,11 @@ export default function Page() {
         return null;
     }
   };
+
+  useEffect(() => {
+    console.log("Spreadsheet File ID:", spreadsheetFileId);
+    console.log("Spreadsheet File URL:", spreadsheetFileUrl);
+  }, [spreadsheetFileId, spreadsheetFileUrl]);
 
   const visibleSteps: string[] = (() => {
     if (!startMode) return ["start-option"];
