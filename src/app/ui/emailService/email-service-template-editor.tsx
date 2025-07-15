@@ -21,7 +21,7 @@ const htmltemplateContent = `
 
 interface EmailServiceTemplateEditorProps {
   onNext: () => void;
-  onSave?: (fileId: string, fileUrl: string) => void;
+  onSave?: (templateFileId: string, templateFileUrl: string) => void;
 }
 
 export default function EmailServiceTemplateEditor({
@@ -104,12 +104,12 @@ export default function EmailServiceTemplateEditor({
       setTimeout(() => setShowToast(false), 5000);
 
       // Extract file_id from the response and pass it to the onSave callback
-      const fileId = result?.files?.[0]?.file_id;
-      const fileUrl = result?.files?.[0]?.file_url;
+      const templateFileId = result?.files?.[0]?.file_id;
+      const templateFileUrl = result?.files?.[0]?.file_url;
 
       // Call the onSave callback if provided
       if (onSave) {
-        onSave(fileId, fileUrl);
+        onSave(templateFileId, templateFileUrl);
       }
     } catch (error) {
       console.error("Upload failed:", error);
@@ -131,7 +131,7 @@ export default function EmailServiceTemplateEditor({
     } else {
       // Fallback to a default action if onNext is not provided
       console.warn("onNext callback is not provided, redirecting to recipients page.");
-      window.location.href = "/emailService#recipients";
+      window.location.href = "/emailService";
     }
   };
 

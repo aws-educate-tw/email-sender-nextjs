@@ -86,9 +86,9 @@ export default function Page() {
         return (
           <EmailServiceTemplateEditor
             onNext={() => (window.location.hash = "recipients")}
-            onSave={(fileId, fileUrl) => {
-              setTemplateFileId(fileId);
-              setTemplateFileUrl(fileUrl);
+            onSave={(templateFileId, templateFileUrl) => {
+              setTemplateFileId(templateFileId);
+              setTemplateFileUrl(templateFileUrl);
             }}
           />
         );
