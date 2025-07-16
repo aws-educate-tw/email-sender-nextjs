@@ -21,7 +21,7 @@ const htmltemplateContent = `
 
 interface EmailServiceTemplateEditorProps {
   onNext: () => void;
-  onSave?: (templateFileId: string, templateFileUrl: string) => void;
+  onSave?: (templateFileName: string, templateFileId: string, templateFileUrl: string) => void;
 }
 
 export default function EmailServiceTemplateEditor({
@@ -104,12 +104,13 @@ export default function EmailServiceTemplateEditor({
       setTimeout(() => setShowToast(false), 5000);
 
       // Extract file_id from the response and pass it to the onSave callback
+      const templateFileName = result?.files?.[0]?.file_name;
       const templateFileId = result?.files?.[0]?.file_id;
       const templateFileUrl = result?.files?.[0]?.file_url;
 
       // Call the onSave callback if provided
       if (onSave) {
-        onSave(templateFileId, templateFileUrl);
+        onSave(templateFileName, templateFileId, templateFileUrl);
       }
     } catch (error) {
       console.error("Upload failed:", error);

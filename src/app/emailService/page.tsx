@@ -5,7 +5,7 @@ import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-o
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
 import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-template-editor";
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
-import { EmailServiceSetting } from "@/app/ui/emailService/email-service-setting";
+import EmailServiceSetting from "@/app/ui/emailService/email-service-setting";
 import { EmailServiceReview } from "@/app/ui/emailService/email-service-review";
 import { EmailProvider } from "@/app/context/EmailContext";
 
@@ -22,9 +22,14 @@ type StartMode = "new" | "edit-existing" | "resend";
 export default function Page() {
   const [currentStep, setCurrentStep] = useState<Step>("start-option");
   const [startMode, setStartMode] = useState<StartMode | null>(null);
+
+  // 管理template的狀態
+  const [templateFileName, setTemplateFileName] = useState<string>("");
   const [templateFileId, setTemplateFileId] = useState<string | null>(null);
   const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
 
+  // 管理spreadsheet的狀態
+  const [spreadsheetFileName, setSpreadsheetFileName] = useState<string>("");
   const [spreadsheetFileId, setSpreadsheetFileId] = useState<string | null>(null);
   const [spreadsheetFileUrl, setSpreadsheetFileUrl] = useState<string | null>(null);
 
@@ -86,7 +91,8 @@ export default function Page() {
         return (
           <EmailServiceTemplateEditor
             onNext={() => (window.location.hash = "recipients")}
-            onSave={(templateFileId, templateFileUrl) => {
+            onSave={(templateFileName, templateFileId, templateFileUrl) => {
+              setTemplateFileName(templateFileName);
               setTemplateFileId(templateFileId);
               setTemplateFileUrl(templateFileUrl);
             }}
@@ -97,25 +103,32 @@ export default function Page() {
           <EmailServiceRecipients
             onNext={() => (window.location.hash = "settings")}
             templateFileId={templateFileId}
-            onSave={(spreadsheetFileId, spreadsheetFileUrl) => {
+            onSave={(spreadsheetFileName, spreadsheetFileId, spreadsheetFileUrl) => {
+              setSpreadsheetFileName(spreadsheetFileName);
               setSpreadsheetFileId(spreadsheetFileId);
               setSpreadsheetFileUrl(spreadsheetFileUrl);
             }}
           />
         );
       case "settings":
-        return <EmailServiceSetting onNext={() => (window.location.hash = "confirmation")} />;
+        return (
+          <EmailServiceSetting
+            onNext={() => (window.location.hash = "confirmation")}
+            templateFileName={templateFileName}
+            templateFileId={templateFileId}
+            templateFileUrl={templateFileUrl}
+            spreadsheetFileName={spreadsheetFileName}
+            spreadsheetFileId={spreadsheetFileId}
+            spreadsheetFileUrl={spreadsheetFileUrl}
+          />
+        );
+
       case "confirmation":
         return <EmailServiceReview onSubmit={() => alert("Email sent successfully!")} />;
       default:
         return null;
     }
   };
-
-  useEffect(() => {
-    console.log("Spreadsheet File ID:", spreadsheetFileId);
-    console.log("Spreadsheet File URL:", spreadsheetFileUrl);
-  }, [spreadsheetFileId, spreadsheetFileUrl]);
 
   const visibleSteps: string[] = (() => {
     if (!startMode) return ["start-option"];

@@ -16,7 +16,11 @@ import { on } from "events";
 interface TemplateProps {
   onNext: () => void;
   templateFileId?: string | null;
-  onSave?: (spreadsheetFileId: string, spreadsheetFileUrl: string) => void;
+  onSave?: (
+    spreadsheetFileName: string,
+    spreadsheetFileId: string,
+    spreadsheetFileUrl: string
+  ) => void;
 }
 
 interface Excel {
@@ -177,8 +181,6 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
     }
   }, [isEditingTitle]);
 
-  const customColumns = allColumns.filter(col => !col.isStandard);
-
   const handleUploadExcelData = async () => {
     if (!sheetTitle || excel.length === 0) {
       alert("請輸入檔案名稱並上傳至少一筆資料");
@@ -219,14 +221,14 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
       }
 
       const result = await response.json();
-      console.log("✅ 上傳成功：", result.files);
 
+      const spreadsheetFileName = result?.files?.[0]?.file_name;
       const spreadsheetFileId = result?.files?.[0]?.file_id;
       const spreadsheetFileUrl = result?.files?.[0]?.file_url;
 
       if (onSave) {
         console.log("📥 Sending to EmailServiceRecipients:", spreadsheetFileId, spreadsheetFileUrl);
-        onSave(spreadsheetFileId, spreadsheetFileUrl);
+        onSave(spreadsheetFileName, spreadsheetFileId, spreadsheetFileUrl);
       }
 
       // ✅ 記錄或更新最後上傳狀態
