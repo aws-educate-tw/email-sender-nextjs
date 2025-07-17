@@ -7,7 +7,7 @@ import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-temp
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
 import EmailServiceSetting from "@/app/ui/emailService/email-service-setting";
 import { EmailServiceReview } from "@/app/ui/emailService/email-service-review";
-import { EmailProvider } from "@/app/context/EmailContext";
+import { EmailData, EmailProvider } from "@/app/context/EmailContext";
 
 type Step =
   | "start-option"
@@ -19,19 +19,48 @@ type Step =
 
 type StartMode = "new" | "edit-existing" | "resend";
 
+export interface EmailDataType {
+  subject: string;
+  senderName: string;
+  templateFileName: string | null;
+  templateFileId: string | null;
+  templateFileUrl: string | null;
+  spreadsheetFileName: string | null;
+  spreadsheetFileId: string | null;
+  spreadsheetFileUrl: string | null;
+  localPart: string;
+  replyTo: string;
+  bcc: string[];
+  cc: string[];
+  provideCertification: "yes" | "no";
+}
+
 export default function Page() {
   const [currentStep, setCurrentStep] = useState<Step>("start-option");
   const [startMode, setStartMode] = useState<StartMode | null>(null);
 
-  // 管理template的狀態
-  const [templateFileName, setTemplateFileName] = useState<string>("");
-  const [templateFileId, setTemplateFileId] = useState<string | null>(null);
-  const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
+  const [emailData, setEmailData] = useState<EmailDataType>({
+    subject: "",
+    senderName: "",
+    templateFileName: null,
+    templateFileId: null,
+    templateFileUrl: null,
+    spreadsheetFileName: null,
+    spreadsheetFileId: null,
+    spreadsheetFileUrl: null,
+    localPart: "",
+    replyTo: "",
+    bcc: [],
+    cc: [],
+    provideCertification: "no",
+  });
 
-  // 管理spreadsheet的狀態
-  const [spreadsheetFileName, setSpreadsheetFileName] = useState<string>("");
-  const [spreadsheetFileId, setSpreadsheetFileId] = useState<string | null>(null);
-  const [spreadsheetFileUrl, setSpreadsheetFileUrl] = useState<string | null>(null);
+  // 管理template的狀態
+  const [templateFileId, setTemplateFileId] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log("emailData:", emailData);
+  }, [emailData]);
 
   useEffect(() => {
     const updateStepFromHash = () => {
@@ -92,9 +121,12 @@ export default function Page() {
           <EmailServiceTemplateEditor
             onNext={() => (window.location.hash = "recipients")}
             onSave={(templateFileName, templateFileId, templateFileUrl) => {
-              setTemplateFileName(templateFileName);
-              setTemplateFileId(templateFileId);
-              setTemplateFileUrl(templateFileUrl);
+              setEmailData(prev => ({
+                ...prev,
+                templateFileName,
+                templateFileId,
+                templateFileUrl,
+              }));
             }}
           />
         );
@@ -102,11 +134,14 @@ export default function Page() {
         return (
           <EmailServiceRecipients
             onNext={() => (window.location.hash = "settings")}
-            templateFileId={templateFileId}
+            templateFileId={emailData.templateFileId}
             onSave={(spreadsheetFileName, spreadsheetFileId, spreadsheetFileUrl) => {
-              setSpreadsheetFileName(spreadsheetFileName);
-              setSpreadsheetFileId(spreadsheetFileId);
-              setSpreadsheetFileUrl(spreadsheetFileUrl);
+              setEmailData(prev => ({
+                ...prev,
+                spreadsheetFileName,
+                spreadsheetFileId,
+                spreadsheetFileUrl,
+              }));
             }}
           />
         );
@@ -114,12 +149,8 @@ export default function Page() {
         return (
           <EmailServiceSetting
             onNext={() => (window.location.hash = "confirmation")}
-            templateFileName={templateFileName}
-            templateFileId={templateFileId}
-            templateFileUrl={templateFileUrl}
-            spreadsheetFileName={spreadsheetFileName}
-            spreadsheetFileId={spreadsheetFileId}
-            spreadsheetFileUrl={spreadsheetFileUrl}
+            emailData={emailData}
+            onEmailDataChange={setEmailData}
           />
         );
 

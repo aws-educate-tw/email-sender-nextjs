@@ -1,15 +1,14 @@
 "use client";
-import React, { useState, useEffect, KeyboardEvent, MouseEvent, useRef } from "react";
+import React, { useState, useEffect, KeyboardEvent, MouseEvent } from "react";
 
 interface EmailInputProps {
   allowMultiple?: boolean;
+  value: string[]; // controlled list of emails
   onEmailsChange: (emails: string[]) => void;
-  initialEmails?: string[] | string;
 }
 
 const contacts = [
   { name: "Alice Wang", email: "alice@example.com" },
-  { name: "Alice Cheng", email: "alicecheng@example.com" },
   { name: "Alice Cheng", email: "alicecheng@example.com" },
   { name: "Alice Tai", email: "alicetai@example.com" },
   { name: "Bob Chen", email: "bob@example.com" },
@@ -19,24 +18,12 @@ const contacts = [
 
 export default function EmailInput({
   allowMultiple = true,
+  value,
   onEmailsChange,
-  initialEmails = [],
 }: EmailInputProps) {
-  const normalizeInitialEmails = (input: string[] | string): string[] => {
-    if (typeof input === "string") {
-      return input.trim() ? [input.trim()] : [];
-    }
-    return input.map(email => email.trim()).filter(Boolean);
-  };
-
   const [email, setEmail] = useState("");
-  const [emails, setEmails] = useState<string[]>(normalizeInitialEmails(initialEmails));
   const [suggestions, setSuggestions] = useState<typeof contacts>([]);
   const [activeIndex, setActiveIndex] = useState(-1); // -1 = no selection
-
-  useEffect(() => {
-    onEmailsChange(emails);
-  }, [emails, onEmailsChange]);
 
   useEffect(() => {
     const keyword = email.toLowerCase();
@@ -45,7 +32,7 @@ export default function EmailInput({
         .filter(
           c => c.name.toLowerCase().includes(keyword) || c.email.toLowerCase().includes(keyword)
         )
-        .slice(0, 5); // 👈 限制最多 5 筆
+        .slice(0, 5);
       setSuggestions(matched);
       setActiveIndex(matched.length > 0 ? 0 : -1);
     } else {
@@ -76,9 +63,9 @@ export default function EmailInput({
       } else {
         alert("Please enter a valid email address");
       }
-    } else if (e.key === "Backspace" && trimmed === "" && emails.length > 0) {
+    } else if (e.key === "Backspace" && trimmed === "" && value.length > 0) {
       e.preventDefault();
-      setEmails(prev => prev.slice(0, -1));
+      onEmailsChange(value.slice(0, -1));
     } else if (e.key === "Escape") {
       setActiveIndex(-1);
       setSuggestions([]);
@@ -86,10 +73,10 @@ export default function EmailInput({
   };
 
   const addEmail = (newEmail: string) => {
-    if (allowMultiple || emails.length === 0) {
-      setEmails(prevEmails => [...prevEmails, newEmail]);
+    if (allowMultiple || value.length === 0) {
+      onEmailsChange([...value, newEmail]);
     } else {
-      setEmails([newEmail]);
+      onEmailsChange([newEmail]);
     }
     setEmail("");
     setSuggestions([]);
@@ -103,7 +90,8 @@ export default function EmailInput({
 
   const removeEmail = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault();
-    setEmails(prevEmails => prevEmails.filter((_, i) => i !== index));
+    const updated = value.filter((_, i) => i !== index);
+    onEmailsChange(updated);
   };
 
   const validateEmail = (email: string) => {
@@ -114,7 +102,7 @@ export default function EmailInput({
   return (
     <div className="relative">
       <div className="bg-white rounded-md shadow-sm flex items-center flex-wrap border border-gray-200 p-2 gap-2 focus-within:border-blue-500 focus-within:outline-none focus-within:ring-1 focus-within:ring-blue-500">
-        {emails.map((email, index) => (
+        {value.map((email, index) => (
           <div
             key={index}
             className="flex items-center bg-neutral-400 bg-opacity-50 hover:bg-opacity-70 px-2 rounded-md"
@@ -134,7 +122,7 @@ export default function EmailInput({
           onChange={e => setEmail(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder={
-            !allowMultiple && emails.length > 0
+            !allowMultiple && value.length > 0
               ? "Edit the existing email and press tab"
               : "Type an email and press tab"
           }

@@ -2,49 +2,19 @@ import React, { useState, useEffect, use } from "react";
 import { ArrowRight, Info, ChevronDown } from "lucide-react";
 import HelpTip from "@/app/ui/help-tip";
 import EmailInput from "@/app/ui/email-input";
+import { EmailDataType } from "@/app/emailService/page";
 
 interface SettingProps {
   onNext: () => void;
-  templateFileName?: string | null;
-  templateFileId?: string | null;
-  templateFileUrl?: string | null;
-  spreadsheetFileName?: string | null;
-  spreadsheetFileId?: string | null;
-  spreadsheetFileUrl?: string | null;
+  emailData: EmailDataType;
+  onEmailDataChange: (data: EmailDataType) => void;
 }
 
 export default function EmailServiceSetting({
   onNext,
-  templateFileName,
-  templateFileId,
-  templateFileUrl,
-  spreadsheetFileName,
-  spreadsheetFileId,
-  spreadsheetFileUrl,
+  emailData,
+  onEmailDataChange,
 }: SettingProps) {
-  const [emailData, setEmailData] = useState({
-    subject: "",
-    senderName: "",
-    templateFileName: templateFileName || null,
-    templateFileId: templateFileId || null,
-    templateFileUrl: templateFileUrl || null,
-    spreadsheetFileName: spreadsheetFileName || null,
-    spreadsheetFileId: spreadsheetFileId || null,
-    spreadsheetFileUrl: spreadsheetFileUrl || null,
-    localPart: "",
-    replyTo: "",
-    bcc: [] as string[],
-    cc: [] as string[],
-    provideCertification: "no",
-  });
-
-  const updateEmailData = (newData: Partial<typeof emailData>) => {
-    setEmailData(prevData => ({
-      ...prevData,
-      ...newData,
-    }));
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
       <div className="p-6 pb-4">
@@ -64,7 +34,7 @@ export default function EmailServiceSetting({
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-gray-400 focus:border-gray-400"
                 placeholder="Enter the subject"
                 value={emailData.subject}
-                onChange={e => updateEmailData({ subject: e.target.value })}
+                onChange={e => onEmailDataChange({ ...emailData, subject: e.target.value })}
               />
             </div>
 
@@ -80,7 +50,7 @@ export default function EmailServiceSetting({
                 className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-gray-400 focus:border-gray-400"
                 placeholder="Enter the name"
                 value={emailData.senderName}
-                onChange={e => updateEmailData({ senderName: e.target.value })}
+                onChange={e => onEmailDataChange({ ...emailData, senderName: e.target.value })}
               />
             </div>
           </div>
@@ -103,7 +73,7 @@ export default function EmailServiceSetting({
                   className="flex-grow p-3 border border-gray-300 rounded-l focus:outline-none focus:ring-gray-400 focus:border-gray-400"
                   placeholder="Enter the local part of email"
                   value={emailData.localPart}
-                  onChange={e => updateEmailData({ localPart: e.target.value })}
+                  onChange={e => onEmailDataChange({ ...emailData, localPart: e.target.value })}
                 />
                 <div className="bg-gray-100 p-3 border border-l-0 border-gray-300 rounded-r text-gray-500">
                   @aws-educate.tw
@@ -120,8 +90,10 @@ export default function EmailServiceSetting({
               </label>
               <EmailInput
                 allowMultiple={false}
-                initialEmails={emailData.replyTo}
-                onEmailsChange={emails => updateEmailData({ replyTo: emails[0] || "" })}
+                value={emailData.replyTo ? [emailData.replyTo] : []}
+                onEmailsChange={emails =>
+                  onEmailDataChange({ ...emailData, replyTo: emails[0] || "" })
+                }
               />
             </div>
 
@@ -133,9 +105,9 @@ export default function EmailServiceSetting({
                 </HelpTip>
               </label>
               <EmailInput
-                allowMultiple={true}
-                initialEmails={emailData.bcc}
-                onEmailsChange={emails => updateEmailData({ bcc: emails })}
+                allowMultiple
+                value={emailData.bcc}
+                onEmailsChange={emails => onEmailDataChange({ ...emailData, bcc: emails })}
               />
             </div>
 
@@ -147,9 +119,9 @@ export default function EmailServiceSetting({
                 </HelpTip>
               </label>
               <EmailInput
-                allowMultiple={true}
-                initialEmails={emailData.cc}
-                onEmailsChange={emails => updateEmailData({ cc: emails })}
+                allowMultiple
+                value={emailData.cc}
+                onEmailsChange={emails => onEmailDataChange({ ...emailData, cc: emails })}
               />
             </div>
 
@@ -168,7 +140,9 @@ export default function EmailServiceSetting({
                     name="certification"
                     value="yes"
                     checked={emailData.provideCertification === "yes"}
-                    onChange={() => updateEmailData({ provideCertification: "yes" })}
+                    onChange={() =>
+                      onEmailDataChange({ ...emailData, provideCertification: "yes" })
+                    }
                   />
                   <span className="ml-2">Yes</span>
                 </label>
@@ -179,7 +153,7 @@ export default function EmailServiceSetting({
                     name="certification"
                     value="no"
                     checked={emailData.provideCertification === "no"}
-                    onChange={() => updateEmailData({ provideCertification: "no" })}
+                    onChange={() => onEmailDataChange({ ...emailData, provideCertification: "no" })}
                   />
                   <span className="ml-2">No</span>
                 </label>
@@ -192,7 +166,10 @@ export default function EmailServiceSetting({
       <div className="flex justify-end p-6">
         <button
           className="px-6 py-2 bg-[#1a2f4a] text-white rounded flex items-center hover:bg-[#2c4a72]"
-          onClick={onNext}
+          onClick={() => {
+            onEmailDataChange?.(emailData);
+            onNext();
+          }}
         >
           Next <ArrowRight className="ml-2 w-4 h-4" />
         </button>
