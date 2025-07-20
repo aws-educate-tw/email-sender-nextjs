@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Send, Mail } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { useEmailContext } from "@/app/context/EmailContext";
 import IframePreview from "@/app/ui/iframe-preview";
 import { submitForm } from "@/lib/actions";
+import { EmailDataType } from "@/app/emailService/page";
 
 interface ReviewProps {
+  emailData: EmailDataType;
   onSubmit: () => void;
 }
 
-export const EmailServiceReview: React.FC<ReviewProps> = () => {
-  const { emailData } = useEmailContext();
+export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps) {
   const [templatePreview, setTemplatePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -328,4 +328,4 @@ export const EmailServiceReview: React.FC<ReviewProps> = () => {
       </div>
     </Card>
   );
-};
+}

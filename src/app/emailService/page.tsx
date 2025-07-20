@@ -6,7 +6,7 @@ import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-te
 import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-template-editor";
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
 import EmailServiceSetting from "@/app/ui/emailService/email-service-setting";
-import { EmailServiceReview } from "@/app/ui/emailService/email-service-review";
+import EmailServiceReview from "@/app/ui/emailService/email-service-review";
 import { EmailData, EmailProvider } from "@/app/context/EmailContext";
 
 type Step =
@@ -33,6 +33,7 @@ export interface EmailDataType {
   bcc: string[];
   cc: string[];
   provideCertification: "yes" | "no";
+  attachments?: { file_id: string; file_url: string }[]; // Optional attachments
 }
 
 export default function Page() {
@@ -53,10 +54,8 @@ export default function Page() {
     bcc: [],
     cc: [],
     provideCertification: "no",
+    attachments: [],
   });
-
-  // 管理template的狀態
-  const [templateFileId, setTemplateFileId] = useState<string | null>(null);
 
   useEffect(() => {
     console.log("emailData:", emailData);
@@ -155,7 +154,12 @@ export default function Page() {
         );
 
       case "confirmation":
-        return <EmailServiceReview onSubmit={() => alert("Email sent successfully!")} />;
+        return (
+          <EmailServiceReview
+            onSubmit={() => alert("Email sent successfully!")}
+            emailData={emailData}
+          />
+        );
       default:
         return null;
     }

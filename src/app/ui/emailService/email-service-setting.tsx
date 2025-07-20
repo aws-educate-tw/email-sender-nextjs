@@ -1,8 +1,10 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowRight, Info, ChevronDown } from "lucide-react";
 import HelpTip from "@/app/ui/help-tip";
-import EmailInput from "@/app/ui/email-input";
+import EmailInput from "@/app/ui/emailService/email-input";
+import AttachDropdown from "@/app/ui/emailService/attach-dropdown";
 import { EmailDataType } from "@/app/emailService/page";
+import FileUpload from "@/app/ui/emailService/file-upload";
 
 interface SettingProps {
   onNext: () => void;
@@ -15,6 +17,13 @@ export default function EmailServiceSetting({
   emailData,
   onEmailDataChange,
 }: SettingProps) {
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const handleFileUpload = () => {
+    setShowFileUpload(true);
+  };
+  const handleFileCloseUpload = () => {
+    setShowFileUpload(false);
+  };
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 mt-2">
       <div className="p-6 pb-4">
@@ -60,6 +69,43 @@ export default function EmailServiceSetting({
           <h3 className="text-xl font-bold mb-4">Optional</h3>
 
           <div className="space-y-6">
+            <div className="flex items-center gap-2">
+              <AttachDropdown
+                onEmailsChange={attachments => {
+                  onEmailDataChange({ ...emailData, attachments });
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleFileUpload}
+                className="text-sky-950 hover:text-sky-800 flex justify-center items-center border-sky-950 h-10 rounded-lg px-2 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+              >
+                upload
+              </button>
+              {showFileUpload && (
+                <div className="bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-screen-lg relative">
+                    <button
+                      onClick={handleFileCloseUpload}
+                      className="absolute top-4 right-4 text-black"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
+                        />
+                      </svg>
+                    </button>
+                    <FileUpload OnFileExtension=".xlsx" />
+                  </div>
+                </div>
+              )}
+            </div>
             <div>
               <label className="mb-2 flex items-center text-gray-700">
                 Sender Local Part
