@@ -294,7 +294,7 @@ export default function EmailServiceSetting({
                 />
               </svg>
             </button>
-            <FileUpload OnFileExtension=".xlsx" />
+            <FileUpload OnFileExtension="any" />
           </div>
         </div>
       )}

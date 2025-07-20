@@ -34,7 +34,6 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
     files.forEach(file => {
       formData.append("file", file);
     });
-    // console.log("Form Data:", formData);
 
     setIsSubmitting(true);
 
@@ -56,20 +55,23 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
       const result = await response.json();
 
       setFileData(result.files);
-      // result.files.forEach((file: FileDataType) => {
-      //   if (file.file_extension === "xlsx") {
-      //     localStorage.setItem("xlsx_key", file.file_id);
-      //   } else if (file.file_extension === "html") {
-      //     localStorage.setItem("html_key", file.file_id);
-      //   }
-      // });
-      // onFileUploadSuccess(result.files);
       alert("File uploaded successfully!");
     } catch (error: any) {
       alert("Failed to send form data: " + error.message);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // 判斷是否接受所有文件類型
+  const acceptsAllFiles = OnFileExtension === "all" || OnFileExtension === "any";
+
+  // 決定 accept 屬性的值
+  const getAcceptValue = () => {
+    if (acceptsAllFiles) {
+      return undefined; // 不設置 accept 屬性，接受所有文件
+    }
+    return OnFileExtension;
   };
 
   return (
@@ -80,7 +82,7 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
           <p className="text-gray-500 italic pb-4">Upload your email template.</p>
         ) : OnFileExtension === ".xlsx" ? (
           <p className="text-gray-500 italic pb-4">Upload your participants sheet.</p>
-        ) : OnFileExtension === "all" ? (
+        ) : acceptsAllFiles ? (
           <p className="text-gray-500 italic pb-4">Attach your files.</p>
         ) : (
           <p className="text-gray-500 italic pb-4">Unsupported file type.</p>
@@ -98,14 +100,14 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
             onChange={handleFileChange}
             disabled={isSubmitting}
             multiple
-            accept={OnFileExtension}
+            accept={getAcceptValue()}
           />
           <style>{`
             .custom-fileinput-label {
               background-color: #082f49;
             }
           `}</style>
-          {OnFileExtension === "all" ? (
+          {acceptsAllFiles ? (
             <p
               className="mt-1 text-sm text-gray-500 dark:text-gray-300 text-right"
               id="file_input_help"
@@ -134,7 +136,7 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
           </button>
         </div>
       </div>
-      {fileData && (
+      {fileData.length > 0 && (
         <div className="rounded-md bg-neutral-100 p-4 min-w-48">
           <label className="mb-2 block text-lg font-medium">Uploaded files</label>
           <div>
@@ -156,9 +158,12 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
                     </th>
                   </tr>
                 </thead>
-                {fileData.map((file: FileDataType, index: number) => (
-                  <tbody key={index}>
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <tbody>
+                  {fileData.map((file: FileDataType, index: number) => (
+                    <tr
+                      key={index}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    >
                       <th
                         scope="row"
                         className="px-6 py-4 font-semibold text-black whitespace-nowrap"
@@ -174,21 +179,13 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
                       <td className="px-6 py-4">{convertToTaipeiTime(file.created_at)}</td>
                       <td className="px-6 py-4">{convertToTaipeiTime(file.updated_at)}</td>
                     </tr>
-                  </tbody>
-                ))}
+                  ))}
+                </tbody>
               </table>
             </div>
           </div>
         </div>
       )}
-      {/* <div className="w-full flex justify-end my-3 gap-3">
-        <button
-          type="submit"
-          className="text-white min-w-32 flex justify-center items-center bg-sky-950 hover:bg-sky-800 h-10 rounded-lg px-4 md:text-base text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-        >
-          <a href="/sendEmail">Next Step</a>
-        </button>
-      </div> */}
     </>
   );
 }

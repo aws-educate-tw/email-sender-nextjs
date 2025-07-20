@@ -33,7 +33,7 @@ export interface EmailDataType {
   bcc: string[];
   cc: string[];
   provideCertification: "yes" | "no";
-  attachments?: { file_id: string; file_url: string }[]; // Optional attachments
+  attachments: { file_id: string; file_url: string }[];
 }
 
 export default function Page() {

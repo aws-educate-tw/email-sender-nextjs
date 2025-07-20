@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime, formatFileSize } from "@/lib/utils/dataUtils";
-import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface FileDataType {
   file_id: string;
