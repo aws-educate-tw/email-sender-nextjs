@@ -100,7 +100,11 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
             <User className="w-8 h-8 text-white" />
           </div>
           <div>
-            <div className="font-semibold">{emailData.senderName}</div>
+            <div
+              className={`font-semibold ${emailData.senderName ? "" : "text-red-500 italic underline"}`}
+            >
+              {emailData.senderName || "Sender Name is missing"}
+            </div>
             <div className="text-gray-500">{`${emailData.localPart || "aws"}@aws-educate.tw`}</div>
           </div>
         </div>
@@ -111,51 +115,50 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
         <div>
           <p className="text-xl font-bold">Selected Template and Spreadsheet</p>
         </div>
-        <div className="flex w-full gap-4 mb-6">
-          <div className="bg-blue-50 flex w-full justify-between items-center border-2 border-gray-200 rounded-lg p-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <FileText className="w-8 h-8 text-blue-600" />
-              </div>
+        <div className="flex flex-wrap w-full gap-4 mb-6">
+          <div className="bg-blue-50 flex flex-col md:flex-row justify-between items-start md:items-center border-2 border-gray-200 rounded-lg p-4 md:p-6 w-full">
+            <div className="flex gap-4 items-center ">
+              <FileText className="w-8 h-8 text-blue-600" />
               <div>
                 <div className="font-semibold">Template</div>
                 <div
                   className={
-                    emailData.templateFileName ? "text-gray-500" : "text-red-500 italic underline"
+                    emailData.templateFileName
+                      ? "text-gray-500 break-words"
+                      : "text-red-500 italic underline"
                   }
                 >
-                  {emailData.templateFileName || "No template selected"}
+                  {emailData.templateFileName || "No template selected."}
                 </div>
               </div>
             </div>
             <button
               onClick={() => setShowTemplateModal(true)}
-              className="bg-white shadow-md hover:shadow-lg text-blue-500 hover:text-blue-600 font-semibold border border-gray-200 px-4 py-1 rounded-full"
+              className="mt-3 md:mt-0 bg-white shadow-md hover:shadow-lg text-blue-500 hover:text-blue-600 font-semibold border border-gray-200 px-4 py-1 rounded-full"
             >
               view
             </button>
           </div>
-          <div className="bg-green-50 flex w-full justify-between items-center border-2 border-gray-200 rounded-lg p-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <Table className="w-8 h-8 text-green-600" />
-              </div>
+
+          <div className="bg-green-50 flex flex-col md:flex-row justify-between items-start md:items-center border-2 border-gray-200 rounded-lg p-4 md:p-6 w-full">
+            <div className="flex gap-4 items-center">
+              <Table className="w-8 h-8 text-green-600" />
               <div>
                 <div className="font-semibold">Spreadsheet</div>
                 <div
                   className={
                     emailData.spreadsheetFileName
-                      ? "text-gray-500"
+                      ? "text-gray-500 break-words"
                       : "text-red-500 italic underline"
                   }
                 >
-                  {emailData.spreadsheetFileName || "No spreadsheet selected"}
+                  {emailData.spreadsheetFileName || "No spreadsheet selected."}
                 </div>
               </div>
             </div>
             <button
               onClick={() => setShowSpreadsheetModal(true)}
-              className="bg-white shadow-md hover:shadow-lg text-green-500 hover:text-green-600 font-semibold border border-gray-200 px-4 py-1 rounded-full"
+              className="mt-3 md:mt-0 bg-white shadow-md hover:shadow-lg text-green-500 hover:text-green-600 font-semibold border border-gray-200 px-4 py-1 rounded-full"
             >
               view
             </button>
@@ -166,7 +169,7 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
         <div>
           <p className="text-xl font-bold">Settings</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3 mb-6">
+        <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3 mb-6">
           <div className="flex flex-col gap-4 w-full">
             <div className="font-semibold">Reply To</div>
             <div className="flex w-full justify-between items-center">
@@ -246,12 +249,12 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
         <div>
           <p className="text-xl font-bold">Attachments</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-5 mb-6">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mb-6">
           {emailData.attachments && emailData.attachments.length > 0 ? (
             emailData.attachments.map((attachment, idx) => (
               <button
                 key={idx}
-                className="flex items-center justify-between gap-2 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                className="flex flex-wrap items-center justify-between gap-2 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
                 onClick={() => {
                   const link = document.createElement("a");
                   link.href = attachment.file_url;
@@ -322,7 +325,7 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-center md:justify-end gap-3 flex-wrap">
         <button
           className={`px-4 py-2.5 rounded-lg text-white font-medium flex items-center ${isSuccess ? "bg-green-600 hover:bg-green-700" : "bg-sky-950 hover:bg-sky-900"} ${isSubmitting ? "opacity-80" : ""}`}
           onClick={handleSend}
