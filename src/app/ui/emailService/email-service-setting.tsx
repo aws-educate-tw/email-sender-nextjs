@@ -32,6 +32,20 @@ export default function EmailServiceSetting({
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [showOptionalSection, setShowOptionalSection] = useState(false);
 
+  useEffect(() => {
+    const hasOptionalValue =
+      (emailData.attachments && emailData.attachments.length > 0) ||
+      emailData.localPart ||
+      emailData.replyTo ||
+      (emailData.bcc && emailData.bcc.length > 0) ||
+      (emailData.cc && emailData.cc.length > 0) ||
+      emailData.provideCertification === "yes";
+
+    if (hasOptionalValue) {
+      setShowOptionalSection(true);
+    }
+  }, [emailData]);
+
   return (
     <div className="space-y-6">
       {/* Required Section */}
