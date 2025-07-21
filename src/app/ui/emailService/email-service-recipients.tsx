@@ -11,7 +11,6 @@ import * as XLSX from "xlsx";
 import ExcelEditor from "@/app/ui/emailService/excel-editor";
 import FileUpload from "@/app/ui/file-upload";
 import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";
-import { on } from "events";
 
 interface TemplateProps {
   onNext: () => void;
