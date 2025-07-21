@@ -61,7 +61,7 @@ interface TipTapProps {
   onSave?: (content: string, fileId?: string, fileUrl?: string) => void; // Updated callback signature
 }
 
-export default function TipTap({ onChange, content, onNext, templateName, onSave }: TipTapProps) {
+export default function TipTap({ onChange, content }: TipTapProps) {
   const [, setEditorContent] = useState(content);
   const [, setIsFocused] = useState(false);
 
@@ -177,118 +177,8 @@ export default function TipTap({ onChange, content, onNext, templateName, onSave
     }
   };
 
-  // const handleUpload = async () => {
-  //   if (!templateName || templateName.trim() === "") {
-  //     console.error("Template name is required");
-  //     setSaveButtonState("error");
-  //     setTimeout(() => {
-  //       setSaveButtonState("idle");
-  //     }, 3000);
-  //     return;
-  //   }
-
-  //   const saveFileName = templateName.trim();
-
-  //   const preserveEmptyLines = (content: string): string => {
-  //     return (
-  //       content
-  //         // 將已有的空段落轉換為包含 &nbsp; 的格式
-  //         .replace(/<p>\s*<\/p>/g, "<p>&nbsp;</p>")
-  //         // 處理連續空行，但保留它們
-  //         .replace(/(<p>&nbsp;<\/p>)+/g, match => match)
-  //         // 確保段落之間有換行符號
-  //         .replace(/<\/p><p>/g, "</p>\n<p>")
-  //     );
-  //   };
-
-  //   const formattedContent = preserveEmptyLines(editorContent);
-
-  //   const html = `
-  //   <!DOCTYPE html>
-  //   <html lang="zh-TW">
-  //   <head>
-  //       <meta charset="UTF-8">
-  //       <title>加入 AWS Educate Taiwan 雲端校園大使證照陪跑計畫</title>
-  //   </head>
-  //   <body>
-  //       ${formattedContent}
-  //   </body>
-  //   </html>`;
-  //   const blob = new Blob([html], { type: "text/html" });
-  //   const fileName = `${saveFileName}.html`;
-  //   const formData = new FormData();
-  //   formData.append("file", blob, fileName);
-
-  //   try {
-  //     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-  //     const url = new URL(`${base_url}/upload-multiple-file`);
-  //     setIsUploading(true);
-  //     const response = await fetch(url.toString(), {
-  //       method: "POST",
-  //       headers: {
-  //         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-  //       },
-  //       body: formData,
-  //     });
-  //     const result = await response.json();
-  //     console.log(result);
-  //     setIsUploading(false);
-  //     setShowToast(true);
-
-  //     // Show "Saved" button state
-  //     setSaveButtonState("saved");
-  //     setTimeout(() => {
-  //       setSaveButtonState("idle");
-  //     }, 3000);
-
-  //     setTimeout(() => setShowToast(false), 5000);
-
-  //     // Extract file_id from the response and pass it to the onSave callback
-  //     const fileId = result?.files?.[0]?.file_id;
-  //     const fileUrl = result?.files?.[0]?.file_url;
-
-  //     // Call the onSave callback if provided
-  //     if (onSave) {
-  //       onSave(formattedContent, fileId, fileUrl);
-  //     }
-  //   } catch (error) {
-  //     console.error("Upload failed:", error);
-  //     setSaveButtonState("error");
-  //     setTimeout(() => {
-  //       setSaveButtonState("idle");
-  //     }, 3000);
-  //   }
-  // };
-
-  // const handleSaveTemplate = () => {
-  //   if (saveButtonState === "saved") return;
-  //   handleUpload();
-  // };
-
-  // const handleNextClick = () => {
-  //   if (onNext) {
-  //     onNext();
-  //   } else {
-  //     router.push("/emailService/recipients");
-  //   }
-  // };
-
   return (
     <>
-      {/* {showToast && (
-        <div className="fixed top-4 right-6 z-50">
-          <Toast
-            className="bg-green-400 drop-shadow-lg transition-opacity hover: cursor-pointer"
-            onClick={() => setShowToast(false)}
-          >
-            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
-              <HiCheck className="h-6 w-6 text-green-500" />
-            </div>
-            <div className="ml-3 font-medium text-white">File uploaded successfully.</div>
-          </Toast>
-        </div>
-      )} */}
-
       <div className="flex-col">
         <div className="pb-4">
           {/* Toolbar */}

@@ -27,7 +27,7 @@ interface Column {
 export default function EmailServiceRecipients({ onNext, templateFileId, onSave }: TemplateProps) {
   const [excel, setExcel] = useState<Excel[]>([]);
   const [fileName, setFileName] = useState("");
-  const [allColumns, setAllColumns] = useState<Column[]>([]);
+  const [, setAllColumns] = useState<Column[]>([]);
   const [isLoadingVariables, setIsLoadingVariables] = useState(false);
   const [templateFileName, setTemplateFileName] = useState<string>("Unknown File Name");
   const [templateVariables, setTemplateVariables] = useState<string[]>([]);
