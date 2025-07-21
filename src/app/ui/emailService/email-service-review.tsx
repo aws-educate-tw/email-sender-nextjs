@@ -16,7 +16,6 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showSpreadsheetModal, setShowSpreadsheetModal] = useState(false);
 
@@ -43,16 +42,16 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
     try {
       const token = localStorage.getItem("access_token") || "";
       const res = await submitForm(JSON.stringify(formData), token);
+      console.log("Submission result:", res);
 
-      if (res.status === "error" && res.errors) {
-        const newErrors: { [key: string]: string } = {};
-        res.errors.forEach((e: any) => (newErrors[e.path] = e.message));
-        setFormErrors(newErrors);
-        setError(res.message || "Error submitting form");
-      } else {
+      if (res.status === "SUCCESS") {
+        console.log("Email sent successfully:", res);
         setIsSuccess(true);
-        setFormErrors({});
-        setTimeout(() => onSubmit(), 2000);
+        setTimeout(() => onSubmit(), 3000);
+      } else {
+        console.error("Error sending email:", res);
+        alert("Error sending email: " + res.message);
+        setError(res.message || "Error sending email");
       }
     } catch (err: any) {
       setError("Submission failed: " + err.message);
@@ -85,20 +84,9 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
     </div>
   );
 
-  // const AttachmentItem = ({ name, type }: { name: string; type: "file" | "certificate" }) => (
-  //   <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded text-sm mb-2">
-  //     {type === "certificate" ? (
-  //       <Check className="w-4 h-4 text-green-500" />
-  //     ) : (
-  //       <Paperclip className="w-4 h-4 text-slate-500" />
-  //     )}
-  //     <span className="font-medium text-slate-700">{name}</span>
-  //   </div>
-  // );
-
   return (
     <>
-      <div className="flex flex-col gap-4 border-2 border-gray-100 rounded-lg p-6 pb-10 mb-4">
+      <div className="flex flex-col gap-4 border-2 border-gray-100 rounded-lg p-6 pb-10 mb-4 bg-white shadow-lg">
         {/* Header */}
         <div>
           <h1

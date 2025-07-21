@@ -63,7 +63,7 @@ export async function submitForm(data: string, access_token: string) {
   }
 
   try {
-    // console.log("data", validation.data);
+    console.log("data", validation.data);
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(url.toString(), {
@@ -74,8 +74,10 @@ export async function submitForm(data: string, access_token: string) {
       },
       body: JSON.stringify(validation.data),
     });
+    console.log("response", response);
 
     const result = await response.json();
+    console.log("result", result);
     return {
       status: result.status,
       message: result.message,

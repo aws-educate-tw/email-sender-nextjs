@@ -128,8 +128,7 @@ export default function SpreadsheetPreview({
 
   return (
     <div className="relative w-full">
-      <div className="absolute rounded-lg top-0 right-0 w-8 h-full pointer-events-none z-10 bg-gradient-to-l from-white to-transparent" />
-      <div className="bg-white rounded-lg p-4 overflow-auto max-h-[400px] w-full">
+      <div className="bg-white rounded-lg p-4 overflow-auto w-full">
         <div className="min-w-fit">
           <table className="text-sm min-w-max w-full">
             <thead>

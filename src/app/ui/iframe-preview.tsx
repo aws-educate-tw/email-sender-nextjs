@@ -9,7 +9,7 @@ interface IframePreviewProps {
 
 export default function IframePreview({ src, title, width, height }: IframePreviewProps) {
   return (
-    <div style={{ width, height }} className="shadow-xl bg-white rounded p-3">
+    <div style={{ width, height }} className="shadow-xl bg-white rounded-lg p-3">
       <iframe
         src={src}
         title={title}
