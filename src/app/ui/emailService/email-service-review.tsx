@@ -1,19 +1,5 @@
 import React, { useState } from "react";
-import {
-  Send,
-  Mail,
-  X,
-  Check,
-  AlertCircle,
-  Paperclip,
-  CornerDownRight,
-  Users,
-  FileText,
-  Database,
-  Table,
-  Eye,
-} from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Send, X, Check, Paperclip, User, FileText, Table, Download } from "lucide-react";
 import { submitForm } from "@/lib/actions";
 import Modal from "@/app/ui/emailService/modal";
 import SpreadsheetPreview from "@/app/ui/emailService/spreadsheet-preview";
@@ -81,199 +67,295 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
     value,
   }: {
     icon?: React.ReactNode;
-    label: string;
+    label: React.ReactNode;
     value: React.ReactNode;
   }) => (
-    <div className="flex gap-3 items-start p-3 rounded-lg hover:bg-slate-50">
-      {icon && <div className="text-slate-500 mt-0.5">{icon}</div>}
-      <div className="flex-1">
-        <p className="text-sm text-slate-500 font-medium mb-1">{label}</p>
+    <div className="flex w-full gap-3 items-center p-3 rounded-lg">
+      {icon && <div className="text-sky-950 bg-gray-200 p-2 rounded-lg">{icon}</div>}
+      <div className="flex flex-col w-full">
+        <div className="underline">{label}</div>
         <div className="text-slate-900 font-medium break-words">
-          {value || <span className="italic text-slate-400">Not set</span>}
+          {value ? (
+            <span className="text-slate-400">{value}</span>
+          ) : (
+            <span className="italic text-slate-400">Not set</span>
+          )}
         </div>
       </div>
     </div>
   );
 
-  const AttachmentItem = ({ name, type }: { name: string; type: "file" | "certificate" }) => (
-    <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded text-sm mb-2">
-      {type === "certificate" ? (
-        <Check className="w-4 h-4 text-green-500" />
-      ) : (
-        <Paperclip className="w-4 h-4 text-slate-500" />
-      )}
-      <span className="font-medium text-slate-700">{name}</span>
-    </div>
-  );
+  // const AttachmentItem = ({ name, type }: { name: string; type: "file" | "certificate" }) => (
+  //   <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded text-sm mb-2">
+  //     {type === "certificate" ? (
+  //       <Check className="w-4 h-4 text-green-500" />
+  //     ) : (
+  //       <Paperclip className="w-4 h-4 text-slate-500" />
+  //     )}
+  //     <span className="font-medium text-slate-700">{name}</span>
+  //   </div>
+  // );
 
   return (
-    <div className="flex">
-      <Card className="border border-slate-200 shadow-lg">
+    <>
+      <div className="flex flex-col gap-4 border-2 border-gray-100 rounded-lg p-6 pb-10 mb-4">
         {/* Header */}
-        <div className="p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-              <div className="bg-blue-100 text-blue-700 p-2 rounded-lg">
-                <Mail className="w-5 h-5" />
-              </div>
-              Email Preview
-            </h2>
+        <div>
+          <h1
+            className={`text-3xl font-bold ${emailData.subject ? "" : "text-red-500 italic underline"}`}
+          >
+            {emailData.subject || "Subject is missing!"}
+          </h1>
+        </div>
+        <div className="flex gap-2 items-center">
+          <div className="p-1 bg-sky-950 rounded-full">
+            <User className="w-8 h-8 text-white" />
           </div>
+          <div>
+            <div className="font-semibold">{emailData.senderName}</div>
+            <div className="text-gray-500">{`${emailData.localPart || "aws"}@aws-educate.tw`}</div>
+          </div>
+        </div>
 
-          <div className="grid gap-6 md:grid-cols-2 mb-8">
-            <div className="space-y-2 bg-gray-100">
-              <InfoRow
-                icon={<FileText className="w-5 h-5" />}
-                label="Subject"
-                value={emailData.subject}
-              />
-              <InfoRow
-                icon={<Mail className="w-5 h-5" />}
-                label="Sender Name and Local Part"
-                value={
-                  <span>
-                    {emailData.senderName} &lt;{emailData.localPart || "aws"}@aws-educate.tw&gt;
-                  </span>
-                }
-              />
-              <InfoRow
-                icon={<CornerDownRight className="w-5 h-5" />}
-                label="Reply To"
-                value={emailData.replyTo || "noreply"}
-              />
+        <hr className="border-t border-gray-200 my-4" />
+
+        {/* Template and Spreadsheet */}
+        <div>
+          <p className="text-xl font-bold">Selected Template and Spreadsheet</p>
+        </div>
+        <div className="flex w-full gap-4 mb-6">
+          <div className="bg-blue-50 flex w-full justify-between items-center border-2 border-gray-200 rounded-lg p-6">
+            <div className="flex items-center gap-4">
+              <div>
+                <FileText className="w-8 h-8 text-blue-600" />
+              </div>
+              <div>
+                <div className="font-semibold">Template</div>
+                <div
+                  className={
+                    emailData.templateFileName ? "text-gray-500" : "text-red-500 italic underline"
+                  }
+                >
+                  {emailData.templateFileName || "No template selected"}
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <InfoRow
-                icon={<FileText className="w-5 h-5" />}
-                label="Template Name"
-                value={
-                  <div className="flex justify-between items-center">
-                    <span>{emailData.templateFileName}</span>
-                    {emailData.templateFileUrl && (
-                      <button
-                        onClick={() => setShowTemplateModal(true)}
-                        className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full hover:text-blue-800 flex items-center gap-1"
-                      >
-                        <Eye className="w-3 h-3" /> View
-                      </button>
-                    )}
-                  </div>
-                }
-              />
-              <InfoRow
-                icon={<Database className="w-5 h-5" />}
-                label="Spreadsheet Name"
-                value={
-                  <div className="flex justify-between items-center">
-                    <span>{emailData.spreadsheetFileName}</span>
-                    {emailData.spreadsheetFileUrl && (
-                      <button
-                        onClick={() => setShowSpreadsheetModal(true)}
-                        className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full hover:text-blue-800 flex items-center gap-1"
-                      >
-                        <Eye className="w-3 h-3" /> View
-                      </button>
-                    )}
-                  </div>
-                }
-              />
-              <InfoRow
-                icon={<Users className="w-5 h-5" />}
-                label="CC"
-                value={emailData.cc?.join(", ") || null}
-              />
-              <InfoRow
-                icon={<Users className="w-5 h-5" />}
-                label="BCC"
-                value={emailData.bcc?.join(", ") || null}
-              />
-            </div>
-            <div className="space-y-2">
-              <InfoRow
-                icon={<Paperclip className="w-5 h-5" />}
-                label="Attachments"
-                value={
-                  emailData.attachments?.length ? (
-                    <div className="space-y-1">
-                      {emailData.attachments.map((f, i) => (
-                        <div key={i} className="text-sm py-1">
-                          {f.file_id}
-                        </div>
-                      ))}
-                    </div>
-                  ) : null
-                }
-              />
-              <InfoRow
-                icon={<Check className="w-5 h-5" />}
-                label="Certificate"
-                value={
-                  <span
-                    className={
-                      emailData.provideCertification === "yes" ? "text-green-600" : "text-slate-500"
-                    }
-                  >
-                    {emailData.provideCertification === "yes" ? "Will be provided" : "Not provided"}
-                  </span>
-                }
-              />
-            </div>
-          </div>
-          {/* Actions */}
-          <div className="flex justify-end gap-3 mt-8">
             <button
-              className="border border-slate-300 px-5 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50 font-medium flex items-center"
-              onClick={() => window.history.back()}
-              disabled={isSubmitting}
+              onClick={() => setShowTemplateModal(true)}
+              className="bg-white shadow-md hover:shadow-lg text-blue-500 hover:text-blue-600 font-semibold border border-gray-200 px-4 py-1 rounded-full"
             >
-              <X className="w-4 h-4 mr-2" /> Cancel
+              view
             </button>
+          </div>
+          <div className="bg-green-50 flex w-full justify-between items-center border-2 border-gray-200 rounded-lg p-6">
+            <div className="flex items-center gap-4">
+              <div>
+                <Table className="w-8 h-8 text-green-600" />
+              </div>
+              <div>
+                <div className="font-semibold">Spreadsheet</div>
+                <div
+                  className={
+                    emailData.spreadsheetFileName
+                      ? "text-gray-500"
+                      : "text-red-500 italic underline"
+                  }
+                >
+                  {emailData.spreadsheetFileName || "No spreadsheet selected"}
+                </div>
+              </div>
+            </div>
             <button
-              className={`px-6 py-2.5 rounded-lg text-white font-medium flex items-center ${isSuccess ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"} ${isSubmitting ? "opacity-80" : ""}`}
-              onClick={handleSend}
-              disabled={isSubmitting || isSuccess}
+              onClick={() => setShowSpreadsheetModal(true)}
+              className="bg-white shadow-md hover:shadow-lg text-green-500 hover:text-green-600 font-semibold border border-gray-200 px-4 py-1 rounded-full"
             >
-              {isSubmitting ? (
-                <>
-                  <span className="loader mr-2" /> Sending...
-                </>
-              ) : isSuccess ? (
-                <>
-                  <Check className="w-4 h-4 mr-2" /> Sent
-                </>
-              ) : (
-                <>
-                  Send Email <Send className="ml-2 w-4 h-4" />
-                </>
-              )}
+              view
             </button>
           </div>
         </div>
-      </Card>
 
-      {/* Modals */}
-      <Modal
-        isOpen={showSpreadsheetModal}
-        onClose={() => setShowSpreadsheetModal(false)}
-        title="Spreadsheet Preview"
-      >
-        {emailData.spreadsheetFileUrl ? (
-          <SpreadsheetPreview fileUrl={emailData.spreadsheetFileUrl} readOnly />
-        ) : (
-          <p className="italic text-center text-slate-500">No spreadsheet available</p>
-        )}
-      </Modal>
-      <Modal
-        isOpen={showTemplateModal}
-        onClose={() => setShowTemplateModal(false)}
-        title="Template Preview"
-      >
-        {emailData.templateFileUrl ? (
-          <TemplatePreview fileUrl={emailData.templateFileUrl} />
-        ) : (
-          <p className="italic text-center text-slate-500">No template available</p>
-        )}
-      </Modal>
-    </div>
+        {/* Settings */}
+        <div>
+          <p className="text-xl font-bold">Settings</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3 mb-6">
+          <div className="flex flex-col gap-4 w-full">
+            <div className="font-semibold">Reply To</div>
+            <div className="flex w-full justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div>
+                  <div className="w-8 h-8 flex items-center justify-center rounded-full bg-sky-950 text-white font-bold text-xl uppercase">
+                    {emailData.replyTo ? emailData.replyTo.split("@")[0].split(".")[0][0] : "A"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-gray-500">
+                    {emailData.replyTo || "awseducate.cloudambassador@gmail.com"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 w-full">
+            <div className="font-semibold">BCC</div>
+            <div className="flex w-full items-start">
+              <div className="flex flex-col items-start">
+                <div className="flex flex-col gap-2">
+                  {emailData.bcc && Array.isArray(emailData.bcc) && emailData.bcc.length > 0 ? (
+                    emailData.bcc.map((bcc: string, idx: number) => (
+                      <div className="flex items-center gap-2" key={idx}>
+                        <div
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-sky-950 text-white text-xl font-bold uppercase"
+                          title={bcc}
+                        >
+                          {bcc.split("@")[0].split(".")[0][0] || "N"}
+                        </div>
+                        <p className="text-gray-500">{bcc}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center gap-2 opacity-30">
+                      <User className="w-8 h-8 p-1 flex items-center justify-center rounded-full bg-sky-950 text-white text-xl font-bold" />
+                      <p className="text-gray-500">No BCC</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 w-full">
+            <div className="font-semibold">CC</div>
+            <div className="flex w-full items-start">
+              <div className="flex flex-col items-start">
+                <div className="flex flex-col gap-2">
+                  {emailData.cc && Array.isArray(emailData.cc) && emailData.cc.length > 0 ? (
+                    emailData.cc.map((cc: string, idx: number) => (
+                      <div className="flex items-center gap-2" key={idx}>
+                        <div
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-sky-950 text-white text-xl font-bold uppercase"
+                          title={cc}
+                        >
+                          {cc.split("@")[0].split(".")[0][0] || "N"}
+                        </div>
+                        <p className="text-gray-500">{cc}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center gap-2 opacity-30">
+                      <User className="w-8 h-8 p-1 flex items-center justify-center rounded-full bg-sky-950 text-white text-xl font-bold" />
+                      <p className="text-gray-500">No CC</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Attachments */}
+        <div>
+          <p className="text-xl font-bold">Attachments</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-5 mb-6">
+          {emailData.attachments && emailData.attachments.length > 0 ? (
+            emailData.attachments.map((attachment, idx) => (
+              <button
+                key={idx}
+                className="flex items-center justify-between gap-2 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = attachment.file_url;
+                  link.download = attachment.file_name || "attachment";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Paperclip className="w-5 h-5 text-sky-950" />
+                  <span className="text-gray-700">{attachment.file_name}</span>
+                </div>
+                <Download className="w-5 h-5 text-sky-950" />
+              </button>
+            ))
+          ) : (
+            <div className="text-gray-500 italic">No attachments</div>
+          )}
+        </div>
+
+        {/* Certification */}
+        <div>
+          <p className="text-xl font-bold">Certification</p>
+        </div>
+        <div>
+          <div className="flex items-center gap-2 rounded-lg opacity-60">
+            <div
+              className={`p-1 rounded-full ${emailData.provideCertification === "yes" ? "bg-green-500" : "bg-red-500"}`}
+            >
+              {emailData.provideCertification === "yes" ? (
+                <Check className="w-6 h-6 text-white" />
+              ) : (
+                <X className="w-6 h-6 text-white" />
+              )}
+            </div>
+            <div className="">
+              {emailData.provideCertification === "yes"
+                ? "Certification will be generated for recipients."
+                : "No certification will be generated."}
+            </div>
+          </div>
+        </div>
+
+        {/* Modals */}
+        <Modal
+          isOpen={showSpreadsheetModal}
+          onClose={() => setShowSpreadsheetModal(false)}
+          title="Spreadsheet Preview"
+        >
+          {emailData.spreadsheetFileUrl ? (
+            <SpreadsheetPreview fileUrl={emailData.spreadsheetFileUrl} readOnly />
+          ) : (
+            <p className="italic text-center text-slate-500">No spreadsheet available</p>
+          )}
+        </Modal>
+        <Modal
+          isOpen={showTemplateModal}
+          onClose={() => setShowTemplateModal(false)}
+          title="Template Preview"
+        >
+          {emailData.templateFileUrl ? (
+            <TemplatePreview fileUrl={emailData.templateFileUrl} />
+          ) : (
+            <p className="italic text-center text-slate-500">No template available</p>
+          )}
+        </Modal>
+      </div>
+
+      {/* Actions */}
+      <div className="flex justify-end gap-3">
+        <button
+          className={`px-4 py-2.5 rounded-lg text-white font-medium flex items-center ${isSuccess ? "bg-green-600 hover:bg-green-700" : "bg-sky-950 hover:bg-sky-900"} ${isSubmitting ? "opacity-80" : ""}`}
+          onClick={handleSend}
+          disabled={isSubmitting || isSuccess}
+        >
+          {isSubmitting ? (
+            <>
+              <span className="loader mr-2" /> Sending...
+            </>
+          ) : isSuccess ? (
+            <>
+              <Check className="w-4 h-4 mr-2" /> Sent
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              Send
+            </div>
+          )}
+        </button>
+      </div>
+    </>
   );
 }

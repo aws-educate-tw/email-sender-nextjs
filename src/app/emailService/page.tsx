@@ -7,7 +7,7 @@ import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-temp
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
 import EmailServiceSetting from "@/app/ui/emailService/email-service-setting";
 import EmailServiceReview from "@/app/ui/emailService/email-service-review";
-import { EmailData, EmailProvider } from "@/app/context/EmailContext";
+import { EmailProvider } from "@/app/context/EmailContext";
 
 type Step =
   | "start-option"
@@ -33,7 +33,7 @@ export interface EmailDataType {
   bcc: string[];
   cc: string[];
   provideCertification: "yes" | "no";
-  attachments: { file_id: string; file_url: string }[];
+  attachments: { file_name: string; file_id: string; file_url: string }[];
 }
 
 export default function Page() {

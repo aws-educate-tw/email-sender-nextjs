@@ -14,7 +14,9 @@ interface FileDataType {
 }
 
 interface AttachDropdownProps {
-  onEmailsChange: (selectedFiles: { file_id: string; file_url: string }[]) => void;
+  onEmailsChange: (
+    selectedFiles: { file_name: string; file_id: string; file_url: string }[]
+  ) => void;
 }
 
 export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) {
@@ -24,9 +26,6 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileDataType[]>([]);
-  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
-  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -72,9 +71,6 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
 
       const result = await response.json();
       setOptions(result.data);
-      setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
-      setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
-      setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
@@ -101,7 +97,9 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
       : [...selectedFiles, file];
 
     setSelectedFiles(updated);
-    onEmailsChange(updated.map(({ file_id, file_url }) => ({ file_id, file_url })));
+    onEmailsChange(
+      updated.map(({ file_name, file_id, file_url }) => ({ file_name, file_id, file_url }))
+    );
   };
 
   return (
