@@ -58,7 +58,7 @@ export default function EmailServiceStartOption({ onSelect }: EmailServiceStartO
                 </div>
                 <div className="font-semibold text-white text-xl mb-3">Resend a previous email</div>
                 <div className="text-gray-300 leading-relaxed">
-                  Pick an email you've sent before and resend it
+                  Pick an email you have sent before and resend it
                 </div>
               </div>
             </button>

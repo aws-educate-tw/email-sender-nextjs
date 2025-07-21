@@ -18,13 +18,13 @@ export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
   ]);
   const [columns, setColumns] = useState<string[]>([]);
   const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
-  const [isResizing, setIsResizing] = useState<string | null>(null);
+  // const [isResizing, setIsResizing] = useState<string | null>(null);
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
 
   // Notify parent whenever data changes
   useEffect(() => {
     onTableChange(data);
-  }, [data]);
+  }, [data, onTableChange]);
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
@@ -117,7 +117,7 @@ export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
   };
 
   const addColumn = () => {
-    let base = `新欄位${columns.length + 1}`;
+    const base = `新欄位${columns.length + 1}`;
     let name = base;
     let i = 1;
     while (columns.includes(name)) {
@@ -152,7 +152,7 @@ export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
 
   const handleMouseDown = (col: string, e: React.MouseEvent) => {
     e.preventDefault();
-    setIsResizing(col);
+    // setIsResizing(col);
     const startX = e.clientX;
     const startW = columnWidths[col] || 150;
     const scrollContainer = e.currentTarget.closest(".overflow-auto");
@@ -162,7 +162,7 @@ export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
       setColumnWidths(prev => ({ ...prev, [col]: Math.max(50, startW + diff) }));
     };
     const onMouseUp = () => {
-      setIsResizing(null);
+      // setIsResizing(null);
       if (scrollContainer) (scrollContainer as HTMLElement).style.pointerEvents = "auto";
       document.body.style.userSelect = "auto";
       document.removeEventListener("mousemove", onMouseMove);

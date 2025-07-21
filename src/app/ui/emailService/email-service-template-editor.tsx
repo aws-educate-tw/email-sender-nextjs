@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import TipTap from "@/app/ui/tip-tap";
 import { Check } from "lucide-react";
 import cn from "classnames";
@@ -32,7 +32,6 @@ export default function EmailServiceTemplateEditor({
   const [templateName, setTemplateName] = useState("");
   const [saveButtonState, setSaveButtonState] = useState<"idle" | "saved" | "error">("idle");
   const [isUploading, setIsUploading] = useState(false);
-  const [showToast, setShowToast] = useState(false);
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
@@ -93,15 +92,12 @@ export default function EmailServiceTemplateEditor({
       });
       const result = await response.json();
       setIsUploading(false);
-      setShowToast(true);
 
       // Show "Saved" button state
       setSaveButtonState("saved");
       setTimeout(() => {
         setSaveButtonState("idle");
       }, 3000);
-
-      setTimeout(() => setShowToast(false), 5000);
 
       // Extract file_id from the response and pass it to the onSave callback
       const templateFileName = result?.files?.[0]?.file_name;

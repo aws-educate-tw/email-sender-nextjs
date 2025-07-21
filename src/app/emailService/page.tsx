@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";

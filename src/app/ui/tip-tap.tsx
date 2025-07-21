@@ -9,8 +9,6 @@ import ListItem from "@tiptap/extension-list-item";
 import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
 import { useEffect, useState } from "react";
-import { Toast } from "flowbite-react";
-import { HiCheck } from "react-icons/hi";
 import { useRouter } from "next/navigation";
 import {
   Bold,
@@ -27,7 +25,6 @@ import {
   Undo,
   Redo,
   Link as LinkIcon,
-  Check,
 } from "lucide-react";
 import cn from "classnames";
 import "./styles.scss";
@@ -65,11 +62,8 @@ interface TipTapProps {
 }
 
 export default function TipTap({ onChange, content, onNext, templateName, onSave }: TipTapProps) {
-  const [editorContent, setEditorContent] = useState(content);
+  const [, setEditorContent] = useState(content);
   const [, setIsFocused] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [saveButtonState, setSaveButtonState] = useState<"idle" | "saved" | "error">("idle");
 
   const router = useRouter();
 

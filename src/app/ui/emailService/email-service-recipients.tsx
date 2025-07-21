@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import SpreadsheetEditor from "@/app/ui/emailService/spreadsheet-editor";
 import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";
@@ -141,6 +141,10 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
     }
   };
 
+  const handleTableChange = useCallback((data: any) => {
+    setExcel(data);
+  }, []);
+
   return (
     <>
       <div className="space-y-6 mb-6">
@@ -150,7 +154,7 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
           isLoading={isLoadingVariables}
           missingVariables={missingVariables}
         />
-        <SpreadsheetEditor onTableChange={excelData => setExcel(excelData)} />
+        <SpreadsheetEditor onTableChange={handleTableChange} />
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 items-center h-12">

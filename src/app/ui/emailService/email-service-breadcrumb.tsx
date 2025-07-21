@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  ChevronRight,
-  FileText,
-  Users,
-  Settings,
-  Send,
-  Layers3,
-  PenLine,
-  BookOpenCheck,
-} from "lucide-react";
+import { ChevronRight, Users, Settings, Send, Layers3, PenLine, BookOpenCheck } from "lucide-react";
 
 interface StepInfo {
   step: string;

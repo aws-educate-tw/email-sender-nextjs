@@ -244,7 +244,7 @@ export default function RecipientsTable({
 
             {/* 表格內容 */}
             <div className="bg-gray-200 rounded-b-lg overflow-hidden">
-              {recipients.map((recipient, rowIndex) => (
+              {recipients.map(recipient => (
                 <div
                   key={recipient.id}
                   className="grid gap-px"

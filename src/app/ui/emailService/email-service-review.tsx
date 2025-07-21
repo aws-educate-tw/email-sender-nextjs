@@ -12,7 +12,6 @@ interface ReviewProps {
 }
 
 export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,8 +49,9 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
         setTimeout(() => onSubmit(), 3000);
       } else {
         console.error("Error sending email:", res);
-        alert("Error sending email: " + res.message);
         setError(res.message || "Error sending email");
+        alert(res.message || "Error sending email");
+        console.error("Error", error);
       }
     } catch (err: any) {
       setError("Submission failed: " + err.message);
@@ -59,30 +59,6 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
       setIsSubmitting(false);
     }
   };
-
-  const InfoRow = ({
-    icon,
-    label,
-    value,
-  }: {
-    icon?: React.ReactNode;
-    label: React.ReactNode;
-    value: React.ReactNode;
-  }) => (
-    <div className="flex w-full gap-3 items-center p-3 rounded-lg">
-      {icon && <div className="text-sky-950 bg-gray-200 p-2 rounded-lg">{icon}</div>}
-      <div className="flex flex-col w-full">
-        <div className="underline">{label}</div>
-        <div className="text-slate-900 font-medium break-words">
-          {value ? (
-            <span className="text-slate-400">{value}</span>
-          ) : (
-            <span className="italic text-slate-400">Not set</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <>
