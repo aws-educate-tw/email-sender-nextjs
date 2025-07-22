@@ -47,6 +47,7 @@ export default function SideNav() {
           width={500}
           height={400}
           className="w-full max-w-[180px] md:max-w-[240px]"
+          priority
         />
       </Link>
 
@@ -55,7 +56,7 @@ export default function SideNav() {
         {/* Top Section */}
         <div className="flex flex-col gap-2 mt-2">
           <Link
-            href="/emailService#start-option"
+            href="/emailService"
             className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
           >
             <p className="text-white text-sm sm:text-base">Email Service</p>
