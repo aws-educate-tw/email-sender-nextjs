@@ -57,10 +57,6 @@ export default function Page() {
   });
 
   useEffect(() => {
-    console.log("emailData:", emailData);
-  }, [emailData]);
-
-  useEffect(() => {
     const updateStepFromHash = () => {
       const hash = window.location.hash.replace("#", "") as Step;
       const steps: Step[] = [
@@ -77,6 +73,22 @@ export default function Page() {
         // 🌟 關鍵：如果跳回 start-option，就清空 startMode
         if (hash === "start-option") {
           setStartMode(null);
+          setEmailData({
+            subject: "",
+            senderName: "",
+            templateFileName: null,
+            templateFileId: null,
+            templateFileUrl: null,
+            spreadsheetFileName: null,
+            spreadsheetFileId: null,
+            spreadsheetFileUrl: null,
+            localPart: "",
+            replyTo: "",
+            bcc: [],
+            cc: [],
+            provideCertification: "no",
+            attachments: [],
+          });
         }
       }
     };
@@ -100,14 +112,6 @@ export default function Page() {
     }
   };
 
-  const handleTemplateSelected = () => {
-    if (startMode === "resend") {
-      window.location.hash = "recipients";
-    } else {
-      window.location.hash = "template-edit";
-    }
-  };
-
   const renderStepContent = () => {
     switch (currentStep) {
       case "start-option":
@@ -115,7 +119,13 @@ export default function Page() {
       case "select-template":
         return (
           <EmailServiceTemplateSelector
-            onNext={() => (window.location.hash = "template-edit")}
+            onNext={() => {
+              if (startMode === "edit-existing") {
+                window.location.hash = "template-edit";
+              } else if (startMode === "resend") {
+                window.location.hash = "recipients";
+              }
+            }}
             onTemplateSelect={(templateFileName, templateFileId, templateFileUrl) => {
               setEmailData(prev => ({
                 ...prev,
@@ -129,7 +139,13 @@ export default function Page() {
       case "template-edit":
         return (
           <EmailServiceTemplateEditor
-            onNext={() => (window.location.hash = "recipients")}
+            onNext={() => {
+              if (startMode === "edit-existing") {
+                window.location.hash = "recipients";
+              } else {
+                window.location.hash = "settings";
+              }
+            }}
             templateFileUrl={emailData.templateFileUrl}
             onSave={(templateFileName, templateFileId, templateFileUrl) => {
               setEmailData(prev => ({
