@@ -49,6 +49,9 @@ export default function EmailServiceBreadcrumb({
   currentStep,
   steps,
 }: EmailServiceBreadcrumbProps) {
+  const mode =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("mode") : null;
+
   return (
     <div className="w-full bg-white rounded-xl p-4">
       <nav className="flex items-center w-full space-x-2 md:space-x-4" aria-label="Process steps">
@@ -57,11 +60,14 @@ export default function EmailServiceBreadcrumb({
           if (!step) return null;
 
           const isActive = currentStep === stepKey;
+          const query = new URLSearchParams();
+          query.set("step", stepKey);
+          if (mode) query.set("mode", mode);
 
           return (
             <div key={stepKey} className="flex items-center">
               <Link
-                href={`/emailService?step=${stepKey}`}
+                href={`/emailService?${query.toString()}`}
                 className="flex items-center group cursor-pointer"
               >
                 {step.icon(
