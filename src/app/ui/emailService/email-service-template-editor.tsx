@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import TipTap from "@/app/ui/tip-tap";
+import TipTap from "@/app/ui/emailService/tip-tap";
 import { Check } from "lucide-react";
 import cn from "classnames";
 

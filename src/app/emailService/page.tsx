@@ -208,7 +208,7 @@ export default function Page() {
 
   return (
     <div className="">
-      <p className="text-4xl font-bold pt-2">Email Service</p>
+      {/* <p className="text-4xl font-bold pt-2">Email Service</p> */}
       {currentStep !== "start-option" && (
         <EmailServiceBreadcrumb currentStep={currentStep} steps={visibleSteps} />
       )}

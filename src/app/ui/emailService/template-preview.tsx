@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import IframePreview from "@/app/ui/iframe-preview";
+import IframePreview from "@/app/ui/emailService/iframe-preview";
 import { AlertCircle } from "lucide-react";
 
 export default function TemplatePreview({ fileUrl }: { fileUrl: string }) {

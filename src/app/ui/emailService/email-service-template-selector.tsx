@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { ChevronRight, ChevronLeft, CalendarClock, FileText, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronRight, ChevronLeft, FileText, RefreshCw } from "lucide-react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 
 interface FileDataType {

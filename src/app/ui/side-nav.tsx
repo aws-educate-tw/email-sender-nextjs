@@ -35,9 +35,10 @@ export default function SideNav() {
   }, [triggerWidth]);
 
   return (
-    <div className="flex h-full flex-col px-5 py-4 md:px-3 bg-gray-200 gap-2 min-w-60">
+    <div className="flex h-full flex-col p-4 backdrop-blur-md bg-gradient-to-br from-gray-200 to-gray-400 shadow-xl rounded-b-lg md:rounded-r-lg gap-2 w-full md:min-w-60">
+      {/* Logo */}
       <Link
-        className="flex h-20 min-w-48 items-end justify-start rounded-md bg-sky-950 p-4 md:h-40"
+        className="flex items-center justify-start rounded-md bg-sky-950 p-4 h-20 md:h-40"
         href="/"
       >
         <Image
@@ -45,111 +46,108 @@ export default function SideNav() {
           alt="the logo of aws educate"
           width={500}
           height={400}
-          className="w-60 sm:w-60 md:w-96"
+          className="w-full max-w-[180px] md:max-w-[240px]"
         />
       </Link>
-      <div className="flex grow flex-row flex-wrap justify-start gap-2 md:flex-col md:space-x-0 rounded-md">
-        <Link
-          href="/aboutUs"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">About Us</p>
-        </Link>
-        <Link
-          href="/templateEdit"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Create Template</p>
-        </Link>
-        <Link
-          href="/sendEmail"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Send Email</p>
-        </Link>
-        <Link
-          href="/emailService"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Email Service</p>
-        </Link>
-        <div className="relative w-full" ref={triggerRef}>
-          <div
-            onMouseEnter={() => setIsOpen(true)}
-            onMouseLeave={() => setIsOpen(false)}
-            className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 cursor-pointer"
-          >
-            <p className="px-3 text-white">Sending History</p>
-          </div>
 
-          {isOpen &&
-            triggerRef.current &&
-            createPortal(
-              <div
-                className={`
+      {/* Navigation Links */}
+      <div className="flex flex-col justify-between h-full">
+        {/* Top Section */}
+        <div className="flex flex-col gap-2 mt-2">
+          <Link
+            href="/emailService"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Email Service</p>
+          </Link>
+
+          {/* Dropdown Menu (Sending History) */}
+          <div className="relative w-full" ref={triggerRef}>
+            <div
+              onMouseEnter={() => setIsOpen(true)}
+              onMouseLeave={() => setIsOpen(false)}
+              className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800 cursor-pointer"
+            >
+              <p className="text-white text-sm sm:text-base">Sending History</p>
+            </div>
+
+            {isOpen &&
+              triggerRef.current &&
+              createPortal(
+                <div
+                  className={`
                   fixed z-[9999] bg-white rounded-md shadow-lg
                 `}
-                style={{
-                  top: canFitRight
-                    ? triggerRef.current.getBoundingClientRect().top
-                    : triggerRef.current.getBoundingClientRect().bottom,
-                  left: canFitRight
-                    ? triggerRef.current.getBoundingClientRect().right
-                    : triggerRef.current.getBoundingClientRect().left,
-                  width: triggerWidth,
-                }}
-                onMouseEnter={() => setIsOpen(true)}
-                onMouseLeave={() => setIsOpen(false)}
-              >
-                {[
-                  { href: "/emailHistory", label: "Email History" },
-                  { href: "/webhookSending", label: "Webhook Sending" },
-                ].map((item, index, arr) => {
-                  const isFirst = index === 0;
-                  const isLast = index === arr.length - 1;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`block px-4 py-2 text-gray-700 hover:bg-gray-200 transition-colors duration-150
+                  style={{
+                    top: canFitRight
+                      ? triggerRef.current.getBoundingClientRect().top
+                      : triggerRef.current.getBoundingClientRect().bottom,
+                    left: canFitRight
+                      ? triggerRef.current.getBoundingClientRect().right
+                      : triggerRef.current.getBoundingClientRect().left,
+                    width: triggerWidth,
+                  }}
+                  onMouseEnter={() => setIsOpen(true)}
+                  onMouseLeave={() => setIsOpen(false)}
+                >
+                  {[
+                    { href: "/emailHistory", label: "Email History" },
+                    { href: "/webhookSending", label: "Webhook Sending" },
+                  ].map((item, index, arr) => {
+                    const isFirst = index === 0;
+                    const isLast = index === arr.length - 1;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`block px-4 py-2 text-gray-700 hover:bg-gray-200 transition-colors duration-150
                         ${hoveredItem === item.href ? "bg-gray-300" : ""}
                         ${isFirst ? "rounded-t-md" : ""}
                         ${isLast ? "rounded-b-md" : ""}
                       `}
-                      onMouseEnter={() => setHoveredItem(item.href)}
-                      onMouseLeave={() => setHoveredItem(null)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </div>,
-              document.body
-            )}
-        </div>
+                        onMouseEnter={() => setHoveredItem(item.href)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>,
+                document.body
+              )}
+          </div>
 
-        <Link
-          href="/webhookService"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Webhook Service</p>
-        </Link>
-        <Link
-          href="/webhookRecords"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Webhook Records</p>
-        </Link>
-      </div>
-      <div>
-        <button
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 w-full"
-          type="button"
-          onClick={signout}
-        >
-          <p className="px-3 text-white">Sign Out</p>
-        </button>
+          <Link
+            href="/webhookService"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Webhook Service</p>
+          </Link>
+          <Link
+            href="/webhookRecords"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Webhook Records</p>
+          </Link>
+        </div>
+        {/* Bottom Section */}
+        <div className="flex flex-col gap-2 mt-2">
+          <Link
+            href="/aboutUs"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">About Us</p>
+          </Link>
+          {/* Sign Out Button */}
+          <button
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+            type="button"
+            onClick={signout}
+          >
+            <p className="text-white text-sm sm:text-base">Sign Out</p>
+          </button>
+        </div>
       </div>
     </div>
   );
