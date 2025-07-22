@@ -124,16 +124,16 @@ export default function EmailServiceTemplateSelector({
   }, [selectedTemplate, onTemplateSelect]);
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-col">
+      <div className="flex">
         {/* Left Panel */}
         <div className="w-1/4 border-r border-gray-200 bg-white p-4 overflow-y-auto">
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-700">Template Library</h2>
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-700">Template History</h2>
               <button
                 onClick={() => fetchFiles(fileExtension, 5, null, "reset")}
-                className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+                className="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
                 disabled={isLoading}
               >
                 <RefreshCw size={18} className={isLoading ? "animate-pulse" : ""} />
@@ -218,12 +218,17 @@ export default function EmailServiceTemplateSelector({
         </div>
 
         {/* Right Panel */}
-        <div className="w-3/4 flex flex-col p-6 overflow-y-auto bg-gray-100">
-          <div className="flex justify-between items-center mb-4">
+        <div className="w-3/4 flex flex-col p-4 gap-4">
+          <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-700">
-              {selectedTemplate
-                ? `Preview: ${selectedTemplate.file_name}`
-                : "Select a template to preview"}
+              {selectedTemplate ? (
+                <>
+                  You have selected:{" "}
+                  <strong className="underline">{selectedTemplate.file_name}</strong>
+                </>
+              ) : (
+                "Select a template to preview"
+              )}
             </h2>
             {selectedTemplate && (
               <span className="text-sm text-gray-500">
@@ -234,14 +239,17 @@ export default function EmailServiceTemplateSelector({
           </div>
 
           {/* Preview Area */}
-          <div className="flex-1 border rounded-lg bg-white shadow-sm overflow-hidden">
+          <div className="flex-1 rounded-lg bg-white shadow-sm overflow-hidden">
             {content ? (
               <div className="h-full overflow-auto">
-                <div className="border-b border-gray-200 p-3 bg-gray-50 flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700">HTML Preview</span>
+                <div className="border-2 border-sky-950 p-4 bg-sky-950 flex justify-between items-center">
+                  <span className="text-sm font-medium text-white">Template Preview</span>
                 </div>
-                <div className="p-4">
-                  <div className="prose max-w-full" dangerouslySetInnerHTML={{ __html: content }} />
+                <div className="p-4 bg-gray-100 cursor-not-allowed">
+                  <div
+                    className="prose max-w-full p-4 bg-white rounded-lg border-2 border-gray-200 opacity-60"
+                    dangerouslySetInnerHTML={{ __html: content }}
+                  />
                 </div>
               </div>
             ) : (
@@ -257,7 +265,7 @@ export default function EmailServiceTemplateSelector({
       </div>
 
       {/* Footer */}
-      <div className="flex justify-end py-6 px-6">
+      <div className="flex justify-end py-2 px-6">
         <button
           className="px-6 py-2 bg-sky-950 text-white rounded-md hover:bg-sky-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!selectedTemplate}

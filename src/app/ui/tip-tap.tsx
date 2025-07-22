@@ -266,54 +266,18 @@ export default function TipTap({ onChange, content }: TipTapProps) {
             />
           </div>
 
+          <div className="border border-sky-950 p-4 rounded-t-lg bg-sky-950 flex justify-between items-center">
+            <span className="text-sm font-medium text-white">Template Preview</span>
+          </div>
+
           {/* Editor Content */}
           <EditorContent
             editor={editor}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            className="p-4 border border-gray-200 border-t-0 bg-gray-50 rounded-b-lg "
           />
         </div>
-        {/* <div className="flex justify-end gap-3">
-          {isUploading ? (
-            <button
-              className="rounded-md bg-gray-500 px-4 py-3 text-base font-medium text-white transition-colors"
-              disabled
-            >
-              Saving...
-            </button>
-          ) : (
-            <>
-              {saveButtonState === "saved" ? (
-                <button
-                  className="flex items-center justify-center rounded-md bg-green-600 hover:bg-green-700 px-4 py-3 text-base font-medium text-white transition-colors"
-                  disabled
-                >
-                  <Check className="mr-2" size={20} /> Saved
-                </button>
-              ) : (
-                <button
-                  onClick={handleSaveTemplate}
-                  disabled={!templateName || templateName.trim() === ""}
-                  className={cn(
-                    "flex items-center justify-center rounded-md px-4 py-3 text-base font-medium text-white transition-colors",
-                    saveButtonState === "error"
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 disabled:bg-gray-400"
-                  )}
-                >
-                  Save Template
-                </button>
-              )}
-
-              <button
-                onClick={handleNextClick}
-                className="rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-3 text-base font-medium text-white transition-colors"
-              >
-                Next
-              </button>
-            </>
-          )}
-        </div> */}
       </div>
     </>
   );

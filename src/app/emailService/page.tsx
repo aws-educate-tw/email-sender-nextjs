@@ -130,6 +130,7 @@ export default function Page() {
         return (
           <EmailServiceTemplateEditor
             onNext={() => (window.location.hash = "recipients")}
+            templateFileUrl={emailData.templateFileUrl}
             onSave={(templateFileName, templateFileId, templateFileUrl) => {
               setEmailData(prev => ({
                 ...prev,
