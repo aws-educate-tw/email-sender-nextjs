@@ -24,7 +24,7 @@ interface SettingProps {
   onEmailDataChange: (data: EmailDataType) => void;
 }
 
-export default function EmailServiceSetting({
+export default function EmailServiceSettings({
   onNext,
   emailData,
   onEmailDataChange,
@@ -133,7 +133,8 @@ export default function EmailServiceSetting({
             </label>
             <div className="flex items-center gap-3">
               <AttachDropdown
-                onEmailsChange={attachments => {
+                value={emailData.attachments}
+                onChange={attachments => {
                   onEmailDataChange({ ...emailData, attachments });
                 }}
               />

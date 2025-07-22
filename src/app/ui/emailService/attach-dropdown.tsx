@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime, formatFileSize } from "@/lib/utils/dataUtils";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface FileDataType {
   file_id: string;
@@ -14,20 +15,36 @@ interface FileDataType {
 }
 
 interface AttachDropdownProps {
-  onEmailsChange: (
-    selectedFiles: { file_name: string; file_id: string; file_url: string }[]
-  ) => void;
+  value: {
+    file_name: string;
+    file_id: string;
+    file_url: string;
+  }[];
+  onChange: (selectedFiles: { file_name: string; file_id: string; file_url: string }[]) => void;
 }
 
-export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) {
+export default function AttachDropdown({ value, onChange }: AttachDropdownProps) {
   const [options, setOptions] = useState<FileDataType[] | null>(null);
   const [filteredOptions, setFilteredOptions] = useState<FileDataType[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileDataType[]>([]);
+  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
+  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
+  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!options || value.length === 0) return;
+
+    const matched = value
+      .map(v => options.find(o => o.file_id === v.file_id))
+      .filter((f): f is FileDataType => f !== undefined);
+
+    setSelectedFiles(matched);
+  }, [options, value]);
 
   useEffect(() => {
     if (options) {
@@ -71,6 +88,9 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
 
       const result = await response.json();
       setOptions(result.data);
+      setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
+      setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
+      setNextLastEvaluatedKey(result.next_last_evaluated_key);
     } catch (error: any) {
       alert("Failed to fetch files: " + error.message);
     } finally {
@@ -79,14 +99,16 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
   };
 
   const toggleDropdown = () => {
-    if (!isOpen) fetchFiles(5, null);
+    if (!isOpen && !options) {
+      fetchFiles(5, null); // ✅ 僅首次展開下拉時抓
+    }
     setIsOpen(!isOpen);
   };
 
   const handleSelect = (file: FileDataType | null) => {
     if (!file) {
       setSelectedFiles([]);
-      onEmailsChange([]);
+      onChange([]);
       setIsOpen(false);
       return;
     }
@@ -97,21 +119,17 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
       : [...selectedFiles, file];
 
     setSelectedFiles(updated);
-    onEmailsChange(
-      updated.map(({ file_name, file_id, file_url }) => ({ file_name, file_id, file_url }))
-    );
+    onChange(updated.map(({ file_name, file_id, file_url }) => ({ file_name, file_id, file_url })));
   };
 
   return (
     <div className="relative inline-block text-left w-full" ref={dropdownRef}>
       <button
         type="button"
-        className="text-start inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        className="text-start inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         onClick={toggleDropdown}
       >
-        {selectedFiles.length > 0
-          ? selectedFiles.map(file => file.file_name).join(", ")
-          : "Attach your files"}
+        {value.length > 0 ? value.map(file => file.file_name).join(", ") : "Attach your files"}
         <svg
           className="-mr-1 ml-2 h-5 w-5"
           xmlns="http://www.w3.org/2000/svg"
@@ -127,9 +145,14 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
       </button>
 
       {isOpen && (
-        <div className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+        <div
+          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="options-menu"
+        >
           <div className="flex justify-between items-center mb-2 pl-4">
-            <p className="font-medium">ATTACH FILES</p>
+            <p className="font-medium">Attachments Selection</p>
             <input
               className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               placeholder="Search a file name..."
@@ -140,32 +163,127 @@ export default function AttachDropdown({ onEmailsChange }: AttachDropdownProps) 
           </div>
 
           {isLoading ? (
-            <div className="text-center py-4">Loading...</div>
+            <div className="flex justify-center items-center py-4">
+              <svg
+                className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l-1.497-1.32A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <p>Loading...</p>
+            </div>
           ) : filteredOptions && filteredOptions.length > 0 ? (
-            <table className="w-full text-sm">
-              <tbody>
-                <tr className="hover:bg-gray-100 cursor-pointer" onClick={() => handleSelect(null)}>
-                  <td className="py-2 px-4 text-gray-500 italic" colSpan={3}>
-                    Clear Selection
-                  </td>
-                </tr>
-                {filteredOptions.map(file => (
-                  <tr
-                    key={file.file_id}
-                    className={`hover:bg-gray-100 cursor-pointer ${
-                      selectedFiles.some(f => f.file_id === file.file_id) ? "bg-gray-100" : ""
-                    }`}
-                    onClick={() => handleSelect(file)}
-                  >
-                    <td className="py-2 px-4">{file.file_name}</td>
-                    <td className="py-2 px-4">{convertToTaipeiTime(file.created_at)}</td>
-                    <td className="py-2 px-4">{formatFileSize(file.file_size)}</td>
+            <div>
+              <table className="w-full bg-white shadow-md rounded-md">
+                <thead>
+                  <tr className="bg-neutral-100 rounded-t-md">
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">File Size</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <tr
+                    className="hover:bg-gray-200 cursor-pointer active:bg-gray-300"
+                    onClick={() => handleSelect(null)}
+                  >
+                    <td
+                      className="py-2 px-4 border-b border-gray-200 text-start text-gray-400 italic"
+                      colSpan={3}
+                    >
+                      Clear Selection
+                    </td>
+                  </tr>
+                  {filteredOptions.map(option => (
+                    <tr
+                      key={option.file_id}
+                      className={`hover:bg-gray-200 cursor-pointer active:bg-gray-300 ${
+                        selectedFiles.some(file => file.file_id === option.file_id)
+                          ? "bg-gray-100"
+                          : ""
+                      }`}
+                      onClick={() => handleSelect(option)}
+                    >
+                      <td className="py-2 px-4 border-b border-gray-200 max-w-96 break-words">
+                        {option.file_name}
+                      </td>
+                      <td className="py-2 px-4 border-b border-gray-200">
+                        {convertToTaipeiTime(option.created_at)}
+                      </td>
+                      <td className="py-2 px-4 border-b border-gray-200">
+                        {formatFileSize(option.file_size)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="flex justify-end gap-8 pt-3 pb-1 px-2">
+                <button
+                  className={`flex items-center gap-1 ${
+                    !currentLastEvaluatedKey
+                      ? "cursor-default text-gray-400"
+                      : "hover:text-gray-600 hover:underline"
+                  }`}
+                  onClick={() => {
+                    fetchFiles(5, previousLastEvaluatedKey);
+                  }}
+                  disabled={!currentLastEvaluatedKey}
+                >
+                  <ChevronLeft size={20} />
+                  Previous
+                </button>
+                <button
+                  className={`flex items-center gap-1 ${
+                    !nextLastEvaluatedKey
+                      ? "cursor-default text-gray-400"
+                      : "hover:text-gray-600 hover:underline"
+                  }`}
+                  onClick={() => {
+                    if (nextLastEvaluatedKey) {
+                      fetchFiles(5, nextLastEvaluatedKey);
+                    }
+                  }}
+                  disabled={!nextLastEvaluatedKey}
+                >
+                  Next
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
           ) : (
-            <div className="py-2 px-4 text-gray-500">No files found.</div>
+            <div>
+              <table className="w-full bg-white">
+                <thead>
+                  <tr className="bg-neutral-100 rounded-t-md">
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tl-md">File Name</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Created At</th>
+                    <th className="py-2 px-4 border-b border-gray-200 rounded-tr-md">File Size</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="py-2 px-4 border-b border-gray-200" colSpan={3}>
+                      No files found
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}

@@ -5,7 +5,7 @@ import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-o
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
 import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-template-editor";
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
-import EmailServiceSetting from "@/app/ui/emailService/email-service-setting";
+import EmailServiceSettings from "@/app/ui/emailService/email-service-settings";
 import EmailServiceReview from "@/app/ui/emailService/email-service-review";
 import { EmailProvider } from "@/app/context/EmailContext";
 
@@ -146,7 +146,7 @@ export default function Page() {
         );
       case "settings":
         return (
-          <EmailServiceSetting
+          <EmailServiceSettings
             onNext={() => (window.location.hash = "confirmation")}
             emailData={emailData}
             onEmailDataChange={setEmailData}
