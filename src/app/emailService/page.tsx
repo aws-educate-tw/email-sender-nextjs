@@ -7,7 +7,6 @@ import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-temp
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
 import EmailServiceSettings from "@/app/ui/emailService/email-service-settings";
 import EmailServiceReview from "@/app/ui/emailService/email-service-review";
-import { EmailProvider } from "@/app/context/EmailContext";
 
 type Step =
   | "start-option"
@@ -179,14 +178,12 @@ export default function Page() {
   })();
 
   return (
-    <EmailProvider>
-      <div className="">
-        <p className="text-4xl font-bold pt-2">Email Service</p>
-        {currentStep !== "start-option" && (
-          <EmailServiceBreadcrumb currentStep={currentStep} steps={visibleSteps} />
-        )}
-        {renderStepContent()}
-      </div>
-    </EmailProvider>
+    <div className="">
+      <p className="text-4xl font-bold pt-2">Email Service</p>
+      {currentStep !== "start-option" && (
+        <EmailServiceBreadcrumb currentStep={currentStep} steps={visibleSteps} />
+      )}
+      {renderStepContent()}
+    </div>
   );
 }
