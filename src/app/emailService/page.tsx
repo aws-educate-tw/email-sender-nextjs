@@ -113,7 +113,19 @@ export default function Page() {
       case "start-option":
         return <EmailServiceStartOption onSelect={handleStart} />;
       case "select-template":
-        return <EmailServiceTemplateSelector onSelect={handleTemplateSelected} />;
+        return (
+          <EmailServiceTemplateSelector
+            onNext={() => (window.location.hash = "template-edit")}
+            onTemplateSelect={(templateFileName, templateFileId, templateFileUrl) => {
+              setEmailData(prev => ({
+                ...prev,
+                templateFileName,
+                templateFileId,
+                templateFileUrl,
+              }));
+            }}
+          />
+        );
       case "template-edit":
         return (
           <EmailServiceTemplateEditor
