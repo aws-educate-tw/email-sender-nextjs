@@ -3,7 +3,7 @@ import EmailService from "@/app/ui/emailService/email-service";
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<></>}>
       <EmailService />
     </Suspense>
   );
