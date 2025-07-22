@@ -6,7 +6,6 @@ import { Underline } from "@tiptap/extension-underline";
 import { Link } from "@tiptap/extension-link";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
-import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
