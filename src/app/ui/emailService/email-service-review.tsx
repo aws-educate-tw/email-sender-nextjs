@@ -4,7 +4,7 @@ import { submitForm } from "@/lib/actions";
 import Modal from "@/app/ui/emailService/modal";
 import SpreadsheetPreview from "@/app/ui/emailService/spreadsheet-preview";
 import TemplatePreview from "@/app/ui/emailService/template-preview";
-import { EmailDataType } from "@/app/emailService/page";
+import { EmailDataType } from "@/app/ui/emailService/email-service";
 
 interface ReviewProps {
   emailData: EmailDataType;
