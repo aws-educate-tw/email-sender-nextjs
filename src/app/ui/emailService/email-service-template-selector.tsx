@@ -113,7 +113,9 @@ export default function EmailServiceTemplateSelector({
     };
 
     fetchHtmlContent();
+  }, [selectedTemplate, onTemplateSelect]);
 
+  useEffect(() => {
     if (selectedTemplate) {
       onTemplateSelect(
         selectedTemplate.file_name,
@@ -121,7 +123,7 @@ export default function EmailServiceTemplateSelector({
         selectedTemplate.file_url
       );
     }
-  }, [selectedTemplate, onTemplateSelect]);
+  }, [selectedTemplate?.file_id]);
 
   return (
     <div className="flex flex-col">

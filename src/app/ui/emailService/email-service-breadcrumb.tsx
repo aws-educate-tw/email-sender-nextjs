@@ -1,4 +1,4 @@
-import React from "react";
+import Link from "next/link";
 import { ChevronRight, Users, Settings, Send, Layers3, PenLine, BookOpenCheck } from "lucide-react";
 
 interface StepInfo {
@@ -60,7 +60,10 @@ export default function EmailServiceBreadcrumb({
 
           return (
             <div key={stepKey} className="flex items-center">
-              <a href={`#${stepKey}`} className="flex items-center group cursor-pointer">
+              <Link
+                href={`/emailService?step=${stepKey}`}
+                className="flex items-center group cursor-pointer"
+              >
                 {step.icon(
                   `w-6 h-6 mr-2 ${
                     isActive ? "text-[#1a2f4a]" : "text-[#1a2f4a] group-hover:text-[#48596e]"
@@ -75,7 +78,7 @@ export default function EmailServiceBreadcrumb({
                 >
                   {step.label}
                 </span>
-              </a>
+              </Link>
               {index < steps.length - 1 && (
                 <ChevronRight className="w-5 h-5 text-[#1a2f4a] flex-shrink-0 ml-2" />
               )}

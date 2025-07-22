@@ -83,7 +83,10 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: false,
+        listItem: false,
+      }),
       Underline,
       BulletList,
       ListItem,
@@ -94,7 +97,6 @@ export default function TipTap({ onChange, content }: TipTapProps) {
           class: "text-blue-500 underline",
         },
       }),
-      Image,
       ImageResize,
     ],
     editorProps: {

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 export default function SideNav() {
@@ -55,7 +55,7 @@ export default function SideNav() {
         {/* Top Section */}
         <div className="flex flex-col gap-2 mt-2">
           <Link
-            href="/emailService"
+            href="/emailService#start-option"
             className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
           >
             <p className="text-white text-sm sm:text-base">Email Service</p>

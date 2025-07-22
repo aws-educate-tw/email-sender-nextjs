@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
@@ -36,9 +37,11 @@ export interface EmailDataType {
 }
 
 export default function Page() {
-  const [currentStep, setCurrentStep] = useState<Step>("start-option");
-  const [startMode, setStartMode] = useState<StartMode | null>(null);
+  const params = useSearchParams();
+  const router = useRouter();
+  const currentStep = (params.get("step") as Step) ?? "start-option";
 
+  const [startMode, setStartMode] = useState<StartMode | null>(null);
   const [emailData, setEmailData] = useState<EmailDataType>({
     subject: "",
     senderName: "",
@@ -56,59 +59,38 @@ export default function Page() {
     attachments: [],
   });
 
+  const goToStep = (step: Step) => {
+    router.push(`/emailService?step=${step}`);
+  };
+
   useEffect(() => {
-    const updateStepFromHash = () => {
-      const hash = window.location.hash.replace("#", "") as Step;
-      const steps: Step[] = [
-        "start-option",
-        "select-template",
-        "template-edit",
-        "recipients",
-        "settings",
-        "confirmation",
-      ];
-      if (steps.includes(hash)) {
-        setCurrentStep(hash);
-
-        // 🌟 關鍵：如果跳回 start-option，就清空 startMode
-        if (hash === "start-option") {
-          setStartMode(null);
-          setEmailData({
-            subject: "",
-            senderName: "",
-            templateFileName: null,
-            templateFileId: null,
-            templateFileUrl: null,
-            spreadsheetFileName: null,
-            spreadsheetFileId: null,
-            spreadsheetFileUrl: null,
-            localPart: "",
-            replyTo: "",
-            bcc: [],
-            cc: [],
-            provideCertification: "no",
-            attachments: [],
-          });
-        }
-      }
-    };
-
-    updateStepFromHash();
-    window.addEventListener("hashchange", updateStepFromHash);
-    return () => window.removeEventListener("hashchange", updateStepFromHash);
-  }, []);
-
-  // useEffect(() => {
-  //   console.log("templateFileId:", templateFileId);
-  //   console.log("templateFileUrl:", templateFileUrl);
-  // }, [templateFileId, templateFileUrl]);
+    if (currentStep === "start-option") {
+      setStartMode(null);
+      setEmailData({
+        subject: "",
+        senderName: "",
+        templateFileName: null,
+        templateFileId: null,
+        templateFileUrl: null,
+        spreadsheetFileName: null,
+        spreadsheetFileId: null,
+        spreadsheetFileUrl: null,
+        localPart: "",
+        replyTo: "",
+        bcc: [],
+        cc: [],
+        provideCertification: "no",
+        attachments: [],
+      });
+    }
+  }, [currentStep]);
 
   const handleStart = (mode: StartMode) => {
     setStartMode(mode);
     if (mode === "new") {
-      window.location.hash = "template-edit";
+      goToStep("template-edit");
     } else {
-      window.location.hash = "select-template";
+      goToStep("select-template");
     }
   };
 
@@ -121,9 +103,9 @@ export default function Page() {
           <EmailServiceTemplateSelector
             onNext={() => {
               if (startMode === "edit-existing") {
-                window.location.hash = "template-edit";
+                goToStep("template-edit");
               } else if (startMode === "resend") {
-                window.location.hash = "recipients";
+                goToStep("recipients");
               }
             }}
             onTemplateSelect={(templateFileName, templateFileId, templateFileUrl) => {
@@ -140,11 +122,7 @@ export default function Page() {
         return (
           <EmailServiceTemplateEditor
             onNext={() => {
-              if (startMode === "edit-existing") {
-                window.location.hash = "recipients";
-              } else {
-                window.location.hash = "settings";
-              }
+              goToStep("recipients");
             }}
             templateFileUrl={emailData.templateFileUrl}
             onSave={(templateFileName, templateFileId, templateFileUrl) => {
@@ -160,7 +138,7 @@ export default function Page() {
       case "recipients":
         return (
           <EmailServiceRecipients
-            onNext={() => (window.location.hash = "settings")}
+            onNext={() => goToStep("settings")}
             templateFileId={emailData.templateFileId}
             onSave={(spreadsheetFileName, spreadsheetFileId, spreadsheetFileUrl) => {
               setEmailData(prev => ({
@@ -175,12 +153,11 @@ export default function Page() {
       case "settings":
         return (
           <EmailServiceSettings
-            onNext={() => (window.location.hash = "confirmation")}
+            onNext={() => goToStep("confirmation")}
             emailData={emailData}
             onEmailDataChange={setEmailData}
           />
         );
-
       case "confirmation":
         return (
           <EmailServiceReview
@@ -195,20 +172,17 @@ export default function Page() {
 
   const visibleSteps: string[] = (() => {
     if (!startMode) return ["start-option"];
-
     const baseSteps =
       startMode === "new"
         ? ["template-edit", "recipients", "settings", "confirmation"]
         : startMode === "edit-existing"
           ? ["select-template", "template-edit", "recipients", "settings", "confirmation"]
           : ["select-template", "recipients", "settings", "confirmation"];
-
     return ["start-option", ...baseSteps];
   })();
 
   return (
-    <div className="">
-      {/* <p className="text-4xl font-bold pt-2">Email Service</p> */}
+    <div>
       {currentStep !== "start-option" && (
         <EmailServiceBreadcrumb currentStep={currentStep} steps={visibleSteps} />
       )}
