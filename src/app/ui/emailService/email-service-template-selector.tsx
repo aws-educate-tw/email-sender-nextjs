@@ -32,7 +32,6 @@ export default function EmailServiceTemplateSelector({
   const [selectedTemplate, setSelectedTemplate] = useState<FileDataType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState<FileDataType[] | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Pagination
   const [evaluatedKeyStack, setEvaluatedKeyStack] = useState<(string | null)[]>([null]);
@@ -53,7 +52,6 @@ export default function EmailServiceTemplateSelector({
       url.searchParams.append("file_extension", ext);
       url.searchParams.append("limit", limit.toString());
       if (lastEvaluatedKey) url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-      if (searchTerm) url.searchParams.append("search", searchTerm);
 
       const token = localStorage.getItem("access_token");
       const response = await fetch(url.toString(), {
