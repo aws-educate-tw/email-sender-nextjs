@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ChevronRight, Users, Settings, Send, Layers3, PenLine, BookOpenCheck } from "lucide-react";
 
 interface StepInfo {
@@ -49,8 +52,8 @@ export default function EmailServiceBreadcrumb({
   currentStep,
   steps,
 }: EmailServiceBreadcrumbProps) {
-  const mode =
-    typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("mode") : null;
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode");
 
   return (
     <>

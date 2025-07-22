@@ -60,10 +60,10 @@ export default function EmailService() {
     attachments: [],
   });
 
-  const goToStep = (step: Step, nextMode: StartMode | null = mode) => {
+  const goToStep = (step: Step, newMode: StartMode) => {
     const search = new URLSearchParams();
     search.set("step", step);
-    if (nextMode) search.set("mode", nextMode);
+    search.set("mode", newMode);
     router.push(`/emailService?${search.toString()}`);
   };
 
@@ -94,24 +94,24 @@ export default function EmailService() {
     }
   }, [currentStep, mode]);
 
-  const handleStart = (startMode: StartMode) => {
-    if (startMode === "new") {
-      goToStep("template-edit", "new");
-    } else {
-      goToStep("select-template", startMode);
-    }
-  };
-
   const renderStepContent = () => {
     switch (currentStep) {
       case "start-option":
-        return <EmailServiceStartOption onSelect={handleStart} />;
+        return (
+          <EmailServiceStartOption
+            onSelect={mode => {
+              if (mode === "new") goToStep("template-edit", "new");
+              else if (mode === "edit-existing") goToStep("select-template", "edit-existing");
+              else if (mode === "resend") goToStep("select-template", "resend");
+            }}
+          />
+        );
       case "select-template":
         return (
           <EmailServiceTemplateSelector
             onNext={() => {
-              if (mode === "edit-existing") goToStep("template-edit");
-              else if (mode === "resend") goToStep("recipients");
+              if (mode === "edit-existing") goToStep("template-edit", "edit-existing");
+              else if (mode === "resend") goToStep("recipients", "resend");
             }}
             onTemplateSelect={(templateFileName, templateFileId, templateFileUrl) => {
               setEmailData(prev => ({
@@ -127,8 +127,9 @@ export default function EmailService() {
         return (
           <EmailServiceTemplateEditor
             onNext={() => {
-              if (mode === "edit-existing") goToStep("recipients");
-              else goToStep("settings");
+              if (mode === "new") goToStep("recipients", "new");
+              else if (mode === "edit-existing") goToStep("recipients", "edit-existing");
+              else if (mode === "resend") goToStep("recipients", "resend");
             }}
             templateFileUrl={emailData.templateFileUrl}
             onSave={(templateFileName, templateFileId, templateFileUrl) => {
@@ -144,7 +145,11 @@ export default function EmailService() {
       case "recipients":
         return (
           <EmailServiceRecipients
-            onNext={() => goToStep("settings")}
+            onNext={() => {
+              if (mode === "new") goToStep("settings", "new");
+              else if (mode === "edit-existing") goToStep("settings", "edit-existing");
+              else if (mode === "resend") goToStep("settings", "resend");
+            }}
             templateFileId={emailData.templateFileId}
             onSave={(spreadsheetFileName, spreadsheetFileId, spreadsheetFileUrl) => {
               setEmailData(prev => ({
@@ -159,7 +164,11 @@ export default function EmailService() {
       case "settings":
         return (
           <EmailServiceSettings
-            onNext={() => goToStep("confirmation")}
+            onNext={() => {
+              if (mode === "new") goToStep("confirmation", "new");
+              else if (mode === "edit-existing") goToStep("confirmation", "edit-existing");
+              else if (mode === "resend") goToStep("confirmation", "resend");
+            }}
             emailData={emailData}
             onEmailDataChange={setEmailData}
           />
@@ -176,17 +185,29 @@ export default function EmailService() {
     }
   };
 
-  const visibleSteps: string[] = (() => {
+  const visibleSteps = (() => {
     if (!mode) return ["start-option"];
 
-    const baseSteps =
-      mode === "new"
-        ? ["template-edit", "recipients", "settings", "confirmation"]
-        : mode === "edit-existing"
-          ? ["select-template", "template-edit", "recipients", "settings", "confirmation"]
-          : ["select-template", "recipients", "settings", "confirmation"];
+    if (mode === "new") {
+      return ["start-option", "template-edit", "recipients", "settings", "confirmation"];
+    }
 
-    return ["start-option", ...baseSteps];
+    if (mode === "edit-existing") {
+      return [
+        "start-option",
+        "select-template",
+        "template-edit",
+        "recipients",
+        "settings",
+        "confirmation",
+      ];
+    }
+
+    if (mode === "resend") {
+      return ["start-option", "select-template", "recipients", "settings", "confirmation"];
+    }
+
+    return ["start-option"];
   })();
 
   return (
