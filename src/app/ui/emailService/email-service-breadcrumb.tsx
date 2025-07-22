@@ -53,45 +53,56 @@ export default function EmailServiceBreadcrumb({
     typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("mode") : null;
 
   return (
-    <div className="w-full bg-white rounded-xl p-4">
-      <nav className="flex items-center w-full space-x-2 md:space-x-4" aria-label="Process steps">
-        {steps.map((stepKey, index) => {
-          const step = stepLabelMap[stepKey];
-          if (!step) return null;
+    <>
+      <div className="flex flex-col justify-center items-start">
+        <p className="text-4xl font-bold pt-2">Email Service</p>
+        <div className="flex justify-between items-center w-full">
+          <p className="text-gray-500 italic">
+            You will be guided through the steps to send emails.
+          </p>
+          <div className="h-10"></div>
+        </div>
+      </div>
+      <div className="w-full bg-white rounded-xl pt-2 pb-6">
+        <nav className="flex items-center w-full space-x-2 md:space-x-4" aria-label="Process steps">
+          {steps.map((stepKey, index) => {
+            const step = stepLabelMap[stepKey];
+            if (!step) return null;
 
-          const isActive = currentStep === stepKey;
-          const query = new URLSearchParams();
-          query.set("step", stepKey);
-          if (mode) query.set("mode", mode);
+            const isActive = currentStep === stepKey;
+            const query = new URLSearchParams();
+            query.set("step", stepKey);
+            if (mode) query.set("mode", mode);
 
-          return (
-            <div key={stepKey} className="flex items-center">
-              <Link
-                href={`/emailService?${query.toString()}`}
-                className="flex items-center group cursor-pointer"
-              >
-                {step.icon(
-                  `w-6 h-6 mr-2 ${
-                    isActive ? "text-[#1a2f4a]" : "text-[#1a2f4a] group-hover:text-[#48596e]"
-                  }`
-                )}
-                <span
-                  className={`text-base md:text-lg ${
-                    isActive
-                      ? "font-bold text-[#1a2f4a]"
-                      : "text-[#1a2f4a] group-hover:text-[#48596e]"
-                  }`}
+            return (
+              <div key={stepKey} className="flex items-center">
+                <Link
+                  href={`/emailService?${query.toString()}`}
+                  className="flex items-center group cursor-pointer"
                 >
-                  {step.label}
-                </span>
-              </Link>
-              {index < steps.length - 1 && (
-                <ChevronRight className="w-5 h-5 text-[#1a2f4a] flex-shrink-0 ml-2" />
-              )}
-            </div>
-          );
-        })}
-      </nav>
-    </div>
+                  {step.icon(
+                    `w-6 h-6 mr-2 ${
+                      isActive ? "text-[#1a2f4a]" : "text-[#1a2f4a] group-hover:text-[#48596e]"
+                    }`
+                  )}
+                  <span
+                    className={`text-base md:text-lg ${
+                      isActive
+                        ? "font-bold text-[#1a2f4a]"
+                        : "text-[#1a2f4a] group-hover:text-[#48596e]"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                </Link>
+                {index < steps.length - 1 && (
+                  <ChevronRight className="w-5 h-5 text-[#1a2f4a] flex-shrink-0 ml-2" />
+                )}
+              </div>
+            );
+          })}
+        </nav>
+      </div>
+    </>
   );
 }
