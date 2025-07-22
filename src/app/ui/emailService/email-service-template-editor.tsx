@@ -136,15 +136,7 @@ export default function EmailServiceTemplateEditor({
 
   return (
     <div>
-      <div className="flex flex-col justify-center items-start">
-        {/* <p className="text-4xl font-bold pt-2">Create an Email Template</p>
-        <div className="flex justify-between items-center w-full pb-4">
-          <p className="text-gray-500 italic">Create and save your HTML file here.</p>
-          <div className="flex justify-end">
-            <TemplateDropdown onSelect={handleHtmlSelect} />
-          </div>
-        </div> */}
-      </div>
+      <div className="flex flex-col justify-center items-start"></div>
       <div>
         <TipTap content={content} onChange={handleContentChange} />
       </div>

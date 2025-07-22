@@ -269,7 +269,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
           </div>
 
           <div className="border border-sky-950 p-4 rounded-t-lg bg-sky-950 flex justify-between items-center">
-            <span className="text-sm font-medium text-white">Template Preview</span>
+            <span className="text-sm font-medium text-white">Template</span>
           </div>
 
           {/* Editor Content */}

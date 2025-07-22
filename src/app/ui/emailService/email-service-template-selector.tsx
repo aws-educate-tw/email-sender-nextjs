@@ -241,7 +241,7 @@ export default function EmailServiceTemplateSelector({
           </div>
 
           {/* Preview Area */}
-          <div className="flex-1 rounded-lg bg-white shadow-sm overflow-hidden">
+          <div className="flex-1 rounded-lg bg-white shadow-lg overflow-hidden">
             {content ? (
               <div className="h-full overflow-auto">
                 <div className="border-2 border-sky-950 p-4 bg-sky-950 flex justify-between items-center">
@@ -255,7 +255,7 @@ export default function EmailServiceTemplateSelector({
                 </div>
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-gray-500">
+              <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50">
                 <div className="text-center p-6">
                   <FileText size={48} className="mx-auto mb-4 text-gray-300" />
                   <p>Select a template from the library to preview</p>
