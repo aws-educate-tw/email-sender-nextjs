@@ -35,7 +35,7 @@ export default function SideNav() {
   }, [triggerWidth]);
 
   return (
-    <div className="flex h-full flex-col p-4 backdrop-blur-md bg-gradient-to-br from-gray-200 to-gray-400 shadow-xl rounded-b-lg md:rounded-r-lg gap-2 w-full md:min-w-60">
+    <div className="flex h-full flex-col p-4 backdrop-blur-md bg-gradient-to-r from-gray-100 to-gray-300 shadow-xl rounded-b-lg md:rounded-r-lg gap-2 w-full md:min-w-60">
       {/* Logo */}
       <Link
         className="flex items-center justify-start rounded-md bg-sky-950 p-4 h-20 md:h-40"
@@ -54,7 +54,7 @@ export default function SideNav() {
       {/* Navigation Links */}
       <div className="flex flex-col justify-between h-full">
         {/* Top Section */}
-        <div className="flex flex-col gap-2 mt-2">
+        <div className="flex flex-col gap-2">
           <Link
             href="/emailService"
             className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
@@ -133,7 +133,7 @@ export default function SideNav() {
           </Link>
         </div>
         {/* Bottom Section */}
-        <div className="flex flex-col gap-2 mt-2">
+        <div className="flex flex-col gap-2">
           <Link
             href="/aboutUs"
             className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"

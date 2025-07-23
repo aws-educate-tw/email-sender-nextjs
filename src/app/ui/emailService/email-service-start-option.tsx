@@ -26,7 +26,7 @@ export default function EmailServiceStartOption({ onSelect }: EmailServiceStartO
                 <div className="aspect-square bg-slate-800 hover:bg-slate-700 rounded-full flex items-center justify-center transform transition-all duration-500 hover:scale-105 shadow-lg shadow-yellow-200/50">
                   <div className="text-center space-y-4 text-white px-4">
                     <div className="text-6xl md:text-8xl animate-bounce">✏️</div>
-                    <div className="font-semibold text-lg md:text-4xl">Write New Email</div>
+                    <div className="font-semibold text-lg md:text-4xl">Write New Emails</div>
                     <div className="text-slate-300 text-sm">Start with a fresh template.</div>
                   </div>
                 </div>
@@ -42,7 +42,7 @@ export default function EmailServiceStartOption({ onSelect }: EmailServiceStartO
                     <div className="text-3xl md:text-4xl">🧩</div>
                     <div className="font-semibold text-gray-800 text-base">Edit Template</div>
                     <div className="text-gray-600 text-xs">
-                      Modify history template for new emails.
+                      Modify a history template for new emails.
                     </div>
                   </div>
                 </div>
@@ -55,7 +55,7 @@ export default function EmailServiceStartOption({ onSelect }: EmailServiceStartO
                     <div className="text-3xl md:text-4xl">🔁</div>
                     <div className="font-semibold text-gray-800 text-base">Resend Email</div>
                     <div className="text-gray-600 text-xs">
-                      Use history template for resending emails.
+                      Use a history template for emails resending.
                     </div>
                   </div>
                 </div>
