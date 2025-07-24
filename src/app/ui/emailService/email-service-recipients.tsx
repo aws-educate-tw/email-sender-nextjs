@@ -32,7 +32,7 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
   const [templateFileName, setTemplateFileName] = useState<string>("Unknown File Name");
   const [templateVariables, setTemplateVariables] = useState<string[]>([]);
   const [missingVariables, setMissingVariables] = useState<string[]>([]);
-  const [isSent, setIsSent] = useState(false);
+  const [isSave, setIsSave] = useState(false);
 
   // Fetch template variables and always include "Email"
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
   }, [excel, templateVariables]);
 
   useEffect(() => {
-    setIsSent(false);
+    setIsSave(false);
   }, [fileName, excel]);
 
   const handleUploadExcelData = async () => {
@@ -126,7 +126,7 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
       if (onSave && saved) {
         onSave(saved.file_name, saved.file_id, saved.file_url);
       }
-      setIsSent(true);
+      setIsSave(true);
     } catch (error: any) {
       console.error("❌ 上傳失敗:", error);
       alert("上傳失敗：" + error.message);
@@ -157,6 +157,7 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
         <SpreadsheetEditor onTableChange={handleTableChange} />
       </div>
 
+      {/* File name input, upload button and next button */}
       <div className="flex flex-wrap justify-end gap-3 items-center h-12">
         <input
           type="text"
@@ -172,12 +173,12 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
     ${
       !fileName || excel.length === 0 || missingVariables.length > 0
         ? "bg-gray-400 cursor-not-allowed"
-        : isSent
+        : isSave
           ? "bg-green-600 hover:bg-green-700"
           : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90"
     }`}
         >
-          {isSent ? "Sent" : "Save Spreadsheet"}
+          {isSave ? "Saved" : "Save Spreadsheet"}
         </button>
         <button
           onClick={handleNextClick}

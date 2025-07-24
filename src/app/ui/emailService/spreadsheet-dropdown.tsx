@@ -14,12 +14,12 @@ interface FileDataType {
   uploader_id: string;
 }
 
-interface TemplateDropdownProps {
+interface SpreadsheetDropdownProps {
   onSelect: (file_id: string, file_url: string, file_name: string) => void;
 }
 
-export default function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
-  const fileExtension = "html";
+export default function SpreadsheetDropdown({ onSelect }: SpreadsheetDropdownProps) {
+  const fileExtension = "xlsx";
   const [options, setOptions] = useState<FileDataType[] | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

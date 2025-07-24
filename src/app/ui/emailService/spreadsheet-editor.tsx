@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Upload, Plus, X, Trash2 } from "lucide-react";
+import SpreadsheetDropdown from "@/app/ui/emailService/spreadsheet-dropdown";
 
 interface Excel {
   id: string;
@@ -18,8 +19,49 @@ export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
   ]);
   const [columns, setColumns] = useState<string[]>([]);
   const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
-  // const [isResizing, setIsResizing] = useState<string | null>(null);
+  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedFileUrl) return;
+
+    const fetchAndParseExcel = async () => {
+      try {
+        const response = await fetch(selectedFileUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const wb = XLSX.read(arrayBuffer, { type: "buffer" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(ws);
+
+        const newData: Excel[] = [];
+        const newColumnSet = new Set<string>();
+
+        jsonData.forEach((row: any) => {
+          const recipient: Excel = { id: Date.now() + Math.random().toString(36).substring(2) };
+          Object.entries(row).forEach(([key, value]) => {
+            recipient[key] = String(value);
+            newColumnSet.add(key);
+          });
+          newData.push(recipient);
+        });
+
+        const newColumns = Array.from(newColumnSet);
+        setColumns(newColumns);
+        setColumnWidths(() => {
+          const widths: { [key: string]: number } = {};
+          newColumns.forEach(col => {
+            widths[col] = 150;
+          });
+          return widths;
+        });
+        setData(newData);
+      } catch (error) {
+        console.error("Failed to load spreadsheet from URL", error);
+      }
+    };
+
+    fetchAndParseExcel();
+  }, [selectedFileUrl]);
 
   // Notify parent whenever data changes
   useEffect(() => {
@@ -178,6 +220,13 @@ export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
   return (
     <div className="flex flex-col">
       <div className="flex justify-end">
+        <SpreadsheetDropdown
+          onSelect={(file_id, file_url, file_name) => {
+            if (file_url) {
+              setSelectedFileUrl(file_url);
+            }
+          }}
+        />
         <button
           onClick={triggerFileInput}
           className="p-2 flex items-center hover:bg-gray-100 rounded-lg"
