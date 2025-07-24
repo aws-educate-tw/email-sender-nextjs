@@ -34,6 +34,13 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
   const [missingVariables, setMissingVariables] = useState<string[]>([]);
   const [isSave, setIsSave] = useState(false);
 
+  const [hasEdited, setHasEdited] = useState(false);
+  const [selectedSpreadsheet, setSelectedSpreadsheet] = useState<{
+    file_id: string;
+    file_url: string;
+    file_name: string;
+  } | null>(null);
+
   // Fetch template variables and always include "Email"
   useEffect(() => {
     if (!templateFileId) return;
@@ -127,6 +134,12 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
         onSave(saved.file_name, saved.file_id, saved.file_url);
       }
       setIsSave(true);
+      setHasEdited(false);
+      setSelectedSpreadsheet({
+        file_id: saved.file_id,
+        file_name: saved.file_name,
+        file_url: saved.file_url,
+      });
     } catch (error: any) {
       console.error("❌ 上傳失敗:", error);
       alert("上傳失敗：" + error.message);
@@ -143,6 +156,8 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
 
   const handleTableChange = useCallback((data: any) => {
     setExcel(data);
+    setHasEdited(true);
+    setSelectedSpreadsheet(null); // 表示使用者編輯了，不能再用 file_id 傳出去
   }, []);
 
   return (
@@ -154,7 +169,17 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
           isLoading={isLoadingVariables}
           missingVariables={missingVariables}
         />
-        <SpreadsheetEditor onTableChange={handleTableChange} />
+        <SpreadsheetEditor
+          onTableChange={handleTableChange}
+          onSelectSpreadsheetFile={(file_id, file_url, file_name) => {
+            if (!hasEdited) {
+              setSelectedSpreadsheet({ file_id, file_url, file_name });
+              if (onSave) {
+                onSave(file_name, file_id, file_url);
+              }
+            }
+          }}
+        />
       </div>
 
       {/* File name input, upload button and next button */}

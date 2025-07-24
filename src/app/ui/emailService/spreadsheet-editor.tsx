@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Upload, Plus, X, Trash2 } from "lucide-react";
+
 import SpreadsheetDropdown from "@/app/ui/emailService/spreadsheet-dropdown";
 
 interface Excel {
@@ -10,9 +11,13 @@ interface Excel {
 
 interface ExcelEditorProps {
   onTableChange: (excel: Excel[]) => void;
+  onSelectSpreadsheetFile?: (file_id: string, file_url: string, file_name: string) => void;
 }
 
-export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
+export default function SpreadsheetEditor({
+  onTableChange,
+  onSelectSpreadsheetFile,
+}: ExcelEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<Excel[]>([
     { id: Date.now() + Math.random().toString(36).substring(2) },
@@ -224,6 +229,10 @@ export default function SpreadsheetEditor({ onTableChange }: ExcelEditorProps) {
           onSelect={(file_id, file_url, file_name) => {
             if (file_url) {
               setSelectedFileUrl(file_url);
+            }
+
+            if (onSelectSpreadsheetFile) {
+              onSelectSpreadsheetFile(file_id, file_url, file_name);
             }
           }}
         />
