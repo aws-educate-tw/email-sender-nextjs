@@ -1,23 +1,31 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Upload, Plus, X, Trash2 } from "lucide-react";
+import { EmailDataType } from "@/app/ui/emailService/email-service";
 
 import SpreadsheetDropdown from "@/app/ui/emailService/spreadsheet-dropdown";
+
+export type TableChangeMeta = {
+  source: "init" | "user";
+  origin: "dropdown" | "import" | "manual";
+};
 
 interface Excel {
   id: string;
   [key: string]: string;
 }
 
-interface ExcelEditorProps {
-  onTableChange: (excel: Excel[]) => void;
+interface SpreadsheetEditorProps {
+  emailData: EmailDataType;
+  onTableChange: (excel: Excel[], meta: TableChangeMeta) => void;
   onSelectSpreadsheetFile?: (file_id: string, file_url: string, file_name: string) => void;
 }
 
 export default function SpreadsheetEditor({
+  emailData,
   onTableChange,
   onSelectSpreadsheetFile,
-}: ExcelEditorProps) {
+}: SpreadsheetEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<Excel[]>([
     { id: Date.now() + Math.random().toString(36).substring(2) },
@@ -26,6 +34,17 @@ export default function SpreadsheetEditor({
   const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
+
+  const applyData = (next: Excel[], meta: TableChangeMeta) => {
+    setData(next);
+    onTableChange(next, meta);
+  };
+
+  useEffect(() => {
+    if (emailData.spreadsheetFileUrl) {
+      setSelectedFileUrl(emailData.spreadsheetFileUrl);
+    }
+  }, [emailData.spreadsheetFileUrl]);
 
   useEffect(() => {
     if (!selectedFileUrl) return;
@@ -61,7 +80,8 @@ export default function SpreadsheetEditor({
           });
           return widths;
         });
-        setData(newData);
+
+        applyData(newData, { source: "init", origin: "dropdown" });
       } catch (error) {
         console.error("Failed to load spreadsheet from URL", error);
       }
@@ -71,9 +91,9 @@ export default function SpreadsheetEditor({
   }, [selectedFileUrl]);
 
   // Notify parent whenever data changes
-  useEffect(() => {
-    onTableChange(data);
-  }, [data, onTableChange]);
+  // useEffect(() => {
+  //   onTableChange(data);
+  // }, [data, onTableChange]);
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
@@ -116,18 +136,16 @@ export default function SpreadsheetEditor({
       });
       return widths;
     });
-    setData(newData);
+    applyData(newData, { source: "init", origin: "import" });
 
     // 清空 input 的值，避免使用者選同一個檔案時不觸發 onChange
     e.target.value = "";
   };
 
   const handleCellChange = (rowIndex: number, column: string, value: string) => {
-    setData(prev => {
-      const updated = [...prev];
-      updated[rowIndex][column] = value;
-      return updated;
-    });
+    const next = [...data];
+    next[rowIndex][column] = value;
+    applyData(next, { source: "user", origin: "manual" });
   };
 
   const handleColumnNameChange = (oldName: string, newName: string) => {
@@ -141,30 +159,29 @@ export default function SpreadsheetEditor({
       return;
     }
 
-    setColumns(prev => prev.map(col => (col === oldName ? newName : col)));
-    setColumnWidths(prev => {
-      const w = { ...prev };
-      w[newName] = w[oldName] || 150;
-      delete w[oldName];
-      return w;
+    const nextColumns = columns.map(col => (col === oldName ? newName : col));
+    const nextWidths = { ...columnWidths, [newName]: columnWidths[oldName] || 150 };
+    delete nextWidths[oldName];
+
+    const nextData = data.map(row => {
+      const r = { ...row };
+      if (r[oldName] !== undefined) {
+        r[newName] = r[oldName];
+        delete r[oldName];
+      }
+      return r;
     });
-    setData(prev =>
-      prev.map(row => {
-        const newRow = { ...row };
-        if (newRow[oldName] !== undefined) {
-          newRow[newName] = newRow[oldName];
-          delete newRow[oldName];
-        }
-        return newRow;
-      })
-    );
+
+    setColumns(nextColumns);
+    setColumnWidths(nextWidths);
     setEditingColumn(null);
+    applyData(nextData, { source: "user", origin: "manual" });
   };
 
   const addRow = () => {
     const newRow: Excel = { id: Date.now() + Math.random().toString(36).substring(2) };
     columns.forEach(col => (newRow[col] = ""));
-    setData(prev => [...prev, newRow]);
+    applyData([...data, newRow], { source: "user", origin: "manual" });
   };
 
   const addColumn = () => {
@@ -176,34 +193,35 @@ export default function SpreadsheetEditor({
     }
     setColumns(prev => [...prev, name]);
     setColumnWidths(prev => ({ ...prev, [name]: 150 }));
-    setData(prev => prev.map(row => ({ ...row, [name]: "" })));
+    const next = data.map(row => ({ ...row, [name]: "" }));
+    applyData(next, { source: "user", origin: "manual" });
   };
 
-  const deleteRow = (idx: number) => setData(prev => prev.filter((_, i) => i !== idx));
+  const deleteRow = (idx: number) => {
+    const next = data.filter((_, i) => i !== idx);
+    applyData(next, { source: "user", origin: "manual" });
+  };
 
   const deleteColumn = (col: string) => {
     if (columns.length <= 1) {
       alert("至少需要保留一個欄位");
       return;
     }
-    setColumns(prev => prev.filter(c => c !== col));
-    setColumnWidths(prev => {
-      const w = { ...prev };
-      delete w[col];
-      return w;
+    const nextColumns = columns.filter(c => c !== col);
+    const w = { ...columnWidths };
+    delete w[col];
+    setColumns(nextColumns);
+    setColumnWidths(w);
+    const next = data.map(row => {
+      const r = { ...row };
+      delete r[col];
+      return r;
     });
-    setData(prev =>
-      prev.map(row => {
-        const r = { ...row };
-        delete r[col];
-        return r;
-      })
-    );
+    applyData(next, { source: "user", origin: "manual" });
   };
 
   const handleMouseDown = (col: string, e: React.MouseEvent) => {
     e.preventDefault();
-    // setIsResizing(col);
     const startX = e.clientX;
     const startW = columnWidths[col] || 150;
     const scrollContainer = e.currentTarget.closest(".overflow-auto");
@@ -213,7 +231,6 @@ export default function SpreadsheetEditor({
       setColumnWidths(prev => ({ ...prev, [col]: Math.max(50, startW + diff) }));
     };
     const onMouseUp = () => {
-      // setIsResizing(null);
       if (scrollContainer) (scrollContainer as HTMLElement).style.pointerEvents = "auto";
       document.body.style.userSelect = "auto";
       document.removeEventListener("mousemove", onMouseMove);
@@ -230,14 +247,10 @@ export default function SpreadsheetEditor({
     <div className="flex flex-col">
       <div className="flex justify-end">
         <SpreadsheetDropdown
+          selectedFileName={emailData.spreadsheetFileName}
           onSelect={(file_id, file_url, file_name) => {
-            if (file_url) {
-              setSelectedFileUrl(file_url);
-            }
-
-            if (onSelectSpreadsheetFile) {
-              onSelectSpreadsheetFile(file_id, file_url, file_name);
-            }
+            if (file_url) setSelectedFileUrl(file_url);
+            onSelectSpreadsheetFile?.(file_id, file_url, file_name);
           }}
         />
         <button

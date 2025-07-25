@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft, CalendarClock } from "lucide-react";
 
@@ -15,20 +15,38 @@ interface FileDataType {
 }
 
 interface SpreadsheetDropdownProps {
+  selectedFileName?: string | null;
   onSelect: (file_id: string, file_url: string, file_name: string) => void;
 }
 
-export default function SpreadsheetDropdown({ onSelect }: SpreadsheetDropdownProps) {
+export default function SpreadsheetDropdown({
+  selectedFileName: propFileName,
+  onSelect,
+}: SpreadsheetDropdownProps) {
   const fileExtension = "xlsx";
   const [options, setOptions] = useState<FileDataType[] | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFileName, setSelectedFileName] = useState<string>("Recent Templates");
+  const [selectedFileName, setSelectedFileName] = useState<string>(
+    propFileName || "Recent Spreadsheet"
+  );
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
   const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (propFileName) {
+      setSelectedFileName(propFileName);
+    }
+  }, [propFileName]);
+
+  useEffect(() => {
+    if (selectedFileName) {
+      setSelectedFileName(selectedFileName);
+    }
+  }, [selectedFileName]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

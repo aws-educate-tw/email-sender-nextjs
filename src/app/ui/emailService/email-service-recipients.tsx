@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import * as XLSX from "xlsx";
 import SpreadsheetEditor from "@/app/ui/emailService/spreadsheet-editor";
 import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";
+import { TableChangeMeta } from "@/app/ui/emailService/spreadsheet-editor";
+import { EmailDataType } from "@/app/ui/emailService/email-service";
 
-interface TemplateProps {
+interface EmailServiceProps {
   onNext: () => void;
+  emailData: EmailDataType;
   templateFileId?: string | null;
   onSave?: (
     spreadsheetFileName: string,
@@ -24,7 +27,12 @@ interface Column {
   isStandard?: boolean;
 }
 
-export default function EmailServiceRecipients({ onNext, templateFileId, onSave }: TemplateProps) {
+export default function EmailServiceRecipients({
+  onNext,
+  emailData,
+  templateFileId,
+  onSave,
+}: EmailServiceProps) {
   const [excel, setExcel] = useState<Excel[]>([]);
   const [fileName, setFileName] = useState("");
   const [, setAllColumns] = useState<Column[]>([]);
@@ -34,12 +42,54 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
   const [missingVariables, setMissingVariables] = useState<string[]>([]);
   const [isSave, setIsSave] = useState(false);
 
-  const [hasEdited, setHasEdited] = useState(false);
-  const [selectedSpreadsheet, setSelectedSpreadsheet] = useState<{
+  const [selectedSpreadsheetInfo, setSelectedSpreadsheetInfo] = useState<{
     file_id: string;
     file_url: string;
     file_name: string;
   } | null>(null);
+
+  /** 讓父層一旦有 dropdown 選擇，就先把 file_id 送上去（情境1） */
+  useEffect(() => {
+    if (selectedSpreadsheetInfo) {
+      onSave?.(
+        selectedSpreadsheetInfo.file_name,
+        selectedSpreadsheetInfo.file_id,
+        selectedSpreadsheetInfo.file_url
+      );
+    }
+  }, [selectedSpreadsheetInfo]);
+
+  /** 只要 user 有任何編輯（包含 dropdown 案例），就清空父層的 file_id 等（情境2 & 3） */
+  const handleTableChange = useCallback(
+    (data: Excel[], meta: TableChangeMeta) => {
+      setExcel(data);
+
+      if (meta.source === "init") {
+        // 來自 editor 的初始化
+        if (meta.origin === "dropdown") {
+          // 情境1：dropdown 選進來 -> 保留 file_id（不用動）
+          return;
+        } else {
+          // import / 其他初始化都不綁定 server 端檔案
+          if (selectedSpreadsheetInfo) {
+            setSelectedSpreadsheetInfo(null);
+            onSave?.("", "", "");
+          }
+          return;
+        }
+      }
+
+      // meta.source === "user"：使用者有編輯
+      if (selectedSpreadsheetInfo) {
+        // 情境2：之前有選 dropdown，現在改了 -> 清空
+        setSelectedSpreadsheetInfo(null);
+        onSave?.("", "", "");
+      } else {
+        // 情境3：沒有 dropdown -> 按你的需求 parent 本來就是 null，不需再特別處理
+      }
+    },
+    [onSave, selectedSpreadsheetInfo]
+  );
 
   // Fetch template variables and always include "Email"
   useEffect(() => {
@@ -80,10 +130,6 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
     const missing = templateVariables.filter(v => !excelColumns.includes(v));
     setMissingVariables(missing);
   }, [excel, templateVariables]);
-
-  useEffect(() => {
-    setIsSave(false);
-  }, [fileName, excel]);
 
   const handleUploadExcelData = async () => {
     if (!fileName || excel.length === 0) {
@@ -134,12 +180,12 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
         onSave(saved.file_name, saved.file_id, saved.file_url);
       }
       setIsSave(true);
-      setHasEdited(false);
-      setSelectedSpreadsheet({
-        file_id: saved.file_id,
-        file_name: saved.file_name,
-        file_url: saved.file_url,
-      });
+      // setHasEdited(false);
+      // setSelectedSpreadsheet({
+      //   file_id: saved.file_id,
+      //   file_name: saved.file_name,
+      //   file_url: saved.file_url,
+      // });
     } catch (error: any) {
       console.error("❌ 上傳失敗:", error);
       alert("上傳失敗：" + error.message);
@@ -154,12 +200,6 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
     }
   };
 
-  const handleTableChange = useCallback((data: any) => {
-    setExcel(data);
-    setHasEdited(true);
-    setSelectedSpreadsheet(null); // 表示使用者編輯了，不能再用 file_id 傳出去
-  }, []);
-
   return (
     <>
       <div className="space-y-6 mb-6">
@@ -170,14 +210,11 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
           missingVariables={missingVariables}
         />
         <SpreadsheetEditor
+          emailData={emailData}
           onTableChange={handleTableChange}
           onSelectSpreadsheetFile={(file_id, file_url, file_name) => {
-            if (!hasEdited) {
-              setSelectedSpreadsheet({ file_id, file_url, file_name });
-              if (onSave) {
-                onSave(file_name, file_id, file_url);
-              }
-            }
+            // dropdown 選到檔案 → 先回存父層
+            setSelectedSpreadsheetInfo({ file_id, file_url, file_name });
           }}
         />
       </div>
@@ -195,13 +232,13 @@ export default function EmailServiceRecipients({ onNext, templateFileId, onSave 
           onClick={handleUploadExcelData}
           disabled={!fileName || excel.length === 0 || missingVariables.length > 0}
           className={`flex items-center justify-center rounded-md px-4 py-3 text-base font-medium text-white transition-colors
-    ${
-      !fileName || excel.length === 0 || missingVariables.length > 0
-        ? "bg-gray-400 cursor-not-allowed"
-        : isSave
-          ? "bg-green-600 hover:bg-green-700"
-          : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90"
-    }`}
+          ${
+            !fileName || excel.length === 0 || missingVariables.length > 0
+              ? "bg-gray-400 cursor-not-allowed"
+              : isSave
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90"
+          }`}
         >
           {isSave ? "Saved" : "Save Spreadsheet"}
         </button>

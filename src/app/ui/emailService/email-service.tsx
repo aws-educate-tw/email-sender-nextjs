@@ -150,6 +150,7 @@ export default function EmailService() {
               else if (mode === "edit-existing") goToStep("settings", "edit-existing");
               else if (mode === "resend") goToStep("settings", "resend");
             }}
+            emailData={emailData}
             templateFileId={emailData.templateFileId}
             onSave={(spreadsheetFileName, spreadsheetFileId, spreadsheetFileUrl) => {
               setEmailData(prev => ({
