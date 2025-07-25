@@ -244,8 +244,8 @@ export default function SpreadsheetEditor({
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-end">
+    <div className="flex flex-col gap-1">
+      <div className="flex justify-end gap-2 items-center">
         <SpreadsheetDropdown
           selectedFileName={emailData.spreadsheetFileName}
           onSelect={(file_id, file_url, file_name) => {
@@ -253,11 +253,14 @@ export default function SpreadsheetEditor({
             onSelectSpreadsheetFile?.(file_id, file_url, file_name);
           }}
         />
+        <hr className="border-2 border-t border-gray-300 mt-4 mb-3 w-12" />
+        <p className="text-gray-400">or</p>
+        <hr className="border-2 border-t border-gray-300 mt-4 mb-3 w-12" />
         <button
           onClick={triggerFileInput}
-          className="p-2 flex items-center hover:bg-gray-100 rounded-lg"
+          className="px-4 py-2 flex items-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-950 border border-gray-300 rounded-lg shadow-md"
         >
-          <Upload className="mr-2 w-4 h-4" /> Import from Excel
+          <Upload className="mr-2 w-4 h-4" /> Import
         </button>
         <input
           ref={fileInputRef}
@@ -273,7 +276,7 @@ export default function SpreadsheetEditor({
         {/* Gradient overlay for scrollable area */}
         {/* <div className="absolute rounded-lg top-0 right-0 w-8 h-full pointer-events-none z-10 bg-gradient-to-l from-white to-transparent" /> */}
 
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mt-2 p-4 overflow-auto max-h-[60vh] w-full">
+        <div className="bg-white rounded-lg shadow-lg border-2 border-gray-200 mt-2 p-4 overflow-auto max-h-[60vh] w-full">
           <div className="min-w-fit">
             <table className="text-sm min-w-max w-fit">
               <thead>

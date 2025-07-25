@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import SpreadsheetEditor from "@/app/ui/emailService/spreadsheet-editor";
 import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";

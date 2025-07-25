@@ -1,4 +1,4 @@
-import { FileCode, Tag, Copy } from "lucide-react";
+import { FileCode, Tag, Copy, SquareFunction } from "lucide-react";
 
 interface TemplateVariablesInfoProps {
   templateFileName: string;
@@ -14,7 +14,7 @@ export default function TemplateVariablesInfo({
   missingVariables,
 }: TemplateVariablesInfoProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
+    <div className="bg-white rounded-xl border-2 border-gray-200 shadow-sm p-6 space-y-6">
       {/* 標題區域 */}
       <div className="flex items-center justify-start gap-6">
         <div className="flex items-center gap-2">
@@ -39,47 +39,16 @@ export default function TemplateVariablesInfo({
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="flex items-center space-x-3 text-gray-500">
-              <svg
-                className="animate-spin h-6 w-6 text-blue-500"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              <span className="text-sm font-medium">正在加載 Template Variables...</span>
+              <SquareFunction className="w-6 h-6 animate-pulse" />
+              <span className="text-sm font-medium">Loading Template Variables...</span>
             </div>
           </div>
         ) : templateVariables.length === 0 ? (
           <div className="text-center py-8">
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <svg
-                className="w-6 h-6 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"
-                />
-              </svg>
+            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <SquareFunction className="w-6 h-6" />
             </div>
-            <p className="text-gray-500 text-sm">未找到 Template Variables</p>
+            <p className="text-gray-500 text-sm">Template Variables Not Found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft, CalendarClock } from "lucide-react";
 
@@ -28,7 +28,7 @@ export default function SpreadsheetDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string>(
-    propFileName || "Recent Spreadsheet"
+    propFileName || "Recent Spreadsheets"
   );
   const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
   const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
@@ -129,7 +129,7 @@ export default function SpreadsheetDropdown({
       <div>
         <button
           type="button"
-          className="inline-flex justify-between items-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex justify-between items-center w-full rounded-lg border border-gray-300 shadow-md px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-950"
           id="options-menu"
           aria-expanded={isOpen}
           aria-haspopup="true"
@@ -155,45 +155,25 @@ export default function SpreadsheetDropdown({
 
       {isOpen && (
         <div
-          className="z-50 p-3 origin-top-right absolute w-full mt-4 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 min-w-80 md:min-w-max right-0 border border-neutral-300"
+          className="z-50 p-3 origin-top-right absolute w-full mt-2 rounded-lg shadow-lg bg-white min-w-80 md:min-w-max right-0 border border-neutral-300 "
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
-          <div className="flex flex-col items-center rounded-md text-lg font-semibold mb-2 p-2">
-            <p className="">Recently Updated Templates</p>
+          <div className="flex flex-col items-center text-lg font-semibold mb-2 px-12 py-4">
+            <p className="">Recent Spreadsheets</p>
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-4 w-96">
-              <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l-1.497-1.32A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <p>Loading...</p>
+            <div className="flex flex-col gap-2">
+              <p className="w-full text-center py-10 animate-pulse">Loading...</p>
             </div>
           ) : options && options.length > 0 ? (
             <div className="flex flex-col gap-2">
               {options.map(option => (
                 <div key={option.file_id}>
                   <div
-                    className="flex gap-4 justify-between items-center py-2 px-4 bg-neutral-100 hover:bg-gray-200 cursor-pointer active:bg-gray-300 rounded-md"
+                    className="flex gap-4 justify-between items-center py-2 px-4 bg-gray-100 hover:bg-gray-200 cursor-pointer active:bg-gray-300 rounded-md border-2 border-gray-300"
                     onClick={() => handleSelect(option.file_id, option.file_url, option.file_name)}
                   >
                     {option.file_name}
