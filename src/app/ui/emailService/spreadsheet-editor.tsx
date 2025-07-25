@@ -44,8 +44,10 @@ export default function SpreadsheetEditor({
         jsonData.forEach((row: any) => {
           const recipient: Excel = { id: Date.now() + Math.random().toString(36).substring(2) };
           Object.entries(row).forEach(([key, value]) => {
-            recipient[key] = String(value);
-            newColumnSet.add(key);
+            if (key !== "id") {
+              recipient[key] = String(value);
+              newColumnSet.add(key);
+            }
           });
           newData.push(recipient);
         });
@@ -96,8 +98,10 @@ export default function SpreadsheetEditor({
     jsonData.forEach((row: any) => {
       const recipient: Excel = { id: Date.now() + Math.random().toString(36).substring(2) };
       Object.entries(row).forEach(([key, value]) => {
-        recipient[key] = String(value);
-        newColumnSet.add(key);
+        if (key !== "id") {
+          recipient[key] = String(value);
+          newColumnSet.add(key);
+        }
       });
       newData.push(recipient);
     });
