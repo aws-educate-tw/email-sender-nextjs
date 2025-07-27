@@ -77,15 +77,16 @@ interface DataType {
 export default function Page() {
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [previousLastEvaluatedKey, setPreviousLastEvaluatedKey] = useState<string | null>(null);
-  const [currentLastEvaluatedKey, setCurrentLastEvaluatedKey] = useState<string | null>(null);
-  const [nextLastEvaluatedKey, setNextLastEvaluatedKey] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchFiles(10, null);
+    fetchFiles(10, 1);
   }, []);
 
-  const fetchFiles = async (limit: number, lastEvaluatedKey: string | null) => {
+  const fetchFiles = async (limit: number, page: number) => {
     let retryCount = 0;
     const maxRetries = 5;
     const retryDelay = 15000; // 15 seconds in milliseconds
@@ -96,9 +97,7 @@ export default function Page() {
         const url = new URL(`${base_url}/runs`);
 
         url.searchParams.append("limit", limit.toString());
-        if (lastEvaluatedKey) {
-          url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-        }
+        url.searchParams.append("page", page.toString());
 
         const token = localStorage.getItem("access_token");
         const response = await fetch(url.toString(), {
@@ -132,9 +131,10 @@ export default function Page() {
       const result = await attemptFetch();
       setIsLoading(false);
       setData(result.data);
-      setPreviousLastEvaluatedKey(result.previous_last_evaluated_key);
-      setCurrentLastEvaluatedKey(result.current_last_evaluated_key);
-      setNextLastEvaluatedKey(result.next_last_evaluated_key);
+      setCurrentPage(result.pagination.page);
+      setTotalPages(result.pagination.total_pages);
+      setHasNextPage(result.pagination.has_next_page);
+      setHasPreviousPage(result.pagination.has_previous_page);
     } catch (error: any) {
       setIsLoading(false);
       alert(
@@ -167,30 +167,32 @@ export default function Page() {
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
               className={`flex items-center gap-1 ${
-                !currentLastEvaluatedKey
+                !hasPreviousPage
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={() => {
-                fetchFiles(5, previousLastEvaluatedKey);
+                if (hasPreviousPage) {
+                  fetchFiles(10, currentPage - 1);
+                }
               }}
-              disabled={!currentLastEvaluatedKey}
+              disabled={!hasPreviousPage}
             >
               <ChevronLeft size={20} />
               Previous
             </button>
             <button
               className={`flex items-center gap-1 ${
-                !nextLastEvaluatedKey
+                !hasNextPage
                   ? "cursor-default text-gray-400"
                   : "hover:text-gray-600 hover:underline"
               }`}
               onClick={() => {
-                if (nextLastEvaluatedKey) {
-                  fetchFiles(5, nextLastEvaluatedKey);
+                if (hasNextPage) {
+                  fetchFiles(10, currentPage + 1);
                 }
               }}
-              disabled={!nextLastEvaluatedKey}
+              disabled={!hasNextPage}
             >
               Next
               <ChevronRight size={20} />
