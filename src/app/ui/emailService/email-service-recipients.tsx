@@ -4,6 +4,8 @@ import SpreadsheetEditor from "@/app/ui/emailService/spreadsheet-editor";
 import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";
 import { TableChangeMeta } from "@/app/ui/emailService/spreadsheet-editor";
 import { EmailDataType } from "@/app/ui/emailService/email-service";
+import cn from "classnames";
+import { ArrowRight } from "lucide-react";
 
 interface EmailServiceProps {
   onNext: () => void;
@@ -224,13 +226,20 @@ export default function EmailServiceRecipients({
 
       {/* File name input, upload button and next button */}
       <div className="flex flex-wrap justify-end gap-3 items-center h-12">
-        <input
-          type="text"
-          value={fileName}
-          onChange={e => setFileName(e.target.value)}
-          placeholder="Enter file name"
-          className="rounded-md border border-gray-300 px-3 py-2 text-base w-60 focus:outline-none focus:ring-2 focus:ring-blue-500 h-full"
-        />
+        <div className="relative flex items-center w-60 h-full">
+          <input
+            type="text"
+            placeholder="Enter file name"
+            value={fileName}
+            onChange={e => {
+              // 自動移除 .html 後綴
+              const value = e.target.value.replace(/\.html$/i, "");
+              setFileName(value);
+            }}
+            className="w-full rounded-md border border-gray-300 pl-3 pr-14 py-2 text-base focus:outline focus:ring-2 focus:ring-sky-950 h-full"
+          />
+          <span className="absolute right-3 text-gray-500 text-sm pointer-events-none">.xlsx</span>
+        </div>
         <button
           onClick={handleUploadExcelData}
           disabled={!fileName || excel.length === 0 || missingVariables.length > 0}
@@ -247,9 +256,14 @@ export default function EmailServiceRecipients({
         </button>
         <button
           onClick={handleNextClick}
-          className="rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-3 text-base font-medium text-white transition-colors"
+          disabled={!isSave}
+          className={cn(
+            "flex items-center gap-2 rounded-md px-4 py-3 text-base font-medium text-white transition-colors",
+            !isSave ? "bg-gray-400 cursor-not-allowed" : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90"
+          )}
         >
           Next
+          <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </>

@@ -81,7 +81,7 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
             >
               {emailData.senderName || "Sender Name is missing"}
             </div>
-            <div className="text-gray-500">{`${emailData.localPart || "aws"}@aws-educate.tw`}</div>
+            <div className="text-gray-500">{`${emailData.localPart || "cloudambassador"}@aws-educate.tw`}</div>
           </div>
         </div>
 
@@ -303,7 +303,7 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
       {/* Actions */}
       <div className="flex justify-center md:justify-end gap-3 flex-wrap">
         <button
-          className={`px-4 py-2.5 rounded-lg text-white font-medium flex items-center ${isSuccess ? "bg-green-600 hover:bg-green-700" : "bg-sky-950 hover:bg-sky-900"} ${isSubmitting ? "opacity-80" : ""}`}
+          className={`px-4 py-3 text-base rounded-lg text-white font-medium flex items-center ${isSuccess ? "bg-green-600 hover:bg-green-700" : "bg-sky-950 hover:bg-sky-900"} ${isSubmitting ? "opacity-80" : ""}`}
           onClick={handleSend}
           disabled={isSubmitting || isSuccess}
         >
@@ -313,11 +313,12 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
             </>
           ) : isSuccess ? (
             <>
-              <Check className="w-4 h-4 mr-2" /> Sent
+              <Check className="w-5 h-5" />
+              Sent
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5" />
               Send
             </div>
           )}

@@ -283,7 +283,7 @@ export default function EmailServiceSettings({
       {/* Footer */}
       <div className="flex justify-end">
         <button
-          className="px-6 py-3 bg-[#1a2f4a] text-white rounded-lg flex items-center gap-2 hover:bg-[#2c4a72] transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+          className="px-4 py-3 bg-[#1a2f4a] text-white rounded-lg flex items-center gap-2 hover:bg-[#2c4a72] transition-all duration-200 shadow-md hover:shadow-lg font-medium"
           onClick={() => {
             onEmailDataChange?.(emailData);
             onNext();

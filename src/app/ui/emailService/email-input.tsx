@@ -8,12 +8,9 @@ interface EmailInputProps {
 }
 
 const contacts = [
-  { name: "Alice Wang", email: "alice@example.com" },
-  { name: "Alice Cheng", email: "alicecheng@example.com" },
-  { name: "Alice Tai", email: "alicetai@example.com" },
-  { name: "Bob Chen", email: "bob@example.com" },
-  { name: "Cathy Lin", email: "cathy@example.com" },
-  { name: "David Wu", email: "david@example.com" },
+  { name: "AWS Educate", email: "awseducate.cloudambassador@gmail.com" },
+  { name: "Boyi Wang", email: "" },
+  { name: "Phoebe Lin", email: "" },
 ];
 
 export default function EmailInput({
@@ -101,7 +98,7 @@ export default function EmailInput({
 
   return (
     <div className="relative">
-      <div className="bg-white rounded-md shadow-sm flex items-center flex-wrap border border-gray-200 p-2 gap-2 focus-within:border-blue-500 focus-within:outline-none focus-within:ring-1 focus-within:ring-blue-500">
+      <div className="bg-white rounded-lg shadow-sm flex items-center flex-wrap border border-gray-200 p-2 gap-2 focus-within:border-sky-950 focus-within:outline-none focus-within:ring-1 focus-within:ring-sky-950">
         {value.map((email, index) => (
           <div
             key={index}

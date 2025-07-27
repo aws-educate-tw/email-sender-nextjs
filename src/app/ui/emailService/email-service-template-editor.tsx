@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import TipTap from "@/app/ui/emailService/tip-tap";
 import { Check } from "lucide-react";
 import cn from "classnames";
+import { ArrowRight } from "lucide-react";
 
 const htmltemplateContent = ``;
 
@@ -142,13 +143,20 @@ export default function EmailServiceTemplateEditor({
       </div>
       <div className="flex flex-wrap justify-end gap-3 items-center h-12">
         {/* Template Name Input */}
-        <input
-          type="text"
-          placeholder="Enter file name"
-          value={templateName}
-          onChange={e => setTemplateName(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-2 text-base w-60 focus:outline-none focus:ring-2 focus:ring-blue-500 h-full"
-        />
+        <div className="relative flex items-center w-60 h-full">
+          <input
+            type="text"
+            placeholder="Enter file name"
+            value={templateName}
+            onChange={e => {
+              // 自動移除 .html 後綴
+              const value = e.target.value.replace(/\.html$/i, "");
+              setTemplateName(value);
+            }}
+            className="w-full rounded-md border border-gray-300 pl-3 pr-14 py-2 text-base focus:outline focus:ring-2 focus:ring-sky-950 h-full"
+          />
+          <span className="absolute right-3 text-gray-500 text-sm pointer-events-none">.html</span>
+        </div>
 
         {/* Save Template Button */}
         {isUploading ? (
@@ -183,9 +191,16 @@ export default function EmailServiceTemplateEditor({
         {/* Next Button */}
         <button
           onClick={handleNextClick}
-          className="rounded-md bg-[#1a2f4a] hover:bg-[#1a2f4a]/90 px-4 py-3 text-base font-medium text-white transition-colors"
+          disabled={saveButtonState !== "saved"}
+          className={cn(
+            "flex items-center gap-2 rounded-md px-4 py-3 text-base font-medium text-white transition-colors",
+            saveButtonState !== "saved"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90"
+          )}
         >
           Next
+          <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

@@ -127,7 +127,7 @@ export default function EmailServiceTemplateSelector({
     <div className="flex flex-col">
       <div className="flex">
         {/* Left Panel */}
-        <div className="w-1/4 border-r border-gray-200 bg-white p-4 overflow-y-auto">
+        <div className="w-1/4 border-r border-gray-300 bg-white p-4 overflow-y-auto">
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-700">Template History</h2>
@@ -151,13 +151,13 @@ export default function EmailServiceTemplateSelector({
                     onClick={() => setSelectedTemplate(option)}
                     className={`border rounded-lg p-3 cursor-pointer transition-all ${
                       selectedTemplate?.file_id === option.file_id
-                        ? "border-sky-500 bg-sky-50"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        ? "border-sky-800 bg-gray-200"
+                        : "border-gray-300 hover:border-gray-400 hover:bg-gray-100"
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="mt-1 p-2 bg-gray-100 rounded-md">
-                        <FileText size={20} className="text-gray-500" />
+                      <div className="mt-1 p-2 bg-sky-950 rounded-md">
+                        <FileText size={20} className="text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-800 truncate">{option.file_name}</h3>
@@ -245,7 +245,7 @@ export default function EmailServiceTemplateSelector({
                 <div className="border-2 border-sky-950 p-4 bg-sky-950 flex justify-between items-center">
                   <span className="text-sm font-medium text-white">Template Preview</span>
                 </div>
-                <div className="p-4 bg-gray-100 cursor-not-allowed">
+                <div className="p-4 h-full bg-gray-100 cursor-not-allowed">
                   <div
                     className="prose max-w-full p-4 bg-white rounded-lg border-2 border-gray-200 opacity-60"
                     dangerouslySetInnerHTML={{ __html: content }}
