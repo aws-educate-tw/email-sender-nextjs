@@ -36,8 +36,10 @@ export default function SpreadsheetEditor({
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
 
   const applyData = (next: Excel[], meta: TableChangeMeta) => {
+    // 過濾掉第一排 id
+    const cleanData = next.map(({ id, ...rest }) => rest);
     setData(next);
-    onTableChange(next, meta);
+    onTableChange(cleanData as Excel[], meta);
   };
 
   useEffect(() => {
