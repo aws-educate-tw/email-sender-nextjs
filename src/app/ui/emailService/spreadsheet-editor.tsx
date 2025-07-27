@@ -12,8 +12,8 @@ export type TableChangeMeta = {
 };
 
 interface Excel {
-  id: string;
-  [key: string]: string;
+  id?: string;
+  [key: string]: string | undefined;
 }
 
 interface SpreadsheetEditorProps {
@@ -38,7 +38,8 @@ export default function SpreadsheetEditor({
 
   const applyData = (next: Excel[], meta: TableChangeMeta) => {
     const cleanData = next.map(row => {
-      const { id, ...rest } = row;
+      const { ...rest } = row;
+      delete rest.id;
       return rest;
     });
     onTableChange(cleanData as Excel[], { ...meta, columns });
