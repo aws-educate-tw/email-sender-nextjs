@@ -78,7 +78,6 @@ export default function Page() {
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
   const [hasPreviousPage, setHasPreviousPage] = useState<boolean>(false);
 
@@ -132,7 +131,6 @@ export default function Page() {
       setIsLoading(false);
       setData(result.data);
       setCurrentPage(result.pagination.page);
-      setTotalPages(result.pagination.total_pages);
       setHasNextPage(result.pagination.has_next_page);
       setHasPreviousPage(result.pagination.has_previous_page);
     } catch (error: any) {
