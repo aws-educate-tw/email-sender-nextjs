@@ -15,7 +15,7 @@ import {
 import HelpTip from "@/app/ui/help-tip";
 import EmailInput from "@/app/ui/emailService/email-input";
 import AttachDropdown from "@/app/ui/emailService/attach-dropdown";
-import { EmailDataType } from "@/app/ui/emailService/email-service";
+import { EmailDataType } from "@/app/ui/emailService/type";
 import FileUpload from "@/app/ui/emailService/file-upload";
 
 interface SettingProps {

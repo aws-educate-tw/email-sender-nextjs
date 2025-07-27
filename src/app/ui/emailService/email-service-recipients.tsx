@@ -2,10 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import SpreadsheetEditor from "@/app/ui/emailService/spreadsheet-editor";
 import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info";
-import { TableChangeMeta } from "@/app/ui/emailService/spreadsheet-editor";
-import { EmailDataType } from "@/app/ui/emailService/email-service";
+import { TableChangeMeta } from "@/app/ui/emailService/type";
+import { EmailDataType } from "@/app/ui/emailService/type";
 import cn from "classnames";
 import { ArrowRight } from "lucide-react";
+import { Excel } from "@/app/ui/emailService/type";
 
 interface EmailServiceProps {
   onNext: () => void;
@@ -16,11 +17,6 @@ interface EmailServiceProps {
     spreadsheetFileId: string,
     spreadsheetFileUrl: string
   ) => void;
-}
-
-interface Excel {
-  id: string;
-  [key: string]: string;
 }
 
 interface Column {

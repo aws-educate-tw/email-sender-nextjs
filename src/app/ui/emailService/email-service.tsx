@@ -1,6 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { EmailDataType } from "@/app/ui/emailService/type";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
@@ -18,23 +19,6 @@ type Step =
   | "confirmation";
 
 type StartMode = "new" | "edit-existing" | "resend";
-
-export interface EmailDataType {
-  subject: string;
-  senderName: string;
-  templateFileName: string | null;
-  templateFileId: string | null;
-  templateFileUrl: string | null;
-  spreadsheetFileName: string | null;
-  spreadsheetFileId: string | null;
-  spreadsheetFileUrl: string | null;
-  localPart: string;
-  replyTo: string;
-  bcc: string[];
-  cc: string[];
-  provideCertification: "yes" | "no";
-  attachments: { file_name: string; file_id: string; file_url: string }[];
-}
 
 export default function EmailService() {
   const params = useSearchParams();

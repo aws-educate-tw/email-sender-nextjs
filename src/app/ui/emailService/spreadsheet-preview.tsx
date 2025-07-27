@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { AlertCircle, Database } from "lucide-react";
-
-interface Excel {
-  id: string;
-  [key: string]: string;
-}
+import { Excel } from "@/app/ui/emailService/type";
 
 interface ExcelPreviewProps {
   fileUrl: string;

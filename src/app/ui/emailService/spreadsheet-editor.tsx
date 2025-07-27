@@ -1,20 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Upload, Plus, X, Trash2 } from "lucide-react";
-import { EmailDataType } from "@/app/ui/emailService/email-service";
-
+import { EmailDataType } from "@/app/ui/emailService/type";
+import { Excel, TableChangeMeta } from "@/app/ui/emailService/type";
 import SpreadsheetDropdown from "@/app/ui/emailService/spreadsheet-dropdown";
-
-export type TableChangeMeta = {
-  source: "init" | "user";
-  origin: "dropdown" | "import" | "manual";
-  columns?: string[];
-};
-
-interface Excel {
-  id?: string;
-  [key: string]: string | undefined;
-}
 
 interface SpreadsheetEditorProps {
   emailData: EmailDataType;
