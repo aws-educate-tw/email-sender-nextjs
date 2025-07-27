@@ -41,6 +41,7 @@ export default function EmailServiceRecipients({
   const [templateVariables, setTemplateVariables] = useState<string[]>([]);
   const [missingVariables, setMissingVariables] = useState<string[]>([]);
   const [isSave, setIsSave] = useState(false);
+  const [columns, setColumns] = useState<string[]>([]);
 
   const [selectedSpreadsheetInfo, setSelectedSpreadsheetInfo] = useState<{
     file_id: string;
@@ -63,6 +64,8 @@ export default function EmailServiceRecipients({
   const handleTableChange = useCallback(
     (data: Excel[], meta: TableChangeMeta) => {
       setExcel(data);
+
+      if (meta.columns) setColumns(meta.columns);
 
       if (meta.source === "init") {
         // 來自 editor 的初始化
@@ -143,7 +146,7 @@ export default function EmailServiceRecipients({
 
     try {
       // 1. Create Excel file from JSON data
-      const worksheet = XLSX.utils.json_to_sheet(excel);
+      const worksheet = XLSX.utils.json_to_sheet(excel, { header: columns });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 

@@ -8,6 +8,7 @@ import SpreadsheetDropdown from "@/app/ui/emailService/spreadsheet-dropdown";
 export type TableChangeMeta = {
   source: "init" | "user";
   origin: "dropdown" | "import" | "manual";
+  columns?: string[];
 };
 
 interface Excel {
@@ -36,10 +37,9 @@ export default function SpreadsheetEditor({
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
 
   const applyData = (next: Excel[], meta: TableChangeMeta) => {
-    // 過濾掉第一排 id
     const cleanData = next.map(({ id, ...rest }) => rest);
+    onTableChange(cleanData as Excel[], { ...meta, columns });
     setData(next);
-    onTableChange(cleanData as Excel[], meta);
   };
 
   useEffect(() => {
