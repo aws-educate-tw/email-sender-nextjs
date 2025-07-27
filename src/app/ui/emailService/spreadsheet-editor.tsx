@@ -37,7 +37,10 @@ export default function SpreadsheetEditor({
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
 
   const applyData = (next: Excel[], meta: TableChangeMeta) => {
-    const cleanData = next.map(({ id, ...rest }) => rest);
+    const cleanData = next.map(row => {
+      const { id, ...rest } = row;
+      return rest;
+    });
     onTableChange(cleanData as Excel[], { ...meta, columns });
     setData(next);
   };
