@@ -101,7 +101,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
     editorProps: {
       attributes: {
         class:
-          "w-full h-[60vh] border border-gray-300 rounded-md p-4 font-sans text-sm overflow-auto bg-white focus:outline-none focus:ring-2 focus:ring-blue-500",
+          "w-full h-[40vh] border border-gray-300 rounded-md p-4 font-sans text-sm overflow-auto bg-white focus:outline-none focus:ring-2 focus:ring-blue-500",
       },
     },
     content: content,

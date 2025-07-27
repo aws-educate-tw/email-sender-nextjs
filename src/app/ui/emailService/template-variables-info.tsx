@@ -29,7 +29,7 @@ export default function TemplateVariablesInfo({
           <h4 className="font-medium text-gray-900">Extracted Template Variables</h4>
           {!isLoading && (
             <span className="text-white bg-sky-950 text-xs font-medium px-2 py-1 rounded-full">
-              {templateVariables.length} 個 Variables
+              {templateVariables.length} Variables
             </span>
           )}
         </div>
@@ -85,7 +85,7 @@ export default function TemplateVariablesInfo({
         )}
         {missingVariables && missingVariables.length > 0 && (
           <p className="mt-4 text-sm text-red-600 font-medium">
-            ⚠️ Spreadsheet 缺少 {missingVariables.length} 個參數
+            ⚠️ Spreadsheet is missing {missingVariables.length} required variables.
           </p>
         )}
       </div>

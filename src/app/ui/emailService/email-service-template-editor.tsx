@@ -98,9 +98,6 @@ export default function EmailServiceTemplateEditor({
 
       // Show "Saved" button state
       setSaveButtonState("saved");
-      setTimeout(() => {
-        setSaveButtonState("idle");
-      }, 3000);
 
       // Extract file_id from the response and pass it to the onSave callback
       const templateFileName = result?.files?.[0]?.file_name;

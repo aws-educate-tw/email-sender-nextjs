@@ -376,7 +376,7 @@ export default function SpreadsheetEditor({
                       onClick={addRow}
                       className="w-full py-2 px-8 flex items-center justify-start hover:bg-gray-200 text-sky-950"
                     >
-                      <Plus className="w-4 h-4 mr-1" /> 新增一行
+                      <Plus className="w-4 h-4 mr-1" /> Add a Row
                     </button>
                   </td>
                 </tr>
