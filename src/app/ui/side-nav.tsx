@@ -26,7 +26,7 @@ export default function SideNav() {
         const rect = triggerRef.current.getBoundingClientRect();
         const rightSpace = window.innerWidth - rect.right;
         setTriggerWidth(triggerRef.current.offsetWidth);
-        setCanFitRight(rightSpace > triggerWidth + 10); // 預留空間
+        setCanFitRight(rightSpace > triggerWidth + 10);
       }
     };
     update();
