@@ -153,7 +153,7 @@ export default function Page({ params }: PageProps) {
   const fetchEmails = useCallback(
     async (
       runId: string,
-      limit: number,
+      limit: string | number,
       page: number,
       status: string | null = null,
       access_token: string
@@ -233,20 +233,8 @@ export default function Page({ params }: PageProps) {
   const storeAllEmails = useCallback(
     async (runId: string, status: string | null = null, access_token: string): Promise<any[]> => {
       try {
-        // First fetch to get pagination info
-        let result = await fetchEmails(runId, 10, 1, status, access_token);
-
+        const result = await fetchEmails(runId, "ALL", 0, status, access_token); // 參數分別是 runId, limit, page, status, access_token
         const allData = [...result.data];
-        let currentPage = result.pagination.page;
-        const totalPages = result.pagination.total_pages;
-
-        // Fetch remaining pages if needed
-        while (totalPages > currentPage) {
-          currentPage += 1;
-          result = await fetchEmails(runId, 10, currentPage, status, access_token);
-          allData.push(...result.data);
-        }
-
         return allData;
       } catch (error) {
         console.error("Failed to fetch all emails:", error);
