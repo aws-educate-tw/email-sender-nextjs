@@ -8,13 +8,9 @@ interface EmailInputProps {
 }
 
 const contacts = [
-  { name: "Alice Wang", email: "alice@example.com" },
-  { name: "Alice Cheng", email: "alicecheng@example.com" },
-  { name: "Alice Cheng", email: "alicecheng@example.com" },
-  { name: "Alice Tai", email: "alicetai@example.com" },
-  { name: "Bob Chen", email: "bob@example.com" },
-  { name: "Cathy Lin", email: "cathy@example.com" },
-  { name: "David Wu", email: "david@example.com" },
+  { name: "AWS Educate", email: "awseducate.cloudambassador@gmail.com" },
+  { name: "Boyi Wang", email: "wangsboy@amazon.com" },
+  { name: "Phoebe Lin", email: "chihting@amazon.com" },
 ];
 
 export default function EmailInput({
