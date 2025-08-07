@@ -63,7 +63,6 @@ export async function submitForm(data: string, access_token: string) {
   }
 
   try {
-    console.log("data", validation.data);
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(url.toString(), {
@@ -240,76 +239,6 @@ export async function submitWebhookForm(data: string, access_token: string) {
       status: "error",
       message: "An unexpected error occurred while creating the webhook.",
       debugInfo: error.message,
-    };
-  }
-}
-
-// export async function checkLoginStatus () {
-//   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-//   const url = new URL(`${base_url}/auth/is-logged-in`);
-//   try {
-//     const response = await fetch(url, {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       credentials: "include",
-//     });
-
-//     const result = await response.json();
-//     console.log('log in or not', result);
-//     return result.loggedIn;
-//   } catch (error) {
-//     console.error('Failed to check login status:', error);
-//     return false;
-//   }
-// };
-
-export async function fetchHistoryTemplates(
-  token: string,
-  limit: number = 10,
-  lastEvaluatedKey: string | null = null
-) {
-  try {
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/files`);
-
-    url.searchParams.append("file_extension", "html");
-    url.searchParams.append("limit", limit.toString());
-    if (lastEvaluatedKey) {
-      url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
-    }
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorMessage = `Request failed: ${response.status} - ${response.statusText}`;
-      throw new Error(errorMessage);
-    }
-
-    const result = await response.json();
-    return {
-      status: "success",
-      message: "Templates fetched successfully",
-      templates: result.data || [],
-      previousLastEvaluatedKey: result.previous_last_evaluated_key,
-      currentLastEvaluatedKey: result.current_last_evaluated_key,
-      nextLastEvaluatedKey: result.next_last_evaluated_key,
-    };
-  } catch (error: any) {
-    return {
-      status: "error",
-      message: error.message || "Failed to fetch templates",
-      templates: [],
-      previousLastEvaluatedKey: null,
-      currentLastEvaluatedKey: null,
-      nextLastEvaluatedKey: null,
     };
   }
 }
