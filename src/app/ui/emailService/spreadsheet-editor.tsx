@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import { Upload, Plus, X, Trash2 } from "lucide-react";
 import { EmailDataType } from "@/app/ui/emailService/type";
@@ -26,15 +26,18 @@ export default function SpreadsheetEditor({
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
   const [selectedFileReloadKey, setSelectedFileReloadKey] = useState(0);
 
-  const applyData = (next: Excel[], meta: TableChangeMeta) => {
-    const cleanData = next.map(row => {
-      const { ...rest } = row;
-      delete rest.id;
-      return rest;
-    });
-    onTableChange(cleanData as Excel[], { ...meta, columns });
-    setData(next);
-  };
+  const applyData = useCallback(
+    (next: Excel[], meta: TableChangeMeta, currentColumns: string[]) => {
+      const cleanData = next.map(row => {
+        const { ...rest } = row;
+        delete rest.id;
+        return rest;
+      });
+      onTableChange(cleanData as Excel[], { ...meta, columns: currentColumns });
+      setData(next);
+    },
+    [onTableChange]
+  );
 
   useEffect(() => {
     if (emailData.spreadsheetFileUrl) {
@@ -77,14 +80,14 @@ export default function SpreadsheetEditor({
           return widths;
         });
 
-        applyData(newData, { source: "init", origin: "dropdown" });
+        applyData(newData, { source: "init", origin: "dropdown" }, newColumns);
       } catch (error) {
         console.error("Failed to load spreadsheet from URL", error);
       }
     };
 
     fetchAndParseExcel();
-  }, [selectedFileUrl, selectedFileReloadKey]);
+  }, [selectedFileUrl, selectedFileReloadKey, applyData]);
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
@@ -127,7 +130,7 @@ export default function SpreadsheetEditor({
       });
       return widths;
     });
-    applyData(newData, { source: "init", origin: "import" });
+    applyData(newData, { source: "init", origin: "import" }, newColumns);
 
     // 清空 input 的值，避免使用者選同一個檔案時不觸發 onChange
     e.target.value = "";
@@ -136,7 +139,7 @@ export default function SpreadsheetEditor({
   const handleCellChange = (rowIndex: number, column: string, value: string) => {
     const next = [...data];
     next[rowIndex][column] = value;
-    applyData(next, { source: "user", origin: "manual" });
+    applyData(next, { source: "user", origin: "manual" }, columns);
   };
 
   const handleColumnNameChange = (oldName: string, newName: string) => {
@@ -166,13 +169,13 @@ export default function SpreadsheetEditor({
     setColumns(nextColumns);
     setColumnWidths(nextWidths);
     setEditingColumn(null);
-    applyData(nextData, { source: "user", origin: "manual" });
+    applyData(nextData, { source: "user", origin: "manual" }, nextColumns);
   };
 
   const addRow = () => {
     const newRow: Excel = { id: Date.now() + Math.random().toString(36).substring(2) };
     columns.forEach(col => (newRow[col] = ""));
-    applyData([...data, newRow], { source: "user", origin: "manual" });
+    applyData([...data, newRow], { source: "user", origin: "manual" }, columns);
   };
 
   const addColumn = () => {
@@ -185,12 +188,13 @@ export default function SpreadsheetEditor({
     setColumns(prev => [...prev, name]);
     setColumnWidths(prev => ({ ...prev, [name]: 150 }));
     const next = data.map(row => ({ ...row, [name]: "" }));
-    applyData(next, { source: "user", origin: "manual" });
+    applyData(next, { source: "user", origin: "manual" }, [...columns, name]);
   };
 
   const deleteRow = (idx: number) => {
     const next = data.filter((_, i) => i !== idx);
-    applyData(next, { source: "user", origin: "manual" });
+    setSelectedFileUrl(null);
+    applyData(next, { source: "user", origin: "manual" }, columns);
   };
 
   const deleteColumn = (col: string) => {
@@ -203,12 +207,13 @@ export default function SpreadsheetEditor({
     delete w[col];
     setColumns(nextColumns);
     setColumnWidths(w);
+    setSelectedFileUrl(null);
     const next = data.map(row => {
       const r = { ...row };
       delete r[col];
       return r;
     });
-    applyData(next, { source: "user", origin: "manual" });
+    applyData(next, { source: "user", origin: "manual" }, nextColumns);
   };
 
   const handleMouseDown = (col: string, e: React.MouseEvent) => {
@@ -288,13 +293,20 @@ export default function SpreadsheetEditor({
                           {editingColumn === col ? (
                             <input
                               type="text"
+                              name={`column-rename-${col}`}
                               className="w-full px-2 py-1 text-sm border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
                               defaultValue={col}
                               autoFocus
-                              onBlur={e => handleColumnNameChange(col, e.target.value)}
+                              onBlur={e => handleColumnNameChange(col, e.currentTarget.value)}
                               onKeyDown={e => {
-                                if (e.key === "Enter") e.currentTarget.blur();
-                                if (e.key === "Escape") setEditingColumn(null);
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  e.currentTarget.blur();
+                                } else if (e.key === "Escape") {
+                                  e.preventDefault();
+                                  setEditingColumn(null);
+                                  e.currentTarget.blur();
+                                }
                               }}
                               onClick={e => e.stopPropagation()}
                             />
@@ -337,12 +349,12 @@ export default function SpreadsheetEditor({
                       colSpan={columns.length + 2}
                       className="text-center text-gray-500 py-4 border-2	border-gray-200"
                     >
-                      尚未上傳 Excel 資料
+                      No data available. Please import a spreadsheet or add rows manually.
                     </td>
                   </tr>
                 )}
                 {data.map((row, idx) => (
-                  <tr key={row.id} className="hover:bg-gray-50">
+                  <tr key={row.id} className="">
                     {/* First column data cell (for trash can) */}
                     <td className="w-3 h-3 p-2 border-2	border-gray-200 bg-gray-50">
                       <button
@@ -360,9 +372,23 @@ export default function SpreadsheetEditor({
                       >
                         <input
                           type="text"
-                          className="border-none w-full px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          name={`cell-${idx}-${col}`}
+                          className="border-none w-full px-2 py-1 focus:outline-none focus:ring-1 focus:ring-sky-950 hover:bg-gray-50 focus:bg-gray-100"
                           value={row[col] || ""}
                           onChange={e => handleCellChange(idx, col, e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === "Enter") {
+                              // Confirm and blur
+                              e.currentTarget.blur();
+                            }
+                            if (e.key === "Escape") {
+                              // Revert to original value and blur
+                              e.preventDefault();
+                              const originalValue = data[idx][col] ?? "";
+                              e.currentTarget.value = originalValue;
+                              e.currentTarget.blur();
+                            }
+                          }}
                         />
                       </td>
                     ))}

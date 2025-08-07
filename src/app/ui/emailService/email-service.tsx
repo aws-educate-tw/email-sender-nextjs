@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { EmailDataType } from "@/app/ui/emailService/type";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
@@ -76,7 +76,48 @@ export default function EmailService() {
       // 若沒帶 mode 參數，但 step 非起始，導回起點
       router.replace("/emailService?step=start-option");
     }
-  }, [currentStep, mode]);
+  }, [currentStep, mode, router]);
+
+  const handleTemplateSelect = useCallback(
+    (templateFileName: string, templateFileId: string, templateFileUrl: string) => {
+      setEmailData(prev => ({
+        ...prev,
+        templateFileName,
+        templateFileId,
+        templateFileUrl,
+      }));
+    },
+    []
+  );
+
+  // 使用 useCallback 包裝 onSave 函數
+  const handleTemplateSave = useCallback(
+    (
+      templateFileName: string | null,
+      templateFileId: string | null,
+      templateFileUrl: string | null
+    ) => {
+      setEmailData(prev => ({
+        ...prev,
+        templateFileName,
+        templateFileId,
+        templateFileUrl,
+      }));
+    },
+    []
+  ); // 空依賴陣列，因為 setEmailData 是穩定的
+
+  const handleSpreadsheetSave = useCallback(
+    (spreadsheetFileName: string, spreadsheetFileId: string, spreadsheetFileUrl: string) => {
+      setEmailData(prev => ({
+        ...prev,
+        spreadsheetFileName,
+        spreadsheetFileId,
+        spreadsheetFileUrl,
+      }));
+    },
+    []
+  ); // 空依賴陣列
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -97,14 +138,7 @@ export default function EmailService() {
               if (mode === "edit-existing") goToStep("template-edit", "edit-existing");
               else if (mode === "resend") goToStep("recipients", "resend");
             }}
-            onTemplateSelect={(templateFileName, templateFileId, templateFileUrl) => {
-              setEmailData(prev => ({
-                ...prev,
-                templateFileName,
-                templateFileId,
-                templateFileUrl,
-              }));
-            }}
+            onTemplateSelect={handleTemplateSelect}
           />
         );
       case "template-edit":
@@ -116,14 +150,7 @@ export default function EmailService() {
               else if (mode === "resend") goToStep("recipients", "resend");
             }}
             templateFileUrl={emailData.templateFileUrl}
-            onSave={(templateFileName, templateFileId, templateFileUrl) => {
-              setEmailData(prev => ({
-                ...prev,
-                templateFileName,
-                templateFileId,
-                templateFileUrl,
-              }));
-            }}
+            onSave={handleTemplateSave}
           />
         );
       case "recipients":
@@ -136,14 +163,7 @@ export default function EmailService() {
             }}
             emailData={emailData}
             templateFileId={emailData.templateFileId}
-            onSave={(spreadsheetFileName, spreadsheetFileId, spreadsheetFileUrl) => {
-              setEmailData(prev => ({
-                ...prev,
-                spreadsheetFileName,
-                spreadsheetFileId,
-                spreadsheetFileUrl,
-              }));
-            }}
+            onSave={handleSpreadsheetSave}
           />
         );
       case "settings":

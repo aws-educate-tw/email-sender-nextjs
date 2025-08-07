@@ -59,13 +59,11 @@ export default function SpreadsheetPreview({
         setColumns(newColumns);
 
         // Set default column widths
-        const newWidths = { ...columnWidths };
+        const defaultWidths: { [key: string]: number } = {};
         newColumns.forEach(col => {
-          if (!newWidths[col]) {
-            newWidths[col] = 150; // Default width
-          }
+          defaultWidths[col] = 150;
         });
-        setColumnWidths(newWidths);
+        setColumnWidths(defaultWidths);
 
         setData(excelData);
 
@@ -81,7 +79,7 @@ export default function SpreadsheetPreview({
     };
 
     loadSpreadsheet();
-  }, [fileUrl]);
+  }, [fileUrl, readOnly, onTableChange]);
 
   const handleCellChange = (rowIndex: number, column: string, value: string) => {
     if (readOnly) return;

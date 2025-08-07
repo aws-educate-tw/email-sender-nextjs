@@ -107,11 +107,13 @@ export default function EmailServiceTemplateSelector({
         } catch (error) {
           console.error("Error fetching HTML:", error);
         }
+      } else {
+        setContent("");
       }
     };
 
     fetchHtmlContent();
-  }, [selectedTemplate, onTemplateSelect]);
+  }, [selectedTemplate]);
 
   useEffect(() => {
     if (selectedTemplate) {
@@ -121,7 +123,7 @@ export default function EmailServiceTemplateSelector({
         selectedTemplate.file_url
       );
     }
-  }, [selectedTemplate?.file_id]);
+  }, [selectedTemplate, onTemplateSelect]);
 
   return (
     <div className="flex flex-col h-full">

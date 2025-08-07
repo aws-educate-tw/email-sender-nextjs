@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Send, X, Check, Paperclip, User, FileText, Table, Download } from "lucide-react";
 import { submitForm } from "@/lib/actions";
 import Modal from "@/app/ui/emailService/modal";
 import SpreadsheetPreview from "@/app/ui/emailService/spreadsheet-preview";
 import TemplatePreview from "@/app/ui/emailService/template-preview";
-import { EmailDataType } from "@/app/ui/emailService/type";
+import { Excel, EmailDataType } from "@/app/ui/emailService/type";
 
 interface ReviewProps {
   emailData: EmailDataType;
@@ -59,6 +59,10 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
       setIsSubmitting(false);
     }
   };
+
+  const handleSpreadsheetChange = useCallback((updatedData: Excel[]) => {
+    console.log("Spreadsheet data changed:", updatedData);
+  }, []);
 
   return (
     <>
@@ -282,7 +286,11 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
           title="Spreadsheet Preview"
         >
           {emailData.spreadsheetFileUrl ? (
-            <SpreadsheetPreview fileUrl={emailData.spreadsheetFileUrl} readOnly />
+            <SpreadsheetPreview
+              fileUrl={emailData.spreadsheetFileUrl}
+              readOnly
+              onTableChange={handleSpreadsheetChange}
+            />
           ) : (
             <p className="italic text-center text-slate-500">No spreadsheet available</p>
           )}

@@ -56,7 +56,7 @@ export default function EmailServiceRecipients({
         selectedSpreadsheetInfo.file_url
       );
     }
-  }, [selectedSpreadsheetInfo]);
+  }, [selectedSpreadsheetInfo, onSave]);
 
   /** 只要 user 有任何編輯（包含 dropdown 案例），就清空父層的 file_id 等（情境2 & 3） */
   const handleTableChange = useCallback(
