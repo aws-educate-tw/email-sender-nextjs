@@ -65,28 +65,35 @@ export default function EmailServiceRecipients({
 
       if (meta.columns) setColumns(meta.columns);
 
-      if (meta.source === "init") {
-        // 來自 editor 的初始化
-        if (meta.origin === "dropdown") {
-          // 情境1：dropdown 選進來 -> 保留 file_id（不用動）
-          return;
-        } else {
-          // import / 其他初始化都不綁定 server 端檔案
+      switch (meta.source) {
+        case "init":
+          switch (meta.origin) {
+            case "dropdown":
+              // 情境1：選擇s3上的spreadsheet進來 -> 保留 file_id（不用動）
+              return;
+            default:
+              // 情境2：使用者上傳本機的 excel file, 還沒有上傳所以沒有 file_id -> 清空 file_id
+              if (selectedSpreadsheetInfo) {
+                setSelectedSpreadsheetInfo(null);
+                onSave?.("", "", "");
+              }
+              return;
+          }
+
+        case "user":
+          // meta.source === "user"：使用者有編輯
           if (selectedSpreadsheetInfo) {
+            // 情境3：之前有選 dropdown，現在改了 -> 清空 file_id
             setSelectedSpreadsheetInfo(null);
             onSave?.("", "", "");
+          } else {
+            // 情境4：沒有 dropdown，使用者直接編輯table -> 按你的需求 parent 本來就是 null，不需再特別處理
           }
           return;
-        }
-      }
 
-      // meta.source === "user"：使用者有編輯
-      if (selectedSpreadsheetInfo) {
-        // 情境2：之前有選 dropdown，現在改了 -> 清空
-        setSelectedSpreadsheetInfo(null);
-        onSave?.("", "", "");
-      } else {
-        // 情境3：沒有 dropdown -> 按你的需求 parent 本來就是 null，不需再特別處理
+        default:
+          console.warn("未知的 meta.source:", meta.source);
+          return;
       }
     },
     [onSave, selectedSpreadsheetInfo]
