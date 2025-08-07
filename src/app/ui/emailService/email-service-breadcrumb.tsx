@@ -124,23 +124,23 @@ export default function EmailServiceBreadcrumb({
                     key={stepKey}
                     href={`/emailService?${query.toString()}`}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center py-3 px-2 rounded-lg transition-colors ${
+                    className={`flex items-center py-3 pl-2 pr-4 rounded-lg transition-colors ${
                       isActive ? "bg-gray-100" : "hover:bg-gray-50"
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center">
                         <span className="text-xs text-gray-500 mr-3 font-medium">{index + 1}</span>
-                        {step.icon(`w-5 h-5 mr-2 ${isActive ? "text-[#1a2f4a]" : "text-gray-600"}`)}
+                        {step.icon(`w-5 h-5 mr-2 ${isActive ? "text-sky-950" : "text-gray-600"}`)}
                         <span
                           className={`text-base ${
-                            isActive ? "font-semibold text-[#1a2f4a]" : "text-gray-700"
+                            isActive ? "font-semibold text-sky-950" : "text-gray-700"
                           }`}
                         >
                           {step.label}
                         </span>
                       </div>
-                      {isActive && <div className="w-2 h-2 bg-[#1a2f4a] rounded-full"></div>}
+                      {isActive && <div className="w-2 h-2 bg-sky-950 rounded-full"></div>}
                     </div>
                   </Link>
                 );

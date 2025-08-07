@@ -11,6 +11,7 @@ import {
   Users,
   Award,
   Paperclip,
+  X,
 } from "lucide-react";
 import HelpTip from "@/app/ui/help-tip";
 import EmailInput from "@/app/ui/emailService/email-input";
@@ -302,12 +303,7 @@ export default function EmailServiceSettings({
               onClick={() => setShowFileUpload(false)}
               className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 hover:bg-gray-100 rounded-lg"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  fill="currentColor"
-                  d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"
-                />
-              </svg>
+              <X className="w-5 h-5" />
             </button>
             <FileUpload OnFileExtension="any" />
           </div>
