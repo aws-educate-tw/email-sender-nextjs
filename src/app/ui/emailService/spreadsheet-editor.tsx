@@ -24,6 +24,7 @@ export default function SpreadsheetEditor({
   const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
+  const [selectedFileReloadKey, setSelectedFileReloadKey] = useState(0);
 
   const applyData = (next: Excel[], meta: TableChangeMeta) => {
     const cleanData = next.map(row => {
@@ -83,12 +84,7 @@ export default function SpreadsheetEditor({
     };
 
     fetchAndParseExcel();
-  }, [selectedFileUrl]);
-
-  // Notify parent whenever data changes
-  // useEffect(() => {
-  //   onTableChange(data);
-  // }, [data, onTableChange]);
+  }, [selectedFileUrl, selectedFileReloadKey]);
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
@@ -180,7 +176,7 @@ export default function SpreadsheetEditor({
   };
 
   const addColumn = () => {
-    const base = `新欄位${columns.length + 1}`;
+    const base = `New Column ${columns.length + 1}`;
     let name = base;
     let i = 1;
     while (columns.includes(name)) {
@@ -244,7 +240,10 @@ export default function SpreadsheetEditor({
         <SpreadsheetDropdown
           selectedFileName={emailData.spreadsheetFileName}
           onSelect={(file_id, file_url, file_name) => {
-            if (file_url) setSelectedFileUrl(file_url);
+            if (file_url) {
+              setSelectedFileUrl(file_url);
+              setSelectedFileReloadKey(prev => prev + 1); // <--- bump key
+            }
             onSelectSpreadsheetFile?.(file_id, file_url, file_name);
           }}
         />
