@@ -124,13 +124,14 @@ export default function EmailServiceTemplateSelector({
   }, [selectedTemplate?.file_id]);
 
   return (
-    <div className="flex flex-col">
-      <div className="flex">
-        {/* Left Panel */}
-        <div className="w-1/4 border-r border-gray-300 bg-white p-4 overflow-y-auto">
+    <div className="flex flex-col h-full">
+      {/* 主要內容區域 - 使用 flex-col 在小螢幕，flex-row 在大螢幕 */}
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+        {/* 左側面板 - 模板列表 */}
+        <div className="w-full lg:w-1/4 border-b lg:border-b-0 lg:border-r pb-8 border-gray-300 bg-white p-4 overflow-y-auto lg:h-auto">
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-700">Template History</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-gray-700">Template History</h2>
               <button
                 onClick={() => fetchFiles(fileExtension, 5, null, "reset")}
                 className="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
@@ -140,8 +141,8 @@ export default function EmailServiceTemplateSelector({
               </button>
             </div>
 
-            {/* Template List */}
-            <div className="space-y-3">
+            {/* 模板列表 - 在小螢幕時可滾動 */}
+            <div className="gap-3 flex flex-col overflow-y-auto">
               {isLoading ? (
                 <div className="text-center py-8 text-gray-500">Loading templates...</div>
               ) : options && options.length > 0 ? (
@@ -149,19 +150,21 @@ export default function EmailServiceTemplateSelector({
                   <div
                     key={option.file_id}
                     onClick={() => setSelectedTemplate(option)}
-                    className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                    className={`border rounded-lg p-2 sm:p-3 cursor-pointer transition-all ${
                       selectedTemplate?.file_id === option.file_id
                         ? "border-sky-800 bg-gray-200"
                         : "border-gray-300 hover:border-gray-400 hover:bg-gray-100"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1 p-2 bg-sky-950 rounded-md">
-                        <FileText size={20} className="text-white" />
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <div className="mt-1 p-1.5 sm:p-2 bg-sky-950 rounded-md flex-shrink-0">
+                        <FileText size={16} className="text-white sm:w-5 sm:h-5" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-800 truncate">{option.file_name}</h3>
-                        <div className="flex justify-between items-center mt-1">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm sm:text-base text-gray-800 truncate">
+                          {option.file_name}
+                        </h3>
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-1 gap-1">
                           <span className="text-xs text-gray-500">
                             {(option.file_size / 1024).toFixed(1)} KB
                           </span>
@@ -177,11 +180,11 @@ export default function EmailServiceTemplateSelector({
                 <div className="text-center py-8 text-gray-500">No templates found.</div>
               )}
 
-              {/* Pagination */}
+              {/* 分頁控制 */}
               {options && options.length > 0 && (
                 <div className="flex justify-between items-center pt-3 mt-2 border-t border-gray-200">
                   <button
-                    className={`flex items-center gap-1 text-sm px-2 py-1 rounded ${
+                    className={`flex items-center gap-1 text-xs sm:text-sm px-2 py-1 rounded ${
                       pageIndex === 0 || isLoading
                         ? "cursor-default text-gray-400"
                         : "text-gray-700 hover:bg-gray-100"
@@ -196,11 +199,11 @@ export default function EmailServiceTemplateSelector({
                     }
                     disabled={pageIndex === 0 || isLoading}
                   >
-                    <ChevronLeft size={16} />
+                    <ChevronLeft size={14} className="sm:w-4 sm:h-4" />
                     Previous
                   </button>
                   <button
-                    className={`flex items-center gap-1 text-sm px-2 py-1 rounded ${
+                    className={`flex items-center gap-1 text-xs sm:text-sm px-2 py-1 rounded ${
                       !nextLastEvaluatedKey || isLoading
                         ? "cursor-default text-gray-400"
                         : "text-gray-700 hover:bg-gray-100"
@@ -209,7 +212,7 @@ export default function EmailServiceTemplateSelector({
                     disabled={!nextLastEvaluatedKey || isLoading}
                   >
                     Next
-                    <ChevronRight size={16} />
+                    <ChevronRight size={14} className="sm:w-4 sm:h-4" />
                   </button>
                 </div>
               )}
@@ -217,37 +220,41 @@ export default function EmailServiceTemplateSelector({
           </div>
         </div>
 
-        {/* Right Panel */}
-        <div className="w-3/4 flex flex-col p-4 gap-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-700">
+        {/* 右側面板 - 預覽區域 */}
+        <div className="w-full lg:w-3/4 flex flex-col p-4 pt-8 lg:pt-4 gap-4 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-700">
               {selectedTemplate ? (
                 <>
-                  You have selected:{" "}
-                  <strong className="underline">{selectedTemplate.file_name}</strong>
+                  <span className="sm:hidden">Selected: </span>
+                  <strong className="underline break-all sm:break-normal">
+                    {selectedTemplate.file_name}
+                  </strong>
                 </>
               ) : (
                 "Select a template to preview"
               )}
             </h2>
             {selectedTemplate && (
-              <span className="text-sm text-gray-500">
-                Last updated:{" "}
+              <span className="text-xs sm:text-sm text-gray-500">
+                <span className="hidden sm:inline">Last updated: </span>
                 {convertToTaipeiTime(selectedTemplate.updated_at || selectedTemplate.created_at)}
               </span>
             )}
           </div>
 
-          {/* Preview Area */}
-          <div className="flex-1 rounded-lg bg-white shadow-lg overflow-hidden">
+          {/* 預覽區域 */}
+          <div className="flex-1 rounded-lg bg-white shadow-lg overflow-hidden h-[300px]">
             {content ? (
               <div className="h-full overflow-auto">
-                <div className="border-2 border-sky-950 p-4 bg-sky-950 flex justify-between items-center">
-                  <span className="text-sm font-medium text-white">Template Preview</span>
+                <div className="border-2 border-sky-950 p-3 sm:p-4 bg-sky-950 flex justify-between items-center">
+                  <span className="text-xs sm:text-sm font-medium text-white">
+                    Template Preview
+                  </span>
                 </div>
-                <div className="p-4 h-full bg-gray-100 cursor-not-allowed">
+                <div className="p-2 sm:p-4 h-full bg-gray-100 cursor-not-allowed">
                   <div
-                    className="prose max-w-full p-4 bg-white rounded-lg border-2 border-gray-200 opacity-60"
+                    className="prose prose-sm sm:prose max-w-full p-3 sm:p-4 bg-white rounded-lg border-2 border-gray-200 opacity-60"
                     dangerouslySetInnerHTML={{ __html: content }}
                   />
                 </div>
@@ -255,8 +262,10 @@ export default function EmailServiceTemplateSelector({
             ) : (
               <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50">
                 <div className="text-center p-6">
-                  <FileText size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p>Select a template from the library to preview</p>
+                  <FileText size={40} className="mx-auto mb-4 text-gray-300 sm:w-12 sm:h-12" />
+                  <p className="text-sm sm:text-base">
+                    Select a template from the library to preview
+                  </p>
                 </div>
               </div>
             )}
@@ -264,10 +273,10 @@ export default function EmailServiceTemplateSelector({
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="flex justify-end py-2 px-6">
+      {/* Footer - 固定在底部 */}
+      <div className="flex justify-end py-2 px-4 sm:px-6 border-gray-200 bg-white">
         <button
-          className="px-6 py-2 bg-sky-950 text-white rounded-md hover:bg-sky-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 sm:px-6 py-2 bg-sky-950 text-white text-sm sm:text-base rounded-md hover:bg-sky-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!selectedTemplate}
           onClick={onNext}
         >
