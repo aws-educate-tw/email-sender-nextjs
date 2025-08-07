@@ -110,6 +110,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
       setEditorContent(html);
       onChange(html);
     },
+    immediatelyRender: false,
   });
 
   useEffect(() => {
