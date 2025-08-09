@@ -56,7 +56,7 @@ interface DataType {
   created_year_month?: string;
   recipients?: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
-  is_generated_certificate: boolean;
+  is_generate_certificate: boolean;
   spreadsheet_file: SpreadsheetFileType | null;
   display_name: string;
   sender_id: string | null;
@@ -81,6 +81,8 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
       <div className="w-full p-8 text-center text-gray-500">No email history details found</div>
     );
   }
+
+  console.log("Email data:", data);
 
   const emailData = data;
   const emailDetails = [
@@ -124,7 +126,7 @@ export default function EmailDetailsDropdown({ data }: EmailDetailsDropdownProps
     },
     {
       label: "ProvideCertificate:",
-      value: emailData.is_generated_certificate ? "Yes" : "No",
+      value: emailData.is_generate_certificate ? "Yes" : "No",
     },
   ];
 
