@@ -9,7 +9,6 @@ import {
   User,
   Reply,
   Users,
-  Award,
   Paperclip,
   X,
 } from "lucide-react";
@@ -39,8 +38,7 @@ export default function EmailServiceSettings({
       emailData.localPart ||
       emailData.replyTo ||
       (emailData.bcc && emailData.bcc.length > 0) ||
-      (emailData.cc && emailData.cc.length > 0) ||
-      emailData.provideCertification === "yes";
+      (emailData.cc && emailData.cc.length > 0);
 
     if (hasOptionalValue) {
       setShowOptionalSection(true);
@@ -232,50 +230,6 @@ export default function EmailServiceSettings({
                 value={emailData.cc}
                 onEmailsChange={emails => onEmailDataChange({ ...emailData, cc: emails })}
               />
-            </div>
-
-            {/* Certification */}
-            <div className="space-y-3">
-              <label className="flex items-center text-gray-700 font-medium text-sm">
-                <Award size={18} className="mr-2 text-gray-600" />
-                Provide a certification of participation?
-                <HelpTip message="Select Yes or No if you want to provide a certification. Note: If you select Yes, the Excel file must include two columns: Name and Certificate Text.">
-                  <Info
-                    size={16}
-                    className="ml-2 text-gray-400 hover:text-gray-600 cursor-help transition-colors"
-                  />
-                </HelpTip>
-              </label>
-              <div className="flex gap-6">
-                <label className="inline-flex items-center cursor-pointer group">
-                  <input
-                    type="radio"
-                    className="w-4 h-4 text-[#1a2f4a] border-gray-300 focus:ring-[#1a2f4a] focus:ring-2"
-                    name="certification"
-                    value="yes"
-                    checked={emailData.provideCertification === "yes"}
-                    onChange={() =>
-                      onEmailDataChange({ ...emailData, provideCertification: "yes" })
-                    }
-                  />
-                  <span className="ml-2 font-medium text-gray-700 group-hover:text-gray-900">
-                    Yes
-                  </span>
-                </label>
-                <label className="inline-flex items-center cursor-pointer group">
-                  <input
-                    type="radio"
-                    className="w-4 h-4 text-[#1a2f4a] border-gray-300 focus:ring-[#1a2f4a] focus:ring-2"
-                    name="certification"
-                    value="no"
-                    checked={emailData.provideCertification === "no"}
-                    onChange={() => onEmailDataChange({ ...emailData, provideCertification: "no" })}
-                  />
-                  <span className="ml-2 font-medium text-gray-700 group-hover:text-gray-900">
-                    No
-                  </span>
-                </label>
-              </div>
             </div>
           </div>
         )}
