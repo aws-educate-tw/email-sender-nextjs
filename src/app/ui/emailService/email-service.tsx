@@ -164,6 +164,7 @@ export default function EmailService() {
             emailData={emailData}
             templateFileId={emailData.templateFileId}
             onSave={handleSpreadsheetSave}
+            onEmailDataChange={setEmailData}
           />
         );
       case "settings":
