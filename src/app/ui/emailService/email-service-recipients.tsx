@@ -231,7 +231,7 @@ export default function EmailServiceRecipients({
     <>
       <div className="space-y-6 mb-6">
         {/* Certification Card */}
-        <div className="bg-white shadow-md rounded-lg p-4 border border-gray-100">
+        <div className="bg-white rounded-xl border-2 border-gray-200 shadow-sm p-6 space-y-6">
           <div className="space-y-3">
             <label className="flex items-center text-gray-700 font-medium text-sm">
               <Award size={18} className="mr-2 text-gray-600" />
