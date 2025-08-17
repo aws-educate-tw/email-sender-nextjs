@@ -114,8 +114,6 @@ export default function Page({ params }: PageProps) {
     failedEmailNum: 0,
   });
 
-
-
   // 更新選中的 email 數量
   useEffect(() => {
     const selectedCount = Object.keys(selectedRows).length;
@@ -233,10 +231,10 @@ export default function Page({ params }: PageProps) {
       }
 
       const result = await fetchRunDetails(params.runId, token);
-      
+
       // 設定詳細資料
       setDetailedData(result);
-      
+
       // 設定統計資料
       setRunSummary({
         successEmailNum: result.success_email_count || 0,

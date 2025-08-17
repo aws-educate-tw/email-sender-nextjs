@@ -67,110 +67,117 @@ export default function EmailDetailsTable({
   const columnHelper = createColumnHelper<DataType>();
 
   // 定義表格欄位
-  const columns = useMemo(() => [
-    // Checkbox 欄位
-    {
-      id: 'select',
-      header: ({ table }: any) => {
-        const isAllSelected = data.length > 0 && data.every(email => selectedRows[email.email_id]);
-        const isIndeterminate = data.some(email => selectedRows[email.email_id]) && !isAllSelected;
-        
-        return (
+  const columns = useMemo(
+    () => [
+      // Checkbox 欄位
+      {
+        id: "select",
+        header: () => {
+          const isAllSelected =
+            data.length > 0 && data.every(email => selectedRows[email.email_id]);
+          const isIndeterminate =
+            data.some(email => selectedRows[email.email_id]) && !isAllSelected;
+
+          return (
+            <input
+              type="checkbox"
+              checked={isAllSelected}
+              ref={el => {
+                if (el) el.indeterminate = isIndeterminate;
+              }}
+              onChange={() => {
+                if (isAllSelected) {
+                  // 取消全選
+                  onRowSelectionChange?.({});
+                } else {
+                  // 全選所有資料
+                  const newSelection: Record<string, boolean> = {};
+                  data.forEach(email => {
+                    newSelection[email.email_id] = true;
+                  });
+                  onRowSelectionChange?.(newSelection);
+                }
+              }}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+          );
+        },
+        cell: ({ row }: any) => (
           <input
             type="checkbox"
-            checked={isAllSelected}
-            ref={(el) => {
-              if (el) el.indeterminate = isIndeterminate;
-            }}
-            onChange={() => {
-              if (isAllSelected) {
-                // 取消全選
-                onRowSelectionChange?.({});
-              } else {
-                // 全選所有資料
-                const newSelection: Record<string, boolean> = {};
-                data.forEach(email => {
-                  newSelection[email.email_id] = true;
-                });
-                onRowSelectionChange?.(newSelection);
-              }
-            }}
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-        );
+        ),
       },
-      cell: ({ row }: any) => (
-        <input
-          type="checkbox"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-      ),
-    },
-    columnHelper.accessor('recipient_email', {
-      header: 'Recipient Email',
-      cell: info => info.getValue(),
-      filterFn: 'includesString',
-      enableSorting: true,
-    }),
-    columnHelper.accessor('bcc', {
-      header: 'BCC',
-      cell: info => {
-        const bccList = info.getValue();
-        return bccList && bccList.length > 0 ? bccList.join(', ') : '-';
-      },
-      enableSorting: true,
-      sortingFn: (rowA, rowB) => {
-        const a = rowA.original.bcc?.join(', ') || '';
-        const b = rowB.original.bcc?.join(', ') || '';
-        return a.localeCompare(b);
-      },
-    }),
-    columnHelper.accessor('cc', {
-      header: 'CC',
-      cell: info => {
-        const ccList = info.getValue();
-        return ccList && ccList.length > 0 ? ccList.join(', ') : '-';
-      },
-      enableSorting: true,
-      sortingFn: (rowA, rowB) => {
-        const a = rowA.original.cc?.join(', ') || '';
-        const b = rowB.original.cc?.join(', ') || '';
-        return a.localeCompare(b);
-      },
-    }),
-    columnHelper.accessor('status', {
-      header: 'Status',
-      cell: info => (
-        <span className={`px-2 py-1 rounded text-xs font-medium ${
-          info.getValue() === 'SUCCESS' 
-            ? 'bg-green-100 text-green-800' 
-            : info.getValue() === 'FAILED'
-            ? 'bg-red-100 text-red-800'
-            : 'bg-yellow-100 text-yellow-800'
-        }`}>
-          {info.getValue()}
-        </span>
-      ),
-      enableSorting: true,
-    }),
-    columnHelper.accessor('sent_at', {
-      header: 'Sent At',
-      cell: info => {
-        const dateValue = info.getValue();
-        if (!dateValue) return '-';
-        const date = new Date(dateValue);
-        return date.toLocaleString();
-      },
-      enableSorting: true,
-      sortingFn: (rowA, rowB) => {
-        const a = new Date(rowA.original.sent_at || 0).getTime();
-        const b = new Date(rowB.original.sent_at || 0).getTime();
-        return a - b;
-      },
-    }),
-  ], [columnHelper, data, selectedRows, onRowSelectionChange]);
+      columnHelper.accessor("recipient_email", {
+        header: "Recipient Email",
+        cell: info => info.getValue(),
+        filterFn: "includesString",
+        enableSorting: true,
+      }),
+      columnHelper.accessor("bcc", {
+        header: "BCC",
+        cell: info => {
+          const bccList = info.getValue();
+          return bccList && bccList.length > 0 ? bccList.join(", ") : "-";
+        },
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          const a = rowA.original.bcc?.join(", ") || "";
+          const b = rowB.original.bcc?.join(", ") || "";
+          return a.localeCompare(b);
+        },
+      }),
+      columnHelper.accessor("cc", {
+        header: "CC",
+        cell: info => {
+          const ccList = info.getValue();
+          return ccList && ccList.length > 0 ? ccList.join(", ") : "-";
+        },
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          const a = rowA.original.cc?.join(", ") || "";
+          const b = rowB.original.cc?.join(", ") || "";
+          return a.localeCompare(b);
+        },
+      }),
+      columnHelper.accessor("status", {
+        header: "Status",
+        cell: info => (
+          <span
+            className={`px-2 py-1 rounded text-xs font-medium ${
+              info.getValue() === "SUCCESS"
+                ? "bg-green-100 text-green-800"
+                : info.getValue() === "FAILED"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-yellow-100 text-yellow-800"
+            }`}
+          >
+            {info.getValue()}
+          </span>
+        ),
+        enableSorting: true,
+      }),
+      columnHelper.accessor("sent_at", {
+        header: "Sent At",
+        cell: info => {
+          const dateValue = info.getValue();
+          if (!dateValue) return "-";
+          const date = new Date(dateValue);
+          return date.toLocaleString();
+        },
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          const a = new Date(rowA.original.sent_at || 0).getTime();
+          const b = new Date(rowB.original.sent_at || 0).getTime();
+          return a - b;
+        },
+      }),
+    ],
+    [columnHelper, data, selectedRows, onRowSelectionChange]
+  );
 
   // 設定 React Table
   const table = useReactTable({
@@ -180,28 +187,26 @@ export default function EmailDetailsTable({
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    globalFilterFn: 'includesString',
+    globalFilterFn: "includesString",
     state: {
       globalFilter,
       rowSelection: selectedRows,
       sorting,
     },
     onGlobalFilterChange: onGlobalFilterChange,
-    onRowSelectionChange: (updaterOrValue) => {
-      const newValue = typeof updaterOrValue === 'function' 
-        ? updaterOrValue(selectedRows) 
-        : updaterOrValue;
+    onRowSelectionChange: updaterOrValue => {
+      const newValue =
+        typeof updaterOrValue === "function" ? updaterOrValue(selectedRows) : updaterOrValue;
       onRowSelectionChange?.(newValue);
     },
-    onSortingChange: (updaterOrValue) => {
-      const newValue = typeof updaterOrValue === 'function' 
-        ? updaterOrValue(sorting) 
-        : updaterOrValue;
+    onSortingChange: updaterOrValue => {
+      const newValue =
+        typeof updaterOrValue === "function" ? updaterOrValue(sorting) : updaterOrValue;
       onSortingChange(newValue);
     },
     enableRowSelection: true,
     enableSorting: true,
-    getRowId: (row) => row.email_id,
+    getRowId: row => row.email_id,
     initialState: {
       pagination: {
         pageSize: 10,
@@ -221,7 +226,7 @@ export default function EmailDetailsTable({
   const generatePageNumbers = (currentPage: number, totalPages: number) => {
     const pages: (number | string)[] = [];
     const delta = 2; // 當前頁碼兩側顯示的頁碼數量
-    
+
     if (totalPages <= 7) {
       // 如果總頁數小於等於 7，顯示所有頁碼
       for (let i = 1; i <= totalPages; i++) {
@@ -230,32 +235,32 @@ export default function EmailDetailsTable({
     } else {
       // 總是顯示第一頁
       pages.push(1);
-      
+
       // 計算當前頁碼範圍
       const startPage = Math.max(2, currentPage - delta);
       const endPage = Math.min(totalPages - 1, currentPage + delta);
-      
+
       // 如果開始頁碼大於 2，加入省略號
       if (startPage > 2) {
-        pages.push('...');
+        pages.push("...");
       }
-      
+
       // 加入當前頁碼範圍
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
-      
+
       // 如果結束頁碼小於總頁數-1，加入省略號
       if (endPage < totalPages - 1) {
-        pages.push('...');
+        pages.push("...");
       }
-      
+
       // 總是顯示最後一頁（如果總頁數大於 1）
       if (totalPages > 1) {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -276,7 +281,7 @@ export default function EmailDetailsTable({
             <option value="PENDING">Pending</option>
           </select>
         </div>
-        
+
         {/* Page Size Selector */}
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-700">Show</span>
@@ -307,20 +312,15 @@ export default function EmailDetailsTable({
                 >
                   {header.isPlaceholder ? null : (
                     <div className="flex items-center space-x-1">
-                      <span>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                      </span>
+                      <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
                       {header.column.getCanSort() && (
                         <button
                           onClick={header.column.getToggleSortingHandler()}
                           className="ml-1 hover:text-gray-700"
                         >
-                          {header.column.getIsSorted() === 'asc' ? (
+                          {header.column.getIsSorted() === "asc" ? (
                             <ArrowUp size={14} />
-                          ) : header.column.getIsSorted() === 'desc' ? (
+                          ) : header.column.getIsSorted() === "desc" ? (
                             <ArrowDown size={14} />
                           ) : (
                             <ArrowUpDown size={14} />
@@ -338,10 +338,7 @@ export default function EmailDetailsTable({
           {table.getRowModel().rows.map(row => (
             <tr key={row.id} className="hover:bg-gray-50">
               {row.getVisibleCells().map(cell => (
-                <td
-                  key={cell.id}
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                >
+                <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -355,11 +352,12 @@ export default function EmailDetailsTable({
         <div className="flex items-center space-x-4">
           <div className="text-sm text-gray-700">
             <span>
-              Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{' '}
+              Showing{" "}
+              {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
               {Math.min(
                 (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
                 table.getFilteredRowModel().rows.length
-              )}{' '}
+              )}{" "}
               of {table.getFilteredRowModel().rows.length} results
             </span>
           </div>
@@ -390,20 +388,17 @@ export default function EmailDetailsTable({
               table.getState().pagination.pageIndex + 1,
               table.getPageCount()
             ).map((page, index) => {
-              if (page === '...') {
+              if (page === "...") {
                 return (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="px-3 py-2 text-sm text-gray-500"
-                  >
+                  <span key={`ellipsis-${index}`} className="px-3 py-2 text-sm text-gray-500">
                     ...
                   </span>
                 );
               }
-              
+
               const pageNumber = page as number;
               const isCurrentPage = pageNumber === table.getState().pagination.pageIndex + 1;
-              
+
               return (
                 <button
                   key={pageNumber}
