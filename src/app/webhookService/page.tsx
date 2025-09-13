@@ -1,10 +1,10 @@
 "use client";
-import CreateWebhookForm from "@/app/ui/create-webhook-form";
+import WebhookService from "@/app/ui/webhookService/webhook-service";
 
 export default function Page() {
   return (
     <div>
-      <CreateWebhookForm />
+      <WebhookService />
     </div>
   );
 }
