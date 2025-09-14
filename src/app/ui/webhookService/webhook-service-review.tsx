@@ -11,6 +11,8 @@ import {
   CheckCircle,
   AlertCircle,
   Mail,
+  Copy,
+  Check,
 } from "lucide-react";
 import { WebhookDataType } from "@/app/ui/webhookService/type";
 import { submitWebhookForm } from "@/lib/actions";
@@ -23,12 +25,37 @@ interface WebhookServiceReviewProps {
 
 export default function WebhookServiceReview({ webhookData }: WebhookServiceReviewProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
   const [submitResult, setSubmitResult] = useState<{
     status: "success" | "error" | null;
     message: string;
     webhookUrl?: string;
   }>({ status: null, message: "" });
   const router = useRouter();
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        setCopiedUrl(true);
+        setTimeout(() => setCopiedUrl(false), 2000);
+      } catch (fallbackErr) {
+        console.error("Fallback copy failed: ", fallbackErr);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -93,9 +120,34 @@ export default function WebhookServiceReview({ webhookData }: WebhookServiceRevi
         </h2>
         <p className="text-gray-600 mb-6 text-center">{submitResult.message}</p>
         {submitResult.webhookUrl && (
-          <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <p className="text-sm font-medium text-gray-700 mb-2">Webhook URL:</p>
-            <p className="text-sm text-gray-600 break-all">{submitResult.webhookUrl}</p>
+          <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-gray-700">Webhook URL:</p>
+              <button
+                onClick={() => copyToClipboard(submitResult.webhookUrl!)}
+                className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  copiedUrl
+                    ? "bg-green-100 text-green-700 border border-green-300"
+                    : "bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200"
+                }`}
+                disabled={copiedUrl}
+              >
+                {copiedUrl ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy URL
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="bg-white p-3 rounded border border-gray-300">
+              <p className="text-sm text-gray-800 break-all font-mono">{submitResult.webhookUrl}</p>
+            </div>
           </div>
         )}
         <div className="flex gap-4 justify-center">
