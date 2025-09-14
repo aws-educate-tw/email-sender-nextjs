@@ -10,10 +10,12 @@ import {
   Paperclip,
   CheckCircle,
   AlertCircle,
+  Mail,
 } from "lucide-react";
 import { WebhookDataType } from "@/app/ui/webhookService/type";
 import { submitWebhookForm } from "@/lib/actions";
 import { useRouter } from "next/navigation";
+import IframePreview from "@/app/ui/emailService/iframe-preview";
 
 interface WebhookServiceReviewProps {
   webhookData: WebhookDataType;
@@ -161,6 +163,31 @@ export default function WebhookServiceReview({ webhookData }: WebhookServiceRevi
           <div className="text-gray-500">{`${webhookData.localPart || "cloudambassador"}@aws-educate.tw`}</div>
         </div>
       </div>
+
+      <hr className="border-t border-gray-200 my-4" />
+
+      {/* Email Preview */}
+      <div>
+        <p className="text-xl font-bold flex items-center gap-2 mb-4">
+          <Mail className="w-6 h-6" />
+          Email Preview
+        </p>
+      </div>
+      {webhookData.templateFileUrl ? (
+        <div className="mb-6">
+          <IframePreview
+            src={webhookData.templateFileUrl}
+            title="Email Template Preview"
+            width="100%"
+            height="400px"
+          />
+        </div>
+      ) : (
+        <div className="mb-6 p-6 border-2 border-dashed border-gray-300 rounded-lg text-center">
+          <Mail className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+          <p className="text-gray-500">No email template selected</p>
+        </div>
+      )}
 
       <hr className="border-t border-gray-200 my-4" />
 
