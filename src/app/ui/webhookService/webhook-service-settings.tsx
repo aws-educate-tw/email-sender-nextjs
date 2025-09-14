@@ -269,7 +269,12 @@ export default function WebhookServiceSettings({
                     name="certification"
                     value="no"
                     checked={webhookData.provideCertification === "no"}
-                    onChange={() => onWebhookDataChange({ ...webhookData, provideCertification: "no" })}
+                    onChange={() =>
+                      onWebhookDataChange({
+                        ...webhookData,
+                        provideCertification: "no",
+                      })
+                    }
                   />
                   <span className="ml-2 font-medium text-gray-700 group-hover:text-gray-900">
                     No

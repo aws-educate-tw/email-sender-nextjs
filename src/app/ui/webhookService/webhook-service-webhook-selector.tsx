@@ -1,7 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { ArrowRight, Webhook, Calendar, User, Mail, Search, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  ArrowRight,
+  Webhook,
+  Calendar,
+  User,
+  Mail,
+  Search,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { WebhookListItem } from "@/app/ui/webhookService/type";
 
 interface WebhookServiceWebhookSelectorProps {
@@ -30,42 +40,88 @@ export default function WebhookServiceWebhookSelector({
   const [totalCount, setTotalCount] = useState<number>(0);
   const [limit] = useState<number>(10); // Items per page
 
-  useEffect(() => {
-    fetchWebhooks(currentPage);
-  }, [currentPage]);
+  const fetchWebhooks = useCallback(
+    async (page: number) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-  const fetchWebhooks = async (page: number) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      if (!base_url) {
-        throw new Error("API endpoint not configured");
-      }
+        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+        if (!base_url) {
+          throw new Error("API endpoint not configured");
+        }
 
-      // Fetch webhooks of all types by making multiple requests if needed
-      const webhookTypes = ["surveycake", "slack"];
-      const allWebhooks: WebhookListItem[] = [];
-      let totalWebhooks = 0;
+        // Fetch webhooks of all types by making multiple requests if needed
+        const webhookTypes = ["surveycake", "slack"];
+        const allWebhooks: WebhookListItem[] = [];
+        let totalWebhooks = 0;
 
-      for (const webhookType of webhookTypes) {
-        try {
+        for (const webhookType of webhookTypes) {
+          try {
+            const url = new URL(`${base_url}/webhooks`);
+
+            // Add required parameters for each webhook type
+            url.searchParams.append("webhook_type", webhookType);
+            url.searchParams.append("limit", limit.toString());
+            url.searchParams.append("page", page.toString());
+            url.searchParams.append("sort_order", "DESC");
+
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+              throw new Error("No access token found. Please login again.");
+            }
+
+            console.log(`Fetching ${webhookType} webhooks from:`, url.toString());
+
+            const response = await fetch(url.toString(), {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            if (response.ok) {
+              const result: ApiResponse = await response.json();
+              console.log(`${webhookType} webhooks response:`, result);
+              if (result.data && Array.isArray(result.data)) {
+                allWebhooks.push(...result.data);
+                totalWebhooks += result.total_count || 0;
+              }
+            } else {
+              console.warn(`Failed to fetch ${webhookType} webhooks:`, response.status);
+              // Try to get error details for debugging
+              try {
+                const errorData = await response.json();
+                console.log(`${webhookType} error response:`, errorData);
+              } catch (e) {
+                console.log(`Could not parse ${webhookType} error response`);
+              }
+            }
+          } catch (typeError) {
+            console.warn(`Error fetching ${webhookType} webhooks:`, typeError);
+            // Continue with other webhook types
+          }
+        }
+
+        // Sort all webhooks by creation date (newest first)
+        allWebhooks.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        console.log("All webhooks fetched:", allWebhooks.length);
+        setWebhooks(allWebhooks);
+        setTotalCount(totalWebhooks);
+
+        // If no webhooks were found at all, it might be an API issue
+        if (allWebhooks.length === 0 && page === 1) {
+          // Try one more time with just surveycake to get proper error message
           const url = new URL(`${base_url}/webhooks`);
-          
-          // Add required parameters for each webhook type
-          url.searchParams.append("webhook_type", webhookType);
+          url.searchParams.append("webhook_type", "surveycake");
           url.searchParams.append("limit", limit.toString());
           url.searchParams.append("page", page.toString());
           url.searchParams.append("sort_order", "DESC");
 
           const token = localStorage.getItem("access_token");
-          if (!token) {
-            throw new Error("No access token found. Please login again.");
-          }
-
-          console.log(`Fetching ${webhookType} webhooks from:`, url.toString());
-
           const response = await fetch(url.toString(), {
             method: "GET",
             headers: {
@@ -74,82 +130,39 @@ export default function WebhookServiceWebhookSelector({
             },
           });
 
-          if (response.ok) {
-            const result: ApiResponse = await response.json();
-            console.log(`${webhookType} webhooks response:`, result);
-            if (result.data && Array.isArray(result.data)) {
-              allWebhooks.push(...result.data);
-              totalWebhooks += result.total_count || 0;
-            }
-          } else {
-            console.warn(`Failed to fetch ${webhookType} webhooks:`, response.status);
-            // Try to get error details for debugging
+          if (!response.ok) {
+            let errorMessage = `Request failed: ${response.status}`;
             try {
               const errorData = await response.json();
-              console.log(`${webhookType} error response:`, errorData);
-            } catch (e) {
-              console.log(`Could not parse ${webhookType} error response`);
+              console.log("Final error response data:", errorData);
+              errorMessage = errorData.message || errorData.error || errorMessage;
+
+              if (response.status === 400) {
+                errorMessage = `Bad Request: ${errorMessage}. Please check if you have permission to access webhooks.`;
+              } else if (response.status === 401) {
+                errorMessage = "Unauthorized. Please login again.";
+              } else if (response.status === 403) {
+                errorMessage = "Forbidden. You don't have permission to access webhooks.";
+              }
+            } catch (jsonError) {
+              console.log("Could not parse final error response:", jsonError);
             }
+            throw new Error(errorMessage);
           }
-        } catch (typeError) {
-          console.warn(`Error fetching ${webhookType} webhooks:`, typeError);
-          // Continue with other webhook types
         }
+      } catch (err: any) {
+        console.error("Failed to fetch webhooks:", err);
+        setError(err.message || "Failed to load webhooks");
+      } finally {
+        setIsLoading(false);
       }
+    },
+    [limit]
+  );
 
-      // Sort all webhooks by creation date (newest first)
-      allWebhooks.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      
-      console.log("All webhooks fetched:", allWebhooks.length);
-      setWebhooks(allWebhooks);
-      setTotalCount(totalWebhooks);
-
-      // If no webhooks were found at all, it might be an API issue
-      if (allWebhooks.length === 0 && page === 1) {
-        // Try one more time with just surveycake to get proper error message
-        const url = new URL(`${base_url}/webhooks`);
-        url.searchParams.append("webhook_type", "surveycake");
-        url.searchParams.append("limit", limit.toString());
-        url.searchParams.append("page", page.toString());
-        url.searchParams.append("sort_order", "DESC");
-
-        const token = localStorage.getItem("access_token");
-        const response = await fetch(url.toString(), {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          let errorMessage = `Request failed: ${response.status}`;
-          try {
-            const errorData = await response.json();
-            console.log("Final error response data:", errorData);
-            errorMessage = errorData.message || errorData.error || errorMessage;
-            
-            if (response.status === 400) {
-              errorMessage = `Bad Request: ${errorMessage}. Please check if you have permission to access webhooks.`;
-            } else if (response.status === 401) {
-              errorMessage = "Unauthorized. Please login again.";
-            } else if (response.status === 403) {
-              errorMessage = "Forbidden. You don't have permission to access webhooks.";
-            }
-          } catch (jsonError) {
-            console.log("Could not parse final error response:", jsonError);
-          }
-          throw new Error(errorMessage);
-        }
-      }
-
-    } catch (err: any) {
-      console.error("Failed to fetch webhooks:", err);
-      setError(err.message || "Failed to load webhooks");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchWebhooks(currentPage);
+  }, [currentPage, fetchWebhooks]);
 
   const handleWebhookSelect = (webhook: WebhookListItem) => {
     setSelectedWebhook(webhook);
@@ -181,10 +194,11 @@ export default function WebhookServiceWebhookSelector({
   const canGoNext = webhooks.length >= limit;
   const canGoPrevious = currentPage > 1;
 
-  const filteredWebhooks = webhooks.filter(webhook =>
-    webhook.webhook_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    webhook.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    webhook.webhook_type?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredWebhooks = webhooks.filter(
+    webhook =>
+      webhook.webhook_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      webhook.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      webhook.webhook_type?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatDate = (dateString: string) => {
@@ -233,7 +247,7 @@ export default function WebhookServiceWebhookSelector({
           <div className="w-1 h-6 bg-[#1a2f4a] rounded-full mr-3"></div>
           Select Webhook to Modify
         </h3>
-        
+
         {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -241,7 +255,7 @@ export default function WebhookServiceWebhookSelector({
             type="text"
             placeholder="Search webhooks by name, subject, or type..."
             value={searchTerm}
-            onChange={(e) => {
+            onChange={e => {
               setSearchTerm(e.target.value);
               // Reset to first page when searching
               if (currentPage !== 1) {
@@ -258,14 +272,16 @@ export default function WebhookServiceWebhookSelector({
           <Webhook className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h4 className="text-lg font-semibold text-gray-600 mb-2">No Webhooks Found</h4>
           <p className="text-gray-500">
-            {searchTerm ? "No webhooks match your search criteria." : "You haven't created any webhooks yet."}
+            {searchTerm
+              ? "No webhooks match your search criteria."
+              : "You haven't created any webhooks yet."}
           </p>
         </div>
       ) : (
         <>
           {/* Webhook List */}
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {filteredWebhooks.map((webhook) => (
+            {filteredWebhooks.map(webhook => (
               <div
                 key={webhook.webhook_id}
                 className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
@@ -282,15 +298,17 @@ export default function WebhookServiceWebhookSelector({
                       <h4 className="font-semibold text-gray-800">
                         {webhook.webhook_name || `Webhook #${webhook.sequence_number}`}
                       </h4>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        webhook.webhook_type === "surveycake" 
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-purple-100 text-purple-800"
-                      }`}>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${
+                          webhook.webhook_type === "surveycake"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-purple-100 text-purple-800"
+                        }`}
+                      >
                         {webhook.webhook_type}
                       </span>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4" />
@@ -306,7 +324,7 @@ export default function WebhookServiceWebhookSelector({
                       </div>
                     </div>
                   </div>
-                  
+
                   {selectedWebhook?.webhook_id === webhook.webhook_id && (
                     <div className="ml-4">
                       <div className="w-6 h-6 bg-[#1a2f4a] rounded-full flex items-center justify-center">
@@ -323,7 +341,8 @@ export default function WebhookServiceWebhookSelector({
           {totalCount > limit && (
             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
               <div className="text-sm text-gray-600">
-                Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, totalCount)} of {totalCount} webhooks
+                Showing {(currentPage - 1) * limit + 1} to{" "}
+                {Math.min(currentPage * limit, totalCount)} of {totalCount} webhooks
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -338,11 +357,8 @@ export default function WebhookServiceWebhookSelector({
                   <ChevronLeft className="w-4 h-4 mr-1" />
                   Previous
                 </button>
-                
-                <span className="px-3 py-2 text-sm text-gray-600">
-                  Page {currentPage}
-                </span>
-                
+                <span className="px-3 py-2 text-sm text-gray-600">Page {currentPage}</span>
+
                 <button
                   onClick={handleNextPage}
                   disabled={!canGoNext}

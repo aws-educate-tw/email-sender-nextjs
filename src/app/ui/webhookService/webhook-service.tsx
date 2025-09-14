@@ -1,7 +1,12 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { WebhookDataType, WebhookStep, WebhookStartMode, WebhookListItem } from "@/app/ui/webhookService/type";
+import {
+  WebhookDataType,
+  WebhookStep,
+  WebhookStartMode,
+  WebhookListItem,
+} from "@/app/ui/webhookService/type";
 import WebhookServiceBreadcrumb from "@/app/ui/webhookService/webhook-service-breadcrumb";
 import WebhookServiceStartOption from "@/app/ui/webhookService/webhook-service-start-option";
 import WebhookServiceWebhookSelector from "@/app/ui/webhookService/webhook-service-webhook-selector";
@@ -37,7 +42,10 @@ export default function WebhookService() {
     attachments: [],
   });
 
-  const [selectedWebhookForModify, setSelectedWebhookForModify] = useState<WebhookListItem | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedWebhookForModify, setSelectedWebhookForModify] = useState<WebhookListItem | null>(
+    null
+  );
 
   const goToStep = (step: WebhookStep, newMode: WebhookStartMode) => {
     const search = new URLSearchParams();
@@ -105,6 +113,7 @@ export default function WebhookService() {
 
   const handleWebhookSelectForModify = useCallback((webhook: WebhookListItem) => {
     setSelectedWebhookForModify(webhook);
+    console.log("Selected webhook for modify:", webhook.webhook_id);
     // Populate webhookData with selected webhook data
     setWebhookData({
       templateFileName: null, // Template will be handled separately

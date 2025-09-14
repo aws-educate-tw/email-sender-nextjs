@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Send,
-  Mail,
   User,
   Webhook,
   Link2,
@@ -9,8 +8,6 @@ import {
   Key,
   Award,
   Paperclip,
-  Users,
-  Reply,
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
@@ -20,13 +17,6 @@ import { useRouter } from "next/navigation";
 
 interface WebhookServiceReviewProps {
   webhookData: WebhookDataType;
-}
-
-interface SubmitResponse {
-  status: string;
-  message: string;
-  data?: { webhook_id: string; webhook_url: string };
-  errors?: { path: string; message: string }[];
 }
 
 export default function WebhookServiceReview({ webhookData }: WebhookServiceReviewProps) {
@@ -96,7 +86,9 @@ export default function WebhookServiceReview({ webhookData }: WebhookServiceRevi
             <CheckCircle className="w-16 h-16 text-green-600" />
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">Webhook Created Successfully!</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+          Webhook Created Successfully!
+        </h2>
         <p className="text-gray-600 mb-6 text-center">{submitResult.message}</p>
         {submitResult.webhookUrl && (
           <div className="bg-gray-50 p-4 rounded-lg mb-6">
@@ -130,7 +122,9 @@ export default function WebhookServiceReview({ webhookData }: WebhookServiceRevi
             <AlertCircle className="w-16 h-16 text-red-600" />
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">Failed to Create Webhook</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+          Failed to Create Webhook
+        </h2>
         <p className="text-gray-600 mb-6 text-center">{submitResult.message}</p>
         <div className="flex justify-center">
           <button

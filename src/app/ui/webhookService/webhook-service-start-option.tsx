@@ -27,7 +27,9 @@ export default function WebhookServiceStartOption({ onSelect }: WebhookServiceSt
                   <div className="text-center space-y-4 text-white px-4">
                     <div className="text-6xl md:text-8xl animate-bounce">🔗</div>
                     <div className="font-semibold text-lg md:text-4xl">Create New Webhook</div>
-                    <div className="text-slate-300 text-sm">start with a fresh webhook and new email templates.</div>
+                    <div className="text-slate-300 text-sm">
+                      start with a fresh webhook and new email templates.
+                    </div>
                   </div>
                 </div>
               </button>
@@ -40,7 +42,9 @@ export default function WebhookServiceStartOption({ onSelect }: WebhookServiceSt
                 <div className="aspect-square rounded-full bg-gray-100 hover:bg-gray-200 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 shadow-md shadow-gray-400/50">
                   <div className="text-center space-y-2 px-2">
                     <div className="text-3xl md:text-4xl">🧩</div>
-                    <div className="font-semibold text-gray-800 text-base">Create Webhooks with History Templates</div>
+                    <div className="font-semibold text-gray-800 text-base">
+                      Create Webhooks with History Templates
+                    </div>
                   </div>
                 </div>
               </button>
@@ -50,7 +54,9 @@ export default function WebhookServiceStartOption({ onSelect }: WebhookServiceSt
                 <div className="aspect-square rounded-full bg-gray-100 hover:bg-gray-200 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 shadow-md shadow-gray-400/50">
                   <div className="text-center space-y-2 px-2">
                     <div className="text-3xl md:text-4xl">🔁</div>
-                    <div className="font-semibold text-gray-800 text-base">Modify Existing Webhooks</div>
+                    <div className="font-semibold text-gray-800 text-base">
+                      Modify Existing Webhooks
+                    </div>
                   </div>
                 </div>
               </button>

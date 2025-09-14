@@ -3,14 +3,14 @@ export interface WebhookDataType {
   templateFileName: string | null;
   templateFileId: string | null;
   templateFileUrl: string | null;
-  
+
   // Webhook settings
   webhookName: string;
   webhookType: "surveycake" | "slack";
   surveycakeLink: string;
   hashKey: string;
   ivKey: string;
-  
+
   // Email settings
   subject: string;
   senderName: string;

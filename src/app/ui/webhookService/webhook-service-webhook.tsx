@@ -91,9 +91,7 @@ export default function WebhookServiceWebhook({
               />
             </HelpTip>
           </label>
-          <WebhookTypeDropdown
-            onSelect={handleWebhookTypeChange}
-          />
+          <WebhookTypeDropdown onSelect={handleWebhookTypeChange} />
         </div>
 
         {/* Surveycake Link */}
