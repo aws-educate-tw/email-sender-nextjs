@@ -201,6 +201,13 @@ export default function WebhookServiceReview({ webhookData }: WebhookServiceRevi
         >
           {webhookData.subject || "Subject is missing!"}
         </h1>
+        {/* Webhook Name */}
+        {webhookData.webhookName && (
+          <div className="mt-2 flex items-center gap-2">
+            <Webhook className="w-5 h-5 text-gray-600" />
+            <span className="text-lg font-medium text-gray-700">{webhookData.webhookName}</span>
+          </div>
+        )}
       </div>
       <div className="flex gap-2 items-center">
         <div className="p-1 bg-sky-950 rounded-full">
