@@ -24,6 +24,7 @@ export interface WebhookDataType {
 
 export type WebhookStep =
   | "start-option"
+  | "select-webhook"
   | "select-template"
   | "template-edit"
   | "webhook"

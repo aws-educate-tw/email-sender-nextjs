@@ -32,6 +32,11 @@ const stepLabelMap: Record<string, StepInfo> = {
     label: "Start",
     icon: className => <Layers3 className={className} />,
   },
+  "select-webhook": {
+    step: "select-webhook",
+    label: "Select Webhook",
+    icon: className => <Webhook className={className} />,
+  },
   "select-template": {
     step: "select-template",
     label: "Select Template",
@@ -67,19 +72,7 @@ export default function WebhookServiceBreadcrumb({
   const mode = searchParams.get("mode");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const getStepInfo = (step: string): StepInfo => {
-    // For modify mode, change "select-template" to "Select Webhook"
-    if (step === "select-template" && mode === "modify") {
-      return {
-        step: "select-template",
-        label: "Select Webhook",
-        icon: className => <Webhook className={className} />,
-      };
-    }
-    return stepLabelMap[step];
-  };
-
-  const currentStepInfo = getStepInfo(currentStep);
+  const currentStepInfo = stepLabelMap[currentStep];
   const currentStepIndex = steps.indexOf(currentStep);
 
   return (
@@ -123,7 +116,7 @@ export default function WebhookServiceBreadcrumb({
           <div className="md:hidden border-t border-gray-200">
             <nav className="px-4 py-2" aria-label="Process steps">
               {steps.map((stepKey, index) => {
-                const step = getStepInfo(stepKey);
+                const step = stepLabelMap[stepKey];
                 if (!step) return null;
 
                 const isActive = currentStep === stepKey;
@@ -167,7 +160,7 @@ export default function WebhookServiceBreadcrumb({
           aria-label="Process steps"
         >
           {steps.map((stepKey, index) => {
-            const step = getStepInfo(stepKey);
+            const step = stepLabelMap[stepKey];
             if (!step) return null;
 
             const isActive = currentStep === stepKey;

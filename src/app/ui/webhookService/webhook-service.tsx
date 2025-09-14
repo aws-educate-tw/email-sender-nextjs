@@ -143,24 +143,25 @@ export default function WebhookService() {
             onSelect={mode => {
               if (mode === "new") goToStep("template-edit", "new");
               else if (mode === "edit-existing") goToStep("select-template", "edit-existing");
-              else if (mode === "modify") goToStep("select-template", "modify");
+              else if (mode === "modify") goToStep("select-webhook", "modify");
             }}
           />
         );
+      case "select-webhook":
+        // This step is only for modify mode - user selects webhook to modify
+        return (
+          <WebhookServiceWebhookSelector
+            onNext={() => goToStep("select-template", "modify")}
+            onWebhookSelect={handleWebhookSelectForModify}
+          />
+        );
       case "select-template":
-        // For modify mode, we show webhook selector instead of template selector
-        if (mode === "modify") {
-          return (
-            <WebhookServiceWebhookSelector
-              onNext={() => goToStep("webhook", "modify")}
-              onWebhookSelect={handleWebhookSelectForModify}
-            />
-          );
-        }
-        // For edit-existing mode, show template selector
+        // This step is for both edit-existing and modify modes - user selects email template
         return (
           <EmailServiceTemplateSelector
-            onNext={() => goToStep("template-edit", "edit-existing")}
+            onNext={() =>
+              goToStep("template-edit", mode === "edit-existing" ? "edit-existing" : "modify")
+            }
             onTemplateSelect={handleTemplateSelect}
           />
         );
@@ -170,6 +171,7 @@ export default function WebhookService() {
             onNext={() => {
               if (mode === "new") goToStep("webhook", "new");
               else if (mode === "edit-existing") goToStep("webhook", "edit-existing");
+              else if (mode === "modify") goToStep("webhook", "modify");
             }}
             templateFileUrl={webhookData.templateFileUrl}
             onSave={handleTemplateSave}
@@ -225,7 +227,15 @@ export default function WebhookService() {
     }
 
     if (mode === "modify") {
-      return ["start-option", "select-template", "webhook", "settings", "confirmation"];
+      return [
+        "start-option",
+        "select-webhook",
+        "select-template",
+        "template-edit",
+        "webhook",
+        "settings",
+        "confirmation",
+      ];
     }
 
     return ["start-option"];
