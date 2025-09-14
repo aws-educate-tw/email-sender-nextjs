@@ -19,12 +19,10 @@ export default function WebhookServiceWebhook({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    const hasOptionalValue = webhookData.webhookName;
-
-    if (hasOptionalValue) {
-      setShowOptionalSection(true);
-    }
-  }, [webhookData]);
+    // Since webhook name is now required, we can hide the optional section by default
+    // or only show it if there are actual optional fields
+    setShowOptionalSection(false);
+  }, []);
 
   const handleWebhookTypeChange = (webhookType: string) => {
     // Ensure the webhookType is one of the valid values
@@ -58,6 +56,9 @@ export default function WebhookServiceWebhook({
     }
     if (!webhookData.ivKey) {
       newErrors.ivKey = "IV Key is required";
+    }
+    if (!webhookData.webhookName) {
+      newErrors.webhookName = "Webhook Name is required";
     }
 
     setErrors(newErrors);
@@ -167,6 +168,30 @@ export default function WebhookServiceWebhook({
           />
           {errors.ivKey && <p className="text-red-500 text-sm mt-1">{errors.ivKey}</p>}
         </div>
+
+        {/* Webhook Name */}
+        <div className="space-y-3">
+          <label className="flex items-center text-gray-700 font-medium text-sm">
+            <Webhook size={18} className="mr-2 text-[#1a2f4a]" />
+            Webhook Name
+            <HelpTip message="Enter a name to identify your webhook.">
+              <Info
+                size={16}
+                className="ml-2 text-gray-400 hover:text-gray-600 cursor-help transition-colors"
+              />
+            </HelpTip>
+          </label>
+          <input
+            type="text"
+            value={webhookData.webhookName}
+            onChange={e => handleInputChange("webhookName", e.target.value)}
+            placeholder="Enter webhook name"
+            className={`w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1a2f4a] focus:border-transparent transition-all duration-200 ${
+              errors.webhookName ? "border-red-500 focus:ring-red-500" : ""
+            }`}
+          />
+          {errors.webhookName && <p className="text-red-500 text-sm mt-1">{errors.webhookName}</p>}
+        </div>
       </div>
 
       {/* Optional Section */}
@@ -192,28 +217,7 @@ export default function WebhookServiceWebhook({
           </div>
         </h3>
         {showOptionalSection && (
-          <div className="space-y-6">
-            {/* Webhook Name */}
-            <div className="space-y-3">
-              <label className="flex items-center text-gray-700 font-medium text-sm">
-                <Webhook size={18} className="mr-2 text-gray-600" />
-                Webhook Name
-                <HelpTip message="Enter a name to identify your webhook.">
-                  <Info
-                    size={16}
-                    className="ml-2 text-gray-400 hover:text-gray-600 cursor-help transition-colors"
-                  />
-                </HelpTip>
-              </label>
-              <input
-                type="text"
-                value={webhookData.webhookName}
-                onChange={e => handleInputChange("webhookName", e.target.value)}
-                placeholder="Enter webhook name"
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1a2f4a] focus:border-transparent transition-all duration-200"
-              />
-            </div>
-          </div>
+          <div className="space-y-6">{/* Optional fields can be added here in the future */}</div>
         )}
       </div>
 
