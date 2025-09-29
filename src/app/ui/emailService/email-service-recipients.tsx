@@ -5,8 +5,9 @@ import TemplateVariablesInfo from "@/app/ui/emailService/template-variables-info
 import { TableChangeMeta } from "@/app/ui/emailService/type";
 import { EmailDataType } from "@/app/ui/emailService/type";
 import cn from "classnames";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Award, Info } from "lucide-react";
 import { Excel } from "@/app/ui/emailService/type";
+import HelpTip from "@/app/ui/help-tip";
 
 interface EmailServiceProps {
   onNext: () => void;
@@ -17,6 +18,7 @@ interface EmailServiceProps {
     spreadsheetFileId: string,
     spreadsheetFileUrl: string
   ) => void;
+  onEmailDataChange?: (data: EmailDataType) => void;
 }
 
 interface Column {
@@ -30,6 +32,7 @@ export default function EmailServiceRecipients({
   emailData,
   templateFileId,
   onSave,
+  onEmailDataChange,
 }: EmailServiceProps) {
   const [excel, setExcel] = useState<Excel[]>([]);
   const [fileName, setFileName] = useState("");
@@ -135,9 +138,14 @@ export default function EmailServiceRecipients({
   // Re-calculate missing variables whenever excel data or templateVariables change
   useEffect(() => {
     const excelColumns = excel.length > 0 ? Object.keys(excel[0]) : [];
-    const missing = templateVariables.filter(v => !excelColumns.includes(v));
+    // If certification is selected, include "Certificate Text" as a required field
+    const requiredVars = [...templateVariables];
+    if (emailData.provideCertification === "yes" && !requiredVars.includes("Certificate Text")) {
+      requiredVars.push("Certificate Text");
+    }
+    const missing = requiredVars.filter(v => !excelColumns.includes(v));
     setMissingVariables(missing);
-  }, [excel, templateVariables]);
+  }, [excel, templateVariables, emailData.provideCertification]);
 
   const handleUploadExcelData = async () => {
     if (!fileName || excel.length === 0) {
@@ -208,15 +216,71 @@ export default function EmailServiceRecipients({
     }
   };
 
+  // Calculate template variables based on certification setting
+  const displayTemplateVariables = React.useMemo(() => {
+    if (
+      emailData.provideCertification === "yes" &&
+      !templateVariables.includes("Certificate Text")
+    ) {
+      return [...templateVariables, "Certificate Text"];
+    }
+    return templateVariables;
+  }, [emailData.provideCertification, templateVariables]);
+
   return (
     <>
       <div className="space-y-6 mb-6">
+        {/* Certification Card */}
+        <div className="bg-white rounded-xl border-2 border-gray-200 shadow-sm p-6 space-y-6">
+          <div className="space-y-3">
+            <label className="flex items-center text-gray-700 font-medium text-sm">
+              <Award size={18} className="mr-2 text-gray-600" />
+              Provide a certification of participation?
+              <HelpTip message="Select Yes or No if you want to provide a certification. Note: If you select Yes, the Excel file must include two columns: Name and Certificate Text.">
+                <Info
+                  size={16}
+                  className="ml-2 text-gray-400 hover:text-gray-600 cursor-help transition-colors"
+                />
+              </HelpTip>
+            </label>
+            <div className="flex gap-6">
+              <label className="inline-flex items-center cursor-pointer group">
+                <input
+                  type="radio"
+                  className="w-4 h-4 text-[#1a2f4a] border-gray-300 focus:ring-[#1a2f4a] focus:ring-2"
+                  name="certification"
+                  value="yes"
+                  checked={emailData.provideCertification === "yes"}
+                  onChange={() =>
+                    onEmailDataChange?.({ ...emailData, provideCertification: "yes" })
+                  }
+                />
+                <span className="ml-2 font-medium text-gray-700 group-hover:text-gray-900">
+                  Yes
+                </span>
+              </label>
+              <label className="inline-flex items-center cursor-pointer group">
+                <input
+                  type="radio"
+                  className="w-4 h-4 text-[#1a2f4a] border-gray-300 focus:ring-[#1a2f4a] focus:ring-2"
+                  name="certification"
+                  value="no"
+                  checked={emailData.provideCertification === "no"}
+                  onChange={() => onEmailDataChange?.({ ...emailData, provideCertification: "no" })}
+                />
+                <span className="ml-2 font-medium text-gray-700 group-hover:text-gray-900">No</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <TemplateVariablesInfo
           templateFileName={templateFileName}
-          templateVariables={templateVariables}
+          templateVariables={displayTemplateVariables}
           isLoading={isLoadingVariables}
           missingVariables={missingVariables}
         />
+
         <SpreadsheetEditor
           emailData={emailData}
           onTableChange={handleTableChange}

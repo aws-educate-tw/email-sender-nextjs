@@ -70,7 +70,7 @@ interface EmailDetailedDataType {
   created_year_month: string;
   recipients: Array<{ email: string; template_variables: Record<string, any> }>;
   attachment_file_ids: string[];
-  is_generated_certificate: boolean;
+  is_generate_certificate: boolean;
   spreadsheet_file: FileType | null;
   display_name: string;
   sender_id: string | null;
