@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { ArrowRight, Info, ChevronDown, ChevronUp, Webhook, Link2, Hash, Key } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowRight, Info, Webhook, Link2, Hash, Key } from "lucide-react";
 import HelpTip from "@/app/ui/help-tip";
 import WebhookTypeDropdown from "@/app/ui/webhook-type-dropdown";
 import { WebhookDataType } from "@/app/ui/webhookService/type";
@@ -15,14 +15,7 @@ export default function WebhookServiceWebhook({
   webhookData,
   onWebhookDataChange,
 }: WebhookServiceWebhookProps) {
-  const [showOptionalSection, setShowOptionalSection] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  useEffect(() => {
-    // Since webhook name is now required, we can hide the optional section by default
-    // or only show it if there are actual optional fields
-    setShowOptionalSection(false);
-  }, []);
 
   const handleWebhookTypeChange = (webhookType: string) => {
     // Ensure the webhookType is one of the valid values
@@ -192,33 +185,6 @@ export default function WebhookServiceWebhook({
           />
           {errors.webhookName && <p className="text-red-500 text-sm mt-1">{errors.webhookName}</p>}
         </div>
-      </div>
-
-      {/* Optional Section */}
-      <div className="space-y-3">
-        <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center justify-between">
-          <div className="flex justify-start items-center">
-            <div className="w-1 h-6 bg-gray-400 rounded-full mr-3"></div>
-            <p className="text-gray-500">Optional</p>
-            <button
-              onClick={() => setShowOptionalSection(!showOptionalSection)}
-              className="flex items-center gap-2 text-gray-500 p-2 hover:text-gray-800"
-            >
-              {showOptionalSection ? (
-                <>
-                  <ChevronUp size={20} />
-                </>
-              ) : (
-                <>
-                  <ChevronDown size={20} />
-                </>
-              )}
-            </button>
-          </div>
-        </h3>
-        {showOptionalSection && (
-          <div className="space-y-6">{/* Optional fields can be added here in the future */}</div>
-        )}
       </div>
 
       {/* Navigation */}
