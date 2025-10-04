@@ -52,7 +52,7 @@ export default function TpetGuide() {
             className="flex gap-2 p-4 items-center bg-sky-950 text-white rounded-lg shadow-md hover:bg-sky-800 transition duration-300 text-xl w-full md:w-auto"
           >
             <BookOpenText className="w-6 h-6 mr-2" />
-            Checkout out Notion Page
+            Check out Notion Page
           </a>
         </div>
       </div>
