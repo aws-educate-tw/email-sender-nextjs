@@ -35,14 +35,15 @@ export default function MemberCard({
       </div>
 
       {/* Avatar */}
-      <Image
-        src={imgSrc} // when error, use default avatar
-        alt={`${name}'s avatar`}
-        width={150}
-        height={150}
-        className={`rounded-full mb-3 border-4 border-sky-950 shadow-lg`}
-        onError={() => setImgSrc("/aws-educate-avatar.png")}
-      />
+      <div className="relative w-[150px] h-[150px] rounded-full mb-3 border-4 border-sky-950 shadow-lg overflow-hidden">
+        <Image
+          src={imgSrc} // when error, use default avatar
+          alt={`${name}'s avatar`}
+          fill
+          className="object-cover"
+          onError={() => setImgSrc("/aws-educate-avatar.png")}
+        />
+      </div>
 
       {/* Name */}
       <p className="text-2xl font-bold text-gray-800 text-center">{name}</p>
