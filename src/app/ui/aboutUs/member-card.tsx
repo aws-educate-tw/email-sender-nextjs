@@ -1,44 +1,63 @@
 import Image from "next/image";
+import { useState } from "react";
 
 interface MemberCardProps {
   name: string;
-  role: string;
   email: string;
-  note?: string;
   avatar?: string;
-  isNew?: boolean; // New property to identify new members
+  period?: string;
+  labels?: string[];
 }
 
 export default function MemberCard({
   name,
-  role,
   email,
-  note,
-  avatar = "/avatar/hachi.jpg",
-  isNew = false, // Default to false
+  avatar = "/aws-educate-avatar.png",
+  period,
+  labels = [],
 }: MemberCardProps) {
+  const [imgSrc, setImgSrc] = useState(avatar);
+
   return (
-    <div className="flex flex-col items-center p-4 rounded-lg ">
-      {note && <p className="text-xs text-gray-500 text-center mt-1">{note}</p>}
-      {isNew && (
-        <span className="mb-2 px-3 py-1 text-xs font-semibold text-sky-950 bg-amber-200 rounded-full animate-bounce">
-          New Member
-        </span>
-      )}
+    <div className="flex flex-col items-center p-4 rounded-lg">
+      {/* Labels - Fixed height container to keep avatars aligned */}
+      <div className="h-14 flex flex-col gap-2 mb-2 justify-end items-center">
+        {labels.map((label, index) => (
+          <span
+            key={index}
+            className={`text-sm font-bold ${
+              label === "FOUNDER MEMBER" ? "text-amber-500 animate-bounce" : "text-blue-700"
+            }`}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+
+      {/* Avatar */}
       <Image
-        src={avatar} // Use a default or provided avatar
+        src={imgSrc} // when error, use default avatar
         alt={`${name}'s avatar`}
-        width={200}
-        height={200}
-        className={`rounded-full mb-4 border-8 ${isNew ? "border-amber-400 border-dashed" : "border-sky-950"} shadow-lg`}
+        width={150}
+        height={150}
+        className={`rounded-full mb-3 border-4 border-sky-950 shadow-lg`}
+        onError={() => setImgSrc("/aws-educate-avatar.png")}
       />
-      <p className="text-3xl font-bold text-gray-800 text-center">{name}</p>
-      <p className="text-lg text-sky-800 text-center">{role}</p>
-      <p className="text-sm text-gray-600 text-center">
-        <a href={`mailto:${email}`} className="hover:underline">
-          {email}
-        </a>
-      </p>
+
+      {/* Name */}
+      <p className="text-2xl font-bold text-gray-800 text-center">{name}</p>
+
+      {/* Period */}
+      {period && <p className="text-sm text-gray-600 text-center mb-2">{period}</p>}
+
+      {/* Email */}
+      {email && (
+        <p className="text-sm text-gray-600 text-center">
+          <a href={`mailto:${email}`} className="hover:underline">
+            {email}
+          </a>
+        </p>
+      )}
     </div>
   );
 }
