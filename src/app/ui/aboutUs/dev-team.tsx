@@ -92,7 +92,7 @@ export default function DevTeam() {
     {
       name: "Kiki",
       period: "2025-present",
-      email: "harryup2000@gmail.com",
+      email: "271yeye@gmail.com",
       avatar: "/avatar/kiki.jpg",
       labels: ["TECH-LEAD"],
     },
@@ -106,7 +106,7 @@ export default function DevTeam() {
     {
       name: "Claire",
       period: "2025",
-      email: "",
+      email: "abctintin0504@gmail.com",
       avatar: "/avatar/claire.jpg",
       labels: [],
     },
@@ -133,7 +133,7 @@ export default function DevTeam() {
     {
       name: "Yuna",
       period: "2024",
-      email: "harryup2000@gmail.com",
+      email: "tmfel91219pinyu@gmail.com",
       avatar: "/avatar/yuna.jpg",
       labels: ["FOUNDER MEMBER"],
     },
@@ -150,7 +150,7 @@ export default function DevTeam() {
     {
       name: "Cody",
       period: "2025",
-      email: "",
+      email: "cdxvy30@gmail.com",
       avatar: "/avatar/cody.jpg",
       labels: [],
     },
