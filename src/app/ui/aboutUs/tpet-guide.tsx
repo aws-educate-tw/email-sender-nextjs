@@ -1,4 +1,4 @@
-import { Download, BookOpenText } from "lucide-react";
+import { BookOpenText } from "lucide-react";
 import { Mail, Calendar, Bell, Award } from "lucide-react";
 
 export default function TpetGuide() {
@@ -46,25 +46,14 @@ export default function TpetGuide() {
         {/* Getting Started Section */}
         <div>
           <h3 className="text-2xl font-semibold text-sky-950 mb-4">Getting Started with TPET</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xl">
-            <a
-              href="/aws-educate-tpet-guide.pdf"
-              target="_blank"
-              download
-              className="flex gap-2 p-4 items-center bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-300"
-            >
-              <Download className="w-6 h-6 mr-2" />
-              Download PDF Guide
-            </a>
-            <a
-              href="https://aws-educate-tw.notion.site/AWS-Educate-TPET-4682e862471a4998bb52b7972f026077"
-              target="_blank"
-              className="flex gap-2 p-4 items-center bg-sky-950 text-white rounded-lg shadow-md hover:bg-sky-800 transition duration-300"
-            >
-              <BookOpenText className="w-6 h-6 mr-2" />
-              Checkout out Notion Page
-            </a>
-          </div>
+          <a
+            href="https://aws-educate-tw.notion.site/AWS-Educate-TPET-User-Guide-2726bfee6817805c9ebbe8479fd74703?pvs=73"
+            target="_blank"
+            className="flex gap-2 p-4 items-center bg-sky-950 text-white rounded-lg shadow-md hover:bg-sky-800 transition duration-300 text-xl w-full md:w-auto"
+          >
+            <BookOpenText className="w-6 h-6 mr-2" />
+            Checkout out Notion Page
+          </a>
         </div>
       </div>
     </section>
