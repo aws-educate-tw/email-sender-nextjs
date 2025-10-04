@@ -19,9 +19,11 @@ export default function EmailServiceTemplateEditor({
   onSave,
 }: EmailServiceTemplateEditorProps) {
   const [content, setContent] = useState(htmltemplateContent);
+  const [originalContent, setOriginalContent] = useState(htmltemplateContent);
   const [templateName, setTemplateName] = useState("");
   const [saveButtonState, setSaveButtonState] = useState<"idle" | "saved" | "error">("idle");
   const [isUploading, setIsUploading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (templateFileUrl) {
@@ -29,15 +31,25 @@ export default function EmailServiceTemplateEditor({
         .then(response => response.text())
         .then(htmlContent => {
           setContent(htmlContent);
+          setOriginalContent(htmlContent);
+          setHasChanges(false);
         })
         .catch(error => {
           console.error("Error fetching template file:", error);
         });
+    } else {
+      setOriginalContent(htmltemplateContent);
+      setHasChanges(false);
     }
   }, [templateFileUrl]);
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
+    setHasChanges(newContent !== originalContent);
+    // Reset save state when content changes
+    if (saveButtonState === "saved") {
+      setSaveButtonState("idle");
+    }
   };
 
   const handleUpload = async () => {
@@ -99,6 +111,10 @@ export default function EmailServiceTemplateEditor({
       // Show "Saved" button state
       setSaveButtonState("saved");
 
+      // Update original content and reset changes flag
+      setOriginalContent(content);
+      setHasChanges(false);
+
       // Extract file_id from the response and pass it to the onSave callback
       const templateFileName = result?.files?.[0]?.file_name;
       const templateFileId = result?.files?.[0]?.file_id;
@@ -123,6 +139,13 @@ export default function EmailServiceTemplateEditor({
   };
 
   const handleNextClick = () => {
+    // If there are changes, save first
+    if (hasChanges && saveButtonState !== "saved") {
+      handleUpload();
+      return;
+    }
+
+    // If no changes or already saved, proceed to next step
     if (onNext) {
       onNext();
     } else {
@@ -188,15 +211,15 @@ export default function EmailServiceTemplateEditor({
         {/* Next Button */}
         <button
           onClick={handleNextClick}
-          disabled={saveButtonState !== "saved"}
+          disabled={hasChanges && saveButtonState !== "saved"}
           className={cn(
             "flex items-center gap-2 rounded-md px-4 py-3 text-base font-medium text-white transition-colors",
-            saveButtonState !== "saved"
+            hasChanges && saveButtonState !== "saved"
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#1a2f4a] hover:bg-[#1a2f4a]/90"
           )}
         >
-          Next
+          {hasChanges && saveButtonState !== "saved" ? "Save First" : "Next"}
           <ArrowRight className="w-5 h-5" />
         </button>
       </div>
