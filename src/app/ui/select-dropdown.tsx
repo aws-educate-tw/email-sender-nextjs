@@ -19,6 +19,7 @@ interface SelectDropdownProps {
   onSelect: (file_id: string, file_url: string) => void;
   fileExtension: string;
   error?: string;
+  error?: string;
 }
 
 export default function SelectDropdown({ onSelect, fileExtension, error }: SelectDropdownProps) {
