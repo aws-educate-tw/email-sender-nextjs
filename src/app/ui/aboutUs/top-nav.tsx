@@ -1,12 +1,16 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function TopNav() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const isDevTeamPage = pathname === "/devTeam";
+
   const navItems = useMemo(
     () => [
       { label: "Introduction", href: "#introduction" },
-      { label: "DevTeam", href: "#dev-team" },
       { label: "TPET Guide", href: "#tpet-guide" },
     ],
     []
@@ -68,6 +72,14 @@ export default function TopNav() {
     }
   };
 
+  const navigateToAboutUs = (hash: string) => {
+    router.push("/aboutUs");
+    // After navigation, scroll to the section
+    setTimeout(() => {
+      scrollToSection(hash);
+    }, 100);
+  };
+
   return (
     <header className="bg-sky-950 text-white py-4 fixed w-full top-0 z-10 shadow-md">
       <nav className="max-w-5xl container mx-auto flex justify-between items-center px-4">
@@ -88,16 +100,33 @@ export default function TopNav() {
           </Link>
           {navItems.map(item => (
             <li key={item.href}>
-              <button
-                className={`text-lg ${
-                  activeSection === item.href ? "text-amber-300" : "text-white"
-                } hover:text-amber-300`}
-                onClick={() => scrollToSection(item.href)}
-              >
-                {item.label}
-              </button>
+              {isDevTeamPage ? (
+                <button
+                  className="text-lg text-white hover:text-amber-300"
+                  onClick={() => navigateToAboutUs(item.href)}
+                >
+                  {item.label}
+                </button>
+              ) : (
+                <button
+                  className={`text-lg ${
+                    activeSection === item.href ? "text-amber-300" : "text-white"
+                  } hover:text-amber-300`}
+                  onClick={() => scrollToSection(item.href)}
+                >
+                  {item.label}
+                </button>
+              )}
             </li>
           ))}
+          <Link
+            href="/devTeam"
+            className={`text-lg hover:text-amber-300 ${
+              isDevTeamPage ? "text-amber-300" : "text-white"
+            }`}
+          >
+            Dev Team
+          </Link>
         </ul>
       </nav>
     </header>

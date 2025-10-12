@@ -63,7 +63,6 @@ export async function submitForm(data: string, access_token: string) {
   }
 
   try {
-    // console.log("data", validation.data);
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/send-email`);
     const response = await fetch(url.toString(), {
@@ -74,8 +73,10 @@ export async function submitForm(data: string, access_token: string) {
       },
       body: JSON.stringify(validation.data),
     });
+    console.log("response", response);
 
     const result = await response.json();
+    console.log("result", result);
     return {
       status: result.status,
       message: result.message,
@@ -241,24 +242,3 @@ export async function submitWebhookForm(data: string, access_token: string) {
     };
   }
 }
-
-// export async function checkLoginStatus () {
-//   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-//   const url = new URL(`${base_url}/auth/is-logged-in`);
-//   try {
-//     const response = await fetch(url, {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       credentials: "include",
-//     });
-
-//     const result = await response.json();
-//     console.log('log in or not', result);
-//     return result.loggedIn;
-//   } catch (error) {
-//     console.error('Failed to check login status:', error);
-//     return false;
-//   }
-// };

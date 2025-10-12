@@ -1,77 +1,80 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-// import { HomeIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 
 export default function SideNav() {
   const router = useRouter();
+
   const signout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_expiry_time");
     router.push("/");
   };
+
   return (
-    <div className="flex h-full flex-col px-5 py-4 md:px-3 bg-gray-200 gap-2 min-w-60">
+    <div className="flex h-full flex-col p-4 backdrop-blur-md bg-gradient-to-r from-gray-100 to-gray-300 shadow-xl rounded-b-lg md:rounded-r-lg gap-2 w-full md:min-w-60">
+      {/* Logo */}
       <Link
-        className="flex h-20 min-w-48 items-end justify-start rounded-md bg-sky-950 p-4 md:h-40"
+        className="flex items-center justify-start rounded-md bg-sky-950 p-4 h-20 md:h-40"
         href="/"
       >
-        {/* <p className="text-white text-2xl">aws educate</p> */}
         <Image
           src="/aws-educate-logo.png"
           alt="the logo of aws educate"
           width={500}
           height={400}
-          className="w-60 sm:w-60 md:w-96"
+          className="w-full max-w-[180px] md:max-w-[240px]"
+          priority
         />
       </Link>
-      <div className="flex grow flex-row flex-wrap justify-start gap-2 md:flex-col md:space-x-0 rounded-md">
-        <Link
-          href="/aboutUs"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">About Us</p>
-        </Link>
-        <Link
-          href="/templateEdit"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Create Template</p>
-        </Link>
-        <Link
-          href="/sendEmail"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Send Email</p>
-        </Link>
-        <Link
-          href="/emailHistory"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Email History</p>
-        </Link>
-        <Link
-          href="/webhookService"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Webhook Service</p>
-        </Link>
-        <Link
-          href="/webhookRecords"
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800"
-        >
-          <p className="px-3 text-white">Webhook Records</p>
-        </Link>
-      </div>
-      <div>
-        <button
-          className="flex flex-grow min-w-48 max-h-10 items-center justify-center rounded-md bg-sky-950 p-4 hover:bg-sky-800 w-full"
-          type="button"
-          onClick={signout}
-        >
-          <p className="px-3 text-white">Sign Out</p>
-        </button>
+
+      {/* Navigation Links */}
+      <div className="flex flex-col justify-between h-full">
+        {/* Top Section */}
+        <div className="flex flex-col gap-2">
+          <Link
+            href="/emailService"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Email Service</p>
+          </Link>
+          <Link
+            href="/emailHistory"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Email History</p>
+          </Link>
+          <Link
+            href="/webhookService"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Webhook Service</p>
+          </Link>
+          <Link
+            href="/webhookRecords"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Webhook Records</p>
+          </Link>
+        </div>
+        {/* Bottom Section */}
+        <div className="flex flex-col gap-2">
+          <Link
+            href="/aboutUs"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">About Us</p>
+          </Link>
+          {/* Sign Out Button */}
+          <button
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+            type="button"
+            onClick={signout}
+          >
+            <p className="text-white text-sm sm:text-base">Sign Out</p>
+          </button>
+        </div>
       </div>
     </div>
   );

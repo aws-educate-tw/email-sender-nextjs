@@ -48,7 +48,7 @@ export default function Page() {
           </div>
           <div className="flex flex-col gap-2 items-center md:flex-row md:items-start">
             <Link
-              href={isAuthenticated ? "/sendEmail" : "/login"}
+              href={isAuthenticated ? "/emailService" : "/login"}
               className="flex items-center gap-2 rounded-lg bg-sky-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-sky-900 md:text-base"
             >
               <p className="animate-pulse">Let&apos;s Get Started</p>

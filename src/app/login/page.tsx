@@ -38,8 +38,6 @@ export default function Page() {
     try {
       const response = await submitLogin(JSON.stringify(formData));
 
-      alert(response.message);
-
       if (response.message === "Login successful") {
         localStorage.setItem("access_token", response.access_token);
 
@@ -47,7 +45,7 @@ export default function Page() {
         const tokenExpiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
         localStorage.setItem("token_expiry_time", tokenExpiryTime.toString());
 
-        router.push("/sendEmail");
+        router.push("/emailService");
       } else if (response.message === "Password reset required for the user") {
         setVerificationRequired(true);
       } else if (response.challengeName === "NEW_PASSWORD_REQUIRED") {
