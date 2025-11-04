@@ -6,7 +6,7 @@ interface FileType {
   file_url: string;
   uploaded_id: string | null;
   updated_at: string;
-  file_name: string;
+  file_name: string | null;
   file_id: string;
   s3_object_key: string;
   created_at: string;
@@ -43,7 +43,7 @@ interface DataType {
   success_email_count: number;
   expected_email_send_count: number;
   reply_to: string;
-  template_file: FileType;
+  template_file: FileType | null;
   created_year_month_day: string;
   created_year: string;
 }
@@ -90,7 +90,11 @@ export default function EmailHistoryCard({ data }: PropsType) {
             ) : item.spreadsheet_file ? (
               <span className="flex items-center gap-1">
                 <Sheet className="w-4 h-4" />
-                {item.spreadsheet_file.file_name}
+                {item.spreadsheet_file ? (
+                  item.spreadsheet_file.file_name
+                ) : (
+                  "No spreadsheet file"
+                )}
               </span>
             ) : (
               "No spreadsheet file"
@@ -112,7 +116,7 @@ export default function EmailHistoryCard({ data }: PropsType) {
           <div className="p-8">
             <div className="flex flex-col">
               <div className="uppercase tracking-wide text-lg text-black font-semibold mb-1">
-                {item.subject}
+                {item.subject ? item.subject : "No Subject"}
               </div>
               <hr />
               <div className="flex flex-col lg:flex-row justify-between">
@@ -122,7 +126,7 @@ export default function EmailHistoryCard({ data }: PropsType) {
                     <User className="" size={32} color="white" />
                   </div>
                   <div className="flex flex-col justify-start">
-                    <p className="text-md font-medium text-black">{item.display_name}</p>
+                    <p className="text-md font-medium text-black">{item.display_name ? item.display_name : "Unknown Sender"}</p>
                     <p className="text-sm font-medium text-neutral-500">
                       {item.sender_local_part}@aws-educate.tw
                     </p>
@@ -140,7 +144,11 @@ export default function EmailHistoryCard({ data }: PropsType) {
                   <div className="flex flex-col justify-start">
                     <p className="text-md font-medium text-black">Template File</p>
                     <p className="text-sm font-medium text-neutral-500">
-                      {item.template_file.file_name}
+                      {item.template_file ? (
+                        item.template_file.file_name
+                      ) : (
+                        "No template file"
+                      )}
                     </p>
                   </div>
                 </div>
