@@ -6,7 +6,7 @@ interface FileType {
   file_url: string;
   uploaded_id: string | null;
   updated_at: string;
-  file_name: string;
+  file_name: string | null;
   file_id: string;
   s3_object_key: string;
   created_at: string;
@@ -43,7 +43,7 @@ interface DataType {
   success_email_count: number;
   expected_email_send_count: number;
   reply_to: string;
-  template_file: FileType;
+  template_file: FileType | null;
   created_year_month_day: string;
   created_year: string;
 }
@@ -90,7 +90,7 @@ export default function EmailHistoryCard({ data }: PropsType) {
             ) : item.spreadsheet_file ? (
               <span className="flex items-center gap-1">
                 <Sheet className="w-4 h-4" />
-                {item.spreadsheet_file.file_name}
+                {item.spreadsheet_file ? item.spreadsheet_file.file_name : "No spreadsheet file"}
               </span>
             ) : (
               "No spreadsheet file"
@@ -107,22 +107,24 @@ export default function EmailHistoryCard({ data }: PropsType) {
         <Link
           key={item.run_id}
           href={`/emailHistory/${item.run_id}`}
-          className="w-full hover:shadow-xl transition bg-white rounded-xl shadow-md overflow-hidden"
+          className="w-full hover:shadow-xl transition rounded-xl shadow-md overflow-hidden bg-white"
         >
           <div className="p-8">
             <div className="flex flex-col">
               <div className="uppercase tracking-wide text-lg text-black font-semibold mb-1">
-                {item.subject}
+                {item.subject ? item.subject : "No Subject"}
               </div>
               <hr />
-              <div className="flex flex-col lg:flex-row justify-between">
+              <div className="flex flex-col py-2 xl:gap-4 xl:flex-row justify-between">
                 {/* Sender Info */}
                 <div className="flex-1 flex py-2 gap-2 items-center">
                   <div className="bg-sky-900 rounded-full p-1 border-2 border-sky-900">
                     <User className="" size={32} color="white" />
                   </div>
                   <div className="flex flex-col justify-start">
-                    <p className="text-md font-medium text-black">{item.display_name}</p>
+                    <p className="text-md font-medium text-black">
+                      {item.display_name ? item.display_name : "Unknown Sender"}
+                    </p>
                     <p className="text-sm font-medium text-neutral-500">
                       {item.sender_local_part}@aws-educate.tw
                     </p>
@@ -140,40 +142,48 @@ export default function EmailHistoryCard({ data }: PropsType) {
                   <div className="flex flex-col justify-start">
                     <p className="text-md font-medium text-black">Template File</p>
                     <p className="text-sm font-medium text-neutral-500">
-                      {item.template_file.file_name}
+                      {item.template_file ? item.template_file.file_name : "No template file"}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Footer Info */}
-              <div className="flex flex-col justify-end pt-2 pl-3 gap-2 lg:flex-row lg:pt-8 lg:gap-8">
+              <div className="flex flex-col justify-end pt-2 pl-3 gap-2 lg:flex-row lg:pt-8 lg:gap-8 text-black">
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 lg:min-w-20 min-w-24">
                     <CalendarDays size={20} />
                     <p>Send at</p>
                   </div>
-                  <strong>{convertToTaipeiTime(item.created_at)}</strong>
+                  <p className="underline">
+                    {/* Convert to Taipei Timezone */}
+                    <strong>{convertToTaipeiTime(item.created_at)}</strong>
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 lg:min-w-20 min-w-24">
                     <Send size={20} />
                     <p>Sender</p>
                   </div>
-                  <strong>{item.sender?.username || "Unknown"}</strong>
+                  <a
+                    href={`mailto:${item.sender.email}`}
+                    className="text-black underline hover:text-sky-800"
+                  >
+                    <strong>{item.sender.username || "Unknown"}</strong>
+                  </a>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 lg:min-w-20 min-w-24">
                     <Clock size={20} />
                     <p>Status</p>
                   </div>
                   <strong
                     className={
                       item.success_email_count < item.expected_email_send_count
-                        ? "text-red-500"
-                        : "text-green-500"
+                        ? "text-red-500 text-2xl"
+                        : "text-green-500 text-2xl"
                     }
                   >
                     {item.success_email_count}/{item.expected_email_send_count}
