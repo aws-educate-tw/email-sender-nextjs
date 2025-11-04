@@ -94,7 +94,7 @@ export default function Page() {
       try {
         const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
         const url = new URL(`${base_url}/runs`);
-
+        url.searchParams.append("run_type", "EMAIL");
         url.searchParams.append("limit", limit.toString());
         url.searchParams.append("page", page.toString());
 
