@@ -96,7 +96,6 @@ export async function submitForm(data: string, access_token: string) {
 export async function submitLogin(data: string) {
   const parsedData = JSON.parse(data);
   const validation = loginSchema.safeParse(parsedData);
-  // console.log("validation", validation);
 
   if (!validation.success) {
     return {
@@ -107,8 +106,7 @@ export async function submitLogin(data: string) {
       })),
     };
   }
-  // console.log(parsedData);
-  // console.log("validation", validation);
+
   try {
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const url = new URL(`${base_url}/auth/login`);
@@ -121,7 +119,11 @@ export async function submitLogin(data: string) {
     });
 
     const result = await response.json();
-    // console.log("response", result);
+
+    if (!response.ok) {
+      throw new Error(result.message || "Error: Failed to Login. Please try again.");
+    }
+
     if (result.challengeName === "NEW_PASSWORD_REQUIRED") {
       return {
         message: result.message,
@@ -136,18 +138,14 @@ export async function submitLogin(data: string) {
       };
     }
   } catch (error: any) {
-    return {
-      status: "error",
-      message: "Error: Failed to Login. Please try again.",
-      error: error.message,
-    };
+    console.error("Error during API call:", error);
+    throw error;
   }
 }
 
 export async function submitChangePassword(data: string) {
   const parsedData = JSON.parse(data);
   const validation = changePasswordSchema.safeParse(parsedData);
-  // console.log("validation", validation);
 
   if (!validation.success) {
     return {
@@ -158,8 +156,6 @@ export async function submitChangePassword(data: string) {
       })),
     };
   }
-  // console.log(parsedData);
-  console.log("validation", validation);
 
   try {
     const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -173,7 +169,6 @@ export async function submitChangePassword(data: string) {
     });
 
     const result = await response.json();
-    console.log("result", result);
     return {
       message: result.message,
     };
