@@ -15,6 +15,7 @@ export default function Page() {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false); // for the pw of login and the pw of new password
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false); //for the confirm pw
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const ref = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function Page() {
     event.preventDefault();
     if (!ref.current) return;
     setShowPassword(false);
+    setIsSubmitting(true);
 
     const formData = {
       account: (ref.current.querySelector("[id='account']") as HTMLInputElement).value,
@@ -132,6 +134,7 @@ export default function Page() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter the password"
                 className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+                disabled={isSubmitting}
               />
               <button
                 type="button"
@@ -201,9 +204,10 @@ export default function Page() {
         <div className="flex flex-col my-5">
           <button
             type="submit"
-            className="h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            disabled={isSubmitting}
+            className="h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {session || verificationRequired ? "Change Password" : "Login"}
+            {isSubmitting ? "Processing..." : (session || verificationRequired ? "Change Password" : "Login")}
           </button>
         </div>
       </form>
