@@ -11,10 +11,12 @@ export default function Page() {
   const [verificationCode, setVerificationCode] = useState<string>("");
 
   const [error, setError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false); // for the pw of login and the pw of new password
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false); //for the confirm pw
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const ref = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -29,6 +31,8 @@ export default function Page() {
     event.preventDefault();
     if (!ref.current) return;
     setShowPassword(false);
+    setIsSubmitting(true);
+    setLoginError(null);
 
     const formData = {
       account: (ref.current.querySelector("[id='account']") as HTMLInputElement).value,
@@ -48,11 +52,15 @@ export default function Page() {
         router.push("/emailService");
       } else if (response.message === "Password reset required for the user") {
         setVerificationRequired(true);
+        setIsSubmitting(false);
       } else if (response.challengeName === "NEW_PASSWORD_REQUIRED") {
         setSession(response.session);
+        setIsSubmitting(false);
       }
     } catch (error: any) {
       console.error("Login failed", error);
+      setLoginError("The username or password is incorrect.");
+      setIsSubmitting(false);
     }
   };
 
@@ -119,7 +127,10 @@ export default function Page() {
               name="account"
               type="text"
               placeholder="Enter the account"
-              className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+              className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                loginError ? "border-red-500" : ""
+              }`}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -131,17 +142,23 @@ export default function Page() {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter the password"
-                className="block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full"
+                className={`block rounded-md border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 w-full ${
+                  loginError ? "border-red-500" : ""
+                }`}
+                disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-12 transform -translate-y-1/2 bg-gray-200 rounded-md p-1 hover:bg-gray-300"
+                disabled={isSubmitting}
               >
                 <ScanEye size={16} />
               </button>
             </div>
           )}
+
+          {loginError && <div className="text-red-500 text-sm">{loginError}</div>}
 
           {(session || verificationRequired) && (
             <>
@@ -201,9 +218,14 @@ export default function Page() {
         <div className="flex flex-col my-5">
           <button
             type="submit"
-            className="h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950"
+            disabled={isSubmitting}
+            className="h-10 items-center rounded-lg bg-sky-950 hover:bg-sky-800 px-4 md:text-base text-xs font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800 active:bg-sky-950 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {session || verificationRequired ? "Change Password" : "Login"}
+            {isSubmitting
+              ? "Processing..."
+              : session || verificationRequired
+                ? "Change Password"
+                : "Login"}
           </button>
         </div>
       </form>
