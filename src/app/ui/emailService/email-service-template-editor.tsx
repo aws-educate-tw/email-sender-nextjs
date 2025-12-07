@@ -113,12 +113,12 @@ export default function EmailServiceTemplateEditor({
 
     // Upload all base64 images
     const uploadPromises: Promise<void>[] = [];
-    
-    images.forEach((img) => {
+
+    images.forEach(img => {
       const src = img.getAttribute("src");
       if (src && src.startsWith("data:")) {
         // This is a base64 image, upload it
-        const uploadPromise = uploadBase64ImageToS3(src).then((s3Url) => {
+        const uploadPromise = uploadBase64ImageToS3(src).then(s3Url => {
           if (s3Url) {
             img.setAttribute("src", s3Url);
           }
@@ -159,7 +159,7 @@ export default function EmailServiceTemplateEditor({
     };
 
     let formattedContent = preserveEmptyLines(content);
-    
+
     // Upload all base64 images to S3 and replace with S3 URLs
     try {
       setIsUploading(true);

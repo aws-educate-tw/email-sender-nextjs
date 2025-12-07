@@ -99,7 +99,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
     // Only process the first image
     const firstImage = imageFiles[0];
     const base64Url = await convertImageToBase64(firstImage);
-    
+
     if (base64Url) {
       editor.chain().focus().setImage({ src: base64Url }).run();
     }
@@ -160,10 +160,10 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      
+
       if (item.type.startsWith("image/")) {
         event.preventDefault();
-        
+
         const file = item.getAsFile();
         if (!file) continue;
 
@@ -172,7 +172,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         if (base64Url && editor) {
           editor.chain().focus().setImage({ src: base64Url }).run();
         }
-        
+
         break;
       }
     }
@@ -308,17 +308,17 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         style={{ display: "none" }}
         onChange={handleImageFileSelect}
       />
-      
+
       <div className="flex-col">
         <div className="pb-4">
           {/* Toolbar */}
           <div className="flex flex-wrap items-center rounded-md p-1 bg-gray-200 mb-4">
-            {/* <ToolbarButton
+            <ToolbarButton
               icon={<LinkIcon size={18} />}
               onClick={() => handleFormatAction("link")}
               label="Insert link"
               isActive={editor?.isActive("link")}
-            /> */}
+            />
             <ToolbarButton
               icon={<Bold size={18} />}
               onClick={() => handleFormatAction("bold")}
@@ -398,7 +398,9 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
           <div className="border border-sky-950 p-4 rounded-t-lg bg-sky-950 flex justify-between items-center">
             <span className="text-sm font-medium text-white">Template</span>
-            <span className="text-xs text-white/80">💡 Tip: Press Enter between images for line breaks</span>
+            <span className="text-xs text-white/80">
+              💡 Tip: Press Enter between images for line breaks
+            </span>
           </div>
 
           {/* Editor Content with Drag and Drop */}
