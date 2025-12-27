@@ -98,10 +98,22 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
     // Only process the first image
     const firstImage = imageFiles[0];
-    const base64Url = await convertImageToBase64(firstImage);
+    
+    // Validate file size (5MB limit)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (firstImage.size > MAX_FILE_SIZE) {
+      alert("Image file is too large. Please select an image smaller than 5MB.");
+      return;
+    }
 
-    if (base64Url) {
-      editor.chain().focus().setImage({ src: base64Url }).run();
+    try {
+      const base64Url = await convertImageToBase64(firstImage);
+      if (base64Url) {
+        editor.chain().focus().setImage({ src: base64Url }).run();
+      }
+    } catch (error) {
+      console.error("Failed to convert image:", error);
+      alert("Failed to process the image. Please try again with a different file.");
     }
   };
 
@@ -168,9 +180,14 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         if (!file) continue;
 
         // Convert to base64 and insert
-        const base64Url = await convertImageToBase64(file);
-        if (base64Url && editor) {
-          editor.chain().focus().setImage({ src: base64Url }).run();
+        try {
+          const base64Url = await convertImageToBase64(file);
+          if (base64Url && editor) {
+            editor.chain().focus().setImage({ src: base64Url }).run();
+          }
+        } catch (error) {
+          console.error("Failed to convert image to base64:", error);
+          alert("Failed to process the pasted image. Please try again.");
         }
 
         break;
@@ -179,7 +196,6 @@ export default function TipTap({ onChange, content }: TipTapProps) {
   };
 
   useEffect(() => {
-    console.log("checkLoginStatus function called");
     const access_token = localStorage.getItem("access_token");
     if (!access_token || isTokenExpired()) {
       router.push("/login");
