@@ -56,7 +56,7 @@ export default function EmailServiceTemplateEditor({
   const uploadBase64ImageToS3 = async (base64Data: string): Promise<string | null> => {
     try {
       // Extract the data from base64 string
-      const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      const matches = base64Data.match(/^data:([A-Za-z0-9-+/]+);base64,(.+)$/);
       if (!matches || matches.length !== 3) {
         throw new Error("Invalid base64 data");
       }
@@ -73,11 +73,20 @@ export default function EmailServiceTemplateEditor({
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: mimeType });
 
-      // Generate a unique filename
-      const extension = mimeType.split("/")[1] || "png";
+      // Generate a unique filename with validated extension
+      const knownImageExtensions = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg"];
+      let extension = "png";
+      if (typeof mimeType === "string" && mimeType.includes("/")) {
+        const ext = mimeType.split("/")[1].toLowerCase();
+        if (knownImageExtensions.includes(ext)) {
+          extension = ext;
+        }
+      }
+      
+      const safeTemplateName = templateName && templateName.trim() ? templateName.trim() : "template";
       const timestamp = Date.now();
       const randomStr = Math.random().toString(36).substring(2, 8);
-      const fileName = `${templateName}_image_${timestamp}_${randomStr}.${extension}`;
+      const fileName = `${safeTemplateName}_image_${timestamp}_${randomStr}.${extension}`;
 
       // Upload to S3
       const formData = new FormData();
@@ -121,6 +130,9 @@ export default function EmailServiceTemplateEditor({
         const uploadPromise = uploadBase64ImageToS3(src).then(s3Url => {
           if (s3Url) {
             img.setAttribute("src", s3Url);
+          } else {
+            // Log or collect failed upload, or throw error
+            throw new Error(`Failed to upload image: ${src.substring(0, 50)}...`);
           }
         });
         uploadPromises.push(uploadPromise);
@@ -161,18 +173,19 @@ export default function EmailServiceTemplateEditor({
     let formattedContent = preserveEmptyLines(content);
 
     // Upload all base64 images to S3 and replace with S3 URLs
+    setIsUploading(true);
     try {
-      setIsUploading(true);
       formattedContent = await processImagesAndUpload(formattedContent);
     } catch (error) {
       console.error("Failed to process images:", error);
       alert("Failed to upload images. Please try again.");
-      setIsUploading(false);
       setSaveButtonState("error");
       setTimeout(() => {
         setSaveButtonState("idle");
       }, 3000);
       return;
+    } finally {
+      setIsUploading(false);
     }
 
     const html = `
