@@ -82,8 +82,9 @@ export default function EmailServiceTemplateEditor({
           extension = ext;
         }
       }
-      
-      const safeTemplateName = templateName && templateName.trim() ? templateName.trim() : "template";
+
+      const safeTemplateName =
+        templateName && templateName.trim() ? templateName.trim() : "template";
       const timestamp = Date.now();
       const randomStr = Math.random().toString(36).substring(2, 8);
       const fileName = `${safeTemplateName}_image_${timestamp}_${randomStr}.${extension}`;

@@ -98,7 +98,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
     // Only process the first image
     const firstImage = imageFiles[0];
-    
+
     // Validate file size (5MB limit)
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     if (firstImage.size > MAX_FILE_SIZE) {
