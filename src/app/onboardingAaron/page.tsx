@@ -177,17 +177,6 @@ export default function OnboardingAaronPage() {
           </div>
         </div>
       </div>
-
-      <style jsx global>{`
-        @keyframes shimmer {
-          100% {
-            transform: translateX(100%);
-          }
-        }
-        .animate-shimmer {
-          animation: shimmer 1.5s infinite;
-        }
-      `}</style>
     </main>
   );
 }
