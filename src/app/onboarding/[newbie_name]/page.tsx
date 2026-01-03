@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import {
   User,
   GraduationCap,
@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-interface AaronData {
+interface OnboardingData {
   "first name": string;
   "last name": string;
   college: string;
@@ -20,9 +20,10 @@ interface AaronData {
   position: string;
 }
 
-export default function OnboardingAaronPage() {
+export default function OnboardingPage() {
   const router = useRouter();
-  const [data, setData] = useState<AaronData | null>(null);
+  const params = useParams();
+  const [data, setData] = useState<OnboardingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimated, setIsAnimated] = useState(false);
@@ -33,7 +34,29 @@ export default function OnboardingAaronPage() {
     const fetchData = async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_ENDPOINT || "";
-        const response = await fetch(`${baseUrl}/onboarding/aaron`);
+        const newbieName = params.newbie_name;
+        if (!newbieName) return;
+        if (newbieName !== "aaron") {
+          const mockData = {
+            "first name": String(newbieName),
+            "last name": "",
+            college: "UNKNOWN",
+            year: "UNKNOWN",
+            position: "UNKNOWN",
+          };
+
+          await new Promise(r => setTimeout(r, 500));
+
+          if (isMounted.current) {
+            setData(mockData);
+            setTimeout(() => setIsVisible(true), 100);
+            setTimeout(() => setIsAnimated(true), 1000);
+            setLoading(false);
+          }
+          return;
+        }
+
+        const response = await fetch(`${baseUrl}/onboarding/${newbieName}`);
 
         if (response.ok) {
           const result = await response.json();
@@ -64,7 +87,7 @@ export default function OnboardingAaronPage() {
     return () => {
       isMounted.current = false;
     };
-  }, []);
+  }, [params.newbie_name]);
 
   // Loading
   if (loading) {
