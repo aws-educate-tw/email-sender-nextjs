@@ -4,7 +4,7 @@ type OnboardingResponse = {
   onboarding_path: string;
 };
 
-const API_BASE_URL = "https://8so9m9wv6i.execute-api.us-west-2.amazonaws.com/local-dev/onboarding";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/onboarding`;
 
 async function fetchOnboarding(name: string): Promise<OnboardingResponse> {
   const response = await fetch(`${API_BASE_URL}/${name}`, {
