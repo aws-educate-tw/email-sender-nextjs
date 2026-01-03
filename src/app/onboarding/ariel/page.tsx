@@ -21,9 +21,10 @@ async function fetchOnboarding(name: string): Promise<OnboardingResponse> {
 export default async function Page({
   params,
 }: {
-  params: { newbie_name?: string; name?: string };
+  params: Promise<{ newbie_name?: string; name?: string }>;
 }) {
-  const resolvedName = params.newbie_name || params.name || "ariel";
+  const resolvedParams = await params;
+  const resolvedName = resolvedParams.newbie_name || resolvedParams.name || "ariel";
 
   let onboardingData: OnboardingResponse | null = null;
   let errorMessage: string | null = null;
