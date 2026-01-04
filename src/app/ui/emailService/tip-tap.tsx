@@ -7,7 +7,7 @@ import { Link } from "@tiptap/extension-link";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 import ImageResize from "tiptap-extension-resize-image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Bold,
@@ -63,6 +63,8 @@ interface TipTapProps {
 export default function TipTap({ onChange, content }: TipTapProps) {
   const [, setEditorContent] = useState(content);
   const [, setIsFocused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
 
@@ -72,8 +74,128 @@ export default function TipTap({ onChange, content }: TipTapProps) {
     return new Date().getTime() > parseInt(expiryTime);
   };
 
+  // Convert image file to base64 data URL
+  const convertImageToBase64 = async (file: File): Promise<string | null> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle image file (single image only)
+  const handleImageFiles = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const imageFiles = fileArray.filter(file => file.type.startsWith("image/"));
+
+    if (imageFiles.length === 0) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    if (!editor) return;
+
+    // Only process the first image
+    const firstImage = imageFiles[0];
+
+    // Validate file size (5MB limit)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (firstImage.size > MAX_FILE_SIZE) {
+      alert("Image file is too large. Please select an image smaller than 5MB.");
+      return;
+    }
+
+    try {
+      const base64Url = await convertImageToBase64(firstImage);
+      if (base64Url) {
+        editor.chain().focus().setImage({ src: base64Url }).run();
+      }
+    } catch (error) {
+      console.error("Failed to convert image:", error);
+      alert("Failed to process the image. Please try again with a different file.");
+    }
+  };
+
+  // Handle image file selection
+  const handleImageFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    await handleImageFiles(files);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Handle drag enter
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  // Handle drag leave
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only set to false if leaving the editor container
+    if (e.currentTarget === e.target) {
+      setIsDragging(false);
+    }
+  };
+
+  // Handle drag over
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  // Handle drop
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      await handleImageFiles(files);
+    }
+  };
+
+  // Handle paste event for images
+  const handlePaste = async (event: ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      if (item.type.startsWith("image/")) {
+        event.preventDefault();
+
+        const file = item.getAsFile();
+        if (!file) continue;
+
+        // Convert to base64 and insert
+        try {
+          const base64Url = await convertImageToBase64(file);
+          if (base64Url && editor) {
+            editor.chain().focus().setImage({ src: base64Url }).run();
+          }
+        } catch (error) {
+          console.error("Failed to convert image to base64:", error);
+          alert("Failed to process the pasted image. Please try again.");
+        }
+
+        break;
+      }
+    }
+  };
+
   useEffect(() => {
-    console.log("checkLoginStatus function called");
     const access_token = localStorage.getItem("access_token");
     if (!access_token || isTokenExpired()) {
       router.push("/login");
@@ -102,6 +224,21 @@ export default function TipTap({ onChange, content }: TipTapProps) {
       attributes: {
         class:
           "w-full h-[40vh] border border-gray-300 rounded-md p-4 font-sans text-sm overflow-auto bg-white focus:outline-none focus:ring-2 focus:ring-blue-500",
+      },
+      handlePaste: (view, event) => {
+        handlePaste(event);
+        return false; // Allow default paste behavior for non-image content
+      },
+      handleDrop: (view, event) => {
+        const files = event.dataTransfer?.files;
+        if (files && files.length > 0) {
+          const hasImages = Array.from(files).some(file => file.type.startsWith("image/"));
+          if (hasImages) {
+            // Let our custom drop handler handle it
+            return false;
+          }
+        }
+        return false;
       },
     },
     content: content,
@@ -163,10 +300,8 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         }
         break;
       case "image":
-        const imageUrl = window.prompt("Enter image URL");
-        if (imageUrl) {
-          editor.chain().focus().setImage({ src: imageUrl }).run();
-        }
+        // Trigger file input click
+        fileInputRef.current?.click();
         break;
       case "undo":
         editor.chain().focus().undo().run();
@@ -181,6 +316,15 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
   return (
     <>
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleImageFileSelect}
+      />
+
       <div className="flex-col">
         <div className="pb-4">
           {/* Toolbar */}
@@ -270,15 +414,35 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
           <div className="border border-sky-950 p-4 rounded-t-lg bg-sky-950 flex justify-between items-center">
             <span className="text-sm font-medium text-white">Template</span>
+            <span className="text-xs text-white/80">
+              💡 Tip: Press Enter between images for line breaks
+            </span>
           </div>
 
-          {/* Editor Content */}
-          <EditorContent
-            editor={editor}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            className="p-4 border border-gray-200 border-t-0 bg-gray-50 rounded-b-lg "
-          />
+          {/* Editor Content with Drag and Drop */}
+          <div
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            className="relative"
+          >
+            {isDragging && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-blue-50 bg-opacity-90 border-2 border-dashed border-blue-500 rounded-b-lg">
+                <div className="text-center">
+                  <ImageIcon size={48} className="mx-auto mb-2 text-blue-500" />
+                  <p className="text-lg font-semibold text-blue-700">Drop image here</p>
+                  <p className="text-sm text-blue-600">One image at a time</p>
+                </div>
+              </div>
+            )}
+            <EditorContent
+              editor={editor}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className="p-4 border border-gray-200 border-t-0 bg-gray-50 rounded-b-lg"
+            />
+          </div>
         </div>
       </div>
     </>
