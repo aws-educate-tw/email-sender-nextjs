@@ -3,8 +3,10 @@ type OnboardingResponse = {
   introduction: string;
 };
 
-const onboardingApiUrl =
-  "https://1ytzswuegc.execute-api.us-west-2.amazonaws.com/onboarding/vincent";
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_ENDPOINT ??
+  "https://1ytzswuegc.execute-api.us-west-2.amazonaws.com";
+const onboardingApiUrl = `${apiBaseUrl.replace(/\/$/, "")}/onboarding/vincent`;
 
 async function fetchOnboarding(): Promise<OnboardingResponse> {
   const response = await fetch(onboardingApiUrl, { cache: "no-store" });
