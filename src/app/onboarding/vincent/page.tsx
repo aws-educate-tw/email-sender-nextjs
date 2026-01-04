@@ -8,7 +8,7 @@ const apiBaseUrl =
 const onboardingApiUrl = `${apiBaseUrl.replace(/\/$/, "")}/onboarding/vincent`;
 
 async function fetchOnboarding(): Promise<OnboardingResponse> {
-  const response = await fetch(onboardingApiUrl, { cache: "no-store" });
+  const response = await fetch(onboardingApiUrl);
 
   if (!response.ok) {
     throw new Error(`Request failed: ${response.status} ${response.statusText}`);
