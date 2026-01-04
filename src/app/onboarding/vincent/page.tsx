@@ -4,8 +4,7 @@ type OnboardingResponse = {
 };
 
 const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_ENDPOINT ??
-  "https://1ytzswuegc.execute-api.us-west-2.amazonaws.com";
+  process.env.NEXT_PUBLIC_API_ENDPOINT ?? "https://1ytzswuegc.execute-api.us-west-2.amazonaws.com";
 const onboardingApiUrl = `${apiBaseUrl.replace(/\/$/, "")}/onboarding/vincent`;
 
 async function fetchOnboarding(): Promise<OnboardingResponse> {
