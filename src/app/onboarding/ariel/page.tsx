@@ -7,9 +7,7 @@ type OnboardingResponse = {
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/onboarding`;
 
 async function fetchOnboarding(name: string): Promise<OnboardingResponse> {
-  const response = await fetch(`${API_BASE_URL}/${name}`, {
-    cache: "no-store",
-  });
+  const response = await fetch(`${API_BASE_URL}/${name}`);
 
   if (!response.ok) {
     throw new Error(`Request failed: ${response.status} ${response.statusText}`);
@@ -35,10 +33,7 @@ export default async function Page({
     errorMessage = error instanceof Error ? error.message : "Unknown error.";
   }
 
-  const displayName =
-    onboardingData?.name && onboardingData.name !== "undefined"
-      ? onboardingData.name
-      : resolvedName;
+  const displayName = onboardingData?.name || resolvedName;
 
   const displayIntro = onboardingData?.introduction || "Reading...";
 
