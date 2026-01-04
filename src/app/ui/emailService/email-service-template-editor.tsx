@@ -52,6 +52,101 @@ export default function EmailServiceTemplateEditor({
     }
   };
 
+  // Upload base64 image to S3 and return the S3 URL
+  const uploadBase64ImageToS3 = async (base64Data: string): Promise<string | null> => {
+    try {
+      // Extract the data from base64 string
+      const matches = base64Data.match(/^data:([A-Za-z0-9-+/]+);base64,(.+)$/);
+      if (!matches || matches.length !== 3) {
+        throw new Error("Invalid base64 data");
+      }
+
+      const mimeType = matches[1];
+      const base64Content = matches[2];
+
+      // Convert base64 to blob
+      const byteCharacters = atob(base64Content);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType });
+
+      // Generate a unique filename with validated extension
+      const knownImageExtensions = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg"];
+      let extension = "png";
+      if (typeof mimeType === "string" && mimeType.includes("/")) {
+        const ext = mimeType.split("/")[1].toLowerCase();
+        if (knownImageExtensions.includes(ext)) {
+          extension = ext;
+        }
+      }
+
+      const safeTemplateName =
+        templateName && templateName.trim() ? templateName.trim() : "template";
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const fileName = `${safeTemplateName}_image_${timestamp}_${randomStr}.${extension}`;
+
+      // Upload to S3
+      const formData = new FormData();
+      formData.append("file", blob, fileName);
+
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const url = new URL(`${base_url}/upload-multiple-file`);
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result?.files?.[0]?.file_url || null;
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      return null;
+    }
+  };
+
+  // Process content and upload all base64 images to S3
+  const processImagesAndUpload = async (htmlContent: string): Promise<string> => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, "text/html");
+    const images = doc.querySelectorAll("img");
+
+    // Upload all base64 images
+    const uploadPromises: Promise<void>[] = [];
+
+    images.forEach(img => {
+      const src = img.getAttribute("src");
+      if (src && src.startsWith("data:")) {
+        // This is a base64 image, upload it
+        const uploadPromise = uploadBase64ImageToS3(src).then(s3Url => {
+          if (s3Url) {
+            img.setAttribute("src", s3Url);
+          } else {
+            // Log or collect failed upload, or throw error
+            throw new Error(`Failed to upload image: ${src.substring(0, 50)}...`);
+          }
+        });
+        uploadPromises.push(uploadPromise);
+      }
+    });
+
+    // Wait for all uploads to complete
+    await Promise.all(uploadPromises);
+
+    // Return the updated HTML
+    return doc.body.innerHTML;
+  };
+
   const handleUpload = async () => {
     if (!templateName || templateName.trim() === "") {
       console.error("Template name is required");
@@ -76,7 +171,23 @@ export default function EmailServiceTemplateEditor({
       );
     };
 
-    const formattedContent = preserveEmptyLines(content);
+    let formattedContent = preserveEmptyLines(content);
+
+    // Upload all base64 images to S3 and replace with S3 URLs
+    setIsUploading(true);
+    try {
+      formattedContent = await processImagesAndUpload(formattedContent);
+    } catch (error) {
+      console.error("Failed to process images:", error);
+      alert("Failed to upload images. Please try again.");
+      setSaveButtonState("error");
+      setTimeout(() => {
+        setSaveButtonState("idle");
+      }, 3000);
+      return;
+    } finally {
+      setIsUploading(false);
+    }
 
     const html = `
     <!DOCTYPE html>
@@ -97,7 +208,6 @@ export default function EmailServiceTemplateEditor({
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const url = new URL(`${base_url}/upload-multiple-file`);
-      setIsUploading(true);
       const response = await fetch(url.toString(), {
         method: "POST",
         headers: {
