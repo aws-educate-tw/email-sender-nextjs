@@ -9,9 +9,7 @@ async function fetchOnboarding(): Promise<OnboardingResponse> {
   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT || "https://api.tpet.aws-educate.tw/dev";
 
   try {
-    const response = await fetch(`${base_url}/onboarding/seren`, {
-      cache: "no-store",
-    });
+    const response = await fetch(`${base_url}/onboarding/seren`);
 
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status}`);

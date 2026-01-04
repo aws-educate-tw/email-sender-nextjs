@@ -227,7 +227,7 @@ export default function QuizClient({ initialData }: QuizClientProps) {
               ? "Perfect score! You really know me well! 🎉"
               : score >= 3
                 ? "Great job! You're getting to know me! 😊"
-                : "Thanks for taking the quiz! Let's connect more! 💭"}
+                : "Thanks for taking the quiz! Let&apos;s connect more! 💭"}
           </p>
           <p className="text-white">
             Thank you for taking the time to get to know me through this quiz! I&apos;m passionate
