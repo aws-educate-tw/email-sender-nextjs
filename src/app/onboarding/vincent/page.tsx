@@ -3,8 +3,7 @@ type OnboardingResponse = {
   introduction: string;
 };
 
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_ENDPOINT ?? "https://1ytzswuegc.execute-api.us-west-2.amazonaws.com";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_ENDPOINT ?? "";
 const onboardingApiUrl = `${apiBaseUrl.replace(/\/$/, "")}/onboarding/vincent`;
 
 async function fetchOnboarding(): Promise<OnboardingResponse> {
