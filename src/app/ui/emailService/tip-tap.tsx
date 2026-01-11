@@ -7,6 +7,10 @@ import { Link } from "@tiptap/extension-link";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 import ImageResize from "tiptap-extension-resize-image";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -24,6 +28,10 @@ import {
   Undo,
   Redo,
   Link as LinkIcon,
+  Table as TableIcon,
+  Trash2,
+  Columns,
+  Rows,
 } from "lucide-react";
 import cn from "classnames";
 import "./styles.scss";
@@ -219,6 +227,15 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         },
       }),
       ImageResize,
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: "tiptap-table",
+        },
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     editorProps: {
       attributes: {
@@ -308,6 +325,39 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         break;
       case "redo":
         editor.chain().focus().redo().run();
+        break;
+      case "insertTable":
+        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+        break;
+      case "deleteTable":
+        editor.chain().focus().deleteTable().run();
+        break;
+      case "addColumnBefore":
+        editor.chain().focus().addColumnBefore().run();
+        break;
+      case "addColumnAfter":
+        editor.chain().focus().addColumnAfter().run();
+        break;
+      case "deleteColumn":
+        editor.chain().focus().deleteColumn().run();
+        break;
+      case "addRowBefore":
+        editor.chain().focus().addRowBefore().run();
+        break;
+      case "addRowAfter":
+        editor.chain().focus().addRowAfter().run();
+        break;
+      case "deleteRow":
+        editor.chain().focus().deleteRow().run();
+        break;
+      case "toggleHeaderRow":
+        editor.chain().focus().toggleHeaderRow().run();
+        break;
+      case "mergeCells":
+        editor.chain().focus().mergeCells().run();
+        break;
+      case "splitCell":
+        editor.chain().focus().splitCell().run();
         break;
       default:
         break;
@@ -410,6 +460,62 @@ export default function TipTap({ onChange, content }: TipTapProps) {
               onClick={() => handleFormatAction("redo")}
               label="Redo"
             />
+            <div className="w-px h-6 bg-gray-400 mx-1" />
+            <ToolbarButton
+              icon={<TableIcon size={18} />}
+              onClick={() => handleFormatAction("insertTable")}
+              label="Insert table (3x3)"
+              isActive={editor?.isActive("table")}
+            />
+            {editor?.isActive("table") && (
+              <>
+                <ToolbarButton
+                  icon={
+                    <div className="flex items-center gap-0.5">
+                      <Columns size={16} />
+                      <span className="text-xs">+</span>
+                    </div>
+                  }
+                  onClick={() => handleFormatAction("addColumnAfter")}
+                  label="Add column after"
+                />
+                <ToolbarButton
+                  icon={
+                    <div className="flex items-center gap-0.5">
+                      <Columns size={16} />
+                      <span className="text-xs">-</span>
+                    </div>
+                  }
+                  onClick={() => handleFormatAction("deleteColumn")}
+                  label="Delete column"
+                />
+                <ToolbarButton
+                  icon={
+                    <div className="flex items-center gap-0.5">
+                      <Rows size={16} />
+                      <span className="text-xs">+</span>
+                    </div>
+                  }
+                  onClick={() => handleFormatAction("addRowAfter")}
+                  label="Add row after"
+                />
+                <ToolbarButton
+                  icon={
+                    <div className="flex items-center gap-0.5">
+                      <Rows size={16} />
+                      <span className="text-xs">-</span>
+                    </div>
+                  }
+                  onClick={() => handleFormatAction("deleteRow")}
+                  label="Delete row"
+                />
+                <ToolbarButton
+                  icon={<Trash2 size={18} className="text-red-600" />}
+                  onClick={() => handleFormatAction("deleteTable")}
+                  label="Delete table"
+                />
+              </>
+            )}
           </div>
 
           <div className="border border-sky-950 p-4 rounded-t-lg bg-sky-950 flex justify-between items-center">
