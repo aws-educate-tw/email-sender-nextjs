@@ -60,6 +60,55 @@ const ToolbarButton = ({
   </button>
 );
 
+// Table size selector component
+const TableSizeSelector = ({
+  onSelect,
+  onClose,
+}: {
+  onSelect: (rows: number, cols: number) => void;
+  onClose: () => void;
+}) => {
+  const [hoveredCell, setHoveredCell] = useState({ row: 0, col: 0 });
+  const maxRows = 10;
+  const maxCols = 10;
+
+  const handleCellHover = (row: number, col: number) => {
+    setHoveredCell({ row, col });
+  };
+
+  const handleCellClick = (row: number, col: number) => {
+    onSelect(row + 1, col + 1);
+    onClose();
+  };
+
+  return (
+    <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3 z-50">
+      <div className="text-xs text-gray-600 mb-2 text-center">
+        {hoveredCell.row + 1} × {hoveredCell.col + 1}
+      </div>
+      <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${maxCols}, 1fr)` }}>
+        {Array.from({ length: maxRows * maxCols }).map((_, index) => {
+          const row = Math.floor(index / maxCols);
+          const col = index % maxCols;
+          const isHighlighted = row <= hoveredCell.row && col <= hoveredCell.col;
+          return (
+            <div
+              key={index}
+              className={cn(
+                "w-5 h-5 border border-gray-300 cursor-pointer transition-colors",
+                isHighlighted ? "bg-blue-400" : "bg-white hover:bg-blue-200"
+              )}
+              onMouseEnter={() => handleCellHover(row, col)}
+              onClick={() => handleCellClick(row, col)}
+            />
+          );
+        })}
+      </div>
+      <div className="text-xs text-gray-500 mt-2 text-center">Select table size</div>
+    </div>
+  );
+};
+
 interface TipTapProps {
   onChange: (content: string) => void;
   content: string;
@@ -72,7 +121,9 @@ export default function TipTap({ onChange, content }: TipTapProps) {
   const [, setEditorContent] = useState(content);
   const [, setIsFocused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [showTableSelector, setShowTableSelector] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const tableSelectorRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
 
@@ -203,6 +254,22 @@ export default function TipTap({ onChange, content }: TipTapProps) {
     }
   };
 
+  // Close table selector when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (tableSelectorRef.current && !tableSelectorRef.current.contains(event.target as Node)) {
+        setShowTableSelector(false);
+      }
+    };
+
+    if (showTableSelector) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [showTableSelector]);
+
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
     if (!access_token || isTokenExpired()) {
@@ -326,9 +393,6 @@ export default function TipTap({ onChange, content }: TipTapProps) {
       case "redo":
         editor.chain().focus().redo().run();
         break;
-      case "insertTable":
-        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-        break;
       case "deleteTable":
         editor.chain().focus().deleteTable().run();
         break;
@@ -362,6 +426,11 @@ export default function TipTap({ onChange, content }: TipTapProps) {
       default:
         break;
     }
+  };
+
+  const handleInsertTable = (rows: number, cols: number) => {
+    if (!editor) return;
+    editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
   };
 
   return (
@@ -461,12 +530,20 @@ export default function TipTap({ onChange, content }: TipTapProps) {
               label="Redo"
             />
             <div className="w-px h-6 bg-gray-400 mx-1" />
-            <ToolbarButton
-              icon={<TableIcon size={18} />}
-              onClick={() => handleFormatAction("insertTable")}
-              label="Insert table (3x3)"
-              isActive={editor?.isActive("table")}
-            />
+            <div className="relative" ref={tableSelectorRef}>
+              <ToolbarButton
+                icon={<TableIcon size={18} />}
+                onClick={() => setShowTableSelector(!showTableSelector)}
+                label="Insert table"
+                isActive={editor?.isActive("table")}
+              />
+              {showTableSelector && (
+                <TableSizeSelector
+                  onSelect={handleInsertTable}
+                  onClose={() => setShowTableSelector(false)}
+                />
+              )}
+            </div>
             {editor?.isActive("table") && (
               <>
                 <ToolbarButton
