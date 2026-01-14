@@ -324,6 +324,44 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         }
         return false;
       },
+      handleKeyDown: (view, event) => {
+        // Handle keyboard shortcuts for table operations
+        if (!editor?.isActive("table")) return false;
+
+        const { state } = view;
+        const { selection } = state;
+        const { $from } = selection;
+
+        // Check if current cell is empty
+        const cellNode = $from.node($from.depth);
+        const isEmpty = cellNode && cellNode.content.size === 0;
+
+        // Cmd/Ctrl+Delete to delete row (works always)
+        if (
+          (event.metaKey || event.ctrlKey) &&
+          (event.key === "Backspace" || event.key === "Delete")
+        ) {
+          event.preventDefault();
+          editor.chain().focus().deleteRow().run();
+          return true;
+        }
+
+        // Shift+Delete to delete column (works always)
+        if (event.shiftKey && (event.key === "Backspace" || event.key === "Delete")) {
+          event.preventDefault();
+          editor.chain().focus().deleteColumn().run();
+          return true;
+        }
+
+        // Plain Delete/Backspace on empty cell deletes the row
+        if (isEmpty && (event.key === "Backspace" || event.key === "Delete")) {
+          event.preventDefault();
+          editor.chain().focus().deleteRow().run();
+          return true;
+        }
+
+        return false;
+      },
     },
     content: content,
     onUpdate: ({ editor }) => {
@@ -430,7 +468,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
   const handleInsertTable = (rows: number, cols: number) => {
     if (!editor) return;
-    editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
+    editor.chain().focus().insertTable({ rows, cols, withHeaderRow: false }).run();
   };
 
   return (
@@ -585,6 +623,18 @@ export default function TipTap({ onChange, content }: TipTapProps) {
                   }
                   onClick={() => handleFormatAction("deleteRow")}
                   label="Delete row"
+                />
+                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <ToolbarButton
+                  icon={
+                    <div className="flex flex-col items-center">
+                      <Rows size={14} />
+                      <span className="text-[8px] leading-none">H</span>
+                    </div>
+                  }
+                  onClick={() => handleFormatAction("toggleHeaderRow")}
+                  label="Toggle header row"
+                  isActive={editor?.isActive("tableHeader")}
                 />
                 <ToolbarButton
                   icon={<Trash2 size={18} className="text-red-600" />}
