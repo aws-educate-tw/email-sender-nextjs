@@ -298,11 +298,27 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         resizable: true,
         HTMLAttributes: {
           class: "tiptap-table",
+          style:
+            "border-collapse: collapse; margin: 0; overflow: hidden; table-layout: fixed; width: 100%;",
         },
       }),
-      TableRow,
-      TableHeader,
-      TableCell,
+      TableRow.configure({
+        HTMLAttributes: {
+          style: "",
+        },
+      }),
+      TableHeader.configure({
+        HTMLAttributes: {
+          style:
+            "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top; background-color: #f1f3f5; font-weight: bold; text-align: left;",
+        },
+      }),
+      TableCell.configure({
+        HTMLAttributes: {
+          style:
+            "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
+        },
+      }),
     ],
     editorProps: {
       attributes: {
