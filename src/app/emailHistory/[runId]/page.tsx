@@ -373,9 +373,10 @@ export default function Page({ params }: PageProps) {
           <button
             onClick={handleExportClick}
             disabled={selectedEmailNum === 0 || isLoading}
+            title={selectedEmailNum === 0 ? "Please select at least one item to export." : ""}
             className={`flex items-center gap-2 px-4 h-10 text-sm font-medium rounded-md ${
               selectedEmailNum === 0 || isLoading
-                ? "cursor-not-allowed text-gray-400 bg-gray-100 border border-gray-300"
+                ? "text-gray-400 bg-gray-100 border border-gray-300"
                 : "text-white bg-sky-950 hover:bg-sky-800 border border-transparent"
             }`}
           >
