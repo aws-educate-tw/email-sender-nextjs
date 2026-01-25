@@ -3,8 +3,10 @@ import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
 import EmailTotalSummary from "@/app/ui/email-total-summary";
-import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import ExportConfirmationModal from "@/app/ui/export-confirmation-modal";
+import { ChevronDown, ChevronUp, Search, Download } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import * as XLSX from "xlsx";
 
 interface PageProps {
   params: {
@@ -107,6 +109,7 @@ export default function Page({ params }: PageProps) {
   const [selectedEmailNum, setSelectedEmailNum] = useState(0);
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const [sorting, setSorting] = useState<any[]>([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const [runSummary, setRunSummary] = useState({
     totalEmailNum: 0,
@@ -268,6 +271,46 @@ export default function Page({ params }: PageProps) {
     setSelectedEmailNum(count);
   }, []);
 
+  const handleExportClick = useCallback(() => {
+    if (selectedEmailNum === 0) {
+      alert("Please select at least one row to export");
+      return;
+    }
+    setIsExportModalOpen(true);
+  }, [selectedEmailNum]);
+
+  const handleExportConfirm = useCallback(() => {
+    // Get selected email data
+    const selectedEmailIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
+    const selectedEmailData = allEmails.filter(email => selectedEmailIds.includes(email.email_id));
+
+    // Prepare data for export - only export columns shown in the table
+    const exportData = selectedEmailData.map(email => ({
+      Email: email.recipient_email,
+      BCC: email.bcc && email.bcc.length > 0 ? email.bcc.join(", ") : "-",
+      CC: email.cc && email.cc.length > 0 ? email.cc.join(", ") : "-",
+      Status: email.status,
+      "Sent At": email.sent_at ? new Date(email.sent_at).toLocaleString() : "-",
+    }));
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+    // Create workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Email History");
+
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+    const filename = `email-history-${params.runId}-${timestamp}.xlsx`;
+
+    // Download file
+    XLSX.writeFile(workbook, filename);
+
+    // Close modal
+    setIsExportModalOpen(false);
+  }, [selectedRows, allEmails, params.runId]);
+
   return (
     <>
       <div className="flex flex-col justify-center items-start">
@@ -295,7 +338,7 @@ export default function Page({ params }: PageProps) {
       </div>
 
       <div className="flex flex-col border rounded-md shadow-md bg-white w-full mx-auto mb-6">
-        <div className="flex justify-between py-6 px-4">
+        <div className="flex justify-between items-center py-4 px-4 gap-4">
           {/* Selected recipients */}
           <div className="flex-grow">
             <EmailTotalSummary
@@ -309,14 +352,14 @@ export default function Page({ params }: PageProps) {
           </div>
           {/* Search input */}
           <div
-            className={`flex rounded-md border border-gray-300 shadow shadow-sm w-full max-w-52
+            className={`flex items-center rounded-md border border-gray-300 shadow shadow-sm w-full max-w-60 h-10
               ${isLoading ? "bg-gray-100" : ""}`}
           >
             <div className="flex items-center pl-3">
               <Search className={`h-4 w-4 ${isLoading ? "text-gray-300" : "text-gray-400"}`} />
             </div>
             <input
-              className={`rounded-md border-transparent shadow-sm w-full
+              className={`rounded-md border-transparent shadow-sm w-full h-full
                 focus:border-transparent focus:ring-transparent
                 disabled:cursor-wait disabled:bg-gray-100 disabled:placeholder-gray-300`}
               placeholder="Search recipients..."
@@ -326,6 +369,20 @@ export default function Page({ params }: PageProps) {
               onChange={e => setGlobalFilter(e.target.value)}
             />
           </div>
+          {/* Export button */}
+          <button
+            onClick={handleExportClick}
+            disabled={selectedEmailNum === 0 || isLoading}
+            title={selectedEmailNum === 0 ? "Please select at least one item to export." : ""}
+            className={`flex items-center gap-2 px-4 h-10 text-sm font-medium rounded-md ${
+              selectedEmailNum === 0 || isLoading
+                ? "text-gray-400 bg-gray-100 border border-gray-300"
+                : "text-white bg-sky-950 hover:bg-sky-800 border border-transparent"
+            }`}
+          >
+            <Download size={16} />
+            Export
+          </button>
         </div>
 
         <div className="">
@@ -348,6 +405,14 @@ export default function Page({ params }: PageProps) {
           )}
         </div>
       </div>
+
+      {/* Export Confirmation Modal */}
+      <ExportConfirmationModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onConfirm={handleExportConfirm}
+        selectedCount={selectedEmailNum}
+      />
     </>
   );
 }

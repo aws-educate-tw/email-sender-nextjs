@@ -98,7 +98,7 @@ export default function EmailDetailsTable({
                   onRowSelectionChange?.(newSelection);
                 }
               }}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 text-sky-950 focus:ring-sky-800"
             />
           );
         },
@@ -107,7 +107,7 @@ export default function EmailDetailsTable({
             type="checkbox"
             checked={row.getIsSelected()}
             onChange={row.getToggleSelectedHandler()}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="rounded border-gray-300 text-sky-950 focus:ring-sky-800"
           />
         ),
       },
@@ -273,7 +273,7 @@ export default function EmailDetailsTable({
           <select
             value={selectedStatus ?? ""}
             onChange={e => onStatusChange(e.target.value || null)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
           >
             <option value="">All Status</option>
             <option value="SUCCESS">Success</option>
@@ -288,7 +288,7 @@ export default function EmailDetailsTable({
           <select
             value={table.getState().pagination.pageSize}
             onChange={e => table.setPageSize(Number(e.target.value))}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
           >
             {[10, 20, 30, 50, 100].map(pageSize => (
               <option key={pageSize} value={pageSize}>
@@ -362,7 +362,7 @@ export default function EmailDetailsTable({
             </span>
           </div>
           {selectedEmailNum > 0 && (
-            <div className="text-sm text-blue-600 font-medium">
+            <div className="text-sm text-sky-950 font-medium">
               {selectedEmailNum} selected (from all {data.length} emails)
             </div>
           )}
@@ -405,7 +405,7 @@ export default function EmailDetailsTable({
                   onClick={() => table.setPageIndex(pageNumber - 1)}
                   className={`px-3 py-2 text-sm font-medium rounded-md ${
                     isCurrentPage
-                      ? "bg-blue-600 text-white"
+                      ? "bg-sky-950 text-white hover:bg-sky-800"
                       : "text-gray-700 bg-white hover:bg-gray-50 border border-gray-300"
                   }`}
                 >
