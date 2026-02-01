@@ -33,7 +33,7 @@ Select the type(s) of changes made (you can select multiple):
 
 <!--
 List related issue numbers or links:
-Example: Closes SCRUM-123, Relates to SCRUM-456
+Example: Closes SCRUM-xxx, Relates to SCRUM-xxx
 -->
 
 ## Testing
