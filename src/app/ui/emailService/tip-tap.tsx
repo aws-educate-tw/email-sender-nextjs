@@ -297,7 +297,6 @@ export default function TipTap({ onChange, content }: TipTapProps) {
       Table.configure({
         resizable: true,
         HTMLAttributes: {
-          class: "tiptap-table",
           style:
             "border-collapse: collapse; margin: 0; overflow: hidden; table-layout: fixed; width: 100%;",
         },
@@ -307,16 +306,60 @@ export default function TipTap({ onChange, content }: TipTapProps) {
           style: "",
         },
       }),
-      TableHeader.configure({
-        HTMLAttributes: {
-          style:
-            "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top; background-color: #f1f3f5; font-weight: bold; text-align: left;",
+      TableHeader.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            colwidth: {
+              default: null,
+              parseHTML: element => {
+                const colwidth = element.getAttribute('colwidth');
+                const value = colwidth ? colwidth.split(',').map(width => parseInt(width, 10)) : null;
+                return value;
+              },
+              renderHTML: attributes => {
+                if (!attributes.colwidth) {
+                  return {};
+                }
+                return {
+                  colwidth: attributes.colwidth.join(','),
+                  style: `width: ${attributes.colwidth[0]}px; border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top; background-color: #f1f3f5; font-weight: bold; text-align: left;`,
+                };
+              },
+            },
+            style: {
+              default: "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top; background-color: #f1f3f5; font-weight: bold; text-align: left;",
+            },
+          };
         },
       }),
-      TableCell.configure({
-        HTMLAttributes: {
-          style:
-            "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
+      TableCell.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            colwidth: {
+              default: null,
+              parseHTML: element => {
+                const colwidth = element.getAttribute('colwidth');
+                const value = colwidth ? colwidth.split(',').map(width => parseInt(width, 10)) : null;
+                return value;
+              },
+              renderHTML: attributes => {
+                if (!attributes.colwidth) {
+                  return {
+                    style: "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
+                  };
+                }
+                return {
+                  colwidth: attributes.colwidth.join(','),
+                  style: `width: ${attributes.colwidth[0]}px; border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;`,
+                };
+              },
+            },
+            style: {
+              default: "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
+            },
+          };
         },
       }),
     ],
