@@ -307,14 +307,17 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         },
       }),
       TableHeader.extend({
+        content: "block+",
         addAttributes() {
           return {
             ...this.parent?.(),
             colwidth: {
               default: null,
               parseHTML: element => {
-                const colwidth = element.getAttribute('colwidth');
-                const value = colwidth ? colwidth.split(',').map(width => parseInt(width, 10)) : null;
+                const colwidth = element.getAttribute("colwidth");
+                const value = colwidth
+                  ? colwidth.split(",").map(width => parseInt(width, 10))
+                  : null;
                 return value;
               },
               renderHTML: attributes => {
@@ -322,42 +325,48 @@ export default function TipTap({ onChange, content }: TipTapProps) {
                   return {};
                 }
                 return {
-                  colwidth: attributes.colwidth.join(','),
+                  colwidth: attributes.colwidth.join(","),
                   style: `width: ${attributes.colwidth[0]}px; border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top; background-color: #f1f3f5; font-weight: bold; text-align: left;`,
                 };
               },
             },
             style: {
-              default: "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top; background-color: #f1f3f5; font-weight: bold; text-align: left;",
+              default:
+                "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top; background-color: #f1f3f5; font-weight: bold; text-align: left;",
             },
           };
         },
       }),
       TableCell.extend({
+        content: "block+",
         addAttributes() {
           return {
             ...this.parent?.(),
             colwidth: {
               default: null,
               parseHTML: element => {
-                const colwidth = element.getAttribute('colwidth');
-                const value = colwidth ? colwidth.split(',').map(width => parseInt(width, 10)) : null;
+                const colwidth = element.getAttribute("colwidth");
+                const value = colwidth
+                  ? colwidth.split(",").map(width => parseInt(width, 10))
+                  : null;
                 return value;
               },
               renderHTML: attributes => {
                 if (!attributes.colwidth) {
                   return {
-                    style: "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
+                    style:
+                      "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
                   };
                 }
                 return {
-                  colwidth: attributes.colwidth.join(','),
+                  colwidth: attributes.colwidth.join(","),
                   style: `width: ${attributes.colwidth[0]}px; border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;`,
                 };
               },
             },
             style: {
-              default: "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
+              default:
+                "border: 2px solid #ced4da; box-sizing: border-box; min-width: 1em; padding: 3px 5px; position: relative; vertical-align: top;",
             },
           };
         },
@@ -527,6 +536,14 @@ export default function TipTap({ onChange, content }: TipTapProps) {
 
   const handleInsertTable = (rows: number, cols: number) => {
     if (!editor) return;
+
+    // 檢查光標是否在表格內
+    if (editor.isActive("table")) {
+      alert("Cannot insert table inside another table");
+      setShowTableSelector(false);
+      return;
+    }
+
     editor.chain().focus().insertTable({ rows, cols, withHeaderRow: false }).run();
   };
 
@@ -628,13 +645,31 @@ export default function TipTap({ onChange, content }: TipTapProps) {
             />
             <div className="w-px h-6 bg-gray-400 mx-1" />
             <div className="relative" ref={tableSelectorRef}>
-              <ToolbarButton
-                icon={<TableIcon size={18} />}
-                onClick={() => setShowTableSelector(!showTableSelector)}
-                label="Insert table"
-                isActive={editor?.isActive("table")}
-              />
-              {showTableSelector && (
+              <button
+                className={cn(
+                  "p-2 mx-1 rounded transition-colors",
+                  editor?.isActive("table")
+                    ? "bg-gray-300 cursor-not-allowed opacity-50"
+                    : "hover:bg-gray-100"
+                )}
+                onClick={() => {
+                  if (editor?.isActive("table")) {
+                    alert("Cannot insert table inside another table");
+                    return;
+                  }
+                  setShowTableSelector(!showTableSelector);
+                }}
+                title={
+                  editor?.isActive("table")
+                    ? "Cannot insert table inside another table"
+                    : "Insert table"
+                }
+                aria-label="Insert table"
+                disabled={editor?.isActive("table")}
+              >
+                <TableIcon size={18} />
+              </button>
+              {showTableSelector && !editor?.isActive("table") && (
                 <TableSizeSelector
                   onSelect={handleInsertTable}
                   onClose={() => setShowTableSelector(false)}
