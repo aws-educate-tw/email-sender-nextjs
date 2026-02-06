@@ -287,7 +287,7 @@ export default function Page({ params }: PageProps) {
 
     // Prepare data for export - only export columns shown in the table
     const exportData = selectedEmailData.map(email => ({
-      RecipientName: email.recipient_name && email.recipient_name.length > 0 ? email.cc.join(", ") : "-",
+      RecipientName: email.recipient_name,
       Email: email.recipient_email,
       BCC: email.bcc && email.bcc.length > 0 ? email.bcc.join(", ") : "-",
       CC: email.cc && email.cc.length > 0 ? email.cc.join(", ") : "-",

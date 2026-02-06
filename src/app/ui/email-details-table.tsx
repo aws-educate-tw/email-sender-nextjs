@@ -114,7 +114,10 @@ export default function EmailDetailsTable({
       },
       columnHelper.accessor("recipient_name", {
         header: "Recipient Name",
-        cell: info => info.getValue(),
+        cell: info => {
+          const name = info.getValue();
+          return name && name.trim() !== "" ? name : "-";
+        },
         filterFn: "includesString",
         enableSorting: true,
       }),
