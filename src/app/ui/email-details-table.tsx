@@ -20,6 +20,7 @@ interface DataType {
   cc: string[];
   run_id: string;
   created_at: string;
+  recipient_name: string;
   recipient_email: string;
   sender_local_part: string;
   status: string;
@@ -111,6 +112,12 @@ export default function EmailDetailsTable({
           />
         ),
       },
+      columnHelper.accessor("recipient_name", {
+        header: "Recipient Name",
+        cell: info => info.getValue(),
+        filterFn: "includesString",
+        enableSorting: true,
+      }),
       columnHelper.accessor("recipient_email", {
         header: "Recipient Email",
         cell: info => info.getValue(),
