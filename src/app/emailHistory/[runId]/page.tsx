@@ -24,6 +24,7 @@ interface EmailSummaryDataType {
   cc: string[];
   run_id: string;
   created_at: string;
+  recipient_name: string;
   recipient_email: string;
   sender_local_part: string;
   status: string;
@@ -286,6 +287,7 @@ export default function Page({ params }: PageProps) {
 
     // Prepare data for export - only export columns shown in the table
     const exportData = selectedEmailData.map(email => ({
+      RecipientName: email.recipient_name,
       Email: email.recipient_email,
       BCC: email.bcc && email.bcc.length > 0 ? email.bcc.join(", ") : "-",
       CC: email.cc && email.cc.length > 0 ? email.cc.join(", ") : "-",
