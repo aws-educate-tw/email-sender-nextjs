@@ -22,7 +22,7 @@ export default function Modal({ title, isOpen, onClose, children }: ModalProps) 
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="overflow-y-auto max-h-[75vh] p-4 bg-gray-100">{children}</div>
+        <div className="overflow-y-auto max-h-[75vh] px-6 py-4 bg-gray-100">{children}</div>
       </div>
     </div>
   );

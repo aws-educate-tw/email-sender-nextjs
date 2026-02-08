@@ -32,8 +32,10 @@ import {
   Trash2,
   Columns,
   Rows,
+  CalendarCheck,
 } from "lucide-react";
 import cn from "classnames";
+import InsertButtonDialog from "@/app/ui/emailService/insert-button-dialog";
 import "./styles.scss";
 
 const ToolbarButton = ({
@@ -122,6 +124,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
   const [, setIsFocused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [showTableSelector, setShowTableSelector] = useState(false);
+  const [showInsertButtonDialog, setShowInsertButtonDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tableSelectorRef = useRef<HTMLDivElement>(null);
 
@@ -558,6 +561,18 @@ export default function TipTap({ onChange, content }: TipTapProps) {
         onChange={handleImageFileSelect}
       />
 
+      {/* Insert Button Dialog */}
+      <InsertButtonDialog
+        isOpen={showInsertButtonDialog}
+        onClose={() => setShowInsertButtonDialog(false)}
+        onInsert={(buttonHtml) => {
+          if (editor) {
+            editor.chain().focus().insertContent(buttonHtml).run();
+          }
+          setShowInsertButtonDialog(false);
+        }}
+      />
+
       <div className="flex-col">
         <div className="pb-4">
           {/* Toolbar */}
@@ -737,6 +752,11 @@ export default function TipTap({ onChange, content }: TipTapProps) {
                 />
               </>
             )}
+            <ToolbarButton
+              icon={<CalendarCheck size={18} />}
+              onClick={() => setShowInsertButtonDialog(true)}
+              label="Insert Button"
+            />
           </div>
 
           <div className="border border-sky-950 p-4 rounded-t-lg bg-sky-950 flex justify-between items-center">
