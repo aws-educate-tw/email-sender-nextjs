@@ -26,11 +26,33 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   const [deadline, setDeadline] = useState("");
   const [deadlineTime, setDeadlineTime] = useState("");
 
+  const getValidationError = () => {
+    if (actionType !== "campaign") return null;
+    if (
+      !campaignStartDate ||
+      !campaignStartTime ||
+      !campaignEndDate ||
+      !campaignEndTime ||
+      !deadline ||
+      !deadlineTime
+    )
+      return null;
+
+    const start = new Date(`${campaignStartDate}T${campaignStartTime}`);
+    const end = new Date(`${campaignEndDate}T${campaignEndTime}`);
+    const deadlineDate = new Date(`${deadline}T${deadlineTime}`);
+
+    if (start >= end) return "Campaign start time must be before end time";
+    if (deadlineDate > start) return "Deadline must be before or equal to campaign start time";
+
+    return null;
+  };
+
   const isValid = () => {
     if (!actionType || !buttonText) return false;
     if (actionType === "external" && !buttonUrl) return false;
     if (actionType === "campaign") {
-      return !!(
+      const hasAllFields = !!(
         campaignName &&
         campaignStartDate &&
         campaignStartTime &&
@@ -40,6 +62,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
         deadline &&
         deadlineTime
       );
+      return hasAllFields && !getValidationError();
     }
     return true;
   };
@@ -151,6 +174,11 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
 
               <div>
                 <label className="block text-sm font-medium mb-2">Campaign time</label>
+                {getValidationError() && (
+                  <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+                    {getValidationError()}
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">Start</label>
