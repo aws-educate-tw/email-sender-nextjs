@@ -50,6 +50,16 @@ export default function AttendancePreview({
           <p>回覆期限：{formatDateTime(deadline, deadlineTime)}</p>
         </div>
 
+        <p className="mb-2 font-medium text-black">
+          姓名：{"{"}
+          {"{"}Name{"}"}
+          {"}"}
+        </p>
+        <p className="mb-6 font-medium text-black">
+          信箱：{"{"}
+          {"{"}Email{"}"}
+          {"}"}
+        </p>
         <p className="mb-6 font-medium">您是否會準時出席此次活動：</p>
 
         <div className="space-y-4 max-w-2xl mx-auto">
