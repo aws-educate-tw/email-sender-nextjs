@@ -20,6 +20,7 @@ export default function RsvpConfirmationForm({ token, testMode }: RsvpConfirmati
   const [isExpired, setIsExpired] = useState(false);
   const [lastEditedTime, setLastEditedTime] = useState<string | null>(null);
   const [participantName] = useState('王小明');
+  const [participantEmail] = useState('test@example.com');
   const [eventName] = useState('AWS Cloud Workshop');
   const [eventTime] = useState('2026-03-01 09:00 - 2026-03-01 17:00');
   const [location] = useState('Taipei 101');
@@ -128,8 +129,14 @@ export default function RsvpConfirmationForm({ token, testMode }: RsvpConfirmati
           </div>
         )}
 
+        <p className="mb-2 font-medium text-black text-sm sm:text-base">
+          姓名：{participantName}
+        </p>
+        <p className="mb-6 font-medium text-black text-sm sm:text-base">
+          信箱：{participantEmail}
+        </p>
         <p className="mb-6 font-medium text-sm sm:text-base">
-          {participantName} 您好，您是否會準時出席此次活動：
+          您是否會準時出席此次活動：
         </p>
 
         <RsvpRadioGroup
