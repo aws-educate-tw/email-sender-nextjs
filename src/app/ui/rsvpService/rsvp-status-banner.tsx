@@ -15,7 +15,7 @@ export default function RsvpStatusBanner({
   lastEditedTime,
   isExpired,
 }: RsvpStatusBannerProps) {
-  // 已過期且已回覆：顯示紅色橫幅
+  // Expired and submitted: Show red banner
   if (isExpired && type === "submitted" && status) {
     return (
       <div className="bg-[#e74c3c] text-white rounded-full p-4 text-center">
@@ -31,7 +31,7 @@ export default function RsvpStatusBanner({
     );
   }
 
-  // 已過期未回覆：顯示紅色橫幅
+  // Expired and not submitted: Show red banner
   if (type === "expired") {
     return (
       <div className="bg-[#e74c3c] text-white rounded-full p-4 text-center">
@@ -46,7 +46,7 @@ export default function RsvpStatusBanner({
     );
   }
 
-  // 已提交未過期：顯示橘色橫幅
+  // Submitted and not expired: Show orange banner
   return (
     <div className="bg-[#f39c12] text-white rounded-full p-4 text-center">
       <Info size={20} className="inline align-middle mr-2" />

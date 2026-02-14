@@ -10,7 +10,7 @@ export const MOCK_RSVP_DATA = {
     name: "AWS Cloud Workshop",
     startTime: "2026-03-01 09:00",
     endTime: "2026-03-01 17:00",
-    location: "Taipei 101",
+    location: "AWS Taipei",
     deadline: "2026-02-20 23:59",
   },
   // Mock response for different test scenarios
