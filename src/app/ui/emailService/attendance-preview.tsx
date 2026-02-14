@@ -30,7 +30,9 @@ export default function AttendancePreview({
     <div className="border rounded-lg overflow-hidden bg-white">
       <header className="bg-[#2c3e50] text-white p-4 text-center">
         <span className="font-bold">aws</span>{" "}
-        <span className="font-bold" style={{ color: "#EA9D3A" }}>educate</span>
+        <span className="font-bold" style={{ color: "#EA9D3A" }}>
+          educate
+        </span>
       </header>
 
       <main className="p-8 text-center">

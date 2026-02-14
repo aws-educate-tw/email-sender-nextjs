@@ -13,11 +13,7 @@ interface InsertButtonDialogProps {
 
 type ActionType = "campaign" | "external" | null;
 
-export default function InsertButtonDialog({
-  isOpen,
-  onClose,
-  onInsert,
-}: InsertButtonDialogProps) {
+export default function InsertButtonDialog({ isOpen, onClose, onInsert }: InsertButtonDialogProps) {
   const [actionType, setActionType] = useState<ActionType>(null);
   const [buttonText, setButtonText] = useState("");
   const [buttonUrl, setButtonUrl] = useState("");
@@ -132,7 +128,7 @@ export default function InsertButtonDialog({
                   type="text"
                   placeholder="e.g. 點此回覆出席意願"
                   value={buttonText}
-                  onChange={(e) => setButtonText(e.target.value)}
+                  onChange={e => setButtonText(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -148,7 +144,7 @@ export default function InsertButtonDialog({
                   type="text"
                   placeholder="Enter campaign name"
                   value={campaignName}
-                  onChange={(e) => setCampaignName(e.target.value)}
+                  onChange={e => setCampaignName(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -162,13 +158,13 @@ export default function InsertButtonDialog({
                       <input
                         type="date"
                         value={campaignStartDate}
-                        onChange={(e) => setCampaignStartDate(e.target.value)}
+                        onChange={e => setCampaignStartDate(e.target.value)}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <input
                         type="time"
                         value={campaignStartTime}
-                        onChange={(e) => setCampaignStartTime(e.target.value)}
+                        onChange={e => setCampaignStartTime(e.target.value)}
                         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -179,13 +175,13 @@ export default function InsertButtonDialog({
                       <input
                         type="date"
                         value={campaignEndDate}
-                        onChange={(e) => setCampaignEndDate(e.target.value)}
+                        onChange={e => setCampaignEndDate(e.target.value)}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <input
                         type="time"
                         value={campaignEndTime}
-                        onChange={(e) => setCampaignEndTime(e.target.value)}
+                        onChange={e => setCampaignEndTime(e.target.value)}
                         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -199,7 +195,7 @@ export default function InsertButtonDialog({
                   type="text"
                   placeholder="Enter campaign location"
                   value={campaignPlace}
-                  onChange={(e) => setCampaignPlace(e.target.value)}
+                  onChange={e => setCampaignPlace(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -212,13 +208,13 @@ export default function InsertButtonDialog({
                   <input
                     type="date"
                     value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
+                    onChange={e => setDeadline(e.target.value)}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="time"
                     value={deadlineTime}
-                    onChange={(e) => setDeadlineTime(e.target.value)}
+                    onChange={e => setDeadlineTime(e.target.value)}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -260,7 +256,7 @@ export default function InsertButtonDialog({
                 type="text"
                 placeholder="e.g. Visit our website"
                 value={buttonText}
-                onChange={(e) => setButtonText(e.target.value)}
+                onChange={e => setButtonText(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -278,7 +274,7 @@ export default function InsertButtonDialog({
                 type="url"
                 placeholder="https://example.com"
                 value={buttonUrl}
-                onChange={(e) => setButtonUrl(e.target.value)}
+                onChange={e => setButtonUrl(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

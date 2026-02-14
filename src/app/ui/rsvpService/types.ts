@@ -1,4 +1,4 @@
-export type RsvpStatus = 'PENDING' | 'ATTEND' | 'NOT_ATTEND';
+export type RsvpStatus = "PENDING" | "ATTEND" | "NOT_ATTEND";
 
 export interface RsvpToken {
   run_id: string;
@@ -20,11 +20,11 @@ export interface RsvpPageState {
   lastEditedTime?: number;
   isEditing: boolean;
   isSubmitting: boolean;
-  selectedOption: 'ATTEND' | 'NOT_ATTEND' | null;
+  selectedOption: "ATTEND" | "NOT_ATTEND" | null;
 }
 
 export interface RsvpApiResponse {
-  status: 'success' | 'error';
+  status: "success" | "error";
   data?: {
     currentStatus: RsvpStatus;
     participantName: string;

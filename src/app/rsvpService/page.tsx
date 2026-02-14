@@ -7,7 +7,7 @@ import RsvpConfirmationForm from "@/app/ui/rsvpService/rsvp-confirmation-form";
 function RsvpPageContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  const testMode = searchParams.get("test");
+  const testMode = searchParams.get("mode");
 
   if (!token) {
     return (

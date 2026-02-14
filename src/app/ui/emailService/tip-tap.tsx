@@ -565,7 +565,7 @@ export default function TipTap({ onChange, content }: TipTapProps) {
       <InsertButtonDialog
         isOpen={showInsertButtonDialog}
         onClose={() => setShowInsertButtonDialog(false)}
-        onInsert={(buttonHtml) => {
+        onInsert={buttonHtml => {
           if (editor) {
             editor.chain().focus().insertContent(buttonHtml).run();
           }

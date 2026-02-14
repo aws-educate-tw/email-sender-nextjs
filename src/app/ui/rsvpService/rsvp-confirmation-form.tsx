@@ -6,6 +6,7 @@ import RsvpStatusBanner from "./rsvp-status-banner";
 import RsvpRadioGroup from "./rsvp-radio-group";
 import RsvpSubmitButton from "./rsvp-submit-button";
 import type { RsvpStatus } from "./types";
+import { MOCK_RSVP_DATA } from "./mock-data";
 
 interface RsvpConfirmationFormProps {
   token: string;
@@ -13,48 +14,61 @@ interface RsvpConfirmationFormProps {
 }
 
 export default function RsvpConfirmationForm({ token, testMode }: RsvpConfirmationFormProps) {
-  const [currentStatus, setCurrentStatus] = useState<RsvpStatus>('PENDING');
-  const [selectedOption, setSelectedOption] = useState<'ATTEND' | 'NOT_ATTEND' | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<RsvpStatus>("PENDING");
+  const [selectedOption, setSelectedOption] = useState<"ATTEND" | "NOT_ATTEND" | null>(null);
   const [isEditing, setIsEditing] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [lastEditedTime, setLastEditedTime] = useState<string | null>(null);
-  const [participantName] = useState('王小明');
-  const [participantEmail] = useState('test@example.com');
-  const [eventName] = useState('AWS Cloud Workshop');
-  const [eventTime] = useState('2026-03-01 09:00 - 2026-03-01 17:00');
-  const [location] = useState('Taipei 101');
-  const [deadline] = useState('2026-02-20 23:59');
+  const [participantName] = useState(MOCK_RSVP_DATA.participant.name);
+  const [participantEmail] = useState(MOCK_RSVP_DATA.participant.email);
+  const [eventName] = useState(MOCK_RSVP_DATA.event.name);
+  const [eventTime] = useState(
+    `${MOCK_RSVP_DATA.event.startTime} - ${MOCK_RSVP_DATA.event.endTime}`
+  );
+  const [location] = useState(MOCK_RSVP_DATA.event.location);
+  const [deadline] = useState(MOCK_RSVP_DATA.event.deadline);
 
   useEffect(() => {
-    // Test mode: simulate different states via URL parameter
-    if (testMode === 'expired') {
+    // TODO: Replace with actual API call to fetch RSVP status
+    // const fetchRsvpStatus = async () => {
+    //   const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/rsvp`, {
+    //     method: 'GET',
+    //     headers: { 'Authorization': `Bearer ${token}` },
+    //   });
+    //   const data = await response.json();
+    //   // Update state based on response
+    // };
+    // fetchRsvpStatus();
+
+    // Mock: Simulate different states via URL parameter for testing
+    if (testMode === "expired-pending") {
       setIsExpired(true);
       setIsEditing(false);
-    } else if (testMode === 'attend') {
-      setCurrentStatus('ATTEND');
-      setSelectedOption('ATTEND');
+    } else if (testMode === "submitted-attend") {
+      const mockData = MOCK_RSVP_DATA.responses.attended;
+      setCurrentStatus(mockData.status);
+      setSelectedOption(mockData.status);
       setIsEditing(false);
-      setLastEditedTime('2026-01-29 21:20');
-    } else if (testMode === 'not-attend') {
-      setCurrentStatus('NOT_ATTEND');
-      setSelectedOption('NOT_ATTEND');
+      setLastEditedTime(mockData.lastEditedTime);
+    } else if (testMode === "submitted-not-attend") {
+      const mockData = MOCK_RSVP_DATA.responses.notAttended;
+      setCurrentStatus(mockData.status);
+      setSelectedOption(mockData.status);
       setIsEditing(false);
-      setLastEditedTime('2026-01-29 21:20');
-    } else if (testMode === 'expired-attend') {
-      setCurrentStatus('ATTEND');
-      setSelectedOption('ATTEND');
+      setLastEditedTime(mockData.lastEditedTime);
+    } else if (testMode === "expired-submitted") {
+      const mockData = MOCK_RSVP_DATA.responses.attended;
+      setCurrentStatus(mockData.status);
+      setSelectedOption(mockData.status);
       setIsExpired(true);
       setIsEditing(false);
-      setLastEditedTime('2026-01-29 21:20');
+      setLastEditedTime(mockData.lastEditedTime);
     } else {
       // Default: PENDING state
       setIsEditing(true);
     }
-
-    // TODO: Replace with actual API call
-    // fetchRsvpStatus(token);
-  }, [testMode]);
+  }, [testMode, token]);
 
   const handleSubmit = async () => {
     if (!selectedOption) return;
@@ -74,33 +88,29 @@ export default function RsvpConfirmationForm({ token, testMode }: RsvpConfirmati
     setCurrentStatus(selectedOption);
     setIsEditing(false);
     setIsSubmitting(false);
-    setLastEditedTime(new Date().toLocaleString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    }));
+    setLastEditedTime(
+      new Date().toLocaleString("zh-TW", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
   };
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
-  const handleOptionChange = (option: 'ATTEND' | 'NOT_ATTEND') => {
+  const handleOptionChange = (option: "ATTEND" | "NOT_ATTEND") => {
     setSelectedOption(option);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-[#2c3e50] text-white p-4 flex items-center justify-center">
-        <Image
-          src="/aws-educate-logo.png"
-          alt="AWS Educate"
-          width={150}
-          height={40}
-          priority
-        />
+        <Image src="/aws-educate-logo.png" alt="AWS Educate" width={150} height={40} priority />
       </header>
 
       <main className="flex-1 p-4 sm:p-8 text-center max-w-4xl mx-auto w-full">
@@ -113,31 +123,26 @@ export default function RsvpConfirmationForm({ token, testMode }: RsvpConfirmati
           <p>回覆期限：{deadline}</p>
         </div>
 
-        {isExpired && currentStatus === 'PENDING' && (
+        {isExpired && currentStatus === "PENDING" && (
           <div className="max-w-2xl mx-auto mb-8">
             <RsvpStatusBanner type="expired" />
           </div>
         )}
 
-        {!isEditing && currentStatus !== 'PENDING' && (
+        {!isEditing && currentStatus !== "PENDING" && (
           <div className="max-w-2xl mx-auto mb-8">
             <RsvpStatusBanner
               type="submitted"
-              status={currentStatus as 'ATTEND' | 'NOT_ATTEND'}
+              status={currentStatus as "ATTEND" | "NOT_ATTEND"}
               lastEditedTime={lastEditedTime || undefined}
+              isExpired={isExpired}
             />
           </div>
         )}
 
-        <p className="mb-2 font-medium text-black text-sm sm:text-base">
-          姓名：{participantName}
-        </p>
-        <p className="mb-6 font-medium text-black text-sm sm:text-base">
-          信箱：{participantEmail}
-        </p>
-        <p className="mb-6 font-medium text-sm sm:text-base">
-          您是否會準時出席此次活動：
-        </p>
+        <p className="mb-2 font-medium text-black text-sm sm:text-base">姓名：{participantName}</p>
+        <p className="mb-6 font-medium text-black text-sm sm:text-base">信箱：{participantEmail}</p>
+        <p className="mb-6 font-medium text-sm sm:text-base">您是否會準時出席此次活動：</p>
 
         <RsvpRadioGroup
           selectedOption={selectedOption}
