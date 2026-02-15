@@ -163,7 +163,7 @@ export default function RsvpConfirmationForm({ token, testMode }: RsvpConfirmati
       <footer className="bg-[#2c3e50] text-white text-center p-4 text-sm sm:text-base">
         聯絡我們：
         <a href="mailto:awseducate.cloudambassador@gmail.com" className="underline ml-1">
-          awseducate.cloudambassador@gmail.com
+          contact@aws-educate.tw
         </a>
       </footer>
     </div>
