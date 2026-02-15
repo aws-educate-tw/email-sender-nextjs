@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface AttendancePreviewProps {
   campaignName: string;
   campaignStartDate: string;
@@ -28,11 +30,8 @@ export default function AttendancePreview({
 
   return (
     <div className="border rounded-lg overflow-hidden bg-white">
-      <header className="bg-[#2c3e50] text-white p-4 text-center">
-        <span className="font-bold">aws</span>{" "}
-        <span className="font-bold" style={{ color: "#EA9D3A" }}>
-          educate
-        </span>
+      <header className="bg-[#2c3e50] text-white p-4 flex items-center justify-center">
+        <Image src="/aws-educate-logo.png" alt="AWS Educate" width={150} height={40} priority />
       </header>
 
       <main className="p-8 text-center">
@@ -63,13 +62,13 @@ export default function AttendancePreview({
         <p className="mb-6 font-medium">您是否會準時出席此次活動：</p>
 
         <div className="space-y-4 max-w-2xl mx-auto">
-          <div className="w-full p-4 border-2 border-blue-300 bg-blue-50 rounded-full flex items-center justify-center gap-3 text-blue-900">
+          <div className="w-full p-4 border-2 border-gray-800 bg-blue-100 rounded-full flex items-center justify-center gap-3 text-gray-800">
             <svg
-              className="w-5 h-5"
+              className="w-5 h-5 bg-gray-800 text-white rounded-full p-0.5"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
