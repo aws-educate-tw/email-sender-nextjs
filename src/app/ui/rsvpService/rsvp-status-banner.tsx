@@ -37,9 +37,11 @@ export default function RsvpStatusBanner({
       <div className="bg-[#e74c3c] text-white rounded-full p-4 text-center">
         <Info size={20} className="inline align-middle mr-2" />
         <span className="text-sm inline align-middle">
-          該活動的出缺席回覆期限已過，您無法再進行回覆。若有任何特殊狀況，請聯絡{" "}
-          <a href="mailto:awseducate.cloudambassador@gmail.com" className="underline">
-            awseducate.cloudambassador@gmail.com
+          該活動的出缺席回覆期限已過，您無法再進行回覆。
+          <br />
+          若有任何特殊狀況，請聯絡{" "}
+          <a href="mailto:contact@aws-educate.com" className="underline">
+            contact@aws-educate.com
           </a>
         </span>
       </div>
