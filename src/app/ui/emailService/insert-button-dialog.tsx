@@ -14,7 +14,7 @@ interface InsertButtonDialogProps {
 type ActionType = "campaign" | "external" | null;
 
 export default function InsertButtonDialog({ isOpen, onClose, onInsert }: InsertButtonDialogProps) {
-  const [actionType, setActionType] = useState<ActionType>(null);
+  const [actionType, setActionType] = useState<ActionType>("campaign");
   const [buttonText, setButtonText] = useState("");
   const [buttonUrl, setButtonUrl] = useState("");
   const [campaignName, setCampaignName] = useState("");
@@ -82,7 +82,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   };
 
   const handleClose = () => {
-    setActionType(null);
+    setActionType("campaign");
     setButtonText("");
     setButtonUrl("");
     setCampaignName("");
@@ -124,12 +124,6 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
             </button>
           </div>
         </div>
-
-        {!actionType && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center text-gray-500">
-            Please select an action type above to continue.
-          </div>
-        )}
 
         {actionType === "campaign" && (
           <>
