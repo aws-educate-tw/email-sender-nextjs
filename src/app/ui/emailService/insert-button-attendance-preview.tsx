@@ -62,30 +62,22 @@ export default function AttendancePreview({
         <p className="mb-6 font-medium">您是否會準時出席此次活動：</p>
 
         <div className="space-y-4 max-w-2xl mx-auto">
-          <div className="w-full p-4 border-2 border-gray-800 bg-blue-100 rounded-full flex items-center justify-center gap-3 text-gray-800">
-            <svg
-              className="w-5 h-5 bg-gray-800 text-white rounded-full p-0.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+          <div className="w-full p-3 border-2 border-[#2c3e50] bg-[#d4e3f7] rounded-full flex items-center justify-center gap-3">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-[#2c3e50]">
+              <svg
+                className="w-3 h-3 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
             是，我會準時出席。
           </div>
-          <div className="w-full p-4 border-2 border-gray-300 bg-white rounded-full flex items-center justify-center gap-3 text-gray-700">
-            <svg
-              className="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10" />
-            </svg>
+          <div className="w-full p-3 border-2 border-gray-300 bg-white rounded-full flex items-center justify-center gap-3">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 border-gray-400" />
             否，我不克出席。
           </div>
         </div>
