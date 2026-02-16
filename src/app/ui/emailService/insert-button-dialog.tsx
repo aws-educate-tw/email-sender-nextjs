@@ -83,7 +83,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Insert Campaign Attendance Button">
       <div className="space-y-6">
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
             Button Setting
           </h3>
@@ -107,7 +107,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
           </div>
         </div>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
             Campaign Information
           </h3>
@@ -129,38 +129,38 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                 {getValidationError()}
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-gray-600 mb-1">Start</label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="date"
                     value={campaignStartDate}
                     onChange={e => setCampaignStartDate(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
                   />
                   <input
                     type="time"
                     value={campaignStartTime}
                     onChange={e => setCampaignStartTime(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
               <div>
                 <label className="block text-xs text-gray-600 mb-1">End</label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="date"
                     value={campaignEndDate}
                     onChange={e => setCampaignEndDate(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
                   />
                   <input
                     type="time"
                     value={campaignEndTime}
                     onChange={e => setCampaignEndTime(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -180,18 +180,18 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
 
           <div>
             <label className="block text-sm font-medium mb-2">Attendance respond deadline</label>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="date"
                 value={deadline}
                 onChange={e => setDeadline(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
               />
               <input
                 type="time"
                 value={deadlineTime}
                 onChange={e => setDeadlineTime(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
           <button
             onClick={handleClose}
             className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
