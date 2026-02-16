@@ -4,6 +4,9 @@ import { useState } from "react";
 import Modal from "@/app/ui/emailService/modal";
 import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-preview";
 import { Info } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "./datepicker-custom.css";
 
 interface InsertButtonDialogProps {
   isOpen: boolean;
@@ -14,31 +17,18 @@ interface InsertButtonDialogProps {
 export default function InsertButtonDialog({ isOpen, onClose, onInsert }: InsertButtonDialogProps) {
   const [buttonText, setButtonText] = useState("");
   const [campaignName, setCampaignName] = useState("");
-  const [campaignStartDate, setCampaignStartDate] = useState("");
-  const [campaignStartTime, setCampaignStartTime] = useState("");
-  const [campaignEndDate, setCampaignEndDate] = useState("");
-  const [campaignEndTime, setCampaignEndTime] = useState("");
+  const [campaignStartDateTime, setCampaignStartDateTime] = useState<Date | null>(null);
+  const [campaignEndDateTime, setCampaignEndDateTime] = useState<Date | null>(null);
   const [campaignPlace, setCampaignPlace] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [deadlineTime, setDeadlineTime] = useState("");
+  const [deadlineDateTime, setDeadlineDateTime] = useState<Date | null>(null);
 
   const getValidationError = () => {
-    if (
-      !campaignStartDate ||
-      !campaignStartTime ||
-      !campaignEndDate ||
-      !campaignEndTime ||
-      !deadline ||
-      !deadlineTime
-    )
-      return null;
+    if (!campaignStartDateTime || !campaignEndDateTime || !deadlineDateTime) return null;
 
-    const start = new Date(`${campaignStartDate}T${campaignStartTime}`);
-    const end = new Date(`${campaignEndDate}T${campaignEndTime}`);
-    const deadlineDate = new Date(`${deadline}T${deadlineTime}`);
-
-    if (start >= end) return "Campaign start time must be before end time";
-    if (deadlineDate > start) return "Deadline must be before or equal to campaign start time";
+    if (campaignStartDateTime >= campaignEndDateTime)
+      return "Campaign start time must be before end time";
+    if (deadlineDateTime > campaignStartDateTime)
+      return "Deadline must be before or equal to campaign start time";
 
     return null;
   };
@@ -47,21 +37,24 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     if (!buttonText) return false;
     const hasAllFields = !!(
       campaignName &&
-      campaignStartDate &&
-      campaignStartTime &&
-      campaignEndDate &&
-      campaignEndTime &&
+      campaignStartDateTime &&
+      campaignEndDateTime &&
       campaignPlace &&
-      deadline &&
-      deadlineTime
+      deadlineDateTime
     );
     return hasAllFields && !getValidationError();
   };
 
-  const handleInsert = () => {
-    if (!isValid()) return;
+  const formatDateTime = (date: Date) => {
+    const dateStr = date.toISOString().split("T")[0];
+    const timeStr = date.toTimeString().slice(0, 5);
+    return `${dateStr} ${timeStr}`;
+  };
 
-    const buttonHtml = `<a href="{{ATTENDANCE_LINK}}" data-button-type="campaign-attendance" data-campaign-name="${campaignName}" data-campaign-start="${campaignStartDate} ${campaignStartTime}" data-campaign-end="${campaignEndDate} ${campaignEndTime}" data-campaign-place="${campaignPlace}" data-deadline="${deadline} ${deadlineTime}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${buttonText}</a>`;
+  const handleInsert = () => {
+    if (!isValid() || !campaignStartDateTime || !campaignEndDateTime || !deadlineDateTime) return;
+
+    const buttonHtml = `<a href="{{ATTENDANCE_LINK}}" data-button-type="campaign-attendance" data-campaign-name="${campaignName}" data-campaign-start="${formatDateTime(campaignStartDateTime)}" data-campaign-end="${formatDateTime(campaignEndDateTime)}" data-campaign-place="${campaignPlace}" data-deadline="${formatDateTime(deadlineDateTime)}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${buttonText}</a>`;
 
     onInsert(buttonHtml);
     handleClose();
@@ -70,13 +63,10 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   const handleClose = () => {
     setButtonText("");
     setCampaignName("");
-    setCampaignStartDate("");
-    setCampaignStartTime("");
-    setCampaignEndDate("");
-    setCampaignEndTime("");
+    setCampaignStartDateTime(null);
+    setCampaignEndDateTime(null);
     setCampaignPlace("");
-    setDeadline("");
-    setDeadlineTime("");
+    setDeadlineDateTime(null);
     onClose();
   };
 
@@ -132,37 +122,29 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-gray-600 mb-1">Start</label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="date"
-                    value={campaignStartDate}
-                    onChange={e => setCampaignStartDate(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
-                  />
-                  <input
-                    type="time"
-                    value={campaignStartTime}
-                    onChange={e => setCampaignStartTime(e.target.value)}
-                    className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                <DatePicker
+                  selected={campaignStartDateTime}
+                  onChange={(date: Date | null) => setCampaignStartDateTime(date)}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="yyyy/MM/dd HH:mm"
+                  placeholderText="Select start date & time"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
               <div>
                 <label className="block text-xs text-gray-600 mb-1">End</label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="date"
-                    value={campaignEndDate}
-                    onChange={e => setCampaignEndDate(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
-                  />
-                  <input
-                    type="time"
-                    value={campaignEndTime}
-                    onChange={e => setCampaignEndTime(e.target.value)}
-                    className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                <DatePicker
+                  selected={campaignEndDateTime}
+                  onChange={(date: Date | null) => setCampaignEndDateTime(date)}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="yyyy/MM/dd HH:mm"
+                  placeholderText="Select end date & time"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
           </div>
@@ -180,20 +162,16 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
 
           <div>
             <label className="block text-sm font-medium mb-2">Attendance respond deadline</label>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="date"
-                value={deadline}
-                onChange={e => setDeadline(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
-              />
-              <input
-                type="time"
-                value={deadlineTime}
-                onChange={e => setDeadlineTime(e.target.value)}
-                className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <DatePicker
+              selected={deadlineDateTime}
+              onChange={(date: Date | null) => setDeadlineDateTime(date)}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="yyyy/MM/dd HH:mm"
+              placeholderText="Select deadline date & time"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
         </div>
 
@@ -201,13 +179,13 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
           <h3 className="text-base font-semibold">Page Preview</h3>
           <AttendancePreview
             campaignName={campaignName}
-            campaignStartDate={campaignStartDate}
-            campaignStartTime={campaignStartTime}
-            campaignEndDate={campaignEndDate}
-            campaignEndTime={campaignEndTime}
+            campaignStartDate={campaignStartDateTime?.toISOString().split("T")[0] || ""}
+            campaignStartTime={campaignStartDateTime?.toTimeString().slice(0, 5) || ""}
+            campaignEndDate={campaignEndDateTime?.toISOString().split("T")[0] || ""}
+            campaignEndTime={campaignEndDateTime?.toTimeString().slice(0, 5) || ""}
             campaignPlace={campaignPlace}
-            deadline={deadline}
-            deadlineTime={deadlineTime}
+            deadline={deadlineDateTime?.toISOString().split("T")[0] || ""}
+            deadlineTime={deadlineDateTime?.toTimeString().slice(0, 5) || ""}
           />
         </div>
 
