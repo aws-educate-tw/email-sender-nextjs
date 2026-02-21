@@ -31,11 +31,11 @@
 
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
-  background-color: #3b82f6;
+  background-color: #192f47;
   color: white;
 }
 
-.react-datepicker__day:hover {
+.react-datepicker__day:not(.react-datepicker__day--disabled):not(.react-datepicker__day--selected):hover {
   background-color: #dbeafe;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .react-datepicker__time-list-item--selected {
-  background-color: #3b82f6 !important;
+  background-color: #192f47 !important;
   color: white !important;
 }
 

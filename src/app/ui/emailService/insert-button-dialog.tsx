@@ -22,6 +22,9 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   const [campaignPlace, setCampaignPlace] = useState("");
   const [deadlineDateTime, setDeadlineDateTime] = useState<Date | null>(null);
 
+  const now = new Date();
+  const fiveYearsLater = new Date(now.getFullYear() + 5, now.getMonth(), now.getDate());
+
   const getValidationError = () => {
     if (!campaignStartDateTime || !campaignEndDateTime || !deadlineDateTime) return null;
 
@@ -130,6 +133,8 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                   timeIntervals={15}
                   dateFormat="yyyy/MM/dd HH:mm"
                   placeholderText="Select start date & time"
+                  minDate={now}
+                  maxDate={fiveYearsLater}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -143,6 +148,8 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                   timeIntervals={15}
                   dateFormat="yyyy/MM/dd HH:mm"
                   placeholderText="Select end date & time"
+                  minDate={campaignStartDateTime || now}
+                  maxDate={fiveYearsLater}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -170,6 +177,8 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
               timeIntervals={15}
               dateFormat="yyyy/MM/dd HH:mm"
               placeholderText="Select deadline date & time"
+              minDate={now}
+              maxDate={campaignStartDateTime || fiveYearsLater}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
