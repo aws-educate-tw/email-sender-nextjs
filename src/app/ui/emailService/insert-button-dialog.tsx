@@ -4,9 +4,66 @@ import { useState } from "react";
 import Modal from "@/app/ui/emailService/modal";
 import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-preview";
 import { Info } from "lucide-react";
-import DatePicker from "react-datepicker";
+import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import "react-datepicker/dist/react-datepicker.css";
-import "./datepicker-custom.css";
+
+const datePickerStyles = `
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+
+  .react-datepicker {
+    font-family: inherit;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .react-datepicker__header {
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding-top: 0.5rem;
+  }
+
+  .react-datepicker__current-month {
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .react-datepicker__day-name {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected {
+    background-color: #192f47;
+    color: white;
+  }
+
+  .react-datepicker__day:not(.react-datepicker__day--disabled):not(
+      .react-datepicker__day--selected
+    ):hover {
+    background-color: #dbeafe;
+  }
+
+  .react-datepicker__time-container {
+    border-left: 1px solid #e5e7eb;
+  }
+
+  .react-datepicker__time-list-item--selected {
+    background-color: #192f47 !important;
+    color: white !important;
+  }
+
+  .react-datepicker__time-list-item:hover {
+    background-color: #dbeafe !important;
+  }
+`;
 
 interface InsertButtonDialogProps {
   isOpen: boolean;
@@ -74,150 +131,143 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Insert Campaign Attendance Button">
-      <div className="space-y-6">
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-            Button Setting
-          </h3>
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium mb-2">
-              Text to display
-              <div className="group relative">
-                <Info size={16} className="text-gray-400 cursor-help" />
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  This is the text recipients will see in the email.
+    <>
+      <style>{datePickerStyles}</style>
+      <Modal isOpen={isOpen} onClose={handleClose} title="Insert Campaign Attendance Button">
+        <div className="space-y-6">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+              Button Setting
+            </h3>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium mb-2">
+                Text to display
+                <div className="group relative">
+                  <Info size={16} className="text-gray-400 cursor-help" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    This is the text recipients will see in the email.
+                  </div>
                 </div>
-              </div>
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. 點此回覆出席意願"
-              value={buttonText}
-              onChange={e => setButtonText(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-            Campaign Information
-          </h3>
-          <div>
-            <label className="block text-sm font-medium mb-2">Campaign name</label>
-            <input
-              type="text"
-              placeholder="Enter campaign name"
-              value={campaignName}
-              onChange={e => setCampaignName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Campaign time</label>
-            {getValidationError() && (
-              <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
-                {getValidationError()}
-              </div>
-            )}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">Start</label>
-                <DatePicker
-                  selected={campaignStartDateTime}
-                  onChange={(date: Date | null) => setCampaignStartDateTime(date)}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  timeIntervals={15}
-                  dateFormat="yyyy/MM/dd HH:mm"
-                  placeholderText="Select start date & time"
-                  minDate={now}
-                  maxDate={fiveYearsLater}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">End</label>
-                <DatePicker
-                  selected={campaignEndDateTime}
-                  onChange={(date: Date | null) => setCampaignEndDateTime(date)}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  timeIntervals={15}
-                  dateFormat="yyyy/MM/dd HH:mm"
-                  placeholderText="Select end date & time"
-                  minDate={campaignStartDateTime || now}
-                  maxDate={fiveYearsLater}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. 點此回覆出席意願"
+                value={buttonText}
+                onChange={e => setButtonText(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Campaign place</label>
-            <input
-              type="text"
-              placeholder="Enter campaign location"
-              value={campaignPlace}
-              onChange={e => setCampaignPlace(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+              Campaign Information
+            </h3>
+            <div>
+              <label className="block text-sm font-medium mb-2">Campaign name</label>
+              <input
+                type="text"
+                placeholder="Enter campaign name"
+                value={campaignName}
+                onChange={e => setCampaignName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Campaign time</label>
+              {getValidationError() && (
+                <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+                  {getValidationError()}
+                </div>
+              )}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Start</label>
+                  <DateTimeInput
+                    selected={campaignStartDateTime}
+                    onChange={(date: Date | null) => {
+                      setCampaignStartDateTime(date);
+                      if (date && campaignEndDateTime && campaignEndDateTime <= date) {
+                        setCampaignEndDateTime(null);
+                      }
+                      if (date && deadlineDateTime && deadlineDateTime > date) {
+                        setDeadlineDateTime(null);
+                      }
+                    }}
+                    minDate={now}
+                    maxDate={fiveYearsLater}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">End</label>
+                  <DateTimeInput
+                    selected={campaignEndDateTime}
+                    onChange={(date: Date | null) => setCampaignEndDateTime(date)}
+                    minDate={campaignStartDateTime || now}
+                    maxDate={fiveYearsLater}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Campaign place</label>
+              <input
+                type="text"
+                placeholder="Enter campaign location"
+                value={campaignPlace}
+                onChange={e => setCampaignPlace(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Attendance respond deadline</label>
+              <DateTimeInput
+                selected={deadlineDateTime}
+                onChange={(date: Date | null) => setDeadlineDateTime(date)}
+                minDate={now}
+                maxDate={campaignStartDateTime || fiveYearsLater}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold">Page Preview</h3>
+            <AttendancePreview
+              campaignName={campaignName}
+              campaignStartDate={campaignStartDateTime?.toISOString().split("T")[0] || ""}
+              campaignStartTime={campaignStartDateTime?.toTimeString().slice(0, 5) || ""}
+              campaignEndDate={campaignEndDateTime?.toISOString().split("T")[0] || ""}
+              campaignEndTime={campaignEndDateTime?.toTimeString().slice(0, 5) || ""}
+              campaignPlace={campaignPlace}
+              deadline={deadlineDateTime?.toISOString().split("T")[0] || ""}
+              deadlineTime={deadlineDateTime?.toTimeString().slice(0, 5) || ""}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Attendance respond deadline</label>
-            <DatePicker
-              selected={deadlineDateTime}
-              onChange={(date: Date | null) => setDeadlineDateTime(date)}
-              showTimeSelect
-              timeFormat="HH:mm"
-              timeIntervals={15}
-              dateFormat="yyyy/MM/dd HH:mm"
-              placeholderText="Select deadline date & time"
-              minDate={now}
-              maxDate={campaignStartDateTime || fiveYearsLater}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+            <button
+              onClick={handleClose}
+              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleInsert}
+              disabled={!isValid()}
+              className={`px-6 py-2 rounded-md font-medium transition-colors ${
+                isValid()
+                  ? "bg-[#2c3e50] text-white hover:bg-[#1a2f4a]"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              Insert
+            </button>
           </div>
         </div>
-
-        <div className="space-y-3">
-          <h3 className="text-base font-semibold">Page Preview</h3>
-          <AttendancePreview
-            campaignName={campaignName}
-            campaignStartDate={campaignStartDateTime?.toISOString().split("T")[0] || ""}
-            campaignStartTime={campaignStartDateTime?.toTimeString().slice(0, 5) || ""}
-            campaignEndDate={campaignEndDateTime?.toISOString().split("T")[0] || ""}
-            campaignEndTime={campaignEndDateTime?.toTimeString().slice(0, 5) || ""}
-            campaignPlace={campaignPlace}
-            deadline={deadlineDateTime?.toISOString().split("T")[0] || ""}
-            deadlineTime={deadlineDateTime?.toTimeString().slice(0, 5) || ""}
-          />
-        </div>
-
-        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
-          <button
-            onClick={handleClose}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleInsert}
-            disabled={!isValid()}
-            className={`px-6 py-2 rounded-md font-medium transition-colors ${
-              isValid()
-                ? "bg-[#2c3e50] text-white hover:bg-[#1a2f4a]"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            Insert
-          </button>
-        </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 }
