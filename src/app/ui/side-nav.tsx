@@ -46,6 +46,12 @@ export default function SideNav() {
             <p className="text-white text-sm sm:text-base">Email History</p>
           </Link>
           <Link
+            href="/campaignService"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Event Service</p>
+          </Link>
+          <Link
             href="/webhookService"
             className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
           >
