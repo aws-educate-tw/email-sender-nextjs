@@ -1,79 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Campaign } from "@/app/ui/campaignService/types";
 import CampaignList from "@/app/ui/campaignService/campaign-list";
 import CreateCampaignDialog from "@/app/ui/campaignService/create-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
-
-// Mock Data（開發階段使用）- 移到組件外部以保持狀態
-export let mockCampaignsData: Campaign[] = [
-  {
-    cohort: "8",
-    created_at: "2024-01-10T10:00:00Z",
-    campaign_id: "camp_001",
-    campaign_name: "AIF workshop I",
-    campaign_start_time: "2024-03-15T01:00:00Z",
-    campaign_end_time: "2024-03-15T09:00:00Z",
-    campaign_location: "Virtual - AWS Chime",
-    is_active: true,
-  },
-  {
-    cohort: "8",
-    created_at: "2024-01-11T10:00:00Z",
-    campaign_id: "camp_002",
-    campaign_name: "AIF workshop II",
-    campaign_start_time: "2024-03-16T01:00:00Z",
-    campaign_end_time: "2024-03-16T09:00:00Z",
-    campaign_location: "Virtual - AWS Chime",
-    is_active: true,
-  },
-  {
-    cohort: "8",
-    created_at: "2024-02-01T10:00:00Z",
-    campaign_id: "camp_003",
-    campaign_name: "AIF workshop III",
-    campaign_start_time: "2025-05-20T01:00:00Z",
-    campaign_end_time: "2025-05-20T09:00:00Z",
-    campaign_location: "Virtual - AWS Chime",
-    is_active: true,
-  },
-];
-
-export function addMockCampaign(campaign: Omit<Campaign, "campaign_id" | "created_at" | "cohort" | "is_active">) {
-  const newCampaign: Campaign = {
-    ...campaign,
-    campaign_id: `camp_${String(mockCampaignsData.length + 1).padStart(3, "0")}`,
-    created_at: new Date().toISOString(),
-    cohort: "8",
-    is_active: true,
-  };
-  mockCampaignsData.push(newCampaign);
-}
+import { mockCampaignsData } from "@/app/ui/campaignService/mockData";
 
 export default function CampaignServicePage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // 🔧 開發開關：true = Mock Data, false = 真實 API
+  // Development toggle: true = Mock Data, false = Real API
   const USE_MOCK_DATA = true;
 
   useEffect(() => {
     loadCampaigns();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loadCampaigns = async () => {
+  const loadCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      // 使用 Mock Data
+      // Use Mock Data
       if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 500));
         setCampaigns([...mockCampaignsData]);
         return;
       }
 
-      // 使用真實 API
+      // Use Real API
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const token = localStorage.getItem("access_token");
       const response = await fetch(`${base_url}/campaigns`, {
@@ -95,7 +52,7 @@ export default function CampaignServicePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [USE_MOCK_DATA]);
 
   return (
     <div>

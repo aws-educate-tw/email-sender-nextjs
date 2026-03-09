@@ -21,10 +21,14 @@ export default function CampaignList({ campaigns }: CampaignListProps) {
     <div className="space-y-6">
       {/* ONGOING EVENT */}
       <div className="bg-gray-50 rounded-lg shadow-md p-6">
-        <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">ONGOING EVENT</h2>
+        <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
+          ONGOING EVENT
+        </h2>
         {ongoingCampaigns.length > 0 ? (
           <div className="space-y-3">
-            {ongoingCampaigns.map(campaign => <CampaignCard key={campaign.campaign_id} campaign={campaign} />)}
+            {ongoingCampaigns.map(campaign => (
+              <CampaignCard key={campaign.campaign_id} campaign={campaign} />
+            ))}
           </div>
         ) : (
           <p className="text-gray-500 text-sm">No ongoing events</p>
@@ -33,10 +37,14 @@ export default function CampaignList({ campaigns }: CampaignListProps) {
 
       {/* FUTURE EVENT */}
       <div className="bg-gray-50 rounded-lg shadow-md p-6">
-        <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">FUTURE EVENT</h2>
+        <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
+          FUTURE EVENT
+        </h2>
         {futureCampaigns.length > 0 ? (
           <div className="space-y-3">
-            {futureCampaigns.map(campaign => <CampaignCard key={campaign.campaign_id} campaign={campaign} />)}
+            {futureCampaigns.map(campaign => (
+              <CampaignCard key={campaign.campaign_id} campaign={campaign} />
+            ))}
           </div>
         ) : (
           <p className="text-gray-500 text-sm">No future events</p>
@@ -49,18 +57,22 @@ export default function CampaignList({ campaigns }: CampaignListProps) {
           onClick={() => setIsPastExpanded(!isPastExpanded)}
           className="flex items-center gap-2 text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4 hover:text-gray-800"
         >
-          <ChevronRight className={`transition-transform ${isPastExpanded ? "rotate-90" : ""}`} size={16} />
+          <ChevronRight
+            className={`transition-transform ${isPastExpanded ? "rotate-90" : ""}`}
+            size={16}
+          />
           PAST EVENT
         </button>
-        {isPastExpanded && (
-          pastCampaigns.length > 0 ? (
+        {isPastExpanded &&
+          (pastCampaigns.length > 0 ? (
             <div className="space-y-3">
-              {pastCampaigns.map(campaign => <CampaignCard key={campaign.campaign_id} campaign={campaign} />)}
+              {pastCampaigns.map(campaign => (
+                <CampaignCard key={campaign.campaign_id} campaign={campaign} />
+              ))}
             </div>
           ) : (
             <p className="text-gray-500 text-sm">No past events</p>
-          )
-        )}
+          ))}
       </div>
     </div>
   );

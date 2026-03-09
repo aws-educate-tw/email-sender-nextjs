@@ -42,11 +42,23 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "ATTEND":
-        return <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">ATTEND</span>;
+        return (
+          <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
+            ATTEND
+          </span>
+        );
       case "NOT_ATTEND":
-        return <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">NOT ATTEND</span>;
+        return (
+          <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
+            NOT ATTEND
+          </span>
+        );
       case "PENDING":
-        return <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">PENDING</span>;
+        return (
+          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+            PENDING
+          </span>
+        );
       default:
         return null;
     }
@@ -54,61 +66,69 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          <span className="font-semibold">{filteredParticipants.length} participants selected</span>
-          <span className="ml-4">
-            Total: {stats.total} | Attend: {stats.attend} | Not Attend: {stats.notAttend} | Pending: {stats.pending}
-          </span>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="text-xs sm:text-sm text-gray-600">
+          <div className="font-semibold mb-1 sm:mb-0">
+            {filteredParticipants.length} participants selected
+          </div>
+          <div className="flex flex-wrap gap-x-2 gap-y-1">
+            <span>Total: {stats.total}</span>
+            <span>Attend: {stats.attend}</span>
+            <span>Not Attend: {stats.notAttend}</span>
+            <span>Pending: {stats.pending}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          <div className="relative flex-1 sm:flex-initial">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={16}
+            />
             <input
               type="text"
               placeholder="Search participants..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm">
             <Download size={16} />
             Export
           </button>
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+          className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
         >
           <option>All Status</option>
           <option>ATTEND</option>
           <option>NOT_ATTEND</option>
           <option>PENDING</option>
         </select>
-        <div className="text-sm text-gray-600">
+        <div className="text-xs sm:text-sm text-gray-600">
           Show <span className="font-semibold">v{itemsPerPage}</span> entries per page
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input type="checkbox" className="rounded" />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Participant Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Participant Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Attendance
               </th>
             </tr>
@@ -116,39 +136,48 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedParticipants.map(participant => (
               <tr key={participant.participant_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <input type="checkbox" className="rounded" />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{participant.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{participant.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(participant.rsvp_status)}</td>
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                  {participant.name}
+                </td>
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                  {participant.email}
+                </td>
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                  {getStatusBadge(participant.rsvp_status)}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
           Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredParticipants.length)} of {filteredParticipants.length} results
+          {Math.min(currentPage * itemsPerPage, filteredParticipants.length)} of{" "}
+          {filteredParticipants.length} results
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-center">
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 text-sm"
           >
             <ChevronLeft size={16} />
-            Previous
+            <span className="hidden sm:inline">Previous</span>
           </button>
-          <button className="px-4 py-2 bg-sky-950 text-white rounded-md">{currentPage}</button>
+          <button className="px-3 sm:px-4 py-2 bg-sky-950 text-white rounded-md text-sm">
+            {currentPage}
+          </button>
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 text-sm"
           >
-            Next
+            <span className="hidden sm:inline">Next</span>
             <ChevronRight size={16} />
           </button>
         </div>

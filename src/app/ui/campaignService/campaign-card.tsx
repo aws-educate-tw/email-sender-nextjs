@@ -14,7 +14,8 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     >
       <h3 className="text-lg font-semibold text-black mb-2">{campaign.campaign_name}</h3>
       <p className="text-sm text-gray-600">
-        Event Date: {formatDateTime(campaign.campaign_start_time)} - {formatDateTime(campaign.campaign_end_time)}
+        Event Date: {formatDateTime(campaign.campaign_start_time)} -{" "}
+        {formatDateTime(campaign.campaign_end_time)}
       </p>
     </Link>
   );

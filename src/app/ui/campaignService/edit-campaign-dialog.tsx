@@ -55,7 +55,12 @@ async function updateCampaign(campaignId: string, data: any): Promise<void> {
   if (!response.ok) throw new Error("Failed to update campaign");
 }
 
-export default function EditCampaignDialog({ isOpen, onClose, onSuccess, campaign }: EditCampaignDialogProps) {
+export default function EditCampaignDialog({
+  isOpen,
+  onClose,
+  onSuccess,
+  campaign,
+}: EditCampaignDialogProps) {
   const [formData, setFormData] = useState<{
     campaign_name: string;
     campaign_start_time: Date;
@@ -71,6 +76,7 @@ export default function EditCampaignDialog({ isOpen, onClose, onSuccess, campaig
   const [runStates, setRunStates] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingRuns, setIsLoadingRuns] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -80,8 +86,10 @@ export default function EditCampaignDialog({ isOpen, onClose, onSuccess, campaig
         campaign_end_time: new Date(campaign.campaign_end_time),
         campaign_location: campaign.campaign_location,
       });
+      setHasChanges(false);
       loadRuns();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, campaign]);
 
   const loadRuns = async () => {
@@ -106,6 +114,7 @@ export default function EditCampaignDialog({ isOpen, onClose, onSuccess, campaig
       ...prev,
       [runId]: !prev[runId],
     }));
+    setHasChanges(true);
   };
 
   const formatDeadline = (createdAt: string) => {
@@ -155,135 +164,165 @@ export default function EditCampaignDialog({ isOpen, onClose, onSuccess, campaig
     formData.campaign_name.trim() !== "" &&
     formData.campaign_start_time !== null &&
     formData.campaign_end_time !== null &&
-    formData.campaign_location.trim() !== "";
+    formData.campaign_location.trim() !== "" &&
+    hasChanges;
 
   if (!isOpen) return null;
 
   const dialogContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b sticky top-0 bg-white z-10">
-          <h2 className="text-xl font-semibold text-gray-900">Event Information</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X size={24} />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 bg-gray-50 flex-shrink-0">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Edit Event Information</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
+            <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Event name</label>
-              <input
-                type="text"
-                required
-                value={formData.campaign_name}
-                onChange={e => setFormData({ ...formData, campaign_name: e.target.value })}
-                placeholder="Enter event name"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="overflow-y-auto flex-1 p-4 sm:p-8">
+            <div className="space-y-6">
+              <div>
+                <label className="block text-base font-semibold text-gray-700 mb-3">
+                  Event name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.campaign_name}
+                  onChange={e => {
+                    setFormData({ ...formData, campaign_name: e.target.value });
+                    setHasChanges(true);
+                  }}
+                  placeholder="Enter event name"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Event time</label>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">Start</label>
-                  <DateTimeInput
-                    selected={formData.campaign_start_time}
-                    onChange={date => {
-                      if (date) {
-                        setFormData({ ...formData, campaign_start_time: date });
-                        if (formData.campaign_end_time && formData.campaign_end_time <= date) {
-                          setFormData(prev => ({ ...prev, campaign_end_time: null }));
+              <div>
+                <label className="block text-base font-semibold text-gray-700 mb-3">
+                  Event time
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-2">Start</label>
+                    <DateTimeInput
+                      selected={formData.campaign_start_time}
+                      onChange={date => {
+                        if (date) {
+                          setFormData({ ...formData, campaign_start_time: date });
+                          setHasChanges(true);
+                          if (formData.campaign_end_time && formData.campaign_end_time <= date) {
+                            setFormData(prev => ({ ...prev, campaign_end_time: null }));
+                          }
                         }
-                      }
-                    }}
-                    minDate={new Date()}
-                    placeholderText="Type or select: YYYY/MM/DD HH:mm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">End</label>
-                  <DateTimeInput
-                    selected={formData.campaign_end_time}
-                    onChange={date => date && setFormData({ ...formData, campaign_end_time: date })}
-                    minDate={formData.campaign_start_time}
-                    placeholderText="Type or select: YYYY/MM/DD HH:mm"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Event place</label>
-              <input
-                type="text"
-                required
-                value={formData.campaign_location}
-                onChange={e => setFormData({ ...formData, campaign_location: e.target.value })}
-                placeholder="Enter event location"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900"
-              />
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-4">Related attendance</label>
-            {isLoadingRuns ? (
-              <div className="text-center py-4 text-gray-500">Loading...</div>
-            ) : runs.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">No related emails found</div>
-            ) : (
-              <div className="space-y-3">
-                {runs.map(run => (
-                  <div key={run.run_id} className="flex items-center justify-between py-3 border-b">
-                    <div className="flex-1">
-                      <span className="text-sm text-gray-600">Email Subject: </span>
-                      <span className="text-sm font-medium text-gray-900">{run.subject}</span>
-                      <span className="text-sm text-gray-500 ml-2">(DL: {formatDeadline(run.created_at)})</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleRunState(run.run_id)}
-                        className={`px-6 py-2 rounded-full transition ${
-                          runStates[run.run_id]
-                            ? "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                            : "bg-sky-950 text-white hover:bg-sky-800"
-                        }`}
-                      >
-                        Enable
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => toggleRunState(run.run_id)}
-                        className={`px-6 py-2 rounded-full transition ${
-                          !runStates[run.run_id]
-                            ? "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                            : "bg-sky-950 text-white hover:bg-sky-800"
-                        }`}
-                      >
-                        Disable
-                      </button>
-                    </div>
+                      }}
+                      minDate={new Date()}
+                      placeholderText="Type or select: YYYY/MM/DD HH:mm"
+                    />
                   </div>
-                ))}
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-2">End</label>
+                    <DateTimeInput
+                      selected={formData.campaign_end_time}
+                      onChange={date => {
+                        if (date) {
+                          setFormData({ ...formData, campaign_end_time: date });
+                          setHasChanges(true);
+                        }
+                      }}
+                      minDate={formData.campaign_start_time}
+                      placeholderText="Type or select: YYYY/MM/DD HH:mm"
+                    />
+                  </div>
+                </div>
               </div>
-            )}
+
+              <div>
+                <label className="block text-base font-semibold text-gray-700 mb-3">
+                  Event place
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.campaign_location}
+                  onChange={e => {
+                    setFormData({ ...formData, campaign_location: e.target.value });
+                    setHasChanges(true);
+                  }}
+                  placeholder="Enter event location"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900"
+                />
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t">
+              <label className="block text-base font-semibold text-gray-700 mb-4">
+                Related attendance
+              </label>
+              {isLoadingRuns ? (
+                <div className="text-center py-4 text-gray-500">Loading...</div>
+              ) : runs.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">No related emails found</div>
+              ) : (
+                <div className="space-y-4">
+                  {runs.map(run => (
+                    <div
+                      key={run.run_id}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-2"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs sm:text-sm text-gray-600">Email Subject: </span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-900 break-words">
+                          {run.subject}
+                        </span>
+                        <span className="text-xs sm:text-sm text-gray-500 ml-2 whitespace-nowrap">
+                          (DL: {formatDeadline(run.created_at)})
+                        </span>
+                      </div>
+                      <div className="flex rounded-lg overflow-hidden border border-gray-300 flex-shrink-0 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          onClick={() => toggleRunState(run.run_id)}
+                          className={`flex-1 sm:flex-initial px-4 sm:px-6 py-2 transition text-xs sm:text-sm ${
+                            runStates[run.run_id]
+                              ? "bg-white text-gray-700"
+                              : "bg-[#2c3e50] text-white"
+                          }`}
+                        >
+                          Active
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleRunState(run.run_id)}
+                          className={`flex-1 sm:flex-initial px-4 sm:px-6 py-2 transition text-xs sm:text-sm ${
+                            !runStates[run.run_id]
+                              ? "bg-white text-gray-700"
+                              : "bg-[#2c3e50] text-white"
+                          }`}
+                        >
+                          Closed
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 px-4 sm:px-8 py-4 sm:py-5 border-t bg-white flex-shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-8 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+              className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!isFormValid || isSubmitting}
-              className={`px-8 py-2.5 rounded-lg transition ${
+              className={`w-full sm:w-auto px-6 sm:px-8 py-2.5 rounded-lg transition ${
                 isFormValid && !isSubmitting
                   ? "bg-[#3d4f5f] text-white hover:bg-[#4a5f71]"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
