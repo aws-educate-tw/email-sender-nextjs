@@ -8,6 +8,7 @@ import ParticipantsTable from "@/app/ui/campaignService/participants-table";
 import EditCampaignDialog from "@/app/ui/campaignService/edit-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
 import { Pencil, ChevronRight } from "lucide-react";
+import { mockCampaignsData } from "@/app/campaignService/page";
 
 export default function CampaignDetailPage() {
   const params = useParams();
@@ -22,39 +23,6 @@ export default function CampaignDetailPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const USE_MOCK_DATA = true;
-
-  const mockCampaigns: Campaign[] = [
-    {
-      cohort: "8",
-      created_at: "2024-01-10T10:00:00Z",
-      campaign_id: "camp_001",
-      campaign_name: "AIF workshop I",
-      campaign_start_time: "2024-03-15T01:00:00Z",
-      campaign_end_time: "2024-03-15T09:00:00Z",
-      campaign_location: "Virtual - AWS Chime",
-      is_active: true,
-    },
-    {
-      cohort: "8",
-      created_at: "2024-01-11T10:00:00Z",
-      campaign_id: "camp_002",
-      campaign_name: "AIF workshop II",
-      campaign_start_time: "2024-03-16T01:00:00Z",
-      campaign_end_time: "2024-03-16T09:00:00Z",
-      campaign_location: "Virtual - AWS Chime",
-      is_active: true,
-    },
-    {
-      cohort: "8",
-      created_at: "2024-02-01T10:00:00Z",
-      campaign_id: "camp_003",
-      campaign_name: "AIF workshop III",
-      campaign_start_time: "2025-05-20T01:00:00Z",
-      campaign_end_time: "2025-05-20T09:00:00Z",
-      campaign_location: "Virtual - AWS Chime",
-      is_active: true,
-    },
-  ];
 
   const mockRuns: Run[] = [
     {
@@ -95,7 +63,7 @@ export default function CampaignDetailPage() {
     try {
       if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 500));
-        const campaignData = mockCampaigns.find(c => c.campaign_id === campaignId);
+        const campaignData = mockCampaignsData.find(c => c.campaign_id === campaignId);
         const runsData = mockRuns.filter(r => r.campaign_id === campaignId);
         setCampaign(campaignData || null);
         setRuns(runsData);

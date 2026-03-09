@@ -18,9 +18,9 @@ export default function CampaignList({ campaigns }: CampaignListProps) {
   const pastCampaigns = campaigns.filter(c => getCampaignStatus(c) === "past");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* ONGOING EVENT */}
-      <div>
+      <div className="bg-gray-50 rounded-lg shadow-md p-6">
         <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">ONGOING EVENT</h2>
         {ongoingCampaigns.length > 0 ? (
           <div className="space-y-3">
@@ -32,7 +32,7 @@ export default function CampaignList({ campaigns }: CampaignListProps) {
       </div>
 
       {/* FUTURE EVENT */}
-      <div>
+      <div className="bg-gray-50 rounded-lg shadow-md p-6">
         <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">FUTURE EVENT</h2>
         {futureCampaigns.length > 0 ? (
           <div className="space-y-3">
@@ -44,7 +44,7 @@ export default function CampaignList({ campaigns }: CampaignListProps) {
       </div>
 
       {/* PAST EVENT */}
-      <div>
+      <div className="bg-gray-50 rounded-lg shadow-md p-6">
         <button
           onClick={() => setIsPastExpanded(!isPastExpanded)}
           className="flex items-center gap-2 text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4 hover:text-gray-800"
