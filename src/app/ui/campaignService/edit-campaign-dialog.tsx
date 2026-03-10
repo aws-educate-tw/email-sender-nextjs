@@ -19,8 +19,22 @@ const mockRuns: Run[] = [
   {
     run_id: "run_001",
     subject: "活動延期通知｜出缺席確認",
-    created_at: "2024-02-15T22:09:16Z",
+    created_at: "2025-03-05T22:09:16Z",
     is_active: true,
+    campaign_id: "camp_001",
+  },
+  {
+    run_id: "run_002",
+    subject: "實體報名成功｜出缺席確認",
+    created_at: "2025-02-22T14:30:00Z",
+    is_active: true,
+    campaign_id: "camp_001",
+  },
+  {
+    run_id: "run_003",
+    subject: "線上報名成功｜出缺席確認",
+    created_at: "2025-02-22T10:15:00Z",
+    is_active: false,
     campaign_id: "camp_001",
   },
 ];
@@ -265,11 +279,11 @@ export default function EditCampaignDialog({
               ) : runs.length === 0 ? (
                 <div className="text-center py-4 text-gray-500">No related emails found</div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {runs.map(run => (
                     <div
                       key={run.run_id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-2"
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-1"
                     >
                       <div className="flex-1 min-w-0">
                         <span className="text-xs sm:text-sm text-gray-600">Email Subject: </span>

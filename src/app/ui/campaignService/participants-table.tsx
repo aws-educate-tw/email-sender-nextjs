@@ -3,16 +3,31 @@
 import { useState, useMemo } from "react";
 import { Participant } from "@/app/ui/campaignService/types";
 import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import * as XLSX from "xlsx";
+import ExportConfirmationModal from "./export-confirmation-modal";
+import { Listbox } from "@headlessui/react";
+import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
 
 interface ParticipantsTableProps {
   participants: Participant[];
+  campaignName?: string;
 }
 
-export default function ParticipantsTable({ participants }: ParticipantsTableProps) {
+export default function ParticipantsTable({ participants, campaignName }: ParticipantsTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All Status");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedAll, setSelectedAll] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [showExportModal, setShowExportModal] = useState(false);
   const itemsPerPage = 10;
+
+  const statusOptions = [
+    { value: "All Status", label: "All Status" },
+    { value: "ATTEND", label: "ATTEND" },
+    { value: "NOT_ATTEND", label: "NOT_ATTEND" },
+    { value: "PENDING", label: "PENDING" },
+  ];
 
   const filteredParticipants = useMemo(() => {
     return participants.filter(p => {
@@ -64,6 +79,51 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
     }
   };
 
+  const handleSelectAll = () => {
+    if (selectedAll) {
+      setSelectedItems(new Set());
+    } else {
+      const allIds = new Set(paginatedParticipants.map(p => p.participant_id));
+      setSelectedItems(allIds);
+    }
+    setSelectedAll(!selectedAll);
+  };
+
+  const handleSelectItem = (id: string) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedItems(newSelected);
+    setSelectedAll(newSelected.size === paginatedParticipants.length);
+  };
+
+  const handleExport = () => {
+    const selectedParticipants = participants.filter(p => selectedItems.has(p.participant_id));
+
+    const exportData = selectedParticipants.map(p => ({
+      "Participant Name": p.name,
+      "Participant Email": p.email,
+      "Attendance Status": p.rsvp_status,
+      "Created At": new Date(p.created_at).toLocaleString("en-US"),
+      "Updated At": new Date(p.updated_at).toLocaleString("en-US"),
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Participants");
+
+    const sanitizedCampaignName = campaignName
+      ? campaignName.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_")
+      : "Event";
+    const fileName = `${sanitizedCampaignName}_participants_${new Date().toISOString().split("T")[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+
+    setShowExportModal(false);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -89,10 +149,18 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
               placeholder="Search participants..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-600 focus:border-gray-600 text-sm"
             />
           </div>
-          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-sm">
+          <button
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+              selectedItems.size > 0
+                ? "bg-sky-950 text-white hover:bg-sky-900"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
+            disabled={selectedItems.size === 0}
+            onClick={() => setShowExportModal(true)}
+          >
             <Download size={16} />
             Export
           </button>
@@ -100,16 +168,46 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
-        >
-          <option>All Status</option>
-          <option>ATTEND</option>
-          <option>NOT_ATTEND</option>
-          <option>PENDING</option>
-        </select>
+        <Listbox value={statusFilter} onChange={setStatusFilter}>
+          <div className="relative w-full sm:w-auto">
+            <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-sm min-w-[140px]">
+              <span className="block truncate">
+                {statusOptions.find(option => option.value === statusFilter)?.label || "All Status"}
+              </span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+              </span>
+            </Listbox.Button>
+            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-xs">
+              {statusOptions.map(option => (
+                <Listbox.Option
+                  key={option.value}
+                  value={option.value}
+                  className={({ active, selected }) =>
+                    `relative cursor-default select-none py-3 pl-4 pr-10 ${
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-900"
+                    } ${selected ? "bg-gray-500 text-white" : ""}`
+                  }
+                >
+                  {({ selected }) => (
+                    <>
+                      <span
+                        className={`block truncate ${selected ? "font-medium" : "font-normal"}`}
+                      >
+                        {option.label}
+                      </span>
+                      {selected && (
+                        <span className="absolute inset-y-0 right-0 flex items-center pr-3">
+                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                      )}
+                    </>
+                  )}
+                </Listbox.Option>
+              ))}
+            </Listbox.Options>
+          </div>
+        </Listbox>
         <div className="text-xs sm:text-sm text-gray-600">
           Show <span className="font-semibold">v{itemsPerPage}</span> entries per page
         </div>
@@ -120,7 +218,12 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <input type="checkbox" className="rounded" />
+                <input
+                  type="checkbox"
+                  className="rounded w-4 h-4 text-sky-950 bg-gray-100 border-sky-950 focus:ring-sky-950 focus:ring-2"
+                  checked={selectedAll}
+                  onChange={handleSelectAll}
+                />
               </th>
               <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Participant Name
@@ -137,7 +240,12 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
             {paginatedParticipants.map(participant => (
               <tr key={participant.participant_id} className="hover:bg-gray-50">
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                  <input type="checkbox" className="rounded" />
+                  <input
+                    type="checkbox"
+                    className="rounded w-4 h-4 text-sky-950 bg-gray-100 border-sky-950 focus:ring-sky-950 focus:ring-2"
+                    checked={selectedItems.has(participant.participant_id)}
+                    onChange={() => handleSelectItem(participant.participant_id)}
+                  />
                 </td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                   {participant.name}
@@ -182,6 +290,13 @@ export default function ParticipantsTable({ participants }: ParticipantsTablePro
           </button>
         </div>
       </div>
+
+      <ExportConfirmationModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onConfirm={handleExport}
+        selectedCount={selectedItems.size}
+      />
     </div>
   );
 }
