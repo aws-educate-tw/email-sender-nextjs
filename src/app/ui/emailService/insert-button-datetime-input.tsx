@@ -100,7 +100,7 @@ const CustomInput = forwardRef<HTMLInputElement, any>(
                 minDate && Math.abs(maxDate.getTime() - minDate.getTime()) > 86400000;
               setError(
                 campaignStart
-                  ? "Deadline cannot be later than campaign start time"
+                  ? "Deadline cannot be later than event start time"
                   : "Date exceeds allowed range"
               );
             } else {
