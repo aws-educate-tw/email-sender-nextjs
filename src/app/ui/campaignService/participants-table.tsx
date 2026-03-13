@@ -129,7 +129,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="text-xs sm:text-sm text-gray-600">
           <div className="font-semibold mb-1 sm:mb-0">
-            {filteredParticipants.length} participants selected
+            {selectedItems.size} participants selected
           </div>
           <div className="flex flex-wrap gap-x-2 gap-y-1">
             <span>Total: {stats.total}</span>
