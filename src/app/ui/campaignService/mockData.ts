@@ -41,6 +41,7 @@ export const mockRuns: Run[] = [
     created_at: "2024-02-15T22:09:16Z",
     is_active: true,
     campaign_id: "camp_001",
+    attendance_respond_deadline: "2026-04-10T23:59:59Z",
   },
   {
     run_id: "run_002",
@@ -48,6 +49,7 @@ export const mockRuns: Run[] = [
     created_at: "2024-02-10T14:30:00Z",
     is_active: true,
     campaign_id: "camp_001",
+    attendance_respond_deadline: "2025-02-28T23:59:59Z",
   },
   {
     run_id: "run_003",
@@ -55,6 +57,7 @@ export const mockRuns: Run[] = [
     created_at: "2024-02-05T10:15:00Z",
     is_active: false,
     campaign_id: "camp_001",
+    attendance_respond_deadline: "2025-02-27T23:59:59Z",
   },
 ];
 

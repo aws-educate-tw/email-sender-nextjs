@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Campaign, Run } from "./types";
+import { mockRuns } from "./mockData";
 import DateTimeInput from "./datetime-input";
 
 interface EditCampaignDialogProps {
@@ -14,30 +15,6 @@ interface EditCampaignDialogProps {
 }
 
 const USE_MOCK_DATA = true;
-
-const mockRuns: Run[] = [
-  {
-    run_id: "run_001",
-    subject: "活動延期通知｜出缺席確認",
-    created_at: "2025-03-05T22:09:16Z",
-    is_active: true,
-    campaign_id: "camp_001",
-  },
-  {
-    run_id: "run_002",
-    subject: "實體報名成功｜出缺席確認",
-    created_at: "2025-02-22T14:30:00Z",
-    is_active: true,
-    campaign_id: "camp_001",
-  },
-  {
-    run_id: "run_003",
-    subject: "線上報名成功｜出缺席確認",
-    created_at: "2025-02-22T10:15:00Z",
-    is_active: false,
-    campaign_id: "camp_001",
-  },
-];
 
 async function fetchRunsByCampaignId(campaignId: string): Promise<Run[]> {
   if (USE_MOCK_DATA) {

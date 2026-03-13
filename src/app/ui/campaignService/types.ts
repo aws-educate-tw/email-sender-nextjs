@@ -35,6 +35,7 @@ export interface Run {
   created_at: string;
   is_active: boolean;
   campaign_id: string;
+  attendance_respond_deadline: string;
 }
 
 export type CampaignStatus = "ongoing" | "future" | "past";

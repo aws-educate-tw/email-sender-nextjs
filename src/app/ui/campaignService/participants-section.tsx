@@ -69,17 +69,38 @@ export default function ParticipantsSection({
         </Listbox>
       </div>
 
-      {selectedRunId && (
-        <div className="mb-4">
-          <div className="text-xs sm:text-sm text-gray-600 mb-2">
-            Status: <span className="text-blue-600">Accepted</span>/
-            <span className="text-blue-600">Not accepted</span> for responses
-            <span className="ml-4">
-              Attendance respond deadline: <span className="font-medium">2025/03/05</span>
-            </span>
+      {selectedRunId && (() => {
+        const selectedRun = runs.find(run => run.run_id === selectedRunId);
+        if (!selectedRun) return null;
+        
+        const deadlineDate = new Date(selectedRun.attendance_respond_deadline);
+        const isDeadlinePassed = new Date() > deadlineDate;
+        const isAcceptingResponses = selectedRun.is_active && !isDeadlinePassed;
+        
+        const formatDeadline = (dateString: string) => {
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) {
+            return 'Invalid Date';
+          }
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}/${month}/${day}`;
+        };
+        
+        return (
+          <div className="mb-4">
+            <div className="text-xs sm:text-sm text-gray-600 mb-2">
+              Status: <span className={isAcceptingResponses ? "text-green-600" : "text-red-600"}>
+                {isAcceptingResponses ? "Accepted" : "Not accepted"}
+              </span> for responses
+              <span className="ml-4">
+                Attendance respond deadline: <span className="font-medium">{formatDeadline(selectedRun.attendance_respond_deadline)}</span>
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {selectedRunId && <ParticipantsTable participants={participants} />}
     </div>
