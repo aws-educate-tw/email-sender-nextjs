@@ -138,8 +138,10 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
 
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex items-center space-x-6 text-gray-700 py-3">
-          <div className="text-xl font-bold">{selectedCount} participants selected</div>
-          <div className="text-base text-gray-500">
+          <div className="text-sm sm:text-base font-bold">
+            {selectedCount} participants selected
+          </div>
+          <div className="text-xs sm:text-sm text-gray-500">
             Total: {stats.total} | Attend: {stats.attend} | Not Attend: {stats.notAttend} | Pending:{" "}
             {stats.pending}
           </div>
@@ -158,11 +160,11 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
                 setSearchTerm(e.target.value);
                 setCurrentPage(1); // Reset to first page when search changes
               }}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-600 focus:border-gray-600 text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-600 focus:border-gray-600 text-xs sm:text-sm"
             />
           </div>
           <button
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-xs sm:text-sm transition-colors ${
               selectedCount > 0
                 ? "bg-sky-950 text-white hover:bg-sky-900"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -185,7 +187,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
           }}
         >
           <div className="relative w-full sm:w-auto">
-            <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-sm min-w-[140px]">
+            <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-xs sm:text-sm min-w-[140px]">
               <span className="block truncate">
                 {statusOptions.find(option => option.value === statusFilter)?.label || "All Status"}
               </span>
@@ -224,7 +226,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
           </div>
         </Listbox>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-700">Show</span>
+          <span className="text-xs sm:text-sm text-gray-700">Show</span>
           <Listbox
             value={itemsPerPage}
             onChange={value => {
@@ -238,7 +240,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
             }}
           >
             <div className="relative">
-              <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-sm min-w-[80px]">
+              <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-xs sm:text-sm min-w-[80px]">
                 <span className="block truncate">{itemsPerPage}</span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -274,7 +276,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
               </Listbox.Options>
             </div>
           </Listbox>
-          <span className="text-sm text-gray-700">entries per page</span>
+          <span className="text-xs sm:text-sm text-gray-700">entries per page</span>
         </div>
       </div>
 

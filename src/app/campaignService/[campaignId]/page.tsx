@@ -53,7 +53,7 @@ export default function CampaignDetailPage() {
         participants={participants}
       />
 
-      <button className="w-full bg-gray-100 rounded-lg shadow-md p-4 sm:p-6 text-base sm:text-lg font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors cursor-pointer text-left">
+      <button className="w-full bg-gray-100 rounded-lg shadow-md p-4 sm:p-6 text-lg sm:text-xl font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors cursor-pointer text-left">
         Related Email Sending Histories
       </button>
 

@@ -34,6 +34,19 @@ async function updateCampaign(campaignId: string, data: any): Promise<void> {
   if (USE_MOCK_DATA) {
     await new Promise(resolve => setTimeout(resolve, 500));
     console.log("Mock: Campaign updated", campaignId, data);
+
+    // Update mock data in place
+    const { mockCampaignsData } = await import("./mockData");
+    const campaignIndex = mockCampaignsData.findIndex(c => c.campaign_id === campaignId);
+    if (campaignIndex !== -1) {
+      mockCampaignsData[campaignIndex] = {
+        ...mockCampaignsData[campaignIndex],
+        campaign_name: data.campaign_name,
+        campaign_start_time: data.campaign_start_time,
+        campaign_end_time: data.campaign_end_time,
+        campaign_location: data.campaign_location,
+      };
+    }
     return;
   }
   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
