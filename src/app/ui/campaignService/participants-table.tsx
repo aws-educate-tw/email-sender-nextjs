@@ -20,7 +20,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
   const [selectedAll, setSelectedAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [showExportModal, setShowExportModal] = useState(false);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const statusOptions = [
     { value: "All Status", label: "All Status" },
@@ -42,7 +42,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
   const paginatedParticipants = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredParticipants.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredParticipants, currentPage]);
+  }, [filteredParticipants, currentPage, itemsPerPage]);
 
   const totalPages = Math.ceil(filteredParticipants.length / itemsPerPage);
 
@@ -126,16 +126,15 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
 
   return (
     <div className="space-y-4">
+      {/* 分隔線 */}
+      <div className="border-t border-gray-200"></div>
+
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="text-xs sm:text-sm text-gray-600">
-          <div className="font-semibold mb-1 sm:mb-0">
-            {selectedItems.size} participants selected
-          </div>
-          <div className="flex flex-wrap gap-x-2 gap-y-1">
-            <span>Total: {stats.total}</span>
-            <span>Attend: {stats.attend}</span>
-            <span>Not Attend: {stats.notAttend}</span>
-            <span>Pending: {stats.pending}</span>
+        <div className="flex items-center space-x-6 text-gray-700 py-3">
+          <div className="text-xl font-bold">{selectedItems.size} participants selected</div>
+          <div className="text-base text-gray-500">
+            Total: {stats.total} | Attend: {stats.attend} | Not Attend: {stats.notAttend} | Pending:{" "}
+            {stats.pending}
           </div>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
@@ -208,8 +207,53 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
             </Listbox.Options>
           </div>
         </Listbox>
-        <div className="text-xs sm:text-sm text-gray-600">
-          Show <span className="font-semibold">v{itemsPerPage}</span> entries per page
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-700">Show</span>
+          <Listbox
+            value={itemsPerPage}
+            onChange={value => {
+              setItemsPerPage(value);
+              setCurrentPage(1); // Reset to first page when changing page size
+            }}
+          >
+            <div className="relative">
+              <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-sm min-w-[80px]">
+                <span className="block truncate">{itemsPerPage}</span>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                  <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </span>
+              </Listbox.Button>
+              <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-xs">
+                {[10, 20, 30, 50, 100].map(pageSize => (
+                  <Listbox.Option
+                    key={pageSize}
+                    value={pageSize}
+                    className={({ active, selected }) =>
+                      `relative cursor-default select-none py-3 pl-4 pr-10 ${
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-900"
+                      } ${selected ? "bg-gray-500 text-white" : ""}`
+                    }
+                  >
+                    {({ selected }) => (
+                      <>
+                        <span
+                          className={`block truncate ${selected ? "font-medium" : "font-normal"}`}
+                        >
+                          {pageSize}
+                        </span>
+                        {selected && (
+                          <span className="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </div>
+          </Listbox>
+          <span className="text-sm text-gray-700">entries per page</span>
         </div>
       </div>
 
@@ -272,18 +316,26 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 text-sm"
+            className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md ${
+              currentPage === 1
+                ? "cursor-not-allowed text-gray-400 bg-gray-100"
+                : "text-gray-700 bg-white hover:bg-gray-50"
+            }`}
           >
             <ChevronLeft size={16} />
             <span className="hidden sm:inline">Previous</span>
           </button>
-          <button className="px-3 sm:px-4 py-2 bg-sky-950 text-white rounded-md text-sm">
+          <button className="px-3 py-2 bg-sky-950 text-white rounded-md text-sm font-medium">
             {currentPage}
           </button>
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 text-sm"
+            className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md ${
+              currentPage === totalPages
+                ? "cursor-not-allowed text-gray-400 bg-gray-100"
+                : "text-gray-700 bg-white hover:bg-gray-50"
+            }`}
           >
             <span className="hidden sm:inline">Next</span>
             <ChevronRight size={16} />
