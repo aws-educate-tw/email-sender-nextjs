@@ -39,6 +39,11 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
     });
   }, [participants, searchTerm, statusFilter]);
 
+  // Calculate selected count based on current filtered results
+  const selectedCount = useMemo(() => {
+    return filteredParticipants.filter(p => selectedItems.has(p.participant_id)).length;
+  }, [filteredParticipants, selectedItems]);
+
   const paginatedParticipants = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredParticipants.slice(startIndex, startIndex + itemsPerPage);
@@ -83,7 +88,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
     if (selectedAll) {
       setSelectedItems(new Set());
     } else {
-      const allIds = new Set(paginatedParticipants.map(p => p.participant_id));
+      const allIds = new Set(filteredParticipants.map(p => p.participant_id));
       setSelectedItems(allIds);
     }
     setSelectedAll(!selectedAll);
@@ -97,11 +102,13 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
       newSelected.add(id);
     }
     setSelectedItems(newSelected);
-    setSelectedAll(newSelected.size === paginatedParticipants.length);
+    setSelectedAll(newSelected.size === filteredParticipants.length);
   };
 
   const handleExport = () => {
-    const selectedParticipants = participants.filter(p => selectedItems.has(p.participant_id));
+    const selectedParticipants = filteredParticipants.filter(p =>
+      selectedItems.has(p.participant_id)
+    );
 
     const exportData = selectedParticipants.map(p => ({
       "Participant Name": p.name,
@@ -131,7 +138,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
 
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex items-center space-x-6 text-gray-700 py-3">
-          <div className="text-xl font-bold">{selectedItems.size} participants selected</div>
+          <div className="text-xl font-bold">{selectedCount} participants selected</div>
           <div className="text-base text-gray-500">
             Total: {stats.total} | Attend: {stats.attend} | Not Attend: {stats.notAttend} | Pending:{" "}
             {stats.pending}
@@ -147,17 +154,20 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
               type="text"
               placeholder="Search participants..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to first page when search changes
+              }}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-600 focus:border-gray-600 text-sm"
             />
           </div>
           <button
             className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
-              selectedItems.size > 0
+              selectedCount > 0
                 ? "bg-sky-950 text-white hover:bg-sky-900"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
-            disabled={selectedItems.size === 0}
+            disabled={selectedCount === 0}
             onClick={() => setShowExportModal(true)}
           >
             <Download size={16} />
@@ -167,7 +177,13 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <Listbox value={statusFilter} onChange={setStatusFilter}>
+        <Listbox
+          value={statusFilter}
+          onChange={value => {
+            setStatusFilter(value);
+            setCurrentPage(1); // Reset to first page when filter changes
+          }}
+        >
           <div className="relative w-full sm:w-auto">
             <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-sm min-w-[140px]">
               <span className="block truncate">
@@ -214,6 +230,11 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
             onChange={value => {
               setItemsPerPage(value);
               setCurrentPage(1); // Reset to first page when changing page size
+              // Update selectedAll state based on current selection
+              setSelectedAll(
+                selectedItems.size === filteredParticipants.length &&
+                  filteredParticipants.length > 0
+              );
             }}
           >
             <div className="relative">
@@ -347,7 +368,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
         onConfirm={handleExport}
-        selectedCount={selectedItems.size}
+        selectedCount={selectedCount}
       />
     </div>
   );
