@@ -193,9 +193,9 @@ const CustomInput = forwardRef<HTMLInputElement, any>(
     const handleClear = (e: React.MouseEvent) => {
       e.stopPropagation();
       setLocalValue("");
-      onDateChange(null);
       setError("");
       setIsTyping(false);
+      onDateChange(null);
     };
 
     return (
@@ -289,7 +289,7 @@ export default function DateTimeInput({
             minDate={minDate}
             maxDate={maxDate}
             onClose={handleClose}
-            onDateChange={onChange}
+            onDateChange={handleDateChange}
           />
         }
         className={className}

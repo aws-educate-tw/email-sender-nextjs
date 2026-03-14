@@ -67,7 +67,7 @@ export default function EditCampaignDialog({
 }: EditCampaignDialogProps) {
   const [formData, setFormData] = useState<{
     campaign_name: string;
-    campaign_start_time: Date;
+    campaign_start_time: Date | null;
     campaign_end_time: Date | null;
     campaign_location: string;
   }>({
@@ -134,8 +134,8 @@ export default function EditCampaignDialog({
     setIsSubmitting(true);
 
     try {
-      if (!formData.campaign_end_time) {
-        alert("Please select an end time.");
+      if (!formData.campaign_start_time || !formData.campaign_end_time) {
+        alert("Please select both start and end times.");
         setIsSubmitting(false);
         return;
       }
@@ -213,12 +213,10 @@ export default function EditCampaignDialog({
                     <DateTimeInput
                       selected={formData.campaign_start_time}
                       onChange={date => {
-                        if (date) {
-                          setFormData({ ...formData, campaign_start_time: date });
-                          setHasChanges(true);
-                          if (formData.campaign_end_time && formData.campaign_end_time <= date) {
-                            setFormData(prev => ({ ...prev, campaign_end_time: null }));
-                          }
+                        setFormData({ ...formData, campaign_start_time: date });
+                        setHasChanges(true);
+                        if (date && formData.campaign_end_time && formData.campaign_end_time <= date) {
+                          setFormData(prev => ({ ...prev, campaign_end_time: null }));
                         }
                       }}
                       minDate={new Date()}
@@ -230,12 +228,10 @@ export default function EditCampaignDialog({
                     <DateTimeInput
                       selected={formData.campaign_end_time}
                       onChange={date => {
-                        if (date) {
-                          setFormData({ ...formData, campaign_end_time: date });
-                          setHasChanges(true);
-                        }
+                        setFormData({ ...formData, campaign_end_time: date });
+                        setHasChanges(true);
                       }}
-                      minDate={formData.campaign_start_time}
+                      minDate={formData.campaign_start_time || new Date()}
                       placeholderText="Type or select: YYYY/MM/DD HH:mm"
                     />
                   </div>
