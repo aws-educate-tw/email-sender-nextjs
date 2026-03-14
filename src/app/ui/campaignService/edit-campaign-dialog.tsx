@@ -215,7 +215,11 @@ export default function EditCampaignDialog({
                       onChange={date => {
                         setFormData({ ...formData, campaign_start_time: date });
                         setHasChanges(true);
-                        if (date && formData.campaign_end_time && formData.campaign_end_time <= date) {
+                        if (
+                          date &&
+                          formData.campaign_end_time &&
+                          formData.campaign_end_time <= date
+                        ) {
                           setFormData(prev => ({ ...prev, campaign_end_time: null }));
                         }
                       }}
