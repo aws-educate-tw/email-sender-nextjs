@@ -7,6 +7,7 @@ import CampaignInfoCard from "@/app/ui/campaignService/campaign-info-card";
 import ParticipantsSection from "@/app/ui/campaignService/participants-section";
 import EditCampaignDialog from "@/app/ui/campaignService/edit-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
+import Link from "next/link";
 
 export default function CampaignDetailPage() {
   const params = useParams();
@@ -53,9 +54,12 @@ export default function CampaignDetailPage() {
         participants={participants}
       />
 
-      <button className="w-full bg-gray-100 rounded-lg shadow-md p-4 sm:p-6 text-lg sm:text-xl font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors cursor-pointer text-left">
+      <Link
+        href={`/emailHistory?campaign_id=${campaignId}`}
+        className="block w-full bg-gray-100 rounded-lg shadow-md p-4 sm:p-6 text-lg sm:text-xl font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors cursor-pointer text-left"
+      >
         Related Email Sending Histories
-      </button>
+      </Link>
 
       {campaign && (
         <EditCampaignDialog
