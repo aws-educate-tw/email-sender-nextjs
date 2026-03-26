@@ -1,0 +1,90 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { Campaign } from "@/app/ui/campaignService/types";
+import CampaignList from "@/app/ui/campaignService/campaign-list";
+import CreateCampaignDialog from "@/app/ui/campaignService/create-campaign-dialog";
+import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
+import { mockCampaignsData } from "@/app/ui/campaignService/mockData";
+
+export default function CampaignServicePage() {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Development toggle: true = Mock Data, false = Real API
+  const USE_MOCK_DATA = true;
+
+  useEffect(() => {
+    loadCampaigns();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadCampaigns = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Use Mock Data
+      if (USE_MOCK_DATA) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setCampaigns([...mockCampaignsData]);
+        return;
+      }
+
+      // Use Real API
+      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(`${base_url}/campaigns`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch campaigns");
+      }
+
+      const data = await response.json();
+      setCampaigns(data);
+    } catch (error) {
+      console.error("Failed to load campaigns:", error);
+      alert("Failed to load events. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [USE_MOCK_DATA]);
+
+  return (
+    <div>
+      <div className="flex flex-col justify-center items-start">
+        <p className="text-4xl font-bold pt-2">Event Service</p>
+        <div className="flex justify-between items-center w-full pb-4">
+          <p className="text-gray-500 italic">Manage your email events and view sending details.</p>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <button
+          onClick={() => setIsDialogOpen(true)}
+          className="px-6 py-2 bg-sky-950 text-white rounded-md hover:bg-sky-800 transition"
+        >
+          Create New Event
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center p-8 bg-neutral-100 rounded-md">
+          <RotatingLoaderAnimation />
+        </div>
+      ) : (
+        <CampaignList campaigns={campaigns} />
+      )}
+
+      <CreateCampaignDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSuccess={loadCampaigns}
+      />
+    </div>
+  );
+}
