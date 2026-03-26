@@ -21,7 +21,7 @@ interface SenderType {
   message?: string;
 }
 
-interface DataType {
+export interface EmailHistoryDataType {
   bcc: string[];
   subject: string;
   cc: string[];
@@ -49,16 +49,17 @@ interface DataType {
 }
 
 interface PropsType {
-  data: DataType[] | null;
+  data: EmailHistoryDataType[] | null;
+  campaignFilterLabel?: string;
 }
 
-export default function EmailHistoryCard({ data }: PropsType) {
+export default function EmailHistoryCard({ data, campaignFilterLabel }: PropsType) {
   // Early return for empty or undefined data
   if (!data || data.length === 0) {
     return <div className="w-full p-8 text-center text-gray-500">No email history found</div>;
   }
 
-  const renderRecipientInfo = (item: DataType) => {
+  const renderRecipientInfo = (item: EmailHistoryDataType) => {
     const isDirect = item.recipient_source === "DIRECT";
 
     return (
@@ -111,8 +112,13 @@ export default function EmailHistoryCard({ data }: PropsType) {
         >
           <div className="p-8">
             <div className="flex flex-col">
-              <div className="uppercase tracking-wide text-lg text-black font-semibold mb-1">
-                {item.subject ? item.subject : "No Subject"}
+              <div className="uppercase tracking-wide text-lg text-black font-semibold mb-1 flex items-center gap-2 flex-wrap">
+                <span>{item.subject ? item.subject : "No Subject"}</span>
+                {campaignFilterLabel && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-700">
+                    {campaignFilterLabel}
+                  </span>
+                )}
               </div>
               <hr />
               <div className="flex flex-col py-2 xl:gap-4 xl:flex-row justify-between">

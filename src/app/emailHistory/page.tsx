@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
@@ -75,6 +76,10 @@ interface DataType {
 }
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const campaignId = searchParams.get("campaign_id") || "";
+  const campaignName = searchParams.get("campaign_name") || "";
+
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -82,10 +87,10 @@ export default function Page() {
   const [hasPreviousPage, setHasPreviousPage] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchFiles(10, 1);
-  }, []);
+    fetchFiles(10, 1, campaignId);
+  }, [campaignId]);
 
-  const fetchFiles = async (limit: number, page: number) => {
+  const fetchFiles = async (limit: number, page: number, targetCampaignId?: string) => {
     let retryCount = 0;
     const maxRetries = 5;
     const retryDelay = 15000; // 15 seconds in milliseconds
@@ -94,7 +99,9 @@ export default function Page() {
       try {
         const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
         const url = new URL(`${base_url}/runs`);
-        url.searchParams.append("run_type", "EMAIL");
+        if (targetCampaignId) {
+          url.searchParams.append("campaign_id", targetCampaignId);
+        }
         url.searchParams.append("limit", limit.toString());
         url.searchParams.append("page", page.toString());
 
@@ -146,9 +153,19 @@ export default function Page() {
       <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">Emails history</p>
         <div className="flex justify-between items-center w-full pb-4">
-          <p className="text-gray-500 italic">
-            Emails you <strong>have sent</strong> are displayed here.
-          </p>
+          <div className="flex flex-col items-start gap-1">
+            <p className="text-gray-500 italic">
+              Emails you <strong>have sent</strong> are displayed here.
+            </p>
+            {campaignId && campaignName && (
+              <div className="flex items-center gap-2">
+                <p className="text-lg font-bold text-gray-700">Filtered Events:</p>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-sm bg-amber-100 text-amber-700 font-bold uppercase tracking-wide">
+                  {campaignName}
+                </span>
+              </div>
+            )}
+          </div>
           <div className="h-10"></div>
         </div>
       </div>
@@ -160,7 +177,11 @@ export default function Page() {
             </div>
           )}
 
-          {isLoading ? <EmailHistoryCardLoading /> : <EmailHistoryCard data={data} />}
+          {isLoading ? (
+            <EmailHistoryCardLoading />
+          ) : (
+            <EmailHistoryCard data={data} campaignFilterLabel={campaignName || undefined} />
+          )}
 
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
@@ -171,7 +192,7 @@ export default function Page() {
               }`}
               onClick={() => {
                 if (hasPreviousPage) {
-                  fetchFiles(10, currentPage - 1);
+                  fetchFiles(10, currentPage - 1, campaignId);
                 }
               }}
               disabled={!hasPreviousPage}
@@ -187,7 +208,7 @@ export default function Page() {
               }`}
               onClick={() => {
                 if (hasNextPage) {
-                  fetchFiles(10, currentPage + 1);
+                  fetchFiles(10, currentPage + 1, campaignId);
                 }
               }}
               disabled={!hasNextPage}
