@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
@@ -75,7 +75,7 @@ interface DataType {
   created_year: string;
 }
 
-export default function Page() {
+function EmailHistoryPageContent() {
   const searchParams = useSearchParams();
   const campaignId = searchParams.get("campaign_id") || "";
   const campaignName = searchParams.get("campaign_name") || "";
@@ -220,5 +220,19 @@ export default function Page() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center p-8">
+          <RotatingLoaderAnimation />
+        </div>
+      }
+    >
+      <EmailHistoryPageContent />
+    </Suspense>
   );
 }
