@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Campaign } from "@/app/ui/campaignService/types";
+import { Campaign, CampaignListItem } from "@/app/ui/campaignService/types";
 import CampaignList from "@/app/ui/campaignService/campaign-list";
 import CreateCampaignDialog from "@/app/ui/campaignService/create-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
@@ -13,7 +13,7 @@ export default function CampaignServicePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Development toggle: true = Mock Data, false = Real API
-  const USE_MOCK_DATA = true;
+  const USE_MOCK_DATA = false;
 
   useEffect(() => {
     loadCampaigns();
@@ -33,7 +33,7 @@ export default function CampaignServicePage() {
       // Use Real API
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${base_url}/campaigns`, {
+      const response = await fetch(`${base_url}/rsvp-service/campaigns`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -44,8 +44,13 @@ export default function CampaignServicePage() {
         throw new Error("Failed to fetch campaigns");
       }
 
-      const data = await response.json();
-      setCampaigns(data);
+      const data: CampaignListItem[] = await response.json();
+      // Convert API response to Campaign format for UI compatibility
+      const campaigns: Campaign[] = data.map(item => ({
+        ...item,
+        description: undefined, // Not available in list API
+      }));
+      setCampaigns(campaigns);
     } catch (error) {
       console.error("Failed to load campaigns:", error);
       alert("Failed to load events. Please try again.");

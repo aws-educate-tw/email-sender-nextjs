@@ -16,18 +16,13 @@ interface EditCampaignDialogProps {
 
 const USE_MOCK_DATA = true;
 
-async function fetchRunsByCampaignId(campaignId: string): Promise<Run[]> {
+async function fetchRunsByCampaignId(): Promise<Run[]> {
   if (USE_MOCK_DATA) {
     await new Promise(resolve => setTimeout(resolve, 300));
-    return mockRuns.filter(r => r.campaign_id === campaignId);
+    return mockRuns.filter(r => r.run_id.includes("001")); // Simplified mock logic
   }
-  const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-  const token = localStorage.getItem("access_token");
-  const response = await fetch(`${base_url}/campaigns/${campaignId}/runs`, {
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) throw new Error("Failed to fetch runs");
-  return response.json();
+  // In real API, runs will be obtained from campaign detail API
+  return [];
 }
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
@@ -99,7 +94,7 @@ export default function EditCampaignDialog({
   const loadRuns = async () => {
     setIsLoadingRuns(true);
     try {
-      const runsData = await fetchRunsByCampaignId(campaign.campaign_id);
+      const runsData = await fetchRunsByCampaignId();
       setRuns(runsData);
       const initialStates: Record<string, boolean> = {};
       runsData.forEach(run => {
@@ -281,7 +276,7 @@ export default function EditCampaignDialog({
                           {run.subject}
                         </span>
                         <span className="text-xs sm:text-sm text-gray-500 ml-2 whitespace-nowrap">
-                          (DL: {formatDeadline(run.created_at)})
+                          (DL: {formatDeadline(run.registration_deadline)})
                         </span>
                       </div>
                       <div className="flex rounded-lg overflow-hidden border border-gray-300 flex-shrink-0 w-full sm:w-auto">
