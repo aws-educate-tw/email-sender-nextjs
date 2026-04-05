@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Campaign, Run } from "./types";
-import { mockRuns } from "./mockData";
 import DateTimeInput from "./datetime-input";
 
 interface EditCampaignDialogProps {
@@ -14,36 +13,12 @@ interface EditCampaignDialogProps {
   campaign: Campaign;
 }
 
-const USE_MOCK_DATA = true;
-
 async function fetchRunsByCampaignId(): Promise<Run[]> {
-  if (USE_MOCK_DATA) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockRuns.filter(r => r.run_id.includes("001")); // Simplified mock logic
-  }
   // In real API, runs will be obtained from campaign detail API
   return [];
 }
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
-  if (USE_MOCK_DATA) {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    console.log("Mock: Campaign updated", campaignId, data);
-
-    // Update mock data in place
-    const { mockCampaignsData } = await import("./mockData");
-    const campaignIndex = mockCampaignsData.findIndex(c => c.campaign_id === campaignId);
-    if (campaignIndex !== -1) {
-      mockCampaignsData[campaignIndex] = {
-        ...mockCampaignsData[campaignIndex],
-        campaign_name: data.campaign_name,
-        campaign_start_time: data.campaign_start_time,
-        campaign_end_time: data.campaign_end_time,
-        campaign_location: data.campaign_location,
-      };
-    }
-    return;
-  }
   const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
   const token = localStorage.getItem("access_token");
   const response = await fetch(`${base_url}/campaigns/${campaignId}`, {

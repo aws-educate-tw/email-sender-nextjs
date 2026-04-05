@@ -5,15 +5,11 @@ import { Campaign, CampaignListItem } from "@/app/ui/campaignService/types";
 import CampaignList from "@/app/ui/campaignService/campaign-list";
 import CreateCampaignDialog from "@/app/ui/campaignService/create-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
-import { mockCampaignsData } from "@/app/ui/campaignService/mockData";
 
 export default function CampaignServicePage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  // Development toggle: true = Mock Data, false = Real API
-  const USE_MOCK_DATA = false;
 
   useEffect(() => {
     loadCampaigns();
@@ -23,13 +19,6 @@ export default function CampaignServicePage() {
   const loadCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Use Mock Data
-      if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setCampaigns([...mockCampaignsData]);
-        return;
-      }
-
       // Use Real API
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const token = localStorage.getItem("access_token");
@@ -57,7 +46,7 @@ export default function CampaignServicePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [USE_MOCK_DATA]);
+  }, []);
 
   return (
     <div>

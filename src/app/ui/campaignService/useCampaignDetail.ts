@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { Campaign, Run, Participant, CampaignDetailResponse, CampaignListItem } from "./types";
-import { mockCampaignsData, mockRuns } from "./mockData";
-
-const USE_MOCK_DATA = false;
 
 export function useCampaignDetail(campaignId: string) {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
@@ -14,19 +11,6 @@ export function useCampaignDetail(campaignId: string) {
   const loadCampaignData = useCallback(async () => {
     setIsLoading(true);
     try {
-      if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const campaignData = mockCampaignsData.find(c => c.campaign_id === campaignId);
-        // For mock data, just return all runs since they don't have campaign_id anymore
-        const runsData = mockRuns;
-        setCampaign(campaignData || null);
-        setRuns(runsData);
-        if (runsData.length > 0) {
-          setSelectedRunId(runsData[0].run_id);
-        }
-        return;
-      }
-
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const token = localStorage.getItem("access_token");
       const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
@@ -75,15 +59,6 @@ export function useCampaignDetail(campaignId: string) {
   const loadParticipants = useCallback(
     async (runId: string) => {
       try {
-        if (USE_MOCK_DATA) {
-          await new Promise(resolve => setTimeout(resolve, 300));
-          // For mock data, find the run and get its participants
-          const currentRun = mockRuns.find(r => r.run_id === runId);
-          const data = currentRun ? currentRun.participants : [];
-          setParticipants(data);
-          return;
-        }
-
         // Get participants from corresponding run
         const currentRun = runs.find(run => run.run_id === runId);
         if (currentRun && currentRun.participants) {
