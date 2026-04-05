@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Campaign, Run, Participant, CampaignDetailResponse } from "./types";
+import { Campaign, Run, Participant, CampaignDetailResponse, CampaignListItem } from "./types";
 import { mockCampaignsData, mockRuns } from "./mockData";
 
 const USE_MOCK_DATA = false;
@@ -29,30 +29,40 @@ export function useCampaignDetail(campaignId: string) {
 
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${base_url}/rsvp-service/campaigns/${campaignId}`, {
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+
+      // Step 1: Get campaign basic info from campaigns list API
+      const campaignsResponse = await fetch(`${base_url}/rsvp-service/campaigns`, { headers });
+      if (!campaignsResponse.ok) throw new Error("Failed to fetch campaigns list");
+
+      const campaignsList: CampaignListItem[] = await campaignsResponse.json();
+      const campaignBasicInfo = campaignsList.find(c => c.campaign_id === campaignId);
+      if (!campaignBasicInfo) throw new Error(`Campaign with ID '${campaignId}' not found`);
+
+      // Step 2: Get campaign detail with runs and participants
+      const detailResponse = await fetch(`${base_url}/rsvp-service/campaigns/${campaignId}`, {
+        headers,
       });
+      if (!detailResponse.ok) throw new Error("Failed to fetch campaign detail");
 
-      if (!response.ok) throw new Error("Failed to fetch campaign detail");
+      const detailData: CampaignDetailResponse = await detailResponse.json();
 
-      const data: CampaignDetailResponse = await response.json();
-
-      // Convert API response format to frontend required format
+      // Merge basic info with detail data
       const campaignData: Campaign = {
-        campaign_id: data.campaign_id,
-        campaign_name: data.campaign_name,
-        campaign_start_time: "", // Not provided in API spec, will need to be added to API or handled differently
-        campaign_end_time: "", // Not provided in API spec, will need to be added to API or handled differently
-        campaign_location: "", // Not provided in API spec, will need to be added to API or handled differently
-        campaign_created_at: data.created_at,
-        is_active: data.is_active,
-        description: data.description,
+        campaign_id: campaignBasicInfo.campaign_id,
+        campaign_name: campaignBasicInfo.campaign_name,
+        campaign_start_time: campaignBasicInfo.campaign_start_time,
+        campaign_end_time: campaignBasicInfo.campaign_end_time,
+        campaign_location: campaignBasicInfo.campaign_location,
+        campaign_created_at: campaignBasicInfo.campaign_created_at,
+        is_active: campaignBasicInfo.is_active,
+        description: detailData.description,
       };
 
       setCampaign(campaignData);
-      setRuns(data.runs);
-      if (data.runs.length > 0) {
-        setSelectedRunId(data.runs[0].run_id);
+      setRuns(detailData.runs);
+      if (detailData.runs.length > 0) {
+        setSelectedRunId(detailData.runs[0].run_id);
       }
     } catch (error) {
       console.error("Failed to load campaign data:", error);
