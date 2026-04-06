@@ -19,17 +19,26 @@ export default function CampaignServicePage() {
   const loadCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Use Real API
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${base_url}/rsvp-service/campaigns`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (!token) {
+        throw new Error("Unauthorized: missing access token. Please login again.");
+      }
+
+      const response = await fetch(
+        `${base_url}/rsvp-service/${process.env.NEXT_PUBLIC_ENVIRONMENT || "dev"}/campaigns`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("Unauthorized: your session may have expired. Please login again.");
+        }
         throw new Error("Failed to fetch campaigns");
       }
 
@@ -42,7 +51,8 @@ export default function CampaignServicePage() {
       setCampaigns(campaigns);
     } catch (error) {
       console.error("Failed to load campaigns:", error);
-      alert("Failed to load events. Please try again.");
+      const message = error instanceof Error ? error.message : "Failed to load events.";
+      alert(message);
     } finally {
       setIsLoading(false);
     }

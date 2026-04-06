@@ -13,10 +13,19 @@ export function useCampaignDetail(campaignId: string) {
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
       const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Unauthorized: missing access token. Please login again.");
+      }
       const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
       // Step 1: Get campaign basic info from campaigns list API
-      const campaignsResponse = await fetch(`${base_url}/rsvp-service/campaigns`, { headers });
+      const campaignsResponse = await fetch(
+        `${base_url}/rsvp-service/${process.env.NEXT_PUBLIC_ENVIRONMENT || "dev"}/campaigns`,
+        { headers }
+      );
+      if (campaignsResponse.status === 401 || campaignsResponse.status === 403) {
+        throw new Error("Unauthorized: your session may have expired. Please login again.");
+      }
       if (!campaignsResponse.ok) throw new Error("Failed to fetch campaigns list");
 
       const campaignsList: CampaignListItem[] = await campaignsResponse.json();
@@ -24,9 +33,15 @@ export function useCampaignDetail(campaignId: string) {
       if (!campaignBasicInfo) throw new Error(`Campaign with ID '${campaignId}' not found`);
 
       // Step 2: Get campaign detail with runs and participants
-      const detailResponse = await fetch(`${base_url}/rsvp-service/campaigns/${campaignId}`, {
-        headers,
-      });
+      const detailResponse = await fetch(
+        `${base_url}/rsvp-service/${process.env.NEXT_PUBLIC_ENVIRONMENT || "dev"}/campaigns/${campaignId}`,
+        {
+          headers,
+        }
+      );
+      if (detailResponse.status === 401 || detailResponse.status === 403) {
+        throw new Error("Unauthorized: your session may have expired. Please login again.");
+      }
       if (!detailResponse.ok) throw new Error("Failed to fetch campaign detail");
 
       const detailData: CampaignDetailResponse = await detailResponse.json();
@@ -40,7 +55,7 @@ export function useCampaignDetail(campaignId: string) {
         campaign_location: campaignBasicInfo.campaign_location,
         campaign_created_at: campaignBasicInfo.campaign_created_at,
         is_active: campaignBasicInfo.is_active,
-        description: detailData.description,
+        description: detailData.description ?? undefined,
       };
 
       setCampaign(campaignData);
@@ -50,7 +65,8 @@ export function useCampaignDetail(campaignId: string) {
       }
     } catch (error) {
       console.error("Failed to load campaign data:", error);
-      alert("Failed to load event data. Please try again.");
+      const message = error instanceof Error ? error.message : "Failed to load event data.";
+      alert(message);
     } finally {
       setIsLoading(false);
     }

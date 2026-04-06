@@ -33,7 +33,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
     return participants.filter(p => {
       const matchesSearch =
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.email_id.toLowerCase().includes(searchTerm.toLowerCase());
+        (p.email_id ?? "").toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === "All Status" || p.rsvp_status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -112,7 +112,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
 
     const exportData = selectedParticipants.map(p => ({
       "Participant Name": p.name,
-      "Participant Email": p.email_id,
+      "Participant Email": p.email_id ?? "",
       "Attendance Status": p.rsvp_status,
       "Created At": new Date(p.created_at).toLocaleString("en-US"),
       "Updated At": new Date(p.updated_at).toLocaleString("en-US"),
@@ -318,7 +318,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
                   {participant.name}
                 </td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                  {participant.email_id}
+                  {participant.email_id ?? "-"}
                 </td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   {getStatusBadge(participant.rsvp_status)}

@@ -23,7 +23,7 @@ export interface Campaign {
 
 export interface Participant {
   participant_id: string;
-  email_id: string;
+  email_id: string | null;
   rsvp_status: "PENDING" | "ATTEND" | "NOT_ATTEND";
   name: string;
   created_at: string;
@@ -43,7 +43,7 @@ export interface Run {
 export interface CampaignDetailResponse {
   campaign_id: string;
   campaign_name: string;
-  description: string;
+  description: string | null;
   created_at: string;
   is_active: boolean;
   runs: Run[];
