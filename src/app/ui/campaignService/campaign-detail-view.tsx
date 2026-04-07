@@ -31,7 +31,7 @@ export default function CampaignDetailView({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <RotatingLoaderAnimation />
+        <RotatingLoaderAnimation message="Loading event detail..." />
       </div>
     );
   }

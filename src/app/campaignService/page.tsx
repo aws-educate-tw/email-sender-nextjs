@@ -78,7 +78,7 @@ export default function CampaignServicePage() {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center p-8 bg-neutral-100 rounded-md">
-          <RotatingLoaderAnimation />
+          <RotatingLoaderAnimation message="Loading events..." />
         </div>
       ) : (
         <CampaignList campaigns={campaigns} />
