@@ -12,6 +12,10 @@ export function useCampaignDetail(campaignId: string) {
     setIsLoading(true);
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
+      if (!environment) {
+        throw new Error("Missing environment configuration. Please set NEXT_PUBLIC_ENVIRONMENT.");
+      }
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Unauthorized: missing access token. Please login again.");
@@ -19,10 +23,9 @@ export function useCampaignDetail(campaignId: string) {
       const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
       // Step 1: Get campaign basic info from campaigns list API
-      const campaignsResponse = await fetch(
-        `${base_url}/rsvp-service/${process.env.NEXT_PUBLIC_ENVIRONMENT || "dev"}/campaigns`,
-        { headers }
-      );
+      const campaignsResponse = await fetch(`${base_url}/rsvp-service/${environment}/campaigns`, {
+        headers,
+      });
       if (campaignsResponse.status === 401 || campaignsResponse.status === 403) {
         throw new Error("Unauthorized: your session may have expired. Please login again.");
       }
@@ -34,7 +37,7 @@ export function useCampaignDetail(campaignId: string) {
 
       // Step 2: Get campaign detail with runs and participants
       const detailResponse = await fetch(
-        `${base_url}/rsvp-service/${process.env.NEXT_PUBLIC_ENVIRONMENT || "dev"}/campaigns/${campaignId}`,
+        `${base_url}/rsvp-service/${environment}/campaigns/${campaignId}`,
         {
           headers,
         }

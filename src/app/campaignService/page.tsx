@@ -20,20 +20,21 @@ export default function CampaignServicePage() {
     setIsLoading(true);
     try {
       const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
+      if (!environment) {
+        throw new Error("Missing environment configuration. Please set NEXT_PUBLIC_ENVIRONMENT.");
+      }
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Unauthorized: missing access token. Please login again.");
       }
 
-      const response = await fetch(
-        `${base_url}/rsvp-service/${process.env.NEXT_PUBLIC_ENVIRONMENT || "dev"}/campaigns`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${base_url}/rsvp-service/${environment}/campaigns`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
