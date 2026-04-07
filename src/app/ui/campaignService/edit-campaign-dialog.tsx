@@ -11,11 +11,7 @@ interface EditCampaignDialogProps {
   onClose: () => void;
   onSuccess: () => void;
   campaign: Campaign;
-}
-
-async function fetchRunsByCampaignId(): Promise<Run[]> {
-  // In real API, runs will be obtained from campaign detail API
-  return [];
+  runs: Run[];
 }
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
@@ -34,6 +30,7 @@ export default function EditCampaignDialog({
   onClose,
   onSuccess,
   campaign,
+  runs,
 }: EditCampaignDialogProps) {
   const [formData, setFormData] = useState<{
     campaign_name: string;
@@ -46,10 +43,8 @@ export default function EditCampaignDialog({
     campaign_end_time: new Date(campaign.campaign_end_time),
     campaign_location: campaign.campaign_location,
   });
-  const [runs, setRuns] = useState<Run[]>([]);
   const [runStates, setRunStates] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingRuns, setIsLoadingRuns] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -61,27 +56,14 @@ export default function EditCampaignDialog({
         campaign_location: campaign.campaign_location,
       });
       setHasChanges(false);
-      loadRuns();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, campaign]);
 
-  const loadRuns = async () => {
-    setIsLoadingRuns(true);
-    try {
-      const runsData = await fetchRunsByCampaignId();
-      setRuns(runsData);
       const initialStates: Record<string, boolean> = {};
-      runsData.forEach(run => {
+      runs.forEach(run => {
         initialStates[run.run_id] = run.is_active;
       });
       setRunStates(initialStates);
-    } catch (error) {
-      console.error("Failed to load runs:", error);
-    } finally {
-      setIsLoadingRuns(false);
     }
-  };
+  }, [isOpen, campaign, runs]);
 
   const toggleRunState = (runId: string) => {
     setRunStates(prev => ({
@@ -234,9 +216,7 @@ export default function EditCampaignDialog({
               <label className="block text-base font-semibold text-gray-700 mb-4">
                 Related attendance
               </label>
-              {isLoadingRuns ? (
-                <div className="text-center py-4 text-gray-500">Loading...</div>
-              ) : runs.length === 0 ? (
+              {runs.length === 0 ? (
                 <div className="text-center py-4 text-gray-500">No related emails found</div>
               ) : (
                 <div className="space-y-2">

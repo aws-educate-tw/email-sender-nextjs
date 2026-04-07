@@ -71,6 +71,7 @@ export default function CampaignDetailView({
             onCampaignUpdate();
           }}
           campaign={campaign}
+          runs={runs}
         />
       )}
     </div>
