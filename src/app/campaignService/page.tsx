@@ -47,7 +47,6 @@ export default function CampaignServicePage() {
       // Convert API response to Campaign format for UI compatibility
       const campaigns: Campaign[] = data.map(item => ({
         ...item,
-        description: undefined, // Not available in list API
       }));
       setCampaigns(campaigns);
     } catch (error) {

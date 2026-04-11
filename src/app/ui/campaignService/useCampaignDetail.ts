@@ -22,30 +22,29 @@ export function useCampaignDetail(campaignId: string) {
       }
       const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
-      // Step 1: Get campaign basic info from campaigns list API
-      const campaignsResponse = await fetch(`${base_url}/rsvp-service/${environment}/campaigns`, {
-        headers,
-      });
+      // Fetch campaign list and detail in parallel because they do not depend on each other.
+      const [campaignsResponse, detailResponse] = await Promise.all([
+        fetch(`${base_url}/rsvp-service/${environment}/campaigns`, {
+          headers,
+        }),
+        fetch(`${base_url}/rsvp-service/${environment}/campaigns/${campaignId}`, {
+          headers,
+        }),
+      ]);
+
       if (campaignsResponse.status === 401 || campaignsResponse.status === 403) {
         throw new Error("Unauthorized: your session may have expired. Please login again.");
       }
       if (!campaignsResponse.ok) throw new Error("Failed to fetch campaigns list");
 
-      const campaignsList: CampaignListItem[] = await campaignsResponse.json();
-      const campaignBasicInfo = campaignsList.find(c => c.campaign_id === campaignId);
-      if (!campaignBasicInfo) throw new Error(`Campaign with ID '${campaignId}' not found`);
-
-      // Step 2: Get campaign detail with runs and participants
-      const detailResponse = await fetch(
-        `${base_url}/rsvp-service/${environment}/campaigns/${campaignId}`,
-        {
-          headers,
-        }
-      );
       if (detailResponse.status === 401 || detailResponse.status === 403) {
         throw new Error("Unauthorized: your session may have expired. Please login again.");
       }
       if (!detailResponse.ok) throw new Error("Failed to fetch campaign detail");
+
+      const campaignsList: CampaignListItem[] = await campaignsResponse.json();
+      const campaignBasicInfo = campaignsList.find(c => c.campaign_id === campaignId);
+      if (!campaignBasicInfo) throw new Error(`Campaign with ID '${campaignId}' not found`);
 
       const detailData: CampaignDetailResponse = await detailResponse.json();
 
@@ -58,7 +57,6 @@ export function useCampaignDetail(campaignId: string) {
         campaign_location: campaignBasicInfo.campaign_location,
         campaign_created_at: campaignBasicInfo.campaign_created_at,
         is_active: campaignBasicInfo.is_active,
-        description: detailData.description ?? undefined,
       };
 
       setCampaign(campaignData);

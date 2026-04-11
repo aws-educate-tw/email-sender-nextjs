@@ -18,7 +18,6 @@ export interface Campaign {
   campaign_location: string;
   campaign_created_at: string;
   is_active: boolean;
-  description?: string; // Optional for list view
 }
 
 export interface Participant {
@@ -43,7 +42,6 @@ export interface Run {
 export interface CampaignDetailResponse {
   campaign_id: string;
   campaign_name: string;
-  description: string | null;
   created_at: string;
   is_active: boolean;
   runs: Run[];
