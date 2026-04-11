@@ -38,7 +38,7 @@ interface DataType {
   spreadsheet_file: FileType | null;
   display_name: string;
   sender_id: string | null;
-  sender: SenderType;
+  sender: SenderType | null;
   template_file_id: string;
   success_email_count: number;
   expected_email_send_count: number;
@@ -126,7 +126,9 @@ export default function EmailHistoryCard({ data }: PropsType) {
                       {item.display_name ? item.display_name : "Unknown Sender"}
                     </p>
                     <p className="text-sm font-medium text-neutral-500">
-                      {item.sender_local_part}@aws-educate.tw
+                      {item.sender_local_part
+                        ? `${item.sender_local_part}@aws-educate.tw`
+                        : "Unknown email"}
                     </p>
                   </div>
                 </div>
@@ -166,12 +168,18 @@ export default function EmailHistoryCard({ data }: PropsType) {
                     <Send size={20} />
                     <p>Sender</p>
                   </div>
-                  <a
-                    href={`mailto:${item.sender.email}`}
-                    className="text-black underline hover:text-sky-800"
-                  >
-                    <strong>{item.sender.username || "Unknown"}</strong>
-                  </a>
+                  {item.sender?.email ? (
+                    <a
+                      href={`mailto:${item.sender.email}`}
+                      className="text-black underline hover:text-sky-800"
+                    >
+                      <strong>{item.sender.username || item.sender.email}</strong>
+                    </a>
+                  ) : (
+                    <span className="text-neutral-500">
+                      <strong>Unknown</strong>
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
