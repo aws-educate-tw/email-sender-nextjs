@@ -38,7 +38,7 @@ interface DataType {
   spreadsheet_file: FileType | null;
   display_name: string;
   sender_id: string | null;
-  sender: SenderType | null;
+  sender: SenderType;
   template_file_id: string;
   success_email_count: number;
   expected_email_send_count: number;
@@ -126,9 +126,7 @@ export default function EmailHistoryCard({ data }: PropsType) {
                       {item.display_name ? item.display_name : "Unknown Sender"}
                     </p>
                     <p className="text-sm font-medium text-neutral-500">
-                      {item.sender_local_part
-                        ? `${item.sender_local_part}@aws-educate.tw`
-                        : "Unknown email"}
+                      {item.sender_local_part}@aws-educate.tw
                     </p>
                   </div>
                 </div>
