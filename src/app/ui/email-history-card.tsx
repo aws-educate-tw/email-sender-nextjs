@@ -166,12 +166,18 @@ export default function EmailHistoryCard({ data }: PropsType) {
                     <Send size={20} />
                     <p>Sender</p>
                   </div>
-                  <a
-                    href={`mailto:${item.sender.email}`}
-                    className="text-black underline hover:text-sky-800"
-                  >
-                    <strong>{item.sender.username || "Unknown"}</strong>
-                  </a>
+                  {item.sender?.email ? (
+                    <a
+                      href={`mailto:${item.sender.email}`}
+                      className="text-black underline hover:text-sky-800"
+                    >
+                      <strong>{item.sender.username || item.sender.email}</strong>
+                    </a>
+                  ) : (
+                    <span className="text-neutral-500">
+                      <strong>Unknown</strong>
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
