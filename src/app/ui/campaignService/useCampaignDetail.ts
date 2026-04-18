@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Campaign, Run, Participant, CampaignDetailResponse, CampaignListItem } from "./types";
+import { getCampaignServiceBaseUrl } from "./utils";
 
 export function useCampaignDetail(campaignId: string) {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
@@ -11,11 +12,7 @@ export function useCampaignDetail(campaignId: string) {
   const loadCampaignData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
-      if (!environment) {
-        throw new Error("Missing environment configuration. Please set NEXT_PUBLIC_ENVIRONMENT.");
-      }
+      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Unauthorized: missing access token. Please login again.");
@@ -24,10 +21,10 @@ export function useCampaignDetail(campaignId: string) {
 
       // Fetch campaign list and detail in parallel because they do not depend on each other.
       const [campaignsResponse, detailResponse] = await Promise.all([
-        fetch(`${base_url}/rsvp-service/${environment}/campaigns`, {
+        fetch(`${campaignServiceBaseUrl}/campaigns`, {
           headers,
         }),
-        fetch(`${base_url}/rsvp-service/${environment}/campaigns/${campaignId}`, {
+        fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
           headers,
         }),
       ]);

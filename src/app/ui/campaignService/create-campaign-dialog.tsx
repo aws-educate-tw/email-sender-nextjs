@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import DateTimeInput from "./datetime-input";
+import { getCampaignServiceBaseUrl } from "./utils";
 
 interface CreateCampaignDialogProps {
   isOpen: boolean;
@@ -36,9 +37,9 @@ export default function CreateCampaignDialog({
     setIsSubmitting(true);
 
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${base_url}/campaigns`, {
+      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

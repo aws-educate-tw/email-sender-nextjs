@@ -5,6 +5,7 @@ import { Campaign, CampaignListItem } from "@/app/ui/campaignService/types";
 import CampaignList from "@/app/ui/campaignService/campaign-list";
 import CreateCampaignDialog from "@/app/ui/campaignService/create-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
+import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 
 export default function CampaignServicePage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -19,17 +20,13 @@ export default function CampaignServicePage() {
   const loadCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
-      if (!environment) {
-        throw new Error("Missing environment configuration. Please set NEXT_PUBLIC_ENVIRONMENT.");
-      }
+      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("Unauthorized: missing access token. Please login again.");
       }
 
-      const response = await fetch(`${base_url}/rsvp-service/${environment}/campaigns`, {
+      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

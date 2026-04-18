@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Campaign, Run } from "./types";
 import DateTimeInput from "./datetime-input";
+import { getCampaignServiceBaseUrl } from "./utils";
 
 interface EditCampaignDialogProps {
   isOpen: boolean;
@@ -15,9 +16,9 @@ interface EditCampaignDialogProps {
 }
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
-  const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+  const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
   const token = localStorage.getItem("access_token");
-  const response = await fetch(`${base_url}/campaigns/${campaignId}`, {
+  const response = await fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(data),

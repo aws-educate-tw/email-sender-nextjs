@@ -108,11 +108,10 @@ export async function submitLogin(data: string) {
   }
 
   try {
-    const base_url =
-      process.env.NEXT_PUBLIC_AUTH_API_ENDPOINT || process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const normalizedBaseUrl = base_url?.replace(/\/+$/, "");
     if (!normalizedBaseUrl) {
-      throw new Error("Auth API endpoint is not configured.");
+      throw new Error("API endpoint is not configured.");
     }
     const url = new URL(`${normalizedBaseUrl}/auth/login`);
     const response = await fetch(url.toString(), {
@@ -163,11 +162,10 @@ export async function submitChangePassword(data: string) {
   }
 
   try {
-    const base_url =
-      process.env.NEXT_PUBLIC_AUTH_API_ENDPOINT || process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const normalizedBaseUrl = base_url?.replace(/\/+$/, "");
     if (!normalizedBaseUrl) {
-      throw new Error("Auth API endpoint is not configured.");
+      throw new Error("API endpoint is not configured.");
     }
     const url = new URL(`${normalizedBaseUrl}/auth/change-password`);
     const response = await fetch(url.toString(), {
