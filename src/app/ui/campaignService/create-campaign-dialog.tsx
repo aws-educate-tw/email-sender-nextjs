@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import DateTimeInput from "./datetime-input";
-import { addMockCampaign } from "./mockData";
+import { getCampaignServiceBaseUrl } from "./utils";
 
 interface CreateCampaignDialogProps {
   isOpen: boolean;
@@ -24,8 +24,6 @@ export default function CreateCampaignDialog({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const USE_MOCK_DATA = true;
-
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,28 +37,9 @@ export default function CreateCampaignDialog({
     setIsSubmitting(true);
 
     try {
-      if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        addMockCampaign({
-          campaign_name: formData.campaign_name,
-          campaign_start_time: formData.campaign_start_time.toISOString(),
-          campaign_end_time: formData.campaign_end_time.toISOString(),
-          campaign_location: formData.campaign_location,
-        });
-        onSuccess();
-        onClose();
-        setFormData({
-          campaign_name: "",
-          campaign_start_time: null,
-          campaign_end_time: null,
-          campaign_location: "",
-        });
-        return;
-      }
-
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${base_url}/campaigns`, {
+      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

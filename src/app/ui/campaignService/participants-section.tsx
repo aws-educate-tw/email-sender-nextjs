@@ -74,7 +74,7 @@ export default function ParticipantsSection({
           const selectedRun = runs.find(run => run.run_id === selectedRunId);
           if (!selectedRun) return null;
 
-          const deadlineDate = new Date(selectedRun.attendance_respond_deadline);
+          const deadlineDate = new Date(selectedRun.registration_deadline);
           const isDeadlinePassed = new Date() > deadlineDate;
           const isAcceptingResponses = selectedRun.is_active && !isDeadlinePassed;
 
@@ -102,7 +102,7 @@ export default function ParticipantsSection({
                 <span className="ml-4">
                   Attendance respond deadline:{" "}
                   <span className="font-bold">
-                    {formatDeadline(selectedRun.attendance_respond_deadline)}
+                    {formatDeadline(selectedRun.registration_deadline)}
                   </span>
                 </span>
               </div>
