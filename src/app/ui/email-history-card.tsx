@@ -22,6 +22,8 @@ interface SenderType {
 }
 
 export interface EmailHistoryDataType {
+  campaign_id?: string | null;
+  campaign_name?: string | null;
   bcc: string[];
   subject: string;
   cc: string[];
@@ -114,9 +116,9 @@ export default function EmailHistoryCard({ data, campaignFilterLabel }: PropsTyp
             <div className="flex flex-col">
               <div className="uppercase tracking-wide text-lg text-black font-semibold mb-1 flex items-center gap-2 flex-wrap">
                 <span>{item.subject ? item.subject : "No Subject"}</span>
-                {campaignFilterLabel && (
+                {(campaignFilterLabel || item.campaign_name) && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-700">
-                    {campaignFilterLabel}
+                    {campaignFilterLabel || item.campaign_name}
                   </span>
                 )}
               </div>

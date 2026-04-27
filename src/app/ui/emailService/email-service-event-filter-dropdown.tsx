@@ -53,20 +53,15 @@ export default function EventFilterDropdown({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const selectedLabel = campaignName || "All Events";
-  const isFiltered = !!campaignId;
+  const selectedLabel = campaignName;
 
   return (
     <div className="flex items-center gap-2 mt-1">
-      <p className="text-lg font-bold text-700">Filtered Event:</p>
+      <p className="text-lg font-bold text-black-700">Filtered Event:</p>
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(prev => !prev)}
-          className={`inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-sm font-bold uppercase tracking-wide transition-colors ${
-            isFiltered
-              ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-              : "bg-amber-100 text-amber-700 hover:bg-amber-200"
-          }`}
+          className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-sm font-bold uppercase tracking-wide transition-colors bg-amber-100 text-amber-700 hover:bg-amber-200"
         >
           {selectedLabel}
           <ChevronDown size={14} />
@@ -74,17 +69,6 @@ export default function EventFilterDropdown({
 
         {isOpen && (
           <div className="absolute left-0 top-full mt-1 z-50 min-w-max bg-white border border-gray-200 rounded-md shadow-lg py-1">
-            <button
-              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                !isFiltered ? "font-bold text-gray-700" : "text-gray-500"
-              }`}
-              onClick={() => {
-                onFilterChange("", "");
-                setIsOpen(false);
-              }}
-            >
-              All Events
-            </button>
             {campaigns.map(c => (
               <button
                 key={c.campaign_id}
