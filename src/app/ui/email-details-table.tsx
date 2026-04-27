@@ -197,7 +197,18 @@ export default function EmailDetailsTable({
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    globalFilterFn: "includesString",
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const keyword = String(filterValue ?? "")
+        .trim()
+        .toLowerCase();
+      if (!keyword) return true;
+
+      // Only search recipient email + name fields.
+      const email = row.original.recipient_email?.toLowerCase() || "";
+      const recipientName = row.original.recipient_name?.toLowerCase() || "";
+
+      return email.includes(keyword) || recipientName.includes(keyword);
+    },
     state: {
       globalFilter,
       rowSelection: selectedRows,

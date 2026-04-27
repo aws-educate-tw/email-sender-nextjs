@@ -5,6 +5,7 @@ import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skelet
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
+import EventFilterDropdown from "@/app/ui/emailService/email-service-event-filter-dropdown";
 
 interface AttachmentFilesType {
   file_url: string;
@@ -77,8 +78,8 @@ interface DataType {
 
 function EmailHistoryPageContent() {
   const searchParams = useSearchParams();
-  const campaignId = searchParams.get("campaign_id") || "";
-  const campaignName = searchParams.get("campaign_name") || "";
+  const [campaignId, setCampaignId] = useState<string>(searchParams.get("campaign_id") || "");
+  const [campaignName, setCampaignName] = useState<string>(searchParams.get("campaign_name") || "");
 
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -157,14 +158,15 @@ function EmailHistoryPageContent() {
             <p className="text-gray-500 italic">
               Emails you <strong>have sent</strong> are displayed here.
             </p>
-            {campaignId && campaignName && (
-              <div className="flex items-center gap-2">
-                <p className="text-lg font-bold text-gray-700">Filtered Events:</p>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-sm bg-amber-100 text-amber-700 font-bold uppercase tracking-wide">
-                  {campaignName}
-                </span>
-              </div>
-            )}
+            <EventFilterDropdown
+              campaignId={campaignId}
+              campaignName={campaignName}
+              onFilterChange={(id, name) => {
+                setCampaignId(id);
+                setCampaignName(name);
+                fetchFiles(10, 1, id);
+              }}
+            />
           </div>
           <div className="h-10"></div>
         </div>

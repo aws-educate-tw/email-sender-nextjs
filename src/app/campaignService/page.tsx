@@ -1,19 +1,16 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Campaign } from "@/app/ui/campaignService/types";
+import { Campaign, CampaignListItem } from "@/app/ui/campaignService/types";
 import CampaignList from "@/app/ui/campaignService/campaign-list";
 import CreateCampaignDialog from "@/app/ui/campaignService/create-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
-import { mockCampaignsData } from "@/app/ui/campaignService/mockData";
+import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 
 export default function CampaignServicePage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  // Development toggle: true = Mock Data, false = Real API
-  const USE_MOCK_DATA = true;
 
   useEffect(() => {
     loadCampaigns();
@@ -23,17 +20,13 @@ export default function CampaignServicePage() {
   const loadCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Use Mock Data
-      if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setCampaigns([...mockCampaignsData]);
-        return;
+      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Unauthorized: missing access token. Please login again.");
       }
 
-      // Use Real API
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${base_url}/campaigns`, {
+      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -41,18 +34,26 @@ export default function CampaignServicePage() {
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("Unauthorized: your session may have expired. Please login again.");
+        }
         throw new Error("Failed to fetch campaigns");
       }
 
-      const data = await response.json();
-      setCampaigns(data);
+      const data: CampaignListItem[] = await response.json();
+      // Convert API response to Campaign format for UI compatibility
+      const campaigns: Campaign[] = data.map(item => ({
+        ...item,
+      }));
+      setCampaigns(campaigns);
     } catch (error) {
       console.error("Failed to load campaigns:", error);
-      alert("Failed to load events. Please try again.");
+      const message = error instanceof Error ? error.message : "Failed to load events.";
+      alert(message);
     } finally {
       setIsLoading(false);
     }
-  }, [USE_MOCK_DATA]);
+  }, []);
 
   return (
     <div>
@@ -74,7 +75,7 @@ export default function CampaignServicePage() {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center p-8 bg-neutral-100 rounded-md">
-          <RotatingLoaderAnimation />
+          <RotatingLoaderAnimation message="Loading events..." />
         </div>
       ) : (
         <CampaignList campaigns={campaigns} />

@@ -4,54 +4,21 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Campaign, Run } from "./types";
-import { mockRuns } from "./mockData";
 import DateTimeInput from "./datetime-input";
+import { getCampaignServiceBaseUrl } from "./utils";
 
 interface EditCampaignDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   campaign: Campaign;
-}
-
-const USE_MOCK_DATA = true;
-
-async function fetchRunsByCampaignId(campaignId: string): Promise<Run[]> {
-  if (USE_MOCK_DATA) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockRuns.filter(r => r.campaign_id === campaignId);
-  }
-  const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-  const token = localStorage.getItem("access_token");
-  const response = await fetch(`${base_url}/campaigns/${campaignId}/runs`, {
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) throw new Error("Failed to fetch runs");
-  return response.json();
+  runs: Run[];
 }
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
-  if (USE_MOCK_DATA) {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    console.log("Mock: Campaign updated", campaignId, data);
-
-    // Update mock data in place
-    const { mockCampaignsData } = await import("./mockData");
-    const campaignIndex = mockCampaignsData.findIndex(c => c.campaign_id === campaignId);
-    if (campaignIndex !== -1) {
-      mockCampaignsData[campaignIndex] = {
-        ...mockCampaignsData[campaignIndex],
-        campaign_name: data.campaign_name,
-        campaign_start_time: data.campaign_start_time,
-        campaign_end_time: data.campaign_end_time,
-        campaign_location: data.campaign_location,
-      };
-    }
-    return;
-  }
-  const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
+  const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
   const token = localStorage.getItem("access_token");
-  const response = await fetch(`${base_url}/campaigns/${campaignId}`, {
+  const response = await fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(data),
@@ -64,6 +31,7 @@ export default function EditCampaignDialog({
   onClose,
   onSuccess,
   campaign,
+  runs,
 }: EditCampaignDialogProps) {
   const [formData, setFormData] = useState<{
     campaign_name: string;
@@ -76,10 +44,8 @@ export default function EditCampaignDialog({
     campaign_end_time: new Date(campaign.campaign_end_time),
     campaign_location: campaign.campaign_location,
   });
-  const [runs, setRuns] = useState<Run[]>([]);
   const [runStates, setRunStates] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingRuns, setIsLoadingRuns] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -91,27 +57,14 @@ export default function EditCampaignDialog({
         campaign_location: campaign.campaign_location,
       });
       setHasChanges(false);
-      loadRuns();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, campaign]);
 
-  const loadRuns = async () => {
-    setIsLoadingRuns(true);
-    try {
-      const runsData = await fetchRunsByCampaignId(campaign.campaign_id);
-      setRuns(runsData);
       const initialStates: Record<string, boolean> = {};
-      runsData.forEach(run => {
+      runs.forEach(run => {
         initialStates[run.run_id] = run.is_active;
       });
       setRunStates(initialStates);
-    } catch (error) {
-      console.error("Failed to load runs:", error);
-    } finally {
-      setIsLoadingRuns(false);
     }
-  };
+  }, [isOpen, campaign, runs]);
 
   const toggleRunState = (runId: string) => {
     setRunStates(prev => ({
@@ -264,9 +217,7 @@ export default function EditCampaignDialog({
               <label className="block text-base font-semibold text-gray-700 mb-4">
                 Related attendance
               </label>
-              {isLoadingRuns ? (
-                <div className="text-center py-4 text-gray-500">Loading...</div>
-              ) : runs.length === 0 ? (
+              {runs.length === 0 ? (
                 <div className="text-center py-4 text-gray-500">No related emails found</div>
               ) : (
                 <div className="space-y-2">
@@ -281,7 +232,7 @@ export default function EditCampaignDialog({
                           {run.subject}
                         </span>
                         <span className="text-xs sm:text-sm text-gray-500 ml-2 whitespace-nowrap">
-                          (DL: {formatDeadline(run.created_at)})
+                          (DL: {formatDeadline(run.registration_deadline)})
                         </span>
                       </div>
                       <div className="flex rounded-lg overflow-hidden border border-gray-300 flex-shrink-0 w-full sm:w-auto">

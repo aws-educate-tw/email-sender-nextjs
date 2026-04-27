@@ -1,8 +1,27 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Participant } from "@/app/ui/campaignService/types";
-import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  RowSelectionState,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+import {
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 import * as XLSX from "xlsx";
 import ExportConfirmationModal from "./export-confirmation-modal";
 import { Listbox } from "@headlessui/react";
@@ -14,11 +33,10 @@ interface ParticipantsTableProps {
 }
 
 export default function ParticipantsTable({ participants, campaignName }: ParticipantsTableProps) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [globalFilter, setGlobalFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All Status");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedAll, setSelectedAll] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [showExportModal, setShowExportModal] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -29,27 +47,98 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
     { value: "PENDING", label: "PENDING" },
   ];
 
-  const filteredParticipants = useMemo(() => {
-    return participants.filter(p => {
-      const matchesSearch =
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.email.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "All Status" || p.rsvp_status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [participants, searchTerm, statusFilter]);
+  const columnHelper = createColumnHelper<Participant>();
 
-  // Calculate selected count based on current filtered results
-  const selectedCount = useMemo(() => {
-    return filteredParticipants.filter(p => selectedItems.has(p.participant_id)).length;
-  }, [filteredParticipants, selectedItems]);
+  const columns = useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }: { table: any }) => {
+          const filteredRows = table.getFilteredRowModel().rows;
+          const allFilteredSelected =
+            filteredRows.length > 0 && filteredRows.every((row: any) => row.getIsSelected());
+          const someFilteredSelected = filteredRows.some((row: any) => row.getIsSelected());
 
-  const paginatedParticipants = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredParticipants.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredParticipants, currentPage, itemsPerPage]);
+          return (
+            <input
+              type="checkbox"
+              className="rounded w-4 h-4 text-sky-950 bg-gray-100 border-sky-950 focus:ring-sky-950 focus:ring-2"
+              checked={allFilteredSelected}
+              ref={el => {
+                if (el) {
+                  el.indeterminate = someFilteredSelected && !allFilteredSelected;
+                }
+              }}
+              onChange={() => {
+                if (allFilteredSelected) {
+                  table.resetRowSelection();
+                  return;
+                }
 
-  const totalPages = Math.ceil(filteredParticipants.length / itemsPerPage);
+                const nextSelection: RowSelectionState = {};
+                filteredRows.forEach((row: any) => {
+                  nextSelection[row.id] = true;
+                });
+                table.setRowSelection(nextSelection);
+              }}
+            />
+          );
+        },
+        cell: ({ row }: { row: any }) => (
+          <input
+            type="checkbox"
+            className="rounded w-4 h-4 text-sky-950 bg-gray-100 border-sky-950 focus:ring-sky-950 focus:ring-2"
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+          />
+        ),
+        enableSorting: false,
+        enableGlobalFilter: false,
+      },
+      columnHelper.accessor("name", {
+        header: "Participant Name",
+        cell: info => info.getValue() || "-",
+      }),
+      columnHelper.accessor("email_id", {
+        header: "Participant Email",
+        cell: info => info.getValue() || "-",
+      }),
+      columnHelper.accessor("rsvp_status", {
+        header: "Attendance",
+        filterFn: "equalsString",
+        cell: info => getStatusBadge(info.getValue()),
+      }),
+    ],
+    [columnHelper]
+  );
+
+  const table = useReactTable({
+    data: participants,
+    columns,
+    state: {
+      globalFilter,
+      sorting,
+      rowSelection,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    // Use a composite id to avoid unintended linked selection when API returns duplicate ids.
+    getRowId: (row, index) => `${row.participant_id}-${index}`,
+    globalFilterFn: "includesString",
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  useEffect(() => {
+    // Clear stale selections when the table data changes (e.g. switching run).
+    setRowSelection({});
+  }, [participants]);
+
+  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
 
   const stats = useMemo(() => {
     const total = participants.length;
@@ -84,35 +173,12 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
     }
   };
 
-  const handleSelectAll = () => {
-    if (selectedAll) {
-      setSelectedItems(new Set());
-    } else {
-      const allIds = new Set(filteredParticipants.map(p => p.participant_id));
-      setSelectedItems(allIds);
-    }
-    setSelectedAll(!selectedAll);
-  };
-
-  const handleSelectItem = (id: string) => {
-    const newSelected = new Set(selectedItems);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedItems(newSelected);
-    setSelectedAll(newSelected.size === filteredParticipants.length);
-  };
-
   const handleExport = () => {
-    const selectedParticipants = filteredParticipants.filter(p =>
-      selectedItems.has(p.participant_id)
-    );
+    const selectedParticipants = table.getFilteredSelectedRowModel().rows.map(row => row.original);
 
     const exportData = selectedParticipants.map(p => ({
       "Participant Name": p.name,
-      "Participant Email": p.email,
+      "Participant Email": p.email_id ?? "",
       "Attendance Status": p.rsvp_status,
       "Created At": new Date(p.created_at).toLocaleString("en-US"),
       "Updated At": new Date(p.updated_at).toLocaleString("en-US"),
@@ -133,7 +199,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
 
   return (
     <div className="space-y-4">
-      {/* 分隔線 */}
+      {/* Separator line */}
       <div className="border-t border-gray-200"></div>
 
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -155,10 +221,10 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
             <input
               type="text"
               placeholder="Search participants..."
-              value={searchTerm}
+              value={globalFilter}
               onChange={e => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1); // Reset to first page when search changes
+                setGlobalFilter(e.target.value);
+                table.setPageIndex(0);
               }}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-600 focus:border-gray-600 text-xs sm:text-sm"
             />
@@ -183,7 +249,10 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
           value={statusFilter}
           onChange={value => {
             setStatusFilter(value);
-            setCurrentPage(1); // Reset to first page when filter changes
+            table
+              .getColumn("rsvp_status")
+              ?.setFilterValue(value === "All Status" ? undefined : value);
+            table.setPageIndex(0);
           }}
         >
           <div className="relative w-full sm:w-auto">
@@ -231,12 +300,8 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
             value={itemsPerPage}
             onChange={value => {
               setItemsPerPage(value);
-              setCurrentPage(1); // Reset to first page when changing page size
-              // Update selectedAll state based on current selection
-              setSelectedAll(
-                selectedItems.size === filteredParticipants.length &&
-                  filteredParticipants.length > 0
-              );
+              table.setPageSize(value);
+              table.setPageIndex(0);
             }}
           >
             <div className="relative">
@@ -283,64 +348,79 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="w-full min-w-[640px]">
           <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <input
-                  type="checkbox"
-                  className="rounded w-4 h-4 text-sky-950 bg-gray-100 border-sky-950 focus:ring-sky-950 focus:ring-2"
-                  checked={selectedAll}
-                  onChange={handleSelectAll}
-                />
-              </th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Participant Name
-              </th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Participant Email
-              </th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Attendance
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedParticipants.map(participant => (
-              <tr key={participant.participant_id} className="hover:bg-gray-50">
-                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    className="rounded w-4 h-4 text-sky-950 bg-gray-100 border-sky-950 focus:ring-sky-950 focus:ring-2"
-                    checked={selectedItems.has(participant.participant_id)}
-                    onChange={() => handleSelectItem(participant.participant_id)}
-                  />
-                </td>
-                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                  {participant.name}
-                </td>
-                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                  {participant.email}
-                </td>
-                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                  {getStatusBadge(participant.rsvp_status)}
-                </td>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <th
+                    key={header.id}
+                    className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header.isPlaceholder ? null : (
+                      <div className="flex items-center gap-1">
+                        <span>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </span>
+                        {header.column.getCanSort() && (
+                          <button
+                            onClick={header.column.getToggleSortingHandler()}
+                            className="text-gray-400 hover:text-gray-700"
+                          >
+                            {header.column.getIsSorted() === "asc" ? (
+                              <ArrowUp size={14} />
+                            ) : header.column.getIsSorted() === "desc" ? (
+                              <ArrowDown size={14} />
+                            ) : (
+                              <ArrowUpDown size={14} />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </th>
+                ))}
               </tr>
             ))}
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map(row => (
+                <tr key={row.id} className="hover:bg-gray-50">
+                  {row.getVisibleCells().map(cell => (
+                    <td
+                      key={cell.id}
+                      className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900"
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
+                  No participants found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredParticipants.length)} of{" "}
-          {filteredParticipants.length} results
+          {table.getFilteredRowModel().rows.length === 0
+            ? "Showing 0 to 0 of 0 results"
+            : `Showing ${table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to ${Math.min(
+                (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                table.getFilteredRowModel().rows.length
+              )} of ${table.getFilteredRowModel().rows.length} results`}
         </div>
         <div className="flex gap-2 justify-center">
           <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
             className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md ${
-              currentPage === 1
+              !table.getCanPreviousPage()
                 ? "cursor-not-allowed text-gray-400 bg-gray-100"
                 : "text-gray-700 bg-white hover:bg-gray-50"
             }`}
@@ -349,13 +429,13 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
             <span className="hidden sm:inline">Previous</span>
           </button>
           <button className="px-3 py-2 bg-sky-950 text-white rounded-md text-sm font-medium">
-            {currentPage}
+            {table.getState().pagination.pageIndex + 1}
           </button>
           <button
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
             className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md ${
-              currentPage === totalPages
+              !table.getCanNextPage()
                 ? "cursor-not-allowed text-gray-400 bg-gray-100"
                 : "text-gray-700 bg-white hover:bg-gray-50"
             }`}
