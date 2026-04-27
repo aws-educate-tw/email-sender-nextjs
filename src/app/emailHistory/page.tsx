@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
@@ -50,6 +50,8 @@ interface SenderType {
 }
 
 interface DataType {
+  campaign_id?: string | null;
+  campaign_name?: string | null;
   bcc: string[];
   subject: string;
   cc: string[];
@@ -78,6 +80,7 @@ interface DataType {
 
 function EmailHistoryPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [campaignId, setCampaignId] = useState<string>(searchParams.get("campaign_id") || "");
   const [campaignName, setCampaignName] = useState<string>(searchParams.get("campaign_name") || "");
 
@@ -102,6 +105,7 @@ function EmailHistoryPageContent() {
         const url = new URL(`${base_url}/runs`);
         if (targetCampaignId) {
           url.searchParams.append("campaign_id", targetCampaignId);
+          url.searchParams.append("run_type", "RSVP");
         }
         url.searchParams.append("limit", limit.toString());
         url.searchParams.append("page", page.toString());
@@ -158,15 +162,21 @@ function EmailHistoryPageContent() {
             <p className="text-gray-500 italic">
               Emails you <strong>have sent</strong> are displayed here.
             </p>
-            <EventFilterDropdown
-              campaignId={campaignId}
-              campaignName={campaignName}
-              onFilterChange={(id, name) => {
-                setCampaignId(id);
-                setCampaignName(name);
-                fetchFiles(10, 1, id);
-              }}
-            />
+            {campaignId && (
+              <EventFilterDropdown
+                campaignId={campaignId}
+                campaignName={campaignName}
+                onFilterChange={(id, name) => {
+                  setCampaignId(id);
+                  setCampaignName(name);
+
+                  const params = new URLSearchParams();
+                  params.set("campaign_id", id);
+                  params.set("campaign_name", name);
+                  router.push(`?${params.toString()}`);
+                }}
+              />
+            )}
           </div>
           <div className="h-10"></div>
         </div>
@@ -182,7 +192,10 @@ function EmailHistoryPageContent() {
           {isLoading ? (
             <EmailHistoryCardLoading />
           ) : (
-            <EmailHistoryCard data={data} campaignFilterLabel={campaignName || undefined} />
+            <EmailHistoryCard
+              data={data}
+              campaignFilterLabel={campaignId ? campaignName : undefined}
+            />
           )}
 
           <div className="flex justify-end gap-8 pb-1 px-2">
