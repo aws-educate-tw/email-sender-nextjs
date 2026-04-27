@@ -6,8 +6,10 @@ import CampaignInfoCard from "./campaign-info-card";
 import ParticipantsSection from "./participants-section";
 import EditCampaignDialog from "./edit-campaign-dialog";
 import RotatingLoaderAnimation from "../rotating-loader-animation";
+import Link from "next/link";
 
 interface CampaignDetailViewProps {
+  campaignId: string;
   campaign: Campaign | null;
   runs: Run[];
   selectedRunId: string;
@@ -18,6 +20,7 @@ interface CampaignDetailViewProps {
 }
 
 export default function CampaignDetailView({
+  campaignId,
   campaign,
   runs,
   selectedRunId,
@@ -58,9 +61,20 @@ export default function CampaignDetailView({
         participants={participants}
       />
 
-      <button className="w-full bg-gray-100 rounded-lg shadow-md p-4 sm:p-6 text-lg sm:text-xl font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors cursor-pointer text-left">
+      <Link
+        href={{
+          pathname: "/emailHistory",
+          query: {
+            campaign_id: campaignId,
+            campaign_name: campaign.campaign_name,
+          },
+        }}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-full bg-gray-100 rounded-lg shadow-md p-4 sm:p-6 text-lg sm:text-xl font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors cursor-pointer text-left"
+      >
         Related Email Sending Histories
-      </button>
+      </Link>
 
       {campaign && (
         <EditCampaignDialog
