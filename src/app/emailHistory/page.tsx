@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
@@ -80,9 +80,8 @@ interface DataType {
 
 function EmailHistoryPageContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const [campaignId, setCampaignId] = useState<string>(searchParams.get("campaign_id") || "");
-  const [campaignName, setCampaignName] = useState<string>(searchParams.get("campaign_name") || "");
+  const [campaignId] = useState<string>(searchParams.get("campaign_id") || "");
+  const [campaignName] = useState<string>(searchParams.get("campaign_name") || "");
 
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -163,19 +162,7 @@ function EmailHistoryPageContent() {
               Emails you <strong>have sent</strong> are displayed here.
             </p>
             {campaignId && (
-              <EventFilterDropdown
-                campaignId={campaignId}
-                campaignName={campaignName}
-                onFilterChange={(id, name) => {
-                  setCampaignId(id);
-                  setCampaignName(name);
-
-                  const params = new URLSearchParams();
-                  params.set("campaign_id", id);
-                  params.set("campaign_name", name);
-                  router.push(`?${params.toString()}`);
-                }}
-              />
+              <EventFilterDropdown campaignId={campaignId} campaignName={campaignName} />
             )}
           </div>
           <div className="h-10"></div>
