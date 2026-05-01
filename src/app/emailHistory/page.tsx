@@ -80,8 +80,8 @@ interface DataType {
 
 function EmailHistoryPageContent() {
   const searchParams = useSearchParams();
-  const [campaignId] = useState<string>(searchParams.get("campaign_id") || "");
-  const [campaignName] = useState<string>(searchParams.get("campaign_name") || "");
+  const campaignId = searchParams.get("campaign_id") || "";
+  const campaignName = searchParams.get("campaign_name") || "";
 
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
