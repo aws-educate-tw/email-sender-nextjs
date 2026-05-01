@@ -68,7 +68,6 @@ export default function CampaignDetailView({
             pathname: "/emailHistory",
             query: {
               campaign_id: campaignId,
-              campaign_name: campaign.campaign_name,
             },
           }}
           className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-md text-white hover:text-white bg-sky-950 hover:bg-sky-800 border border-gray-200"

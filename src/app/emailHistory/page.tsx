@@ -1,11 +1,12 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
 import EventFilterDropdown from "@/app/ui/emailService/email-service-event-filter-dropdown";
+import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 
 interface AttachmentFilesType {
   file_url: string;
@@ -80,8 +81,41 @@ interface DataType {
 
 function EmailHistoryPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const campaignId = searchParams.get("campaign_id") || "";
   const campaignName = searchParams.get("campaign_name") || "";
+  const [resolvedCampaignName, setResolvedCampaignName] = useState<string>("");
+
+  useEffect(() => {
+    if (!campaignId && campaignName) {
+      router.replace("/emailHistory");
+      return;
+    }
+    setResolvedCampaignName("");
+    if (campaignId) {
+      const fetchCampaignName = async () => {
+        try {
+          const baseUrl = getCampaignServiceBaseUrl();
+          const token = localStorage.getItem("access_token");
+          const res = await fetch(`${baseUrl}/campaigns/${campaignId}`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.campaign_name) {
+              setResolvedCampaignName(data.campaign_name);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch campaign name for campaign ID:", campaignId, error);
+        }
+      };
+      fetchCampaignName();
+    }
+  }, [campaignId, campaignName, router]);
 
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -162,7 +196,7 @@ function EmailHistoryPageContent() {
               Emails you <strong>have sent</strong> are displayed here.
             </p>
             {campaignId && (
-              <EventFilterDropdown campaignId={campaignId} campaignName={campaignName} />
+              <EventFilterDropdown campaignId={campaignId} campaignName={resolvedCampaignName} />
             )}
           </div>
           <div className="h-10"></div>
@@ -181,7 +215,7 @@ function EmailHistoryPageContent() {
           ) : (
             <EmailHistoryCard
               data={data}
-              campaignFilterLabel={campaignId ? campaignName : undefined}
+              campaignFilterLabel={campaignId ? resolvedCampaignName : undefined}
             />
           )}
 
