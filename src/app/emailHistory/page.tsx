@@ -95,9 +95,9 @@ function EmailHistoryPageContent() {
     if (campaignId) {
       const fetchCampaignName = async () => {
         try {
-          const baseUrl = getCampaignServiceBaseUrl();
+          const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
           const token = localStorage.getItem("access_token");
-          const res = await fetch(`${baseUrl}/campaigns/${campaignId}`, {
+          const res = await fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -108,6 +108,11 @@ function EmailHistoryPageContent() {
             if (data.campaign_name) {
               setResolvedCampaignName(data.campaign_name);
             }
+          } else {
+            if (res.status === 401 || res.status === 403) {
+              throw new Error("Unauthorized: your session may have expired. Please login again.");
+            }
+            throw new Error("Failed to fetch campaigns");
           }
         } catch (error) {
           console.error("Failed to fetch campaign name for campaign ID:", campaignId, error);
