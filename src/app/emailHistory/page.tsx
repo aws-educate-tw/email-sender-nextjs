@@ -5,7 +5,7 @@ import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skelet
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
-import EventFilterDropdown from "@/app/ui/emailService/email-service-event-filter-dropdown";
+import EventLabel from "@/app/ui/emailService/email-service-event-label";
 import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 
 interface AttachmentFilesType {
@@ -201,7 +201,7 @@ function EmailHistoryPageContent() {
               Emails you <strong>have sent</strong> are displayed here.
             </p>
             {campaignId && (
-              <EventFilterDropdown campaignId={campaignId} campaignName={resolvedCampaignName} />
+              <EventLabel campaignId={campaignId} campaignName={resolvedCampaignName} />
             )}
           </div>
           <div className="h-10"></div>
