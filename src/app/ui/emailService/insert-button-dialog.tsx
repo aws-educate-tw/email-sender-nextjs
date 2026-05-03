@@ -3,10 +3,9 @@
 import { useState } from "react";
 import Modal from "@/app/ui/emailService/modal";
 import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-preview";
-import { Info } from "lucide-react";
+import { Info, ChevronsUpDown, Check } from "lucide-react";
 import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import { Listbox } from "@headlessui/react";
-import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
 import "react-datepicker/dist/react-datepicker.css";
 
 const datePickerStyles = `
@@ -392,7 +391,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                             : "Select an existing event"}
                         </span>
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                          <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                          <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </span>
                       </Listbox.Button>
                       <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-sm">
@@ -413,7 +412,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                               </span>
                               {selected && (
                                 <span className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                  <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                  <Check className="h-5 w-5" aria-hidden="true" />
                                 </span>
                               )}
                             </>
@@ -438,7 +437,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                                 </span>
                                 {selected && (
                                   <span className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                    <Check className="h-5 w-5" aria-hidden="true" />
                                   </span>
                                 )}
                               </>
@@ -461,7 +460,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Attendance respond deadline</label>
+              <label className="block text-sm font-medium mb-2">Registration deadline</label>
               <DateTimeInput
                 selected={deadlineDateTime}
                 onChange={(date: Date | null) => setDeadlineDateTime(date)}
