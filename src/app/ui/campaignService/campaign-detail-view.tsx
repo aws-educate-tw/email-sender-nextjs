@@ -6,8 +6,11 @@ import CampaignInfoCard from "./campaign-info-card";
 import ParticipantsSection from "./participants-section";
 import EditCampaignDialog from "./edit-campaign-dialog";
 import RotatingLoaderAnimation from "../rotating-loader-animation";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 interface CampaignDetailViewProps {
+  campaignId: string;
   campaign: Campaign | null;
   runs: Run[];
   selectedRunId: string;
@@ -18,6 +21,7 @@ interface CampaignDetailViewProps {
 }
 
 export default function CampaignDetailView({
+  campaignId,
   campaign,
   runs,
   selectedRunId,
@@ -58,9 +62,20 @@ export default function CampaignDetailView({
         participants={participants}
       />
 
-      <button className="w-full bg-gray-100 rounded-lg shadow-md p-4 sm:p-6 text-lg sm:text-xl font-bold text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors cursor-pointer text-left">
-        Related Email Sending Histories
-      </button>
+      <div className="flex justify-end">
+        <Link
+          href={{
+            pathname: "/emailHistory",
+            query: {
+              campaign_id: campaignId,
+            },
+          }}
+          className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-md text-white hover:text-white bg-sky-950 hover:bg-sky-800 border border-gray-200"
+        >
+          View related email histories
+          <ChevronRight size={16} />
+        </Link>
+      </div>
 
       {campaign && (
         <EditCampaignDialog

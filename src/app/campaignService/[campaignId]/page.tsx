@@ -20,6 +20,7 @@ export default function CampaignDetailPage() {
 
   return (
     <CampaignDetailView
+      campaignId={campaignId}
       campaign={campaign}
       runs={runs}
       selectedRunId={selectedRunId}

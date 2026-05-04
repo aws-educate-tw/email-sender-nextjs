@@ -1,9 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
+import EventLabel from "@/app/ui/emailService/email-service-event-label";
+import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 
 interface AttachmentFilesType {
   file_url: string;
@@ -48,6 +51,8 @@ interface SenderType {
 }
 
 interface DataType {
+  campaign_id?: string | null;
+  campaign_name?: string | null;
   bcc: string[];
   subject: string;
   cc: string[];
@@ -74,7 +79,49 @@ interface DataType {
   created_year: string;
 }
 
-export default function Page() {
+function EmailHistoryPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const campaignId = searchParams.get("campaign_id") || "";
+  const campaignName = searchParams.get("campaign_name") || "";
+  const [resolvedCampaignName, setResolvedCampaignName] = useState<string>("");
+
+  useEffect(() => {
+    if (!campaignId && campaignName) {
+      router.replace("/emailHistory");
+      return;
+    }
+    setResolvedCampaignName("");
+    if (campaignId) {
+      const fetchCampaignName = async () => {
+        try {
+          const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
+          const token = localStorage.getItem("access_token");
+          const res = await fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.campaign_name) {
+              setResolvedCampaignName(data.campaign_name);
+            }
+          } else {
+            if (res.status === 401 || res.status === 403) {
+              throw new Error("Unauthorized: your session may have expired. Please login again.");
+            }
+            throw new Error("Failed to fetch campaigns");
+          }
+        } catch (error) {
+          console.error("Failed to fetch campaign name for campaign ID:", campaignId, error);
+        }
+      };
+      fetchCampaignName();
+    }
+  }, [campaignId, campaignName, router]);
+
   const [data, setData] = useState<DataType[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -82,10 +129,10 @@ export default function Page() {
   const [hasPreviousPage, setHasPreviousPage] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchFiles(10, 1);
-  }, []);
+    fetchFiles(10, 1, campaignId);
+  }, [campaignId]);
 
-  const fetchFiles = async (limit: number, page: number) => {
+  const fetchFiles = async (limit: number, page: number, targetCampaignId?: string) => {
     let retryCount = 0;
     const maxRetries = 5;
     const retryDelay = 15000; // 15 seconds in milliseconds
@@ -94,6 +141,10 @@ export default function Page() {
       try {
         const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
         const url = new URL(`${base_url}/runs`);
+        if (targetCampaignId) {
+          url.searchParams.append("campaign_id", targetCampaignId);
+          url.searchParams.append("run_type", "RSVP");
+        }
         url.searchParams.append("limit", limit.toString());
         url.searchParams.append("page", page.toString());
 
@@ -145,9 +196,14 @@ export default function Page() {
       <div className="flex flex-col justify-center items-start">
         <p className="text-4xl font-bold pt-2">Emails history</p>
         <div className="flex justify-between items-center w-full pb-4">
-          <p className="text-gray-500 italic">
-            Emails you <strong>have sent</strong> are displayed here.
-          </p>
+          <div className="flex flex-col items-start gap-1">
+            <p className="text-gray-500 italic">
+              Emails you <strong>have sent</strong> are displayed here.
+            </p>
+            {campaignId && (
+              <EventLabel campaignId={campaignId} campaignName={resolvedCampaignName} />
+            )}
+          </div>
           <div className="h-10"></div>
         </div>
       </div>
@@ -159,7 +215,14 @@ export default function Page() {
             </div>
           )}
 
-          {isLoading ? <EmailHistoryCardLoading /> : <EmailHistoryCard data={data} />}
+          {isLoading ? (
+            <EmailHistoryCardLoading />
+          ) : (
+            <EmailHistoryCard
+              data={data}
+              campaignFilterLabel={campaignId ? resolvedCampaignName : undefined}
+            />
+          )}
 
           <div className="flex justify-end gap-8 pb-1 px-2">
             <button
@@ -170,7 +233,7 @@ export default function Page() {
               }`}
               onClick={() => {
                 if (hasPreviousPage) {
-                  fetchFiles(10, currentPage - 1);
+                  fetchFiles(10, currentPage - 1, campaignId);
                 }
               }}
               disabled={!hasPreviousPage}
@@ -186,7 +249,7 @@ export default function Page() {
               }`}
               onClick={() => {
                 if (hasNextPage) {
-                  fetchFiles(10, currentPage + 1);
+                  fetchFiles(10, currentPage + 1, campaignId);
                 }
               }}
               disabled={!hasNextPage}
@@ -198,5 +261,19 @@ export default function Page() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center p-8">
+          <RotatingLoaderAnimation />
+        </div>
+      }
+    >
+      <EmailHistoryPageContent />
+    </Suspense>
   );
 }
