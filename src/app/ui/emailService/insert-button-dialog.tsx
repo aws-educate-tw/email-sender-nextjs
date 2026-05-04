@@ -6,75 +6,7 @@ import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-pr
 import { Info, ChevronsUpDown, Check } from "lucide-react";
 import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import { Listbox } from "@headlessui/react";
-import "react-datepicker/dist/react-datepicker.css";
-
-const datePickerStyles = `
-  .react-datepicker-wrapper {
-    width: 100%;
-  }
-
-
-  .react-datepicker__input-container {
-    width: 100%;
-  }
-
-
-  .react-datepicker {
-    font-family: inherit;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-
-  .react-datepicker__header {
-    background-color: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    padding-top: 0.5rem;
-  }
-
-
-  .react-datepicker__current-month {
-    font-weight: 600;
-    color: #1f2937;
-  }
-
-
-  .react-datepicker__day-name {
-    color: #6b7280;
-    font-weight: 500;
-  }
-
-
-  .react-datepicker__day--selected,
-  .react-datepicker__day--keyboard-selected {
-    background-color: #192f47;
-    color: white;
-  }
-
-
-  .react-datepicker__day:not(.react-datepicker__day--disabled):not(
-      .react-datepicker__day--selected
-    ):hover {
-    background-color: #dbeafe;
-  }
-
-
-  .react-datepicker__time-container {
-    border-left: 1px solid #e5e7eb;
-  }
-
-
-  .react-datepicker__time-list-item--selected {
-    background-color: #192f47 !important;
-    color: white !important;
-  }
-
-
-  .react-datepicker__time-list-item:hover {
-    background-color: #dbeafe !important;
-  }
-`;
+import { DatePickerStyleProvider } from "@/app/ui/emailService/date-picker-styles";
 
 interface InsertButtonDialogProps {
   isOpen: boolean;
@@ -340,7 +272,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
 
   return (
     <>
-      <style>{datePickerStyles}</style>
+      <DatePickerStyleProvider />
       <CreateCampaignDialog
         isOpen={isCreateCampaignDialogOpen}
         onClose={() => setIsCreateCampaignDialogOpen(false)}
