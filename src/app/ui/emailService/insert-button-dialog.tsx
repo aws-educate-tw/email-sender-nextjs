@@ -6,7 +6,6 @@ import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-pr
 import { Info, ChevronsUpDown, Check } from "lucide-react";
 import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import { Listbox } from "@headlessui/react";
-import { DatePickerStyleProvider } from "@/app/ui/emailService/date-picker-styles";
 
 interface InsertButtonDialogProps {
   isOpen: boolean;
@@ -272,7 +271,6 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
 
   return (
     <>
-      <DatePickerStyleProvider />
       <CreateCampaignDialog
         isOpen={isCreateCampaignDialogOpen}
         onClose={() => setIsCreateCampaignDialogOpen(false)}

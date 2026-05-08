@@ -3,6 +3,7 @@
 import { forwardRef, useState, useRef, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import { X } from "lucide-react";
+import { DatePickerStyleProvider } from "@/app/ui/date-picker-styles";
 
 interface DateTimeInputProps {
   selected: Date | null;
@@ -212,28 +213,31 @@ export default function DateTimeInput({
   };
 
   return (
-    <DatePicker
-      ref={datePickerRef}
-      selected={selected}
-      onChange={handleDateChange}
-      showTimeSelect
-      timeFormat="HH:mm"
-      timeIntervals={15}
-      dateFormat="yyyy/MM/dd HH:mm"
-      placeholderText={placeholderText}
-      minDate={minDate}
-      maxDate={maxDate}
-      customInput={
-        <CustomInput
-          minDate={minDate}
-          maxDate={maxDate}
-          onClose={handleClose}
-          onDateChange={onChange}
-        />
-      }
-      className={className}
-      timeCaption="Time"
-      onClickOutside={handleClose}
-    />
+    <>
+      <DatePickerStyleProvider />
+      <DatePicker
+        ref={datePickerRef}
+        selected={selected}
+        onChange={handleDateChange}
+        showTimeSelect
+        timeFormat="HH:mm"
+        timeIntervals={15}
+        dateFormat="yyyy/MM/dd HH:mm"
+        placeholderText={placeholderText}
+        minDate={minDate}
+        maxDate={maxDate}
+        customInput={
+          <CustomInput
+            minDate={minDate}
+            maxDate={maxDate}
+            onClose={handleClose}
+            onDateChange={onChange}
+          />
+        }
+        className={className}
+        timeCaption="Time"
+        onClickOutside={handleClose}
+      />
+    </>
   );
 }
