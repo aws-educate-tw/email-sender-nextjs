@@ -72,8 +72,8 @@ const CustomInput = forwardRef<HTMLInputElement, any>(
           const h = parseInt(hour);
           const min = parseInt(minute);
 
-          if (y < new Date().getFullYear() || y > 2100) {
-            setError("Year should be between current year and 2100");
+          if (y < 2025 || y > 2100) {
+            setError("Year should be between 2025-2100");
           } else if (m < 1 || m > 12) {
             setError("Month should be between 01-12");
           } else if (h > 23) {
@@ -101,7 +101,7 @@ const CustomInput = forwardRef<HTMLInputElement, any>(
                 minDate && Math.abs(maxDate.getTime() - minDate.getTime()) > 86400000;
               setError(
                 campaignStart
-                  ? "Deadline cannot be later than campaign start time"
+                  ? "Deadline cannot be later than event start time"
                   : "Date exceeds allowed range"
               );
             } else {
@@ -135,9 +135,9 @@ const CustomInput = forwardRef<HTMLInputElement, any>(
     const handleClear = (e: React.MouseEvent) => {
       e.stopPropagation();
       setLocalValue("");
+      onDateChange(null);
       setError("");
       setIsTyping(false);
-      onDateChange(null);
     };
 
     return (
@@ -231,7 +231,7 @@ export default function DateTimeInput({
             minDate={minDate}
             maxDate={maxDate}
             onClose={handleClose}
-            onDateChange={handleDateChange}
+            onDateChange={onChange}
           />
         }
         className={className}
