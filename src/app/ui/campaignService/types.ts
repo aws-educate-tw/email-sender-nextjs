@@ -22,7 +22,7 @@ export interface Campaign {
 
 export interface Participant {
   participant_id: string;
-  email_id: string | null;
+  email: string | null;
   rsvp_status: "PENDING" | "ATTEND" | "NOT_ATTEND";
   name: string;
   created_at: string;
