@@ -99,7 +99,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
         header: "Participant Name",
         cell: info => info.getValue() || "-",
       }),
-      columnHelper.accessor("email_id", {
+      columnHelper.accessor("email", {
         header: "Participant Email",
         cell: info => info.getValue() || "-",
       }),
@@ -178,7 +178,7 @@ export default function ParticipantsTable({ participants, campaignName }: Partic
 
     const exportData = selectedParticipants.map(p => ({
       "Participant Name": p.name,
-      "Participant Email": p.email_id ?? "",
+      "Participant Email": p.email ?? "",
       "Attendance Status": p.rsvp_status,
       "Created At": new Date(p.created_at).toLocaleString("en-US"),
       "Updated At": new Date(p.updated_at).toLocaleString("en-US"),
