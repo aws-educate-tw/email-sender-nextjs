@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import RsvpStatusBanner from "./rsvp-status-banner";
 import RsvpRadioGroup from "./rsvp-radio-group";
@@ -13,6 +13,14 @@ interface RsvpConfirmationFormProps {
 
 type PageError = "invalid_token" | "not_found" | "system_error";
 type RsvpTokenPayload = Pick<RsvpToken, "run_id" | "participant_id">;
+interface CampaignDisplayData {
+  participantName: string;
+  campaignName: string;
+  campaignStartTime: string;
+  campaignLocation: string;
+  registrationDeadline: string;
+  isRegistrationClosed: boolean;
+}
 
 function parseJwtPayload(token: string): RsvpTokenPayload | null {
   try {
@@ -47,32 +55,50 @@ function formatDatetime(isoString: string): string {
   }
 }
 
+function getRsvpApiEndpoint(apiEndpoint?: string): string | null {
+  if (!apiEndpoint?.trim()) return null;
+
+  try {
+    const url = new URL(apiEndpoint.trim());
+    const pathSegments = url.pathname.split("/").filter(Boolean);
+    const environment = pathSegments.at(-1);
+
+    if (!environment) return null;
+
+    url.pathname = `/${[...pathSegments.slice(0, -1), "rsvp-service", environment].join("/")}`;
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return null;
+  }
+}
+
 export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [pageError, setPageError] = useState<PageError | null>(null);
   const [rsvpStatus, setRsvpStatus] = useState<RsvpStatus>("PENDING");
-  const [participantName, setParticipantName] = useState("");
-  const [campaignName, setCampaignName] = useState("");
-  const [campaignStartTime, setCampaignStartTime] = useState("");
-  const [campaignLocation, setCampaignLocation] = useState("");
-  const [registrationDeadline, setRegistrationDeadline] = useState("");
-  const [isRegistrationClosed, setIsRegistrationClosed] = useState(false);
+  const [campaignData, setCampaignData] = useState<CampaignDisplayData | null>(null);
   const [selectedOption, setSelectedOption] = useState<"ATTEND" | "NOT_ATTEND" | null>(null);
   const [isEditing, setIsEditing] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastEditedTime, setLastEditedTime] = useState<string | null>(null);
-  const [compositeId, setCompositeId] = useState("");
 
-  const apiBase = process.env.NEXT_PUBLIC_RSVP_API_ENDPOINT;
+  const apiBase = getRsvpApiEndpoint(process.env.NEXT_PUBLIC_API_ENDPOINT);
+  const tokenPayload = useMemo(() => parseJwtPayload(token), [token]);
+  const compositeId = useMemo(
+    () => (tokenPayload ? `${tokenPayload.run_id}_${tokenPayload.participant_id}` : ""),
+    [tokenPayload]
+  );
 
   const applyStatusResponse = useCallback((data: RsvpStatusResponse) => {
     setRsvpStatus(data.rsvp_status);
-    setParticipantName(data.participant_name);
-    setCampaignName(data.campaign_name);
-    setCampaignStartTime(formatDatetime(data.campaign_start_time));
-    setCampaignLocation(data.campaign_location);
-    setRegistrationDeadline(formatDatetime(data.registration_deadline));
-    setIsRegistrationClosed(data.is_registration_closed);
+    setCampaignData({
+      participantName: data.participant_name,
+      campaignName: data.campaign_name,
+      campaignStartTime: formatDatetime(data.campaign_start_time),
+      campaignLocation: data.campaign_location,
+      registrationDeadline: formatDatetime(data.registration_deadline),
+      isRegistrationClosed: data.is_registration_closed,
+    });
 
     if (data.rsvp_status !== "PENDING") {
       setSelectedOption(data.rsvp_status);
@@ -115,19 +141,15 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
   );
 
   useEffect(() => {
-    const payload = parseJwtPayload(token);
-    if (!payload) {
+    if (!tokenPayload || !compositeId) {
       setPageError("invalid_token");
       setIsLoading(false);
       return;
     }
 
-    const id = `${payload.run_id}_${payload.participant_id}`;
-    setCompositeId(id);
-
     const loadStatus = async () => {
       try {
-        await fetchStatus(id);
+        await fetchStatus(compositeId);
       } catch {
         setPageError("system_error");
       } finally {
@@ -136,7 +158,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
     };
 
     loadStatus();
-  }, [token, fetchStatus]);
+  }, [tokenPayload, compositeId, fetchStatus]);
 
   const handleSubmit = async () => {
     if (!selectedOption || !apiBase || !compositeId) return;
@@ -165,7 +187,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
           try {
             await fetchStatus(compositeId);
           } finally {
-            setIsRegistrationClosed(true);
+            setCampaignData(prev => (prev ? { ...prev, isRegistrationClosed: true } : prev));
             setIsEditing(false);
           }
           break;
@@ -192,15 +214,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
         setRsvpStatus(current);
         if (current !== "PENDING") setSelectedOption(current);
         setIsEditing(false);
-        setLastEditedTime(
-          new Date().toLocaleString("zh-TW", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        );
+        setLastEditedTime(formatDatetime(new Date().toISOString()));
         break;
       } catch {
         setPageError("system_error");
@@ -251,6 +265,26 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
       </div>
     );
   }
+
+  if (!campaignData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
+          <h1 className="text-xl font-bold text-red-600 mb-4">系統忙碌中</h1>
+          <p className="text-gray-600">請稍後再試，若問題持續請聯絡主辦單位。</p>
+        </div>
+      </div>
+    );
+  }
+
+  const {
+    participantName,
+    campaignName,
+    campaignStartTime,
+    campaignLocation,
+    registrationDeadline,
+    isRegistrationClosed,
+  } = campaignData;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

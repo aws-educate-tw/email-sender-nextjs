@@ -26,8 +26,3 @@ export interface RsvpUpdateResponse {
     currentStatus: RsvpStatus;
   };
 }
-
-export interface RsvpErrorResponse {
-  code?: string;
-  message?: string;
-}
