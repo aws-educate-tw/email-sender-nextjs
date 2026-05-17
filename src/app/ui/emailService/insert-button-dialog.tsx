@@ -1,23 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "@/app/ui/emailService/modal";
 import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-preview";
 import { Info, ChevronsUpDown, Check } from "lucide-react";
 import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import { Listbox } from "@headlessui/react";
+import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
+import { CampaignListItem } from "@/app/ui/campaignService/types";
 
 interface InsertButtonDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onInsert: (buttonHtml: string) => void;
+  onInsert: (buttonHtml: string, campaignId: string, deadline: Date) => void;
 }
 
-// Create New Campaign Dialog Component
 interface CreateCampaignDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCampaignCreated: (campaign: any) => void;
+  onCampaignCreated: (campaign: {
+    campaign_id: string;
+    name: string;
+    startDateTime: Date;
+    endDateTime: Date;
+    place: string;
+  }) => void;
 }
 
 function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCampaignDialogProps) {
@@ -25,6 +32,7 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
   const [campaignStartDateTime, setCampaignStartDateTime] = useState<Date | null>(null);
   const [campaignEndDateTime, setCampaignEndDateTime] = useState<Date | null>(null);
   const [campaignPlace, setCampaignPlace] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const now = new Date();
   const fiveYearsLater = new Date(now.getFullYear() + 5, now.getMonth(), now.getDate());
@@ -46,19 +54,45 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
     return !getValidationError();
   };
 
-  const handleCreate = () => {
-    if (!isValid()) return;
+  const handleCreate = async () => {
+    if (!isValid() || !campaignStartDateTime || !campaignEndDateTime) return;
 
-    const newCampaign = {
-      id: Date.now().toString(),
-      name: campaignName,
-      startDateTime: campaignStartDateTime,
-      endDateTime: campaignEndDateTime,
-      place: campaignPlace,
-    };
+    setIsSubmitting(true);
+    try {
+      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          campaign_name: campaignName,
+          campaign_start_time: campaignStartDateTime.toISOString(),
+          campaign_end_time: campaignEndDateTime.toISOString(),
+          campaign_location: campaignPlace,
+          is_active: true,
+        }),
+      });
 
-    onCampaignCreated(newCampaign);
-    handleClose();
+      if (!response.ok) throw new Error("Failed to create campaign");
+
+      const created = await response.json();
+      onCampaignCreated({
+        campaign_id: created.campaign_id,
+        name: campaignName,
+        startDateTime: campaignStartDateTime,
+        endDateTime: campaignEndDateTime,
+        place: campaignPlace,
+      });
+      handleClose();
+    } catch (error) {
+      console.error("Failed to create campaign:", error);
+      alert("Failed to create event. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -160,14 +194,14 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
           </button>
           <button
             onClick={handleCreate}
-            disabled={!isValid()}
+            disabled={!isValid() || isSubmitting}
             className={`px-6 py-2 rounded-md font-medium transition-colors ${
-              isValid()
+              isValid() && !isSubmitting
                 ? "bg-[#2c3e50] text-white hover:bg-[#1a2f4a]"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            Create
+            {isSubmitting ? "Creating..." : "Create"}
           </button>
         </div>
       </div>
@@ -177,17 +211,39 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
 
 export default function InsertButtonDialog({ isOpen, onClose, onInsert }: InsertButtonDialogProps) {
   const [buttonText, setButtonText] = useState("");
-  const [selectedCampaign, setSelectedCampaign] = useState("");
+  const [selectedCampaignId, setSelectedCampaignId] = useState("");
   const [campaignName, setCampaignName] = useState("");
   const [campaignStartDateTime, setCampaignStartDateTime] = useState<Date | null>(null);
   const [campaignEndDateTime, setCampaignEndDateTime] = useState<Date | null>(null);
   const [campaignPlace, setCampaignPlace] = useState("");
   const [deadlineDateTime, setDeadlineDateTime] = useState<Date | null>(null);
   const [isCreateCampaignDialogOpen, setIsCreateCampaignDialogOpen] = useState(false);
-  const [availableCampaigns, setAvailableCampaigns] = useState<any[]>([]);
+  const [availableCampaigns, setAvailableCampaigns] = useState<CampaignListItem[]>([]);
 
   const now = new Date();
   const fiveYearsLater = new Date(now.getFullYear() + 5, now.getMonth(), now.getDate());
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const fetchCampaigns = async () => {
+      try {
+        const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
+        const token = localStorage.getItem("access_token");
+        const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) return;
+        const data: CampaignListItem[] = await response.json();
+        setAvailableCampaigns(data);
+      } catch (error) {
+        console.error("Failed to fetch campaigns:", error);
+      }
+    };
+    fetchCampaigns();
+  }, [isOpen]);
 
   const getValidationError = () => {
     if (!campaignStartDateTime || !campaignEndDateTime || !deadlineDateTime) return null;
@@ -201,19 +257,8 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   };
 
   const isValid = () => {
-    if (!buttonText || !deadlineDateTime) return false;
-
-    if (selectedCampaign) {
-      return true;
-    }
-
-    const hasAllFields = !!(
-      campaignName &&
-      campaignStartDateTime &&
-      campaignEndDateTime &&
-      campaignPlace
-    );
-    return hasAllFields && !getValidationError();
+    if (!buttonText || !deadlineDateTime || !selectedCampaignId) return false;
+    return !getValidationError();
   };
 
   const formatDateTime = (date: Date) => {
@@ -222,9 +267,24 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     return `${dateStr} ${timeStr}`;
   };
 
-  const handleCampaignCreated = (newCampaign: any) => {
-    setAvailableCampaigns(prev => [...prev, newCampaign]);
-    setSelectedCampaign(newCampaign.id);
+  const handleCampaignCreated = (newCampaign: {
+    campaign_id: string;
+    name: string;
+    startDateTime: Date;
+    endDateTime: Date;
+    place: string;
+  }) => {
+    const newItem: CampaignListItem = {
+      campaign_id: newCampaign.campaign_id,
+      campaign_name: newCampaign.name,
+      campaign_start_time: newCampaign.startDateTime.toISOString(),
+      campaign_end_time: newCampaign.endDateTime.toISOString(),
+      campaign_location: newCampaign.place,
+      campaign_created_at: new Date().toISOString(),
+      is_active: true,
+    };
+    setAvailableCampaigns(prev => [...prev, newItem]);
+    setSelectedCampaignId(newCampaign.campaign_id);
     setCampaignName(newCampaign.name);
     setCampaignStartDateTime(newCampaign.startDateTime);
     setCampaignEndDateTime(newCampaign.endDateTime);
@@ -232,16 +292,17 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   };
 
   const handleCampaignSelection = (campaignId: string) => {
-    setSelectedCampaign(campaignId);
+    setSelectedCampaignId(campaignId);
     if (campaignId && campaignId !== "none") {
-      const campaign = availableCampaigns.find(c => c.id === campaignId);
+      const campaign = availableCampaigns.find(c => c.campaign_id === campaignId);
       if (campaign) {
-        setCampaignName(campaign.name);
-        setCampaignStartDateTime(campaign.startDateTime);
-        setCampaignEndDateTime(campaign.endDateTime);
-        setCampaignPlace(campaign.place);
+        setCampaignName(campaign.campaign_name);
+        setCampaignStartDateTime(new Date(campaign.campaign_start_time));
+        setCampaignEndDateTime(new Date(campaign.campaign_end_time));
+        setCampaignPlace(campaign.campaign_location);
       }
     } else {
+      setSelectedCampaignId("");
       setCampaignName("");
       setCampaignStartDateTime(null);
       setCampaignEndDateTime(null);
@@ -252,15 +313,15 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   const handleInsert = () => {
     if (!isValid() || !campaignStartDateTime || !campaignEndDateTime || !deadlineDateTime) return;
 
-    const buttonHtml = `<a href="{{RSVP_LINK}}" data-button-type="campaign-attendance" data-campaign-name="${campaignName}" data-campaign-start="${formatDateTime(campaignStartDateTime)}" data-campaign-end="${formatDateTime(campaignEndDateTime)}" data-campaign-place="${campaignPlace}" data-deadline="${formatDateTime(deadlineDateTime)}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${buttonText}</a>`;
+    const buttonHtml = `<a href="{{RSVP_LINK}}" data-button-type="campaign-attendance" data-campaign-id="${selectedCampaignId}" data-campaign-name="${campaignName}" data-campaign-start="${formatDateTime(campaignStartDateTime)}" data-campaign-end="${formatDateTime(campaignEndDateTime)}" data-campaign-place="${campaignPlace}" data-deadline="${formatDateTime(deadlineDateTime)}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${buttonText}</a>`;
 
-    onInsert(buttonHtml);
+    onInsert(buttonHtml, selectedCampaignId, deadlineDateTime);
     handleClose();
   };
 
   const handleClose = () => {
     setButtonText("");
-    setSelectedCampaign("");
+    setSelectedCampaignId("");
     setCampaignName("");
     setCampaignStartDateTime(null);
     setCampaignEndDateTime(null);
@@ -311,13 +372,13 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
               <label className="block text-sm font-medium mb-2">Related event</label>
               <div className="flex gap-3 items-center">
                 <div className="flex-1">
-                  <Listbox value={selectedCampaign || "none"} onChange={handleCampaignSelection}>
+                  <Listbox value={selectedCampaignId || "none"} onChange={handleCampaignSelection}>
                     <div className="relative">
                       <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-3 pl-4 pr-10 text-left shadow-sm border border-gray-300 focus:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600 text-sm">
                         <span className="block truncate text-gray-900">
-                          {selectedCampaign && selectedCampaign !== "none"
-                            ? availableCampaigns.find(c => c.id === selectedCampaign)?.name ||
-                              "Select an existing event"
+                          {selectedCampaignId
+                            ? availableCampaigns.find(c => c.campaign_id === selectedCampaignId)
+                                ?.campaign_name || "Select an existing event"
                             : "Select an existing event"}
                         </span>
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -350,8 +411,8 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                         </Listbox.Option>
                         {availableCampaigns.map(campaign => (
                           <Listbox.Option
-                            key={campaign.id}
-                            value={campaign.id}
+                            key={campaign.campaign_id}
+                            value={campaign.campaign_id}
                             className={({ active, selected }) =>
                               `relative cursor-default select-none py-3 pl-4 pr-10 ${
                                 active ? "bg-gray-100 text-gray-900" : "text-gray-900"
@@ -363,7 +424,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
                                 <span
                                   className={`block truncate ${selected ? "font-medium" : "font-normal"}`}
                                 >
-                                  {campaign.name}
+                                  {campaign.campaign_name}
                                 </span>
                                 {selected && (
                                   <span className="absolute inset-y-0 right-0 flex items-center pr-3">

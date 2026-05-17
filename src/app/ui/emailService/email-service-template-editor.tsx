@@ -11,12 +11,14 @@ interface EmailServiceTemplateEditorProps {
   onNext: () => void;
   templateFileUrl?: string | null;
   onSave?: (templateFileName: string, templateFileId: string, templateFileUrl: string) => void;
+  onCampaignInserted?: (campaignId: string, deadline: Date) => void;
 }
 
 export default function EmailServiceTemplateEditor({
   onNext,
   templateFileUrl,
   onSave,
+  onCampaignInserted,
 }: EmailServiceTemplateEditorProps) {
   const [content, setContent] = useState(htmltemplateContent);
   const [originalContent, setOriginalContent] = useState(htmltemplateContent);
@@ -269,7 +271,11 @@ export default function EmailServiceTemplateEditor({
     <div>
       <div className="flex flex-col justify-center items-start"></div>
       <div>
-        <TipTap content={content} onChange={handleContentChange} />
+        <TipTap
+          content={content}
+          onChange={handleContentChange}
+          onCampaignInserted={onCampaignInserted}
+        />
       </div>
       <div className="flex flex-wrap justify-end gap-3 items-center h-12">
         {/* Template Name Input */}

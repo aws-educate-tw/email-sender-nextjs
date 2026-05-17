@@ -116,10 +116,11 @@ interface TipTapProps {
   content: string;
   onNext?: () => void;
   templateName?: string;
-  onSave?: (content: string, fileId?: string, fileUrl?: string) => void; // Updated callback signature
+  onSave?: (content: string, fileId?: string, fileUrl?: string) => void;
+  onCampaignInserted?: (campaignId: string, deadline: Date) => void;
 }
 
-export default function TipTap({ onChange, content }: TipTapProps) {
+export default function TipTap({ onChange, content, onCampaignInserted }: TipTapProps) {
   const [, setEditorContent] = useState(content);
   const [, setIsFocused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -565,10 +566,11 @@ export default function TipTap({ onChange, content }: TipTapProps) {
       <InsertButtonDialog
         isOpen={showInsertButtonDialog}
         onClose={() => setShowInsertButtonDialog(false)}
-        onInsert={buttonHtml => {
+        onInsert={(buttonHtml, campaignId, deadline) => {
           if (editor) {
             editor.chain().focus().insertContent(buttonHtml).run();
           }
+          onCampaignInserted?.(campaignId, deadline);
           setShowInsertButtonDialog(false);
         }}
       />
