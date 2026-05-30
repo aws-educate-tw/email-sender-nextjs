@@ -121,7 +121,10 @@ export async function submitLogin(data: string) {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.message || "Error: Failed to Login. Please try again.");
+      return {
+        status: "error",
+        message: result.message || "Error: Failed to Login. Please try again.",
+      };
     }
 
     if (result.challengeName === "NEW_PASSWORD_REQUIRED") {
@@ -139,7 +142,11 @@ export async function submitLogin(data: string) {
     }
   } catch (error: any) {
     console.error("Error during API call:", error);
-    throw error;
+    return {
+      status: "error",
+      message: "Error: Failed to Login. Please try again.",
+      error: error.message,
+    };
   }
 }
 

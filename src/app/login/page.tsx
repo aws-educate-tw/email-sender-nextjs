@@ -56,6 +56,9 @@ export default function Page() {
       } else if (response.challengeName === "NEW_PASSWORD_REQUIRED") {
         setSession(response.session);
         setIsSubmitting(false);
+      } else {
+        setLoginError(response.message || "The username or password is incorrect.");
+        setIsSubmitting(false);
       }
     } catch (error: any) {
       console.error("Login failed", error);
