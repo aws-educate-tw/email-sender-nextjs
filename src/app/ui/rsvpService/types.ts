@@ -18,6 +18,7 @@ export interface RsvpStatusResponse {
   campaign_location: string;
   registration_deadline: string;
   is_registration_closed: boolean;
+  last_edited_time?: string | null;
 }
 
 export interface RsvpUpdateResponse {

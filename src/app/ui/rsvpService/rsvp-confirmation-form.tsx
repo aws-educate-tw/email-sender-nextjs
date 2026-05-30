@@ -91,6 +91,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
 
   const applyStatusResponse = useCallback((data: RsvpStatusResponse) => {
     setRsvpStatus(data.rsvp_status);
+    setLastEditedTime(data.last_edited_time ? formatDatetime(data.last_edited_time) : null);
     setCampaignData({
       participantName: data.participant_name,
       campaignName: data.campaign_name,
