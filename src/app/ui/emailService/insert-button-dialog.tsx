@@ -9,6 +9,14 @@ import { Listbox } from "@headlessui/react";
 import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 import { CampaignListItem } from "@/app/ui/campaignService/types";
 
+function escapeAttr(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 interface InsertButtonDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -313,7 +321,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   const handleInsert = () => {
     if (!isValid() || !campaignStartDateTime || !campaignEndDateTime || !deadlineDateTime) return;
 
-    const buttonHtml = `<a href="{{RSVP_LINK}}" data-button-type="campaign-attendance" data-campaign-id="${selectedCampaignId}" data-campaign-name="${campaignName}" data-campaign-start="${formatDateTime(campaignStartDateTime)}" data-campaign-end="${formatDateTime(campaignEndDateTime)}" data-campaign-place="${campaignPlace}" data-deadline="${formatDateTime(deadlineDateTime)}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${buttonText}</a>`;
+    const buttonHtml = `<a href="{{RSVP_LINK}}" data-button-type="campaign-attendance" data-campaign-id="${escapeAttr(selectedCampaignId)}" data-campaign-name="${escapeAttr(campaignName)}" data-campaign-start="${escapeAttr(formatDateTime(campaignStartDateTime))}" data-campaign-end="${escapeAttr(formatDateTime(campaignEndDateTime))}" data-campaign-place="${escapeAttr(campaignPlace)}" data-deadline="${escapeAttr(formatDateTime(deadlineDateTime))}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${escapeAttr(buttonText)}</a>`;
 
     onInsert(buttonHtml, selectedCampaignId, deadlineDateTime);
     handleClose();
