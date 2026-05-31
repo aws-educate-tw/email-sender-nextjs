@@ -12,6 +12,7 @@ interface EmailServiceTemplateEditorProps {
   templateFileUrl?: string | null;
   onSave?: (templateFileName: string, templateFileId: string, templateFileUrl: string) => void;
   onCampaignInserted?: (campaignId: string, deadline: Date) => void;
+  onRsvpButtonRemoved?: () => void;
 }
 
 export default function EmailServiceTemplateEditor({
@@ -19,6 +20,7 @@ export default function EmailServiceTemplateEditor({
   templateFileUrl,
   onSave,
   onCampaignInserted,
+  onRsvpButtonRemoved,
 }: EmailServiceTemplateEditorProps) {
   const [content, setContent] = useState(htmltemplateContent);
   const [originalContent, setOriginalContent] = useState(htmltemplateContent);
@@ -48,9 +50,11 @@ export default function EmailServiceTemplateEditor({
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
     setHasChanges(newContent !== originalContent);
-    // Reset save state when content changes
     if (saveButtonState === "saved") {
       setSaveButtonState("idle");
+    }
+    if (!newContent.includes('data-button-type="campaign-attendance"')) {
+      onRsvpButtonRemoved?.();
     }
   };
 

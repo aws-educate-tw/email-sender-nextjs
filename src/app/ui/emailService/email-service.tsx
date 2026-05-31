@@ -105,6 +105,15 @@ export default function EmailService() {
     }));
   }, []);
 
+  const handleRsvpButtonRemoved = useCallback(() => {
+    setEmailData(prev => ({
+      ...prev,
+      isRsvp: false,
+      campaignId: null,
+      registrationDeadline: null,
+    }));
+  }, []);
+
   // 使用 useCallback 包裝 onSave 函數
   const handleTemplateSave = useCallback(
     (
@@ -167,6 +176,7 @@ export default function EmailService() {
             templateFileUrl={emailData.templateFileUrl}
             onSave={handleTemplateSave}
             onCampaignInserted={handleCampaignInserted}
+            onRsvpButtonRemoved={handleRsvpButtonRemoved}
           />
         );
       case "recipients":
