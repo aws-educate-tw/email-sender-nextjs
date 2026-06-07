@@ -177,6 +177,7 @@ export default function EmailService() {
             onSave={handleTemplateSave}
             onCampaignInserted={handleCampaignInserted}
             onRsvpButtonRemoved={handleRsvpButtonRemoved}
+            isRsvp={emailData.isRsvp}
           />
         );
       case "recipients":

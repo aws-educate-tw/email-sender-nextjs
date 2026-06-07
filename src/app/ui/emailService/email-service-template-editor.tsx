@@ -13,6 +13,7 @@ interface EmailServiceTemplateEditorProps {
   onSave?: (templateFileName: string, templateFileId: string, templateFileUrl: string) => void;
   onCampaignInserted?: (campaignId: string, deadline: Date) => void;
   onRsvpButtonRemoved?: () => void;
+  isRsvp?: boolean;
 }
 
 export default function EmailServiceTemplateEditor({
@@ -21,6 +22,7 @@ export default function EmailServiceTemplateEditor({
   onSave,
   onCampaignInserted,
   onRsvpButtonRemoved,
+  isRsvp,
 }: EmailServiceTemplateEditorProps) {
   const [content, setContent] = useState(htmltemplateContent);
   const [originalContent, setOriginalContent] = useState(htmltemplateContent);
@@ -53,7 +55,7 @@ export default function EmailServiceTemplateEditor({
     if (saveButtonState === "saved") {
       setSaveButtonState("idle");
     }
-    if (!newContent.includes('data-button-type="campaign-attendance"')) {
+    if (isRsvp && !newContent.includes('data-button-type="campaign-attendance"')) {
       onRsvpButtonRemoved?.();
     }
   };

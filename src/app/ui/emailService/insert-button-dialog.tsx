@@ -32,6 +32,7 @@ interface CreateCampaignDialogProps {
     startDateTime: Date;
     endDateTime: Date;
     place: string;
+    createdAt: string;
   }) => void;
 }
 
@@ -68,7 +69,7 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
     setIsSubmitting(true);
     try {
       const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("access_token") || "";
       const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         method: "POST",
         headers: {
@@ -93,6 +94,7 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
         startDateTime: campaignStartDateTime,
         endDateTime: campaignEndDateTime,
         place: campaignPlace,
+        createdAt: created.campaign_created_at,
       });
       handleClose();
     } catch (error) {
@@ -236,7 +238,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     const fetchCampaigns = async () => {
       try {
         const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem("access_token") || "";
         const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
           headers: {
             "Content-Type": "application/json",
@@ -265,12 +267,19 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   };
 
   const isValid = () => {
-    if (!buttonText || !deadlineDateTime || !selectedCampaignId) return false;
+    if (
+      !buttonText ||
+      !deadlineDateTime ||
+      !selectedCampaignId ||
+      !campaignStartDateTime ||
+      !campaignEndDateTime
+    )
+      return false;
     return !getValidationError();
   };
 
   const formatDateTime = (date: Date) => {
-    const dateStr = date.toISOString().split("T")[0];
+    const dateStr = date.toLocaleDateString("sv");
     const timeStr = date.toTimeString().slice(0, 5);
     return `${dateStr} ${timeStr}`;
   };
@@ -281,6 +290,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     startDateTime: Date;
     endDateTime: Date;
     place: string;
+    createdAt: string;
   }) => {
     const newItem: CampaignListItem = {
       campaign_id: newCampaign.campaign_id,
@@ -288,7 +298,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
       campaign_start_time: newCampaign.startDateTime.toISOString(),
       campaign_end_time: newCampaign.endDateTime.toISOString(),
       campaign_location: newCampaign.place,
-      campaign_created_at: new Date().toISOString(),
+      campaign_created_at: newCampaign.createdAt,
       is_active: true,
     };
     setAvailableCampaigns(prev => [...prev, newItem]);
