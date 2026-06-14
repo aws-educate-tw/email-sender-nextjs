@@ -122,28 +122,32 @@ export async function submitLogin(data: string) {
 
     if (!response.ok) {
       return {
-        status: "error",
         message: result.message || "Error: Failed to Login. Please try again.",
       };
     }
 
     if (result.challengeName === "NEW_PASSWORD_REQUIRED") {
       return {
-        message: result.message,
+        message: result.message || "New password required",
         challengeName: result.challengeName,
         session: result.session,
         challengeParameters: result.challengeParameters,
       };
-    } else {
+    }
+
+    if (result.message === "Password reset required for the user") {
       return {
         message: result.message,
-        access_token: result.access_token,
       };
     }
+
+    return {
+      message: result.message || "Login successful",
+      access_token: result.access_token,
+    };
   } catch (error: any) {
     console.error("Error during API call:", error);
     return {
-      status: "error",
       message: "Error: Failed to Login. Please try again.",
       error: error.message,
     };
@@ -176,12 +180,18 @@ export async function submitChangePassword(data: string) {
     });
 
     const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        message: result.message || "Error: Failed to Change Password. Please try again.",
+      };
+    }
+
     return {
-      message: result.message,
+      message: result.message || "Password changed successfully",
     };
   } catch (error: any) {
     return {
-      status: "error",
       message: "Error: Failed to Change Password. Please try again.",
       error: error.message,
     };
