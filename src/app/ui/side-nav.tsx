@@ -2,11 +2,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { submitLogout } from "@/lib/actions";
 
 export default function SideNav() {
   const router = useRouter();
 
-  const signout = () => {
+  const signout = async () => {
+    await submitLogout();
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_expiry_time");
     router.push("/");

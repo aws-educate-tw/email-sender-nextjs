@@ -1,5 +1,12 @@
 "use server";
+import { cookies } from "next/headers";
 import { z } from "zod";
+import {
+  ACCESS_TOKEN_COOKIE,
+  TOKEN_EXPIRY_COOKIE,
+  TOKEN_MAX_AGE_SECONDS,
+  getTokenExpiryTime,
+} from "@/lib/auth-cookies";
 
 const formSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
@@ -47,6 +54,14 @@ const webhookFormSchema = z.object({
   cc: z.array(z.string().email("Invalid email address")).optional(),
   attachment_file_ids: z.array(z.string()).optional(),
 });
+
+const authCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: TOKEN_MAX_AGE_SECONDS,
+};
 
 export async function submitForm(data: string, access_token: string) {
   const parsedData = JSON.parse(data);
@@ -141,9 +156,14 @@ export async function submitLogin(data: string) {
       };
     }
 
+    const tokenExpiryTime = getTokenExpiryTime().toString();
+    cookies().set(ACCESS_TOKEN_COOKIE, result.access_token, authCookieOptions);
+    cookies().set(TOKEN_EXPIRY_COOKIE, tokenExpiryTime, authCookieOptions);
+
     return {
       message: result.message || "Login successful",
       access_token: result.access_token,
+      token_expiry_time: tokenExpiryTime,
     };
   } catch (error: any) {
     console.error("Error during API call:", error);
@@ -152,6 +172,11 @@ export async function submitLogin(data: string) {
       error: error.message,
     };
   }
+}
+
+export async function submitLogout() {
+  cookies().delete(ACCESS_TOKEN_COOKIE);
+  cookies().delete(TOKEN_EXPIRY_COOKIE);
 }
 
 export async function submitChangePassword(data: string) {

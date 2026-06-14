@@ -42,12 +42,9 @@ export default function Page() {
     try {
       const response = await submitLogin(JSON.stringify(formData));
 
-      if ("access_token" in response) {
+      if ("access_token" in response && response.token_expiry_time) {
         localStorage.setItem("access_token", response.access_token);
-
-        // Set token expiry time to 24 hours
-        const tokenExpiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
-        localStorage.setItem("token_expiry_time", tokenExpiryTime.toString());
+        localStorage.setItem("token_expiry_time", response.token_expiry_time);
 
         router.push("/emailService");
       } else if (response.message === "Password reset required for the user") {
