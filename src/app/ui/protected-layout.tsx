@@ -1,5 +1,3 @@
-"use client";
-
 import SideNav from "@/app/ui/side-nav";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {

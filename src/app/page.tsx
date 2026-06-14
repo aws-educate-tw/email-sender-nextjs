@@ -1,18 +1,17 @@
-"use client";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRightIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { cookies } from "next/headers";
+import {
+  ACCESS_TOKEN_COOKIE,
+  TOKEN_EXPIRY_COOKIE,
+  isTokenExpiryTimeValid,
+} from "@/lib/auth-cookies";
 
 export default function Page() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const access_token = localStorage.getItem("access_token");
-    const expiryTime = localStorage.getItem("token_expiry_time");
-    const isValid = access_token && expiryTime && new Date().getTime() <= parseInt(expiryTime);
-    setIsAuthenticated(isValid ? true : false);
-  }, []);
+  const accessToken = cookies().get(ACCESS_TOKEN_COOKIE)?.value;
+  const expiryTime = cookies().get(TOKEN_EXPIRY_COOKIE)?.value;
+  const isAuthenticated = Boolean(accessToken && isTokenExpiryTimeValid(expiryTime));
 
   return (
     <main className="flex min-h-screen flex-col p-6">

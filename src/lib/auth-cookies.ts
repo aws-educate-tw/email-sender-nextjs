@@ -5,3 +5,7 @@ export const TOKEN_MAX_AGE_SECONDS = 24 * 60 * 60;
 export function getTokenExpiryTime() {
   return Date.now() + TOKEN_MAX_AGE_SECONDS * 1000;
 }
+
+export function isTokenExpiryTimeValid(expiryTime?: string) {
+  return Boolean(expiryTime && Date.now() <= Number.parseInt(expiryTime, 10));
+}
