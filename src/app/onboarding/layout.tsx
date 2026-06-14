@@ -1,5 +1,5 @@
-import ProtectedLayout from "@/app/ui/protected-layout";
+import AppShell from "@/app/ui/app-shell";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <ProtectedLayout>{children}</ProtectedLayout>;
+  return <AppShell>{children}</AppShell>;
 }
