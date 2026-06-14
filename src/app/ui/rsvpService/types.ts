@@ -24,6 +24,6 @@ export interface RsvpStatusResponse {
 export interface RsvpUpdateResponse {
   status: "SUCCESS";
   data: {
-    currentStatus: RsvpStatus;
+    rsvp_status: RsvpStatus;
   };
 }

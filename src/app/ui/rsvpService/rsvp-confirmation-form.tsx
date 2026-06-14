@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
+import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 import RsvpStatusBanner from "./rsvp-status-banner";
 import RsvpRadioGroup from "./rsvp-radio-group";
 import RsvpSubmitButton from "./rsvp-submit-button";
@@ -27,7 +28,9 @@ function parseJwtPayload(token: string): RsvpTokenPayload | null {
     const payload = token.split(".")[1];
     if (!payload) return null;
 
-    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+    const decoded = JSON.parse(atob(padded));
     if (typeof decoded.run_id !== "string" || typeof decoded.participant_id !== "string") {
       return null;
     }
@@ -55,18 +58,9 @@ function formatDatetime(isoString: string): string {
   }
 }
 
-function getRsvpApiEndpoint(apiEndpoint?: string): string | null {
-  if (!apiEndpoint?.trim()) return null;
-
+function getRsvpApiEndpoint(): string | null {
   try {
-    const url = new URL(apiEndpoint.trim());
-    const pathSegments = url.pathname.split("/").filter(Boolean);
-    const environment = pathSegments.at(-1);
-
-    if (!environment) return null;
-
-    url.pathname = `/${[...pathSegments.slice(0, -1), "rsvp-service", environment].join("/")}`;
-    return url.toString().replace(/\/$/, "");
+    return getCampaignServiceBaseUrl();
   } catch {
     return null;
   }
@@ -82,7 +76,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastEditedTime, setLastEditedTime] = useState<string | null>(null);
 
-  const apiBase = getRsvpApiEndpoint(process.env.NEXT_PUBLIC_API_ENDPOINT);
+  const apiBase = getRsvpApiEndpoint();
   const tokenPayload = useMemo(() => parseJwtPayload(token), [token]);
   const compositeId = useMemo(
     () => (tokenPayload ? `${tokenPayload.run_id}_${tokenPayload.participant_id}` : ""),
@@ -211,7 +205,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
         }
 
         const data: RsvpUpdateResponse = await res.json();
-        const current = data.data.currentStatus;
+        const current = data.data.rsvp_status;
         setRsvpStatus(current);
         if (current !== "PENDING") setSelectedOption(current);
         setIsEditing(false);
