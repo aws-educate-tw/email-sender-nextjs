@@ -28,7 +28,6 @@ export const config = {
     "/campaignService/:path*",
     "/emailHistory/:path*",
     "/emailService/:path*",
-    "/onboarding/:path*",
     "/webhookRecords/:path*",
     "/webhookService/:path*",
   ],
