@@ -331,7 +331,9 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
   const handleInsert = () => {
     if (!isValid() || !campaignStartDateTime || !campaignEndDateTime || !deadlineDateTime) return;
 
-    const buttonHtml = `<a href="{{RSVP_LINK}}" data-button-type="campaign-attendance" data-campaign-id="${escapeAttr(selectedCampaignId)}" data-campaign-name="${escapeAttr(campaignName)}" data-campaign-start="${escapeAttr(formatDateTime(campaignStartDateTime))}" data-campaign-end="${escapeAttr(formatDateTime(campaignEndDateTime))}" data-campaign-place="${escapeAttr(campaignPlace)}" data-deadline="${escapeAttr(formatDateTime(deadlineDateTime))}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${escapeAttr(buttonText)}</a>`;
+    const rsvpPageUrl = process.env.NEXT_PUBLIC_RSVP_PAGE_URL?.trim();
+    const rsvpHref = rsvpPageUrl ? `${rsvpPageUrl}#{{jwt_token}}` : "{{RSVP_LINK}}";
+    const buttonHtml = `<a href="${rsvpHref}" data-button-type="campaign-attendance" data-campaign-id="${escapeAttr(selectedCampaignId)}" data-campaign-name="${escapeAttr(campaignName)}" data-campaign-start="${escapeAttr(formatDateTime(campaignStartDateTime))}" data-campaign-end="${escapeAttr(formatDateTime(campaignEndDateTime))}" data-campaign-place="${escapeAttr(campaignPlace)}" data-deadline="${escapeAttr(formatDateTime(deadlineDateTime))}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${escapeAttr(buttonText)}</a>`;
 
     onInsert(buttonHtml, selectedCampaignId, deadlineDateTime);
     handleClose();

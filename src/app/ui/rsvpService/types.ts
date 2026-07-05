@@ -9,35 +9,21 @@ export interface RsvpToken {
   exp: number;
 }
 
-export interface RsvpPageState {
-  currentStatus: RsvpStatus;
-  participantName: string;
-  eventName: string;
-  eventTime: string;
-  location: string;
-  registrationDeadline: string;
-  isRegistrationClosed: boolean;
-  lastEditedTime?: number;
-  isEditing: boolean;
-  isSubmitting: boolean;
-  selectedOption: "ATTEND" | "NOT_ATTEND" | null;
+export interface RsvpStatusResponse {
+  status: "SUCCESS";
+  rsvp_status: RsvpStatus;
+  participant_name: string;
+  campaign_name: string;
+  campaign_start_time: string;
+  campaign_location: string;
+  registration_deadline: string;
+  is_registration_closed: boolean;
+  last_edited_time?: string | null;
 }
 
-export interface RsvpApiResponse {
-  status: "success" | "error";
-  data?: {
-    currentStatus: RsvpStatus;
-    participantName: string;
-    runInfo: {
-      eventName: string;
-      eventTime: string;
-      location: string;
-      registrationDeadline: string;
-      isRegistrationClosed: boolean;
-    };
-    stats?: {
-      totalAttendees: number;
-    };
+export interface RsvpUpdateResponse {
+  status: "SUCCESS";
+  data: {
+    rsvp_status: RsvpStatus;
   };
-  message?: string;
 }
