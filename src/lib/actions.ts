@@ -13,6 +13,9 @@ const formSchema = z.object({
   cc: z.array(z.string().email("Invalid email address")).optional(),
   attachment_file_ids: z.array(z.string()).optional(),
   is_generate_certificate: z.boolean().optional(),
+  run_type: z.string().optional(),
+  campaign_id: z.string().optional(),
+  registration_deadline: z.string().optional(),
 });
 
 const loginSchema = z.object({

@@ -42,6 +42,9 @@ export default function EmailService() {
     cc: [],
     provideCertification: "no",
     attachments: [],
+    isRsvp: false,
+    campaignId: null,
+    registrationDeadline: null,
   });
 
   const goToStep = (step: Step, newMode: StartMode) => {
@@ -69,6 +72,9 @@ export default function EmailService() {
         cc: [],
         provideCertification: "no",
         attachments: [],
+        isRsvp: false,
+        campaignId: null,
+        registrationDeadline: null,
       });
     }
 
@@ -89,6 +95,24 @@ export default function EmailService() {
     },
     []
   );
+
+  const handleCampaignInserted = useCallback((campaignId: string, deadline: Date) => {
+    setEmailData(prev => ({
+      ...prev,
+      isRsvp: true,
+      campaignId,
+      registrationDeadline: deadline.toISOString(),
+    }));
+  }, []);
+
+  const handleRsvpButtonRemoved = useCallback(() => {
+    setEmailData(prev => ({
+      ...prev,
+      isRsvp: false,
+      campaignId: null,
+      registrationDeadline: null,
+    }));
+  }, []);
 
   // 使用 useCallback 包裝 onSave 函數
   const handleTemplateSave = useCallback(
@@ -151,6 +175,9 @@ export default function EmailService() {
             }}
             templateFileUrl={emailData.templateFileUrl}
             onSave={handleTemplateSave}
+            onCampaignInserted={handleCampaignInserted}
+            onRsvpButtonRemoved={handleRsvpButtonRemoved}
+            isRsvp={emailData.isRsvp}
           />
         );
       case "recipients":

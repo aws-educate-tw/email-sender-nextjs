@@ -11,12 +11,18 @@ interface EmailServiceTemplateEditorProps {
   onNext: () => void;
   templateFileUrl?: string | null;
   onSave?: (templateFileName: string, templateFileId: string, templateFileUrl: string) => void;
+  onCampaignInserted?: (campaignId: string, deadline: Date) => void;
+  onRsvpButtonRemoved?: () => void;
+  isRsvp?: boolean;
 }
 
 export default function EmailServiceTemplateEditor({
   onNext,
   templateFileUrl,
   onSave,
+  onCampaignInserted,
+  onRsvpButtonRemoved,
+  isRsvp,
 }: EmailServiceTemplateEditorProps) {
   const [content, setContent] = useState(htmltemplateContent);
   const [originalContent, setOriginalContent] = useState(htmltemplateContent);
@@ -46,9 +52,11 @@ export default function EmailServiceTemplateEditor({
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
     setHasChanges(newContent !== originalContent);
-    // Reset save state when content changes
     if (saveButtonState === "saved") {
       setSaveButtonState("idle");
+    }
+    if (isRsvp && !newContent.includes('data-button-type="campaign-attendance"')) {
+      onRsvpButtonRemoved?.();
     }
   };
 
@@ -269,7 +277,11 @@ export default function EmailServiceTemplateEditor({
     <div>
       <div className="flex flex-col justify-center items-start"></div>
       <div>
-        <TipTap content={content} onChange={handleContentChange} />
+        <TipTap
+          content={content}
+          onChange={handleContentChange}
+          onCampaignInserted={onCampaignInserted}
+        />
       </div>
       <div className="flex flex-wrap justify-end gap-3 items-center h-12">
         {/* Template Name Input */}

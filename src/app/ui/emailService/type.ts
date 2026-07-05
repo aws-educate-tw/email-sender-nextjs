@@ -24,4 +24,7 @@ export interface EmailDataType {
   cc: string[];
   provideCertification: "yes" | "no";
   attachments: { file_name: string; file_id: string; file_url: string }[];
+  isRsvp: boolean;
+  campaignId: string | null;
+  registrationDeadline: string | null;
 }
