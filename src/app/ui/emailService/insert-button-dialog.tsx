@@ -280,6 +280,9 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
 
   const formatDateTime = (date: Date) => {
     const dateStr = date.toLocaleDateString("sv");
+    // same as format "const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;"
+    // but using localeDateString("sv") for better readability
+
     const timeStr = date.toTimeString().slice(0, 5);
     return `${dateStr} ${timeStr}`;
   };
