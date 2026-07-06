@@ -12,6 +12,7 @@ export default function SideNav() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_expiry_time");
     router.push("/");
+    router.refresh();
   };
 
   return (
