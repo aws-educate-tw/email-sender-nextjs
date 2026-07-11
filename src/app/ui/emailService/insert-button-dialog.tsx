@@ -20,7 +20,12 @@ function escapeAttr(value: string): string {
 interface InsertButtonDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onInsert: (buttonHtml: string, campaignId: string, deadline: Date) => void;
+  onInsert: (
+    buttonHtml: string,
+    campaignId: string,
+    deadline: Date,
+    campaignStartTime: Date
+  ) => void;
 }
 
 interface CreateCampaignDialogProps {
@@ -338,7 +343,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     const rsvpHref = rsvpPageUrl ? `${rsvpPageUrl}#{{jwt_token}}` : "{{RSVP_LINK}}";
     const buttonHtml = `<a href="${rsvpHref}" data-button-type="campaign-attendance" data-campaign-id="${escapeAttr(selectedCampaignId)}" data-campaign-name="${escapeAttr(campaignName)}" data-campaign-start="${escapeAttr(formatDateTime(campaignStartDateTime))}" data-campaign-end="${escapeAttr(formatDateTime(campaignEndDateTime))}" data-campaign-place="${escapeAttr(campaignPlace)}" data-deadline="${escapeAttr(formatDateTime(deadlineDateTime))}" style="display:inline-block;padding:12px 24px;background:#1a2f4a;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${escapeAttr(buttonText)}</a>`;
 
-    onInsert(buttonHtml, selectedCampaignId, deadlineDateTime);
+    onInsert(buttonHtml, selectedCampaignId, deadlineDateTime, campaignStartDateTime);
     handleClose();
   };
 

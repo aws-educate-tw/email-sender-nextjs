@@ -26,5 +26,6 @@ export interface EmailDataType {
   attachments: { file_name: string; file_id: string; file_url: string }[];
   isRsvp: boolean;
   campaignId: string | null;
+  campaignStartTime: string | null;
   registrationDeadline: string | null;
 }

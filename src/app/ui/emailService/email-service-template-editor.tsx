@@ -11,7 +11,7 @@ interface EmailServiceTemplateEditorProps {
   onNext: () => void;
   templateFileUrl?: string | null;
   onSave?: (templateFileName: string, templateFileId: string, templateFileUrl: string) => void;
-  onCampaignInserted?: (campaignId: string, deadline: Date) => void;
+  onCampaignInserted?: (campaignId: string, deadline: Date, campaignStartTime: Date) => void;
   onRsvpButtonRemoved?: () => void;
   isRsvp?: boolean;
 }

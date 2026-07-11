@@ -15,6 +15,7 @@ const formSchema = z.object({
   is_generate_certificate: z.boolean().optional(),
   run_type: z.string().optional(),
   campaign_id: z.string().optional(),
+  campaign_start_time: z.string().optional(),
   registration_deadline: z.string().optional(),
 });
 

@@ -117,7 +117,7 @@ interface TipTapProps {
   onNext?: () => void;
   templateName?: string;
   onSave?: (content: string, fileId?: string, fileUrl?: string) => void;
-  onCampaignInserted?: (campaignId: string, deadline: Date) => void;
+  onCampaignInserted?: (campaignId: string, deadline: Date, campaignStartTime: Date) => void;
 }
 
 export default function TipTap({ onChange, content, onCampaignInserted }: TipTapProps) {
@@ -566,11 +566,11 @@ export default function TipTap({ onChange, content, onCampaignInserted }: TipTap
       <InsertButtonDialog
         isOpen={showInsertButtonDialog}
         onClose={() => setShowInsertButtonDialog(false)}
-        onInsert={(buttonHtml, campaignId, deadline) => {
+        onInsert={(buttonHtml, campaignId, deadline, campaignStartTime) => {
           if (editor) {
             editor.chain().focus().insertContent(buttonHtml).run();
           }
-          onCampaignInserted?.(campaignId, deadline);
+          onCampaignInserted?.(campaignId, deadline, campaignStartTime);
           setShowInsertButtonDialog(false);
         }}
       />
