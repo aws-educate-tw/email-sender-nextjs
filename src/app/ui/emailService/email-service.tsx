@@ -148,16 +148,18 @@ export default function EmailService() {
       case "start-option":
         return (
           <EmailServiceStartOption
-            onSelect={mode => {
-              if (mode === "new") goToStep("template-edit", "new");
-              else if (mode === "edit-existing") goToStep("select-template", "edit-existing");
-              else if (mode === "resend") goToStep("select-template", "resend");
+            onSelect={selectedMode => {
+              if (selectedMode === "new") goToStep("template-edit", "new");
+              else if (selectedMode === "edit-existing")
+                goToStep("select-template", "edit-existing");
+              else if (selectedMode === "resend") goToStep("select-template", "resend");
             }}
           />
         );
       case "select-template":
         return (
           <EmailServiceTemplateSelector
+            mode={mode}
             onNext={() => {
               if (mode === "edit-existing") goToStep("template-edit", "edit-existing");
               else if (mode === "resend") goToStep("recipients", "resend");
