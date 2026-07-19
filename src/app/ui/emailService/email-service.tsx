@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { EmailDataType } from "@/app/ui/emailService/type";
+import { EmailDataType, StartMode } from "@/app/ui/emailService/type";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
@@ -17,8 +17,6 @@ type Step =
   | "recipients"
   | "settings"
   | "confirmation";
-
-type StartMode = "new" | "edit-existing" | "resend";
 
 export default function EmailService() {
   const params = useSearchParams();
@@ -148,16 +146,18 @@ export default function EmailService() {
       case "start-option":
         return (
           <EmailServiceStartOption
-            onSelect={mode => {
-              if (mode === "new") goToStep("template-edit", "new");
-              else if (mode === "edit-existing") goToStep("select-template", "edit-existing");
-              else if (mode === "resend") goToStep("select-template", "resend");
+            onSelect={selectedMode => {
+              if (selectedMode === "new") goToStep("template-edit", "new");
+              else if (selectedMode === "edit-existing")
+                goToStep("select-template", "edit-existing");
+              else if (selectedMode === "resend") goToStep("select-template", "resend");
             }}
           />
         );
       case "select-template":
         return (
           <EmailServiceTemplateSelector
+            mode={mode}
             onNext={() => {
               if (mode === "edit-existing") goToStep("template-edit", "edit-existing");
               else if (mode === "resend") goToStep("recipients", "resend");

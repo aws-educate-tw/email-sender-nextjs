@@ -3,6 +3,8 @@ export interface Excel {
   [key: string]: string | undefined;
 }
 
+export type StartMode = "new" | "edit-existing" | "resend";
+
 export type TableChangeMeta = {
   source: "init" | "user";
   origin: "dropdown" | "import" | "manual";
