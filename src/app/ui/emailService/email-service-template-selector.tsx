@@ -315,19 +315,19 @@ export default function EmailServiceTemplateSelector({
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-left transform transition-all">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <span className="text-amber-500">⚠️</span> 提醒
+              <span className="text-amber-500">⚠️</span> Warning
             </h3>
             <p className="text-gray-600 mb-6 leading-relaxed">
               {mode === "resend"
-                ? "此 Template 含有 RSVP 功能，無法在 Resend Email 中使用，請選擇其他 Template。"
-                : "此 Template 含有 RSVP 功能，請先將原有的 RSVP 刪除再繼續編輯。"}
+                ? "This template contains an RSVP button and cannot be used for Resend Email. Please select another template."
+                : "This template contains an RSVP button. Please remove it before continuing to edit."}
             </p>
             <div className="flex justify-end">
               <button
                 onClick={handleRsvpWarningAcknowledge}
                 className="bg-gray-800 text-white px-5 py-2 rounded-md hover:bg-gray-700 transition"
               >
-                我了解了
+                Got it
               </button>
             </div>
           </div>
