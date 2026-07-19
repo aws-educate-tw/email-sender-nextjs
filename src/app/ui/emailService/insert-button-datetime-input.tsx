@@ -14,6 +14,17 @@ interface DateTimeInputProps {
   className?: string;
 }
 
+const isSameDay = (first: Date, second: Date) =>
+  first.getFullYear() === second.getFullYear() &&
+  first.getMonth() === second.getMonth() &&
+  first.getDate() === second.getDate();
+
+const getDayBoundary = (date: Date, hour: number, minute: number) => {
+  const boundary = new Date(date);
+  boundary.setHours(hour, minute, 0, 0);
+  return boundary;
+};
+
 const CustomInput = forwardRef<HTMLInputElement, any>(
   ({ value, onClick, placeholder, minDate, maxDate, onClose, onDateChange }, ref) => {
     const [error, setError] = useState("");
@@ -184,6 +195,21 @@ export default function DateTimeInput({
   const datePickerRef = useRef<DatePicker>(null);
   const previousSelectedRef = useRef<Date | null>(null);
 
+  const minTime =
+    selected && minDate && isSameDay(selected, minDate)
+      ? minDate
+      : getDayBoundary(selected || minDate || maxDate || new Date(), 0, 0);
+  const maxTime =
+    selected && maxDate && isSameDay(selected, maxDate)
+      ? maxDate
+      : getDayBoundary(selected || minDate || maxDate || new Date(), 23, 59);
+
+  const filterTime = (time: Date) => {
+    if (minDate && time < minDate) return false;
+    if (maxDate && time > maxDate) return false;
+    return true;
+  };
+
   const handleClose = () => {
     setTimeout(() => {
       datePickerRef.current?.setOpen(false);
@@ -226,6 +252,9 @@ export default function DateTimeInput({
         placeholderText={placeholderText}
         minDate={minDate}
         maxDate={maxDate}
+        minTime={minTime}
+        maxTime={maxTime}
+        filterTime={filterTime}
         customInput={
           <CustomInput
             minDate={minDate}
