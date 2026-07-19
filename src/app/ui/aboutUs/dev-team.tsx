@@ -270,7 +270,7 @@ export default function DevTeam() {
       <div className="mb-12">
         <h3 className="text-2xl font-bold text-sky-950 mb-6">Impact Snapshot</h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {performanceHighlights.map((item) => (
+          {performanceHighlights.map(item => (
             <div
               key={item.label}
               className="rounded-xl border border-sky-100 bg-sky-50/60 p-5 shadow-sm"
@@ -284,9 +284,9 @@ export default function DevTeam() {
           ))}
         </div>
         <p className="mt-4 text-sm text-gray-600">
-          Between 2025/10 and 2026/05, the team sent 8,326 emails in total, including
-          8,120 general emails and 206 participation certificates, with the largest
-          single campaign reaching 2,139 recipients.
+          Between 2025/10 and 2026/05, the team sent 8,326 emails in total, including 8,120 general
+          emails and 206 participation certificates, with the largest single campaign reaching 2,139
+          recipients.
         </p>
       </div>
 
