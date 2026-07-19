@@ -149,7 +149,7 @@ export default function DevTeam() {
       period: "2025-present",
       email: "271yeye@gmail.com",
       avatar: "/avatar/kiki.jpg",
-      labels: ["TECH-LEAD"],
+      labels: ["MENTOR"],
     },
     {
       name: "Tony",
