@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { EmailDataType } from "@/app/ui/emailService/type";
+import { EmailDataType, StartMode } from "@/app/ui/emailService/type";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
@@ -17,8 +17,6 @@ type Step =
   | "recipients"
   | "settings"
   | "confirmation";
-
-type StartMode = "new" | "edit-existing" | "resend";
 
 export default function EmailService() {
   const params = useSearchParams();

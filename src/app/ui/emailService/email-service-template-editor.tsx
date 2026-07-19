@@ -31,17 +31,11 @@ export default function EmailServiceTemplateEditor({
   const [isUploading, setIsUploading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
-  const [showEditWarning, setShowEditWarning] = useState(false);
-
   useEffect(() => {
     if (templateFileUrl) {
       fetch(templateFileUrl)
         .then(response => response.text())
         .then(htmlContent => {
-          if (htmlContent.includes('data-button-type="campaign-attendance"')) {
-            setShowEditWarning(true);
-          }
-
           setContent(htmlContent);
           setOriginalContent(htmlContent);
           setHasChanges(false);
@@ -174,11 +168,15 @@ export default function EmailServiceTemplateEditor({
     const saveFileName = templateName.trim();
 
     const preserveEmptyLines = (content: string): string => {
-      return content
-
-        .replace(/<p>\s*<\/p>/g, "<p>&nbsp;</p>")
-        .replace(/(<p>&nbsp;<\/p>)+/g, match => match)
-        .replace(/<\/p><p>/g, "</p>\n<p>");
+      return (
+        content
+          // 將已有的空段落轉換為包含 &nbsp; 的格式
+          .replace(/<p>\s*<\/p>/g, "<p>&nbsp;</p>")
+          // 處理連續空行，但保留它們
+          .replace(/(<p>&nbsp;<\/p>)+/g, match => match)
+          // 確保段落之間有換行符號
+          .replace(/<\/p><p>/g, "</p>\n<p>")
+      );
     };
 
     let formattedContent = preserveEmptyLines(content);
@@ -347,29 +345,6 @@ export default function EmailServiceTemplateEditor({
           <ArrowRight className="w-5 h-5" />
         </button>
       </div>
-
-      {/* 新增 Edit 模式的警告彈窗 */}
-      {showEditWarning && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center justify-center gap-2">
-              <span className="text-amber-500">⚠️</span> 提醒
-            </h3>
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              此 Template 含有 RSVP 功能，請先將原有的 RSVP 刪除再繼續編輯。
-            </p>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowEditWarning(false)}
-                className="bg-gray-800 text-white px-5 py-2 rounded-md hover:bg-gray-700 transition"
-              >
-                我了解了
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* 新增 Edit 模式的警告彈窗 */}
     </div>
   );
 }

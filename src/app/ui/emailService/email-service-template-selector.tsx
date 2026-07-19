@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { ChevronRight, ChevronLeft, FileText, RefreshCw } from "lucide-react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import type { StartMode } from "@/app/ui/emailService/type";
 
 interface FileDataType {
   file_id: string;
@@ -13,8 +14,6 @@ interface FileDataType {
   file_size: number;
   uploader_id: string;
 }
-
-type StartMode = "new" | "edit-existing" | "resend";
 
 interface EmailServiceTemplateSelectorProps {
   onTemplateSelect: (
