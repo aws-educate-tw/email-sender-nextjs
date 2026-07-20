@@ -49,7 +49,9 @@ export default function Introduction() {
               </p>
               <ul className="mt-3 space-y-2 text-base text-gray-700">
                 <li>2026/07: Introduced DLQ handling flow for better recovery and stability.</li>
-                <li>2026/08: Rolled out RSVP Service for attendance collection and confirmation.</li>
+                <li>
+                  2026/08: Rolled out RSVP Service for attendance collection and confirmation.
+                </li>
               </ul>
             </div>
             <div className="rounded-lg bg-white p-4 shadow-sm">
@@ -57,9 +59,9 @@ export default function Introduction() {
                 Delivery Impact
               </p>
               <p className="mt-3 text-base text-gray-700">
-                Between 2025/10 and 2026/05, TPET supported 8,326 email deliveries, including
-                8,120 general emails and 206 participation certificates. The largest single
-                campaign reached 2,139 recipients.
+                Between 2025/10 and 2026/05, TPET supported 8,326 email deliveries, including 8,120
+                general emails and 206 participation certificates. The largest single campaign
+                reached 2,139 recipients.
               </p>
             </div>
           </div>
