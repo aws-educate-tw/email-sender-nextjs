@@ -184,6 +184,12 @@ export default function DateTimeInput({
   const datePickerRef = useRef<DatePicker>(null);
   const previousSelectedRef = useRef<Date | null>(null);
 
+  const filterTime = (time: Date) => {
+    if (minDate && time < minDate) return false;
+    if (maxDate && time > maxDate) return false;
+    return true;
+  };
+
   const handleClose = () => {
     setTimeout(() => {
       datePickerRef.current?.setOpen(false);
@@ -226,6 +232,7 @@ export default function DateTimeInput({
         placeholderText={placeholderText}
         minDate={minDate}
         maxDate={maxDate}
+        filterTime={filterTime}
         customInput={
           <CustomInput
             minDate={minDate}
