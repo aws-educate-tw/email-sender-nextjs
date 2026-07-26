@@ -55,6 +55,47 @@ export default function DevTeam() {
         },
       ],
     },
+    // 2026
+    {
+      year: "2026",
+      events: [
+        {
+          date: "2026/07",
+          title: "Implemented DLQ handling flow",
+          description:
+            "Introduced dead-letter queue processing to improve failure recovery and operational stability.",
+        },
+        {
+          date: "2026/08",
+          title: "RSVP Service rollout",
+          description:
+            "Released RSVP workflow for attendance collection and confirmation handling.",
+        },
+      ],
+    },
+  ];
+
+  const performanceHighlights = [
+    {
+      label: "Total Emails Sent",
+      value: "8,326",
+      note: "From 2025/10 to 2026/05",
+    },
+    {
+      label: "General Emails",
+      value: "8,120",
+      note: "Standard campaign and notification emails",
+    },
+    {
+      label: "Participation Certificates",
+      value: "206",
+      note: "Generated and delivered automatically",
+    },
+    {
+      label: "Largest Single Batch",
+      value: "2,139",
+      note: "Maximum event email delivery in one run",
+    },
   ];
 
   const productOwners = [
@@ -79,6 +120,20 @@ export default function DevTeam() {
       avatar: "/avatar/tiffany.jpg",
       labels: [],
     },
+    {
+      name: "Selina",
+      period: "2026-present",
+      email: "yishan2004931022@gmail.com",
+      avatar: "/avatar/selina.jpg",
+      labels: [],
+    },
+    {
+      name: "Maggie",
+      period: "2026-present",
+      email: "maggie0302501@gmail.com",
+      avatar: "/avatar/maggie.jpg",
+      labels: [],
+    },
   ];
 
   const fullStackDevs = [
@@ -94,14 +149,14 @@ export default function DevTeam() {
       period: "2025-present",
       email: "271yeye@gmail.com",
       avatar: "/avatar/kiki.jpg",
-      labels: ["TECH-LEAD"],
+      labels: ["MENTOR"],
     },
     {
       name: "Tony",
       period: "2024-present",
       email: "poyang1024@gmail.com",
       avatar: "/avatar/tony.jpg",
-      labels: [],
+      labels: ["MENTOR"],
     },
     {
       name: "Claire",
@@ -127,6 +182,27 @@ export default function DevTeam() {
       avatar: "/avatar/richie.jpg",
       labels: ["FOUNDER MEMBER"],
     },
+    {
+      name: "Vincent",
+      period: "2026-present",
+      email: "asd1111zxcv@gmail.com",
+      avatar: "/avatar/vincent.jpg",
+      labels: ["TECH-LEAD"],
+    },
+    {
+      name: "Aaron",
+      period: "2026-present",
+      email: "aaronwayway@gmail.com",
+      avatar: "/avatar/aaron.jpg",
+      labels: [],
+    },
+    {
+      name: "Ariel",
+      period: "2026-present",
+      email: "arielyu999@gmail.com",
+      avatar: "/avatar/ariel.jpg",
+      labels: [],
+    },
   ];
 
   const frontendDevs = [
@@ -136,6 +212,13 @@ export default function DevTeam() {
       email: "tmfel91219pinyu@gmail.com",
       avatar: "/avatar/yuna.jpg",
       labels: ["FOUNDER MEMBER"],
+    },
+    {
+      name: "Seren",
+      period: "2026-present",
+      email: "dxes100144@gmail.com",
+      avatar: "/avatar/seren.jpg",
+      labels: [],
     },
   ];
 
@@ -180,8 +263,31 @@ export default function DevTeam() {
 
       {/* Our Journey */}
       <div className="mb-12">
-        <h3 className="text-2xl font-bold text-sky-950 mb-6">Our Journey</h3>
+        <h3 className="text-2xl font-bold text-sky-950 mb-6">Dev Team 2026 Journey</h3>
         <Timeline milestones={milestones} />
+      </div>
+
+      <div className="mb-12">
+        <h3 className="text-2xl font-bold text-sky-950 mb-6">Impact Snapshot</h3>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {performanceHighlights.map(item => (
+            <div
+              key={item.label}
+              className="rounded-xl border border-sky-100 bg-sky-50/60 p-5 shadow-sm"
+            >
+              <p className="text-sm font-medium uppercase tracking-wide text-sky-900/70">
+                {item.label}
+              </p>
+              <p className="mt-2 text-3xl font-bold text-sky-950">{item.value}</p>
+              <p className="mt-2 text-sm text-gray-600">{item.note}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-gray-600">
+          Between 2025/10 and 2026/05, the team sent 8,326 emails in total, including 8,120 general
+          emails and 206 participation certificates, with the largest single campaign reaching 2,139
+          recipients.
+        </p>
       </div>
 
       {/* Team Members */}

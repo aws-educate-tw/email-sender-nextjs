@@ -2,7 +2,7 @@ export default function Introduction() {
   return (
     <section id="introduction" className="bg-white p-8 rounded-lg shadow-lg">
       <h1 className="text-4xl font-bold text-sky-950 mb-6">Who We Are?</h1>
-      <div className="space-y-4">
+      <div className="space-y-6">
         <p className="text-xl text-gray-700">
           <strong className="text-sky-950">AWS Educate Ambassadors:</strong>
         </p>
@@ -39,6 +39,33 @@ export default function Introduction() {
           Together, the AWS Educate Ambassadors and the Dev Team are shaping the future of cloud
           education, one project at a time.
         </p>
+
+        <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-6">
+          <h2 className="text-2xl font-semibold text-sky-950">2026 Highlights</h2>
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="rounded-lg bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium uppercase tracking-wide text-sky-900/70">
+                Product Updates
+              </p>
+              <ul className="mt-3 space-y-2 text-base text-gray-700">
+                <li>2026/07: Introduced DLQ handling flow for better recovery and stability.</li>
+                <li>
+                  2026/08: Rolled out RSVP Service for attendance collection and confirmation.
+                </li>
+              </ul>
+            </div>
+            <div className="rounded-lg bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium uppercase tracking-wide text-sky-900/70">
+                Delivery Impact
+              </p>
+              <p className="mt-3 text-base text-gray-700">
+                Between 2025/10 and 2026/05, TPET supported 8,326 email deliveries, including 8,120
+                general emails and 206 participation certificates. The largest single campaign
+                reached 2,139 recipients.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -31,11 +31,11 @@ export default function Page() {
         {/* Image container - moved up in mobile view using order utility */}
         <div className="flex items-center justify-center order-first md:order-last md:w-3/5 md:px-12 md:py-4">
           <Image
-            src="/aws-educate-6th.jpg"
+            src="/aws-educate-8th.jpg"
             width={1200}
             height={1000}
             className="w-full md:max-w-none md:block object-contain"
-            alt="6th-aws-educate"
+            alt="8th-aws-educate"
           />
         </div>
         {/* Content container */}
