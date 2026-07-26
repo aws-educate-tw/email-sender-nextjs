@@ -119,8 +119,12 @@ export default function EmailServiceRecipients({
         const data = await res.json();
         setTemplateFileName(data.file_name || "Unknown File");
 
-        // Ensure "Email" is always included
-        const varsWithEmail = Array.from(new Set([...(data.variables || []), "Email"]));
+        // Ensure "Email" is always included. Exclude "jwt_token": it's a special
+        // replacement injected by the backend after the send-email API call, so it
+        // should never be treated as a spreadsheet column the user must provide.
+        const varsWithEmail = Array.from(new Set([...(data.variables || []), "Email"])).filter(
+          v => v !== "jwt_token"
+        );
         setTemplateVariables(varsWithEmail);
 
         // Build columns for rendering/editing
