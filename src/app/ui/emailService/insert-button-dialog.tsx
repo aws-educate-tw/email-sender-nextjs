@@ -8,6 +8,7 @@ import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import { Listbox } from "@headlessui/react";
 import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
 import { CampaignListItem } from "@/app/ui/campaignService/types";
+import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
 function escapeAttr(value: string): string {
   return value
@@ -83,8 +84,8 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
         },
         body: JSON.stringify({
           campaign_name: campaignName,
-          campaign_start_time: campaignStartDateTime.toISOString(),
-          campaign_end_time: campaignEndDateTime.toISOString(),
+          campaign_start_time: toIso8601Seconds(campaignStartDateTime),
+          campaign_end_time: toIso8601Seconds(campaignEndDateTime),
           campaign_location: campaignPlace,
           is_active: true,
         }),
@@ -303,8 +304,8 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     const newItem: CampaignListItem = {
       campaign_id: newCampaign.campaign_id,
       campaign_name: newCampaign.name,
-      campaign_start_time: newCampaign.startDateTime.toISOString(),
-      campaign_end_time: newCampaign.endDateTime.toISOString(),
+      campaign_start_time: toIso8601Seconds(newCampaign.startDateTime),
+      campaign_end_time: toIso8601Seconds(newCampaign.endDateTime),
       campaign_location: newCampaign.place,
       campaign_created_at: newCampaign.createdAt,
       is_active: true,
