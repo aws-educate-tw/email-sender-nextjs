@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import DateTimeInput from "./datetime-input";
 import { getCampaignServiceBaseUrl } from "./utils";
+import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
 interface CreateCampaignDialogProps {
   isOpen: boolean;
@@ -47,8 +48,8 @@ export default function CreateCampaignDialog({
         },
         body: JSON.stringify({
           campaign_name: formData.campaign_name,
-          campaign_start_time: formData.campaign_start_time.toISOString(),
-          campaign_end_time: formData.campaign_end_time.toISOString(),
+          campaign_start_time: toIso8601Seconds(formData.campaign_start_time),
+          campaign_end_time: toIso8601Seconds(formData.campaign_end_time),
           campaign_location: formData.campaign_location,
           is_active: true,
         }),

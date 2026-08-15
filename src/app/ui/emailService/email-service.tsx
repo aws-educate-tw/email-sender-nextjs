@@ -9,6 +9,7 @@ import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-temp
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
 import EmailServiceSettings from "@/app/ui/emailService/email-service-settings";
 import EmailServiceReview from "@/app/ui/emailService/email-service-review";
+import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
 type Step =
   | "start-option"
@@ -42,6 +43,7 @@ export default function EmailService() {
     attachments: [],
     isRsvp: false,
     campaignId: null,
+    campaignStartTime: null,
     registrationDeadline: null,
   });
 
@@ -72,6 +74,7 @@ export default function EmailService() {
         attachments: [],
         isRsvp: false,
         campaignId: null,
+        campaignStartTime: null,
         registrationDeadline: null,
       });
     }
@@ -94,20 +97,25 @@ export default function EmailService() {
     []
   );
 
-  const handleCampaignInserted = useCallback((campaignId: string, deadline: Date) => {
-    setEmailData(prev => ({
-      ...prev,
-      isRsvp: true,
-      campaignId,
-      registrationDeadline: deadline.toISOString(),
-    }));
-  }, []);
+  const handleCampaignInserted = useCallback(
+    (campaignId: string, deadline: Date, campaignStartTime: Date) => {
+      setEmailData(prev => ({
+        ...prev,
+        isRsvp: true,
+        campaignId,
+        campaignStartTime: toIso8601Seconds(campaignStartTime),
+        registrationDeadline: toIso8601Seconds(deadline),
+      }));
+    },
+    []
+  );
 
   const handleRsvpButtonRemoved = useCallback(() => {
     setEmailData(prev => ({
       ...prev,
       isRsvp: false,
       campaignId: null,
+      campaignStartTime: null,
       registrationDeadline: null,
     }));
   }, []);
