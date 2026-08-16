@@ -27,6 +27,8 @@ interface Column {
   isStandard?: boolean;
 }
 
+const RSVP_JWT_TOKEN_COLUMN = "jwt_token";
+
 export default function EmailServiceRecipients({
   onNext,
   emailData,
@@ -163,7 +165,19 @@ export default function EmailServiceRecipients({
 
     try {
       // 1. Create Excel file from JSON data
-      const worksheet = XLSX.utils.json_to_sheet(excel, { header: columns });
+      const shouldIncludeRsvpTokenColumn = emailData.isRsvp;
+      const uploadColumns =
+        shouldIncludeRsvpTokenColumn && !columns.includes(RSVP_JWT_TOKEN_COLUMN)
+          ? [...columns, RSVP_JWT_TOKEN_COLUMN]
+          : columns;
+      const uploadExcel = shouldIncludeRsvpTokenColumn
+        ? excel.map(row => ({
+            ...row,
+            [RSVP_JWT_TOKEN_COLUMN]: row[RSVP_JWT_TOKEN_COLUMN] ?? "",
+          }))
+        : excel;
+
+      const worksheet = XLSX.utils.json_to_sheet(uploadExcel, { header: uploadColumns });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
