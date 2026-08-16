@@ -7,6 +7,7 @@ import RsvpStatusBanner from "./rsvp-status-banner";
 import RsvpRadioGroup from "./rsvp-radio-group";
 import RsvpSubmitButton from "./rsvp-submit-button";
 import type { RsvpStatus, RsvpStatusResponse, RsvpToken, RsvpUpdateResponse } from "./types";
+import { createRsvpUpdatePayload, isRsvpChoice, type RsvpChoice } from "./rsvp-status";
 
 interface RsvpConfirmationFormProps {
   token: string;
@@ -71,7 +72,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
   const [pageError, setPageError] = useState<PageError | null>(null);
   const [rsvpStatus, setRsvpStatus] = useState<RsvpStatus>("PENDING");
   const [campaignData, setCampaignData] = useState<CampaignDisplayData | null>(null);
-  const [selectedOption, setSelectedOption] = useState<"ATTEND" | "NOT_ATTEND" | null>(null);
+  const [selectedOption, setSelectedOption] = useState<RsvpChoice | null>(null);
   const [isEditing, setIsEditing] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastEditedTime, setLastEditedTime] = useState<string | null>(null);
@@ -168,9 +169,7 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            action: selectedOption,
-          }),
+          body: JSON.stringify(createRsvpUpdatePayload(selectedOption)),
         });
 
         if (res.status === 401) {
@@ -205,9 +204,16 @@ export default function RsvpConfirmationForm({ token }: RsvpConfirmationFormProp
         }
 
         const data: RsvpUpdateResponse = await res.json();
-        const current = data.data.rsvp_status;
+        // Prefer the current API field, while accepting the legacy field used
+        // by older deployed RSVP-service versions.
+        const current = data.data.rsvp_status ?? data.data.currentStatus;
+        if (!isRsvpChoice(current)) {
+          setPageError("system_error");
+          break;
+        }
+
         setRsvpStatus(current);
-        if (current !== "PENDING") setSelectedOption(current);
+        setSelectedOption(current);
         setIsEditing(false);
         setLastEditedTime(formatDatetime(new Date().toISOString()));
         break;
