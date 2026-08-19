@@ -42,24 +42,27 @@ export default function Page() {
     try {
       const response = await submitLogin(JSON.stringify(formData));
 
-      if (response.message === "Login successful") {
+      if ("access_token" in response && response.token_expiry_time) {
         localStorage.setItem("access_token", response.access_token);
-
-        // Set token expiry time to 24 hours
-        const tokenExpiryTime = new Date().getTime() + 24 * 60 * 60 * 1000;
-        localStorage.setItem("token_expiry_time", tokenExpiryTime.toString());
+        localStorage.setItem("token_expiry_time", response.token_expiry_time);
 
         router.push("/emailService");
       } else if (response.message === "Password reset required for the user") {
         setVerificationRequired(true);
         setIsSubmitting(false);
-      } else if (response.challengeName === "NEW_PASSWORD_REQUIRED") {
+      } else if (
+        "challengeName" in response &&
+        response.challengeName === "NEW_PASSWORD_REQUIRED"
+      ) {
         setSession(response.session);
+        setIsSubmitting(false);
+      } else {
+        setLoginError(response.message || "The username or password is incorrect.");
         setIsSubmitting(false);
       }
     } catch (error: any) {
       console.error("Login failed", error);
-      setLoginError("The username or password is incorrect.");
+      setLoginError("Something went wrong, please try again.");
       setIsSubmitting(false);
     }
   };
@@ -98,13 +101,17 @@ export default function Page() {
       // console.log(response);
       if (
         response.message === "Password changed successfully (First Login)" ||
-        response.message === "Password reset successfully (Forgot Password)"
+        response.message === "Password reset successfully (Forgot Password)" ||
+        response.message === "Password changed successfully"
       ) {
         alert("Password changed successfully, please login again");
         router.push("/");
+      } else {
+        setError(response.message || "Password change failed");
       }
     } catch (error: any) {
       console.error("Password change failed", error);
+      setError("Password change failed");
     }
   };
 

@@ -1,5 +1,12 @@
 "use server";
+import { cookies } from "next/headers";
 import { z } from "zod";
+import {
+  ACCESS_TOKEN_COOKIE,
+  TOKEN_EXPIRY_COOKIE,
+  TOKEN_MAX_AGE_SECONDS,
+  getTokenExpiryTime,
+} from "@/lib/auth-cookies";
 
 const formSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
@@ -51,6 +58,14 @@ const webhookFormSchema = z.object({
   cc: z.array(z.string().email("Invalid email address")).optional(),
   attachment_file_ids: z.array(z.string()).optional(),
 });
+
+const authCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: TOKEN_MAX_AGE_SECONDS,
+};
 
 export async function submitForm(data: string, access_token: string) {
   const parsedData = JSON.parse(data);
@@ -125,26 +140,47 @@ export async function submitLogin(data: string) {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.message || "Error: Failed to Login. Please try again.");
+      return {
+        message: result.message || "Error: Failed to Login. Please try again.",
+      };
     }
 
     if (result.challengeName === "NEW_PASSWORD_REQUIRED") {
       return {
-        message: result.message,
+        message: result.message || "New password required",
         challengeName: result.challengeName,
         session: result.session,
         challengeParameters: result.challengeParameters,
       };
-    } else {
+    }
+
+    if (result.message === "Password reset required for the user") {
       return {
         message: result.message,
-        access_token: result.access_token,
       };
     }
+
+    const tokenExpiryTime = getTokenExpiryTime().toString();
+    cookies().set(ACCESS_TOKEN_COOKIE, result.access_token, authCookieOptions);
+    cookies().set(TOKEN_EXPIRY_COOKIE, tokenExpiryTime, authCookieOptions);
+
+    return {
+      message: result.message || "Login successful",
+      access_token: result.access_token,
+      token_expiry_time: tokenExpiryTime,
+    };
   } catch (error: any) {
     console.error("Error during API call:", error);
-    throw error;
+    return {
+      message: "Error: Failed to Login. Please try again.",
+      error: error.message,
+    };
   }
+}
+
+export async function submitLogout() {
+  cookies().delete(ACCESS_TOKEN_COOKIE);
+  cookies().delete(TOKEN_EXPIRY_COOKIE);
 }
 
 export async function submitChangePassword(data: string) {
@@ -173,12 +209,18 @@ export async function submitChangePassword(data: string) {
     });
 
     const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        message: result.message || "Error: Failed to Change Password. Please try again.",
+      };
+    }
+
     return {
-      message: result.message,
+      message: result.message || "Password changed successfully",
     };
   } catch (error: any) {
     return {
-      status: "error",
       message: "Error: Failed to Change Password. Please try again.",
       error: error.message,
     };
