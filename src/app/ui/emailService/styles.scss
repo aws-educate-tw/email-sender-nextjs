@@ -1,9 +1,10 @@
 /* Gmail Web-like defaults for the editor preview only. */
 
 .ProseMirror {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  line-height: normal;
+  color: #222;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
 
   p {
     margin: 1em 0;
@@ -22,6 +23,15 @@
   ol {
     margin: 1em 0;
     padding-left: 40px;
+
+    ul,
+    ol {
+      margin: 0;
+    }
+  }
+
+  li {
+    margin-left: 15px;
   }
 
   ul ul {
