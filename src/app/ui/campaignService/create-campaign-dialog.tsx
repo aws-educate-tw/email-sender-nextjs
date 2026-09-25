@@ -25,6 +25,15 @@ export default function CreateCampaignDialog({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const hasValidTimeRange =
+    formData.campaign_start_time !== null &&
+    formData.campaign_end_time !== null &&
+    formData.campaign_end_time > formData.campaign_start_time;
+  const timeRangeError =
+    formData.campaign_start_time && formData.campaign_end_time && !hasValidTimeRange
+      ? "End time must be later than start time."
+      : null;
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,6 +41,10 @@ export default function CreateCampaignDialog({
 
     if (!formData.campaign_start_time || !formData.campaign_end_time) {
       alert("Please select both start and end times.");
+      return;
+    }
+
+    if (!hasValidTimeRange) {
       return;
     }
 
@@ -75,8 +88,7 @@ export default function CreateCampaignDialog({
 
   const isFormValid =
     formData.campaign_name.trim() !== "" &&
-    formData.campaign_start_time !== null &&
-    formData.campaign_end_time !== null &&
+    hasValidTimeRange &&
     formData.campaign_location.trim() !== "";
 
   return (
@@ -139,6 +151,7 @@ export default function CreateCampaignDialog({
                     />
                   </div>
                 </div>
+                {timeRangeError && <p className="mt-2 text-sm text-red-600">{timeRangeError}</p>}
               </div>
 
               <div>
