@@ -27,10 +27,6 @@ interface Column {
   isStandard?: boolean;
 }
 
-const RSVP_JWT_TOKEN_COLUMN = "jwt_token";
-
-const getSpreadsheetNameWithoutExtension = (fileName: string) => fileName.replace(/\.xlsx$/i, "");
-
 export default function EmailServiceRecipients({
   onNext,
   emailData,
@@ -57,20 +53,13 @@ export default function EmailServiceRecipients({
   /** 讓父層一旦有 dropdown 選擇，就先把 file_id 送上去（情境1） */
   useEffect(() => {
     if (selectedSpreadsheetInfo) {
-      if (emailData.isRsvp) {
-        setFileName(getSpreadsheetNameWithoutExtension(selectedSpreadsheetInfo.file_name));
-        setIsSave(false);
-        onSave?.("", "", "");
-        return;
-      }
-
       onSave?.(
         selectedSpreadsheetInfo.file_name,
         selectedSpreadsheetInfo.file_id,
         selectedSpreadsheetInfo.file_url
       );
     }
-  }, [emailData.isRsvp, selectedSpreadsheetInfo, onSave]);
+  }, [selectedSpreadsheetInfo, onSave]);
 
   /** 只要 user 有任何編輯（包含 dropdown 案例），就清空父層的 file_id 等（情境2 & 3） */
   const handleTableChange = useCallback(
@@ -174,19 +163,7 @@ export default function EmailServiceRecipients({
 
     try {
       // 1. Create Excel file from JSON data
-      const shouldIncludeRsvpTokenColumn = emailData.isRsvp;
-      const uploadColumns =
-        shouldIncludeRsvpTokenColumn && !columns.includes(RSVP_JWT_TOKEN_COLUMN)
-          ? [...columns, RSVP_JWT_TOKEN_COLUMN]
-          : columns;
-      const uploadExcel = shouldIncludeRsvpTokenColumn
-        ? excel.map(row => ({
-            ...row,
-            [RSVP_JWT_TOKEN_COLUMN]: row[RSVP_JWT_TOKEN_COLUMN] ?? "",
-          }))
-        : excel;
-
-      const worksheet = XLSX.utils.json_to_sheet(uploadExcel, { header: uploadColumns });
+      const worksheet = XLSX.utils.json_to_sheet(excel, { header: columns });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
