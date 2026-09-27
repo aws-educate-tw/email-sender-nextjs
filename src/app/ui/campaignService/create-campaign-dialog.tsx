@@ -39,12 +39,10 @@ export default function CreateCampaignDialog({
 
     try {
       const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const token = localStorage.getItem("access_token");
       const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           campaign_name: formData.campaign_name,

@@ -21,15 +21,10 @@ export default function CampaignServicePage() {
     setIsLoading(true);
     try {
       const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Unauthorized: missing access token. Please login again.");
-      }
 
       const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
 

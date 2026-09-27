@@ -1,29 +1,7 @@
 import { Campaign, CampaignStatus } from "./types";
 
-function getNormalizedApiEndpoint(): string {
-  const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT?.trim();
-  if (!apiEndpoint) {
-    throw new Error("Missing API endpoint configuration. Please set NEXT_PUBLIC_API_ENDPOINT.");
-  }
-  return apiEndpoint.replace(/\/+$/, "");
-}
-
-function resolveCampaignEnvironment(apiEndpoint: string): string {
-  const pathnameEnvironment = new URL(apiEndpoint).pathname.split("/").filter(Boolean)[0];
-  if (pathnameEnvironment) {
-    return pathnameEnvironment;
-  }
-
-  throw new Error(
-    "Unable to resolve campaign environment. Set NEXT_PUBLIC_API_ENDPOINT as https://api.tpet.aws-educate.tw/{environment}."
-  );
-}
-
 export function getCampaignServiceBaseUrl(): string {
-  const normalizedApiEndpoint = getNormalizedApiEndpoint();
-  const endpointUrl = new URL(normalizedApiEndpoint);
-  const environment = resolveCampaignEnvironment(normalizedApiEndpoint);
-  return `${endpointUrl.origin}/rsvp-service/${environment}`;
+  return "/api/backend/rsvp";
 }
 
 export function getCampaignStatus(campaign: Campaign): CampaignStatus {

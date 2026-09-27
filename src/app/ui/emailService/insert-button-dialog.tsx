@@ -75,12 +75,10 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
     setIsSubmitting(true);
     try {
       const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const token = localStorage.getItem("access_token") || "";
       const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           campaign_name: campaignName,
@@ -244,11 +242,9 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     const fetchCampaigns = async () => {
       try {
         const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-        const token = localStorage.getItem("access_token") || "";
         const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         });
         if (!response.ok) return;

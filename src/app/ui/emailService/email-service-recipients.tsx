@@ -119,14 +119,7 @@ export default function EmailServiceRecipients({
     const fetchVariables = async () => {
       setIsLoadingVariables(true);
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/files/${templateFileId}/template-variables`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-          }
-        );
+        const res = await fetch(`/api/backend/files/${templateFileId}/template-variables`);
         const data = await res.json();
         setTemplateFileName(data.file_name || "Unknown File");
 
@@ -203,13 +196,10 @@ export default function EmailServiceRecipients({
       const formData = new FormData();
       formData.append("file", file);
 
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/upload-multiple-file`);
+      const base_url = "/api/backend";
+      const url = new URL(`${base_url}/upload-multiple-file`, window.location.origin);
       const response = await fetch(url.toString(), {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
         body: formData,
       });
 

@@ -38,13 +38,10 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
     setIsSubmitting(true);
 
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/upload-multiple-file`);
+      const base_url = "/api/backend";
+      const url = new URL(`${base_url}/upload-multiple-file`, window.location.origin);
       const response = await fetch(url.toString(), {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
         body: formData,
       });
 

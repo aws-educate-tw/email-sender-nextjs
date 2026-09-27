@@ -18,10 +18,9 @@ interface EditCampaignDialogProps {
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
   const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-  const token = localStorage.getItem("access_token");
   const response = await fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
   if (!response.ok) throw new Error("Failed to update campaign");

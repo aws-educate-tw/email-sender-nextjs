@@ -50,8 +50,7 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
     }
 
     try {
-      const token = localStorage.getItem("access_token") || "";
-      const res = await submitForm(JSON.stringify(formData), token);
+      const res = await submitForm(JSON.stringify(formData));
       console.log("Submission result:", res);
 
       if (res.status === "SUCCESS") {

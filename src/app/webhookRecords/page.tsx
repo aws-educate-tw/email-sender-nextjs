@@ -44,8 +44,8 @@ export default function Page() {
 
   const fetchWebhooks = async (limit: number, page: number) => {
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/webhooks`);
+      const base_url = "/api/backend";
+      const url = new URL(`${base_url}/webhooks`, window.location.origin);
 
       // Add required parameters
       url.searchParams.append("webhook_type", "surveycake");
@@ -53,16 +53,10 @@ export default function Page() {
       url.searchParams.append("page", page.toString());
       url.searchParams.append("sort_order", "DESC"); // Newest first
 
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("No access token found");
-      }
-
       const response = await fetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
 

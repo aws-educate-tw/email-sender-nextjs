@@ -61,20 +61,18 @@ export default function SelectDropdown({ onSelect, fileExtension, error }: Selec
   ) => {
     try {
       setIsLoading(true);
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/files`);
+      const base_url = "/api/backend";
+      const url = new URL(`${base_url}/files`, window.location.origin);
       url.searchParams.append("file_extension", file_extension);
       url.searchParams.append("limit", limit.toString());
       if (lastEvaluatedKey) {
         url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
       }
 
-      const token = localStorage.getItem("access_token");
       const response = await fetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
 

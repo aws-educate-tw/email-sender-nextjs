@@ -13,11 +13,7 @@ export function useCampaignDetail(campaignId: string) {
     setIsLoading(true);
     try {
       const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Unauthorized: missing access token. Please login again.");
-      }
-      const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+      const headers = { "Content-Type": "application/json" };
 
       // Fetch campaign list and detail in parallel because they do not depend on each other.
       const [campaignsResponse, detailResponse] = await Promise.all([
