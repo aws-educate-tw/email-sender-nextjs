@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import DateTimeInput from "./datetime-input";
-import { getCampaignServiceBaseUrl } from "./utils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
 interface CreateCampaignDialogProps {
@@ -38,8 +38,7 @@ export default function CreateCampaignDialog({
     setIsSubmitting(true);
 
     try {
-      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+      const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

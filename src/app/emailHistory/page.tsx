@@ -6,7 +6,7 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import EmailHistoryCard from "@/app/ui/email-history-card";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
 import EventLabel from "@/app/ui/emailService/email-service-event-label";
-import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface AttachmentFilesType {
   file_url: string;
@@ -95,8 +95,7 @@ function EmailHistoryPageContent() {
     if (campaignId) {
       const fetchCampaignName = async () => {
         try {
-          const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-          const res = await fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
+          const res = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`, {
             headers: {
               "Content-Type": "application/json",
             },
@@ -137,8 +136,7 @@ function EmailHistoryPageContent() {
 
     const attemptFetch = async (): Promise<any> => {
       try {
-        const base_url = "/api/backend";
-        const url = new URL(`${base_url}/runs`, window.location.origin);
+        const url = new URL(`${BACKEND_API_ENDPOINT}/runs`, window.location.origin);
         if (targetCampaignId) {
           url.searchParams.append("campaign_id", targetCampaignId);
           url.searchParams.append("run_type", "RSVP");

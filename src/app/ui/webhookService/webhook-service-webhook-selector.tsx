@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { WebhookListItem } from "@/app/ui/webhookService/type";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface WebhookServiceWebhookSelectorProps {
   onNext: () => void;
@@ -46,8 +47,6 @@ export default function WebhookServiceWebhookSelector({
         setIsLoading(true);
         setError(null);
 
-        const base_url = "/api/backend";
-
         // Fetch webhooks of all types by making multiple requests if needed
         const webhookTypes = ["surveycake", "slack"];
         const allWebhooks: WebhookListItem[] = [];
@@ -55,7 +54,7 @@ export default function WebhookServiceWebhookSelector({
 
         for (const webhookType of webhookTypes) {
           try {
-            const url = new URL(`${base_url}/webhooks`, window.location.origin);
+            const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks`, window.location.origin);
 
             // Add required parameters for each webhook type
             url.searchParams.append("webhook_type", webhookType);
@@ -106,7 +105,7 @@ export default function WebhookServiceWebhookSelector({
         // If no webhooks were found at all, it might be an API issue
         if (allWebhooks.length === 0 && page === 1) {
           // Try one more time with just surveycake to get proper error message
-          const url = new URL(`${base_url}/webhooks`, window.location.origin);
+          const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks`, window.location.origin);
           url.searchParams.append("webhook_type", "surveycake");
           url.searchParams.append("limit", limit.toString());
           url.searchParams.append("page", page.toString());

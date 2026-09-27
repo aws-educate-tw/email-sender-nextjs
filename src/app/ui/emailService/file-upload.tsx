@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, ChangeEvent } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface FileDataType {
   file_id: string;
@@ -38,8 +39,7 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
     setIsSubmitting(true);
 
     try {
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/upload-multiple-file`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/upload-multiple-file`, window.location.origin);
       const response = await fetch(url.toString(), {
         method: "POST",
         body: formData,

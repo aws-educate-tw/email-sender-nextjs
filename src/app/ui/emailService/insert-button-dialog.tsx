@@ -6,7 +6,7 @@ import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-pr
 import { Info, ChevronsUpDown, Check } from "lucide-react";
 import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import { Listbox } from "@headlessui/react";
-import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 import { CampaignListItem } from "@/app/ui/campaignService/types";
 import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
@@ -74,8 +74,7 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
 
     setIsSubmitting(true);
     try {
-      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+      const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -241,8 +240,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     if (!isOpen) return;
     const fetchCampaigns = async () => {
       try {
-        const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-        const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+        const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
           headers: {
             "Content-Type": "application/json",
           },

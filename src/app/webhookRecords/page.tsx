@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import WebhookRecordsCardSkeleton from "@/app/ui/skeleton/webhook-records-card-skeleton";
 import WebhookRecordsCard from "@/app/ui/webhook-records-card";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface WebhookData {
   webhook_id: string;
@@ -44,8 +45,7 @@ export default function Page() {
 
   const fetchWebhooks = async (limit: number, page: number) => {
     try {
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/webhooks`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks`, window.location.origin);
 
       // Add required parameters
       url.searchParams.append("webhook_type", "surveycake");

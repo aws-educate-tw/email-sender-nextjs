@@ -4,6 +4,7 @@ import TipTap from "@/app/ui/emailService/tip-tap";
 import { Check } from "lucide-react";
 import cn from "classnames";
 import { ArrowRight } from "lucide-react";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 const htmltemplateContent = ``;
 
@@ -101,8 +102,7 @@ export default function EmailServiceTemplateEditor({
       const formData = new FormData();
       formData.append("file", blob, fileName);
 
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/upload-multiple-file`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/upload-multiple-file`, window.location.origin);
       const response = await fetch(url.toString(), {
         method: "POST",
         body: formData,
@@ -211,8 +211,7 @@ export default function EmailServiceTemplateEditor({
     formData.append("file", blob, fileName);
 
     try {
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/upload-multiple-file`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/upload-multiple-file`, window.location.origin);
       const response = await fetch(url.toString(), {
         method: "POST",
         body: formData,

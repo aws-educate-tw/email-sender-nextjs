@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime, formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface FileDataType {
   file_id: string;
@@ -54,8 +55,7 @@ export default function AttachDropdown({ onSelect }: AttachDropdownProps) {
   const fetchFiles = async (limit: number, lastEvaluatedKey: string | null) => {
     try {
       setIsLoading(true);
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/files`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/files`, window.location.origin);
       url.searchParams.append("limit", limit.toString());
       if (lastEvaluatedKey) {
         url.searchParams.append("last_evaluated_key", lastEvaluatedKey);

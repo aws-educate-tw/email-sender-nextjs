@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ChevronRight, ChevronLeft, FileText, RefreshCw } from "lucide-react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import type { StartMode } from "@/app/ui/emailService/type";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface FileDataType {
   file_id: string;
@@ -54,8 +55,7 @@ export default function EmailServiceTemplateSelector({
   ) => {
     try {
       setIsLoading(true);
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/files`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/files`, window.location.origin);
       url.searchParams.append("file_extension", ext);
       url.searchParams.append("limit", limit.toString());
       if (lastEvaluatedKey) url.searchParams.append("last_evaluated_key", lastEvaluatedKey);

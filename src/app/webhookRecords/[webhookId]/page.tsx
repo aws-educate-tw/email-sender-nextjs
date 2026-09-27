@@ -9,6 +9,7 @@ import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface PageProps {
   params: {
@@ -139,8 +140,7 @@ export default function Page({ params }: PageProps) {
 
   const fetchWebhookDetails = async (webhookId: string) => {
     try {
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/webhooks/${webhookId}`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks/${webhookId}`, window.location.origin);
 
       const response = await fetch(url.toString(), {
         method: "GET",
@@ -175,8 +175,7 @@ export default function Page({ params }: PageProps) {
       page: number,
       status: string | null = null
     ): Promise<EmailsResponse> => {
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/runs/${runId}/emails`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/runs/${runId}/emails`, window.location.origin);
 
       url.searchParams.append("page", page.toString());
 
@@ -260,8 +259,10 @@ export default function Page({ params }: PageProps) {
         // First, we need to get the run_id associated with this webhook
         // This could come from the webhook details API or a separate endpoint
         // For now, let's try to get it from webhook runs endpoint
-        const base_url = "/api/backend";
-        const runsUrl = new URL(`${base_url}/webhooks/${webhookId}/runs`, window.location.origin);
+        const runsUrl = new URL(
+          `${BACKEND_API_ENDPOINT}/webhooks/${webhookId}/runs`,
+          window.location.origin
+        );
 
         const runsResponse = await fetch(runsUrl.toString(), {
           method: "GET",
@@ -438,8 +439,10 @@ export default function Page({ params }: PageProps) {
     setSuccessMessage(null);
 
     try {
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/webhooks/${params.webhookId}`, window.location.origin);
+      const url = new URL(
+        `${BACKEND_API_ENDPOINT}/webhooks/${params.webhookId}`,
+        window.location.origin
+      );
 
       const response = await fetch(url.toString(), {
         method: "PUT",

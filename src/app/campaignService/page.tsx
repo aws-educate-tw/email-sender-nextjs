@@ -5,7 +5,7 @@ import { Campaign, CampaignListItem } from "@/app/ui/campaignService/types";
 import CampaignList from "@/app/ui/campaignService/campaign-list";
 import CreateCampaignDialog from "@/app/ui/campaignService/create-campaign-dialog";
 import RotatingLoaderAnimation from "@/app/ui/rotating-loader-animation";
-import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 export default function CampaignServicePage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -20,9 +20,7 @@ export default function CampaignServicePage() {
   const loadCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-
-      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+      const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
         headers: {
           "Content-Type": "application/json",
         },

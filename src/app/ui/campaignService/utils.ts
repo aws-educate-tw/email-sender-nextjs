@@ -1,9 +1,5 @@
 import { Campaign, CampaignStatus } from "./types";
 
-export function getCampaignServiceBaseUrl(): string {
-  return "/api/backend/rsvp";
-}
-
 export function getCampaignStatus(campaign: Campaign): CampaignStatus {
   const now = new Date();
   const startTime = new Date(campaign.campaign_start_time);

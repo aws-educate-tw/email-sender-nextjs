@@ -7,6 +7,7 @@ import ExportConfirmationModal from "@/app/ui/export-confirmation-modal";
 import { ChevronDown, ChevronUp, Search, Download } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface PageProps {
   params: {
@@ -131,8 +132,7 @@ export default function Page({ params }: PageProps) {
       page: number,
       status: string | null = null
     ): Promise<EmailsResponse> => {
-      const base_url = "/api/backend";
-      const url = new URL(`${base_url}/runs/${runId}/emails`, window.location.origin);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/runs/${runId}/emails`, window.location.origin);
 
       url.searchParams.append("page", page.toString());
 
@@ -180,8 +180,7 @@ export default function Page({ params }: PageProps) {
   );
 
   async function fetchRunDetails(runId: string) {
-    const base_url = "/api/backend";
-    const url = new URL(`${base_url}/runs/${runId}`, window.location.origin);
+    const url = new URL(`${BACKEND_API_ENDPOINT}/runs/${runId}`, window.location.origin);
 
     return fetch(url.toString(), {
       method: "GET",

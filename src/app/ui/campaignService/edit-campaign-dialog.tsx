@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Campaign, Run } from "./types";
 import DateTimeInput from "./datetime-input";
-import { getCampaignServiceBaseUrl } from "./utils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
 interface EditCampaignDialogProps {
@@ -17,8 +17,7 @@ interface EditCampaignDialogProps {
 }
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
-  const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-  const response = await fetch(`${campaignServiceBaseUrl}/campaigns/${campaignId}`, {
+  const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
