@@ -14,6 +14,17 @@ interface DateTimeInputProps {
   className?: string;
 }
 
+const isSameCalendarDay = (first: Date, second: Date) =>
+  first.getFullYear() === second.getFullYear() &&
+  first.getMonth() === second.getMonth() &&
+  first.getDate() === second.getDate();
+
+const startOfCalendarDay = (date: Date) => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  return start;
+};
+
 const CustomInput = forwardRef<HTMLInputElement, any>(
   ({ value, onClick, placeholder, minDate, maxDate, onClose, onDateChange }, ref) => {
     const [error, setError] = useState("");
@@ -184,6 +195,21 @@ export default function DateTimeInput({
   const datePickerRef = useRef<DatePicker>(null);
   const previousSelectedRef = useRef<Date | null>(null);
 
+  // `react-datepicker` evaluates `minDate` by calendar day. Normalizing it makes
+  // the start day selectable in the end picker; the separate time filter below
+  // preserves the stricter rule for a same-day end time.
+  const calendarMinDate = minDate ? startOfCalendarDay(minDate) : undefined;
+
+  const filterTime = (time: Date) => {
+    if (!selected || !minDate || !isSameCalendarDay(selected, minDate)) {
+      return true;
+    }
+
+    const selectedMinutes = time.getHours() * 60 + time.getMinutes();
+    const minimumMinutes = minDate.getHours() * 60 + minDate.getMinutes();
+    return selectedMinutes > minimumMinutes;
+  };
+
   const handleClose = () => {
     setTimeout(() => {
       datePickerRef.current?.setOpen(false);
@@ -224,8 +250,10 @@ export default function DateTimeInput({
         timeIntervals={15}
         dateFormat="yyyy/MM/dd HH:mm"
         placeholderText={placeholderText}
-        minDate={minDate}
+        minDate={calendarMinDate}
         maxDate={maxDate}
+        openToDate={selected || calendarMinDate}
+        filterTime={filterTime}
         customInput={
           <CustomInput
             minDate={minDate}
