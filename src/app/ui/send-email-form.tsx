@@ -7,8 +7,6 @@ import AttachDropdown from "./attach-dropdown";
 import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Info } from "lucide-react";
 
 interface SubmitResponse {
@@ -42,22 +40,6 @@ export default function SendEmailForm() {
   const [ccEmails, setCcEmails] = useState<string[]>([]);
   const [localPart, setLocalPart] = useState<string>("");
 
-  const router = useRouter();
-
-  const isTokenExpired = () => {
-    const expiryTime = localStorage.getItem("token_expiry_time");
-    if (!expiryTime) return true;
-    return new Date().getTime() > parseInt(expiryTime);
-  };
-
-  useEffect(() => {
-    console.log("checkLoginStatus function called");
-    const access_token = localStorage.getItem("access_token");
-    if (!access_token || isTokenExpired()) {
-      router.push("/login");
-    }
-  }, [router]);
-
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!ref.current) return;
@@ -82,10 +64,7 @@ export default function SendEmailForm() {
 
     setIsSubmitting(true);
     try {
-      const response: SubmitResponse = await submitForm(
-        JSON.stringify(formData),
-        localStorage.getItem("access_token") ?? ""
-      );
+      const response: SubmitResponse = await submitForm(JSON.stringify(formData));
 
       if (response.status === "error" && response.errors) {
         const newErrors: { [key: string]: string } = {};

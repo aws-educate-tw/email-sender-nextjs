@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import WebhookRecordsCardSkeleton from "@/app/ui/skeleton/webhook-records-card-skeleton";
 import WebhookRecordsCard from "@/app/ui/webhook-records-card";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface WebhookData {
   webhook_id: string;
@@ -44,8 +45,7 @@ export default function Page() {
 
   const fetchWebhooks = async (limit: number, page: number) => {
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/webhooks`);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks`, window.location.origin);
 
       // Add required parameters
       url.searchParams.append("webhook_type", "surveycake");
@@ -53,16 +53,10 @@ export default function Page() {
       url.searchParams.append("page", page.toString());
       url.searchParams.append("sort_order", "DESC"); // Newest first
 
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("No access token found");
-      }
-
       const response = await fetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
 

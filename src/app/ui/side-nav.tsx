@@ -9,8 +9,6 @@ export default function SideNav() {
 
   const signout = async () => {
     await submitLogout();
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("token_expiry_time");
     router.push("/");
     router.refresh();
   };
