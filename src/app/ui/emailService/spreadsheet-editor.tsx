@@ -45,6 +45,8 @@ export default function SpreadsheetEditor({
     }
   }, [emailData.spreadsheetFileUrl]);
 
+  const RSVP_SYSTEM_GENERATED_COLUMNS = new Set(["jwt_token", "participant_id", "email_id"]);
+
   useEffect(() => {
     if (!selectedFileUrl) return;
 
@@ -62,7 +64,7 @@ export default function SpreadsheetEditor({
         jsonData.forEach((row: any) => {
           const recipient: Excel = { id: Date.now() + Math.random().toString(36).substring(2) };
           Object.entries(row).forEach(([key, value]) => {
-            if (key !== "id") {
+            if (key !== "id" && !RSVP_SYSTEM_GENERATED_COLUMNS.has(key)) {
               recipient[key] = String(value);
               newColumnSet.add(key);
             }
