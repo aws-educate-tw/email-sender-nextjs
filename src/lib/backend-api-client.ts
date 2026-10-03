@@ -14,6 +14,16 @@ export class AuthenticationError extends Error {
   }
 }
 
+function resolveWithinBase(pathname: string, baseUrl: URL): URL {
+  const targetUrl = new URL(pathname.replace(/^\/+/, ""), baseUrl);
+
+  if (targetUrl.origin !== baseUrl.origin || !targetUrl.pathname.startsWith(baseUrl.pathname)) {
+    throw new Error("Backend path escapes configured endpoint");
+  }
+
+  return targetUrl;
+}
+
 export function getBackendApiUrl(pathname: string): URL {
   const endpoint = (
     process.env.BACKEND_API_ENDPOINT || process.env.NEXT_PUBLIC_API_ENDPOINT
@@ -33,14 +43,15 @@ export function getBackendApiUrl(pathname: string): URL {
     }
 
     const rsvpPath = normalizedPath.replace(/^rsvp\/?/, "");
-    return new URL(
-      `/rsvp-service/${encodeURIComponent(environment)}/${rsvpPath}`,
+    const rsvpBaseUrl = new URL(
+      `/rsvp-service/${encodeURIComponent(environment)}/`,
       endpointUrl.origin
     );
+    return resolveWithinBase(rsvpPath, rsvpBaseUrl);
   }
 
   const normalizedEndpoint = `${endpoint.replace(/\/+$/, "")}/`;
-  return new URL(normalizedPath, normalizedEndpoint);
+  return resolveWithinBase(normalizedPath, new URL(normalizedEndpoint));
 }
 
 export function getAuthenticatedAccessToken(): string {
