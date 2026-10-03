@@ -65,7 +65,7 @@ async function proxyRequest(request: NextRequest, { params }: RouteContext) {
       headers: responseHeaders,
     });
 
-    if (backendResponse.status === 401) {
+    if (backendResponse.status === 401 && !isPublicRsvpTokenRequest) {
       clearAuthenticationCookies(response);
     }
 
