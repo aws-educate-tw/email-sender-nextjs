@@ -42,11 +42,9 @@ export default function Page() {
     try {
       const response = await submitLogin(JSON.stringify(formData));
 
-      if ("access_token" in response && response.token_expiry_time) {
-        localStorage.setItem("access_token", response.access_token);
-        localStorage.setItem("token_expiry_time", response.token_expiry_time);
-
+      if ("success" in response && response.success) {
         router.push("/emailService");
+        router.refresh();
       } else if (response.message === "Password reset required for the user") {
         setVerificationRequired(true);
         setIsSubmitting(false);

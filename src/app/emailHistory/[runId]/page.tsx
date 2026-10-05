@@ -7,6 +7,7 @@ import ExportConfirmationModal from "@/app/ui/export-confirmation-modal";
 import { ChevronDown, ChevronUp, Search, Download } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface PageProps {
   params: {
@@ -129,11 +130,9 @@ export default function Page({ params }: PageProps) {
       runId: string,
       limit: string | number,
       page: number,
-      status: string | null = null,
-      access_token: string
+      status: string | null = null
     ): Promise<EmailsResponse> => {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/runs/${runId}/emails`);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/runs/${runId}/emails`, window.location.origin);
 
       url.searchParams.append("page", page.toString());
 
@@ -155,7 +154,6 @@ export default function Page({ params }: PageProps) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${access_token}`,
             },
           });
 
@@ -181,15 +179,13 @@ export default function Page({ params }: PageProps) {
     []
   );
 
-  async function fetchRunDetails(runId: string, access_token: string) {
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/runs/${runId}`);
+  async function fetchRunDetails(runId: string) {
+    const url = new URL(`${BACKEND_API_ENDPOINT}/runs/${runId}`, window.location.origin);
 
     return fetch(url.toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
       },
     })
       .then(response => {
@@ -209,13 +205,8 @@ export default function Page({ params }: PageProps) {
     async (status: string | null = null) => {
       setIsLoading(true);
       try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          throw new Error("No access token found");
-        }
-
         // 每次都從後端獲取對應狀態的資料
-        const result = await fetchEmails(params.runId, "ALL", 0, status, token);
+        const result = await fetchEmails(params.runId, "ALL", 0, status);
         setAllEmails(result.data);
         setIsLoading(false);
       } catch (error: any) {
@@ -229,12 +220,7 @@ export default function Page({ params }: PageProps) {
   // 合併 fetchRunDetails 的呼叫，同時獲取詳細資料和統計
   const fetchRunDetailsAndSummary = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("No access token found");
-      }
-
-      const result = await fetchRunDetails(params.runId, token);
+      const result = await fetchRunDetails(params.runId);
 
       // 設定詳細資料
       setDetailedData(result);

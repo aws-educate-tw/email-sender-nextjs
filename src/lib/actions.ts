@@ -7,6 +7,11 @@ import {
   TOKEN_MAX_AGE_SECONDS,
   getTokenExpiryTime,
 } from "@/lib/auth-cookies";
+import {
+  AuthenticationError,
+  authenticatedBackendFetch,
+  getBackendApiUrl,
+} from "@/lib/backend-api-client";
 
 const formSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
@@ -67,7 +72,7 @@ const authCookieOptions = {
   maxAge: TOKEN_MAX_AGE_SECONDS,
 };
 
-export async function submitForm(data: string, access_token: string) {
+export async function submitForm(data: string) {
   const parsedData = JSON.parse(data);
   const validation = formSchema.safeParse(parsedData);
   if (!validation.success) {
@@ -82,13 +87,10 @@ export async function submitForm(data: string, access_token: string) {
   }
 
   try {
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/send-email`);
-    const response = await fetch(url.toString(), {
+    const response = await authenticatedBackendFetch("send-email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify(validation.data),
     });
@@ -104,6 +106,12 @@ export async function submitForm(data: string, access_token: string) {
       sqs_message_id: result.sqs_message_id,
     };
   } catch (error: any) {
+    if (error instanceof AuthenticationError) {
+      return {
+        status: "error",
+        message: "Unauthorized. Please login again.",
+      };
+    }
     return {
       status: "error",
       message: "Error: Failed to Send Form Data. Please try again.",
@@ -127,9 +135,7 @@ export async function submitLogin(data: string) {
   }
 
   try {
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/auth/login`);
-    const response = await fetch(url.toString(), {
+    const response = await fetch(getBackendApiUrl("auth/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -165,9 +171,8 @@ export async function submitLogin(data: string) {
     cookies().set(TOKEN_EXPIRY_COOKIE, tokenExpiryTime, authCookieOptions);
 
     return {
+      success: true,
       message: result.message || "Login successful",
-      access_token: result.access_token,
-      token_expiry_time: tokenExpiryTime,
     };
   } catch (error: any) {
     console.error("Error during API call:", error);
@@ -198,9 +203,7 @@ export async function submitChangePassword(data: string) {
   }
 
   try {
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/auth/change-password`);
-    const response = await fetch(url.toString(), {
+    const response = await fetch(getBackendApiUrl("auth/change-password"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -227,7 +230,7 @@ export async function submitChangePassword(data: string) {
   }
 }
 
-export async function submitWebhookForm(data: string, access_token: string) {
+export async function submitWebhookForm(data: string) {
   const parsedData = JSON.parse(data);
   const validation = webhookFormSchema.safeParse(parsedData);
   if (!validation.success) {
@@ -243,13 +246,10 @@ export async function submitWebhookForm(data: string, access_token: string) {
 
   try {
     console.log("data", validation.data);
-    const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const url = new URL(`${base_url}/webhook`);
-    const response = await fetch(url.toString(), {
+    const response = await authenticatedBackendFetch("webhook", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify(validation.data),
     });
@@ -275,6 +275,12 @@ export async function submitWebhookForm(data: string, access_token: string) {
       },
     };
   } catch (error: any) {
+    if (error instanceof AuthenticationError) {
+      return {
+        status: "error",
+        message: "Unauthorized. Please login again.",
+      };
+    }
     console.error("Error during API call:", error);
     return {
       status: "error",

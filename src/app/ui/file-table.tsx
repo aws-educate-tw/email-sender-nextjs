@@ -45,13 +45,11 @@ export default function FileTable({
         return new Date(file.created_at) > new Date(latest.created_at) ? file : latest;
       }, files[0]);
       setSelectedFileId(latestFile.file_id);
-      localStorage.setItem(`${file_extension}_key`, latestFile.file_id);
     }
   }, [files, file_extension]);
 
   const handleCheckboxChange = (file_id: string) => {
     setSelectedFileId(file_id);
-    localStorage.setItem(`${file_extension}_key`, file_id);
   };
 
   return files ? (

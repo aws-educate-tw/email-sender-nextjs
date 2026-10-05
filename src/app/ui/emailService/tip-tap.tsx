@@ -12,7 +12,6 @@ import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Bold,
   Italic,
@@ -128,14 +127,6 @@ export default function TipTap({ onChange, content, onCampaignInserted }: TipTap
   const [showInsertButtonDialog, setShowInsertButtonDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tableSelectorRef = useRef<HTMLDivElement>(null);
-
-  const router = useRouter();
-
-  const isTokenExpired = () => {
-    const expiryTime = localStorage.getItem("token_expiry_time");
-    if (!expiryTime) return true;
-    return new Date().getTime() > parseInt(expiryTime);
-  };
 
   // Convert image file to base64 data URL
   const convertImageToBase64 = async (file: File): Promise<string | null> => {
@@ -273,13 +264,6 @@ export default function TipTap({ onChange, content, onCampaignInserted }: TipTap
       };
     }
   }, [showTableSelector]);
-
-  useEffect(() => {
-    const access_token = localStorage.getItem("access_token");
-    if (!access_token || isTokenExpired()) {
-      router.push("/login");
-    }
-  }, [router]);
 
   const editor = useEditor({
     extensions: [

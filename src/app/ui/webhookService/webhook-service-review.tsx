@@ -80,10 +80,7 @@ export default function WebhookServiceReview({ webhookData }: WebhookServiceRevi
         is_generate_certificate: webhookData.provideCertification === "yes",
       };
 
-      const response = await submitWebhookForm(
-        JSON.stringify(formData),
-        localStorage.getItem("access_token") || ""
-      );
+      const response = await submitWebhookForm(JSON.stringify(formData));
 
       if (response.status === "success") {
         setSubmitResult({
