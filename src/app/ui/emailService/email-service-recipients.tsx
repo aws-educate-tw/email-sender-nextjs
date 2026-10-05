@@ -102,7 +102,8 @@ export default function EmailServiceRecipients({
     [onSave, selectedSpreadsheetInfo]
   );
 
-  // Fetch template variables and always include "Email"
+  // Fetch template variables and always include "Email" (plus "Name" for RSVP
+  // campaigns, since the RSVP status page needs it).
   useEffect(() => {
     if (!templateFileId) return;
     const fetchVariables = async () => {
@@ -119,8 +120,14 @@ export default function EmailServiceRecipients({
         const data = await res.json();
         setTemplateFileName(data.file_name || "Unknown File");
 
-        // Ensure "Email" is always included
-        const varsWithEmail = Array.from(new Set([...(data.variables || []), "Email"]));
+        // Ensure "Email" (and "Name" for RSVP) are always included. Exclude
+        // "jwt_token": it's a special replacement injected by the backend after
+        // the send-email API call, so it should never be treated as a
+        // spreadsheet column the user must provide.
+        const requiredExtras = emailData.isRsvp ? ["Email", "Name"] : ["Email"];
+        const varsWithEmail = Array.from(
+          new Set([...(data.variables || []), ...requiredExtras])
+        ).filter(v => v !== "jwt_token");
         setTemplateVariables(varsWithEmail);
 
         // Build columns for rendering/editing
@@ -133,7 +140,7 @@ export default function EmailServiceRecipients({
       }
     };
     fetchVariables();
-  }, [templateFileId]);
+  }, [templateFileId, emailData.isRsvp]);
 
   // Re-calculate missing variables whenever excel data or templateVariables change
   useEffect(() => {

@@ -15,7 +15,7 @@ export default function Modal({ title, isOpen, onClose, children }: ModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-[70vw] max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-[95vw] sm:max-w-[85vw] lg:max-w-[70vw] max-h-[90vh] overflow-hidden mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-700">

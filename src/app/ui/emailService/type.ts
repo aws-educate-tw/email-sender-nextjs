@@ -3,6 +3,8 @@ export interface Excel {
   [key: string]: string | undefined;
 }
 
+export type StartMode = "new" | "edit-existing" | "resend";
+
 export type TableChangeMeta = {
   source: "init" | "user";
   origin: "dropdown" | "import" | "manual";
@@ -24,4 +26,8 @@ export interface EmailDataType {
   cc: string[];
   provideCertification: "yes" | "no";
   attachments: { file_name: string; file_id: string; file_url: string }[];
+  isRsvp: boolean;
+  campaignId: string | null;
+  campaignStartTime: string | null;
+  registrationDeadline: string | null;
 }

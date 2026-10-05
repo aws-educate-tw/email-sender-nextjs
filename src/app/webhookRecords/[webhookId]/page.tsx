@@ -26,6 +26,7 @@ interface EmailDataType {
   cc: string[];
   run_id: string;
   created_at: string;
+  recipient_name: string;
   recipient_email: string;
   sender_local_part: string;
   status: string;

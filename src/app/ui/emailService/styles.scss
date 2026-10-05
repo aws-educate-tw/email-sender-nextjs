@@ -1,43 +1,75 @@
-/* Basic editor styles */
+/* Gmail Web-like defaults for the editor preview only. */
 
 .ProseMirror {
-  > * + * {
-    margin-top: 0.75em;
-  }
+  color: #222;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
 
   p {
+    margin: 1em 0;
     min-width: 1px;
   }
 
   ul {
-    list-style: disc;
+    list-style-type: disc;
   }
+
   ol {
-    list-style: decimal;
+    list-style-type: decimal;
   }
 
   ul,
   ol {
-    padding: 0 1rem;
+    margin: 1em 0;
+    padding-left: 40px;
+
+    ul,
+    ol {
+      margin: 0;
+    }
+  }
+
+  li {
+    margin-left: 15px;
+  }
+
+  ul ul {
+    list-style-type: circle;
+  }
+
+  ul ul ul {
+    list-style-type: square;
   }
 
   h1 {
     font-size: 2em;
+    margin: 0.67em 0;
   }
+
   h2 {
     font-size: 1.5em;
+    margin: 0.83em 0;
   }
+
   h3 {
     font-size: 1.17em;
+    margin: 1em 0;
   }
+
   h4 {
     font-size: 1em;
+    margin: 1.33em 0;
   }
+
   h5 {
     font-size: 0.83em;
+    margin: 1.67em 0;
   }
+
   h6 {
     font-size: 0.67em;
+    margin: 2.33em 0;
   }
 
   h1,
@@ -46,13 +78,11 @@
   h4,
   h5,
   h6 {
-    line-height: 1.1;
     font-weight: bold;
   }
 
   code {
-    background-color: rgba(#616161, 0.1);
-    color: #616161;
+    font-family: monospace;
   }
 
   pre {
@@ -68,6 +98,7 @@
       background: none;
       font-size: 0.8rem;
     }
+
     .hljs-comment,
     .hljs-quote {
       color: #616161;
@@ -127,18 +158,28 @@
   }
 
   blockquote {
-    padding-left: 1rem;
-    border-left: 2px solid rgba(#0d0d0d, 0.1);
+    margin: 1em 40px;
   }
 
   hr {
-    border: none;
-    border-top: 2px solid rgba(#0d0d0d, 0.1);
-    margin: 2rem 0;
+    border-style: inset;
+    border-width: 1px;
+    margin: 0.5em auto;
   }
 
   mark {
-    background-color: #faf594;
+    background-color: yellow;
+    color: black;
+  }
+
+  a {
+    color: #1155cc;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: #1155cc;
+    }
   }
 
   //  table
@@ -205,13 +246,4 @@
 .resize-cursor {
   cursor: ew-resize;
   cursor: col-resize;
-}
-
-a {
-  color: blue;
-  cursor: pointer;
-
-  &:hover {
-    color: dodgerblue;
-  }
 }

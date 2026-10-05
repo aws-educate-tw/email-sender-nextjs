@@ -2,14 +2,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { submitLogout } from "@/lib/actions";
 
 export default function SideNav() {
   const router = useRouter();
 
-  const signout = () => {
+  const signout = async () => {
+    await submitLogout();
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_expiry_time");
     router.push("/");
+    router.refresh();
   };
 
   return (
@@ -44,6 +47,12 @@ export default function SideNav() {
             className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
           >
             <p className="text-white text-sm sm:text-base">Email History</p>
+          </Link>
+          <Link
+            href="/campaignService"
+            className="w-full flex items-center justify-center rounded-md bg-sky-950 p-3 hover:bg-sky-800"
+          >
+            <p className="text-white text-sm sm:text-base">Event Service</p>
           </Link>
           <Link
             href="/webhookService"

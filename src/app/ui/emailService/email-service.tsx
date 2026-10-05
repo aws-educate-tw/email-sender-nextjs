@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { EmailDataType } from "@/app/ui/emailService/type";
+import { EmailDataType, StartMode } from "@/app/ui/emailService/type";
 import EmailServiceBreadcrumb from "@/app/ui/emailService/email-service-breadcrumb";
 import EmailServiceStartOption from "@/app/ui/emailService/email-service-start-option";
 import EmailServiceTemplateSelector from "@/app/ui/emailService/email-service-template-selector";
@@ -9,6 +9,7 @@ import EmailServiceTemplateEditor from "@/app/ui/emailService/email-service-temp
 import EmailServiceRecipients from "@/app/ui/emailService/email-service-recipients";
 import EmailServiceSettings from "@/app/ui/emailService/email-service-settings";
 import EmailServiceReview from "@/app/ui/emailService/email-service-review";
+import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
 type Step =
   | "start-option"
@@ -17,8 +18,6 @@ type Step =
   | "recipients"
   | "settings"
   | "confirmation";
-
-type StartMode = "new" | "edit-existing" | "resend";
 
 export default function EmailService() {
   const params = useSearchParams();
@@ -42,6 +41,10 @@ export default function EmailService() {
     cc: [],
     provideCertification: "no",
     attachments: [],
+    isRsvp: false,
+    campaignId: null,
+    campaignStartTime: null,
+    registrationDeadline: null,
   });
 
   const goToStep = (step: Step, newMode: StartMode) => {
@@ -69,6 +72,10 @@ export default function EmailService() {
         cc: [],
         provideCertification: "no",
         attachments: [],
+        isRsvp: false,
+        campaignId: null,
+        campaignStartTime: null,
+        registrationDeadline: null,
       });
     }
 
@@ -89,6 +96,29 @@ export default function EmailService() {
     },
     []
   );
+
+  const handleCampaignInserted = useCallback(
+    (campaignId: string, deadline: Date, campaignStartTime: Date) => {
+      setEmailData(prev => ({
+        ...prev,
+        isRsvp: true,
+        campaignId,
+        campaignStartTime: toIso8601Seconds(campaignStartTime),
+        registrationDeadline: toIso8601Seconds(deadline),
+      }));
+    },
+    []
+  );
+
+  const handleRsvpButtonRemoved = useCallback(() => {
+    setEmailData(prev => ({
+      ...prev,
+      isRsvp: false,
+      campaignId: null,
+      campaignStartTime: null,
+      registrationDeadline: null,
+    }));
+  }, []);
 
   // 使用 useCallback 包裝 onSave 函數
   const handleTemplateSave = useCallback(
@@ -124,16 +154,18 @@ export default function EmailService() {
       case "start-option":
         return (
           <EmailServiceStartOption
-            onSelect={mode => {
-              if (mode === "new") goToStep("template-edit", "new");
-              else if (mode === "edit-existing") goToStep("select-template", "edit-existing");
-              else if (mode === "resend") goToStep("select-template", "resend");
+            onSelect={selectedMode => {
+              if (selectedMode === "new") goToStep("template-edit", "new");
+              else if (selectedMode === "edit-existing")
+                goToStep("select-template", "edit-existing");
+              else if (selectedMode === "resend") goToStep("select-template", "resend");
             }}
           />
         );
       case "select-template":
         return (
           <EmailServiceTemplateSelector
+            mode={mode}
             onNext={() => {
               if (mode === "edit-existing") goToStep("template-edit", "edit-existing");
               else if (mode === "resend") goToStep("recipients", "resend");
@@ -151,6 +183,9 @@ export default function EmailService() {
             }}
             templateFileUrl={emailData.templateFileUrl}
             onSave={handleTemplateSave}
+            onCampaignInserted={handleCampaignInserted}
+            onRsvpButtonRemoved={handleRsvpButtonRemoved}
+            isRsvp={emailData.isRsvp}
           />
         );
       case "recipients":

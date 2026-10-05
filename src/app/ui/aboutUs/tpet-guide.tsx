@@ -33,12 +33,14 @@ export default function TpetGuide() {
           </ul>
           <div className="flex flex-col md:flex-row justify-evenly py-20 gap-20 md:gap-0">
             <div className="flex flex-col justify-center items-center">
-              <p className="text-9xl flex w-full justify-center text-sky-950">80%</p>
-              <p className="text-lg text-gray-700">TPET reduces workload by 80%.</p>
+              <p className="text-9xl flex w-full justify-center text-sky-950">8,326</p>
+              <p className="text-lg text-gray-700">Emails delivered between 2025/10 and 2026/05.</p>
             </div>
             <div className="flex flex-col justify-center items-center">
-              <p className="text-9xl flex w-full justify-center text-sky-950">$1.5</p>
-              <p className="text-lg text-gray-700">TPET costs 1.5$USD (avg.) per month.</p>
+              <p className="text-9xl flex w-full justify-center text-sky-950">2,139</p>
+              <p className="text-lg text-gray-700">
+                Largest single event email batch sent in one run.
+              </p>
             </div>
           </div>
         </div>

@@ -37,6 +37,17 @@ export default function EmailServiceReview({ emailData, onSubmit }: ReviewProps)
     if (emailData.bcc?.length) formData.bcc = emailData.bcc;
     if (emailData.attachments?.length)
       formData.attachment_file_ids = emailData.attachments.map(f => f.file_id);
+    if (
+      emailData.isRsvp &&
+      emailData.campaignId &&
+      emailData.campaignStartTime &&
+      emailData.registrationDeadline
+    ) {
+      formData.run_type = "RSVP";
+      formData.campaign_id = emailData.campaignId;
+      formData.campaign_start_time = emailData.campaignStartTime;
+      formData.registration_deadline = emailData.registrationDeadline;
+    }
 
     try {
       const token = localStorage.getItem("access_token") || "";

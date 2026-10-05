@@ -1,0 +1,31 @@
+export type RsvpStatus = "PENDING" | "ATTEND" | "NOT_ATTEND";
+
+export interface RsvpToken {
+  run_id: string;
+  participant_id: string;
+  email_id: string;
+  name: string;
+  iat: number;
+  exp: number;
+}
+
+export interface RsvpStatusResponse {
+  status: "SUCCESS";
+  rsvp_status: RsvpStatus;
+  participant_name: string;
+  campaign_name: string;
+  campaign_start_time: string;
+  campaign_location: string;
+  registration_deadline: string;
+  is_registration_closed: boolean;
+  last_edited_time?: string | null;
+}
+
+export interface RsvpUpdateResponse {
+  status: "SUCCESS";
+  data: {
+    rsvp_status?: RsvpStatus;
+    // Supported for compatibility with older RSVP-service responses.
+    currentStatus?: RsvpStatus;
+  };
+}

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { ChevronRight, ChevronLeft, FileText, RefreshCw } from "lucide-react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
+import type { StartMode } from "@/app/ui/emailService/type";
 
 interface FileDataType {
   file_id: string;
@@ -21,17 +22,23 @@ interface EmailServiceTemplateSelectorProps {
     templateFileUrl: string
   ) => void;
   onNext: () => void;
+  mode?: StartMode | null;
 }
+
+const RSVP_LINK_PATH = "/rsvpPage";
 
 export default function EmailServiceTemplateSelector({
   onTemplateSelect,
   onNext,
+  mode,
 }: EmailServiceTemplateSelectorProps) {
   const fileExtension = "html";
   const [content, setContent] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState<FileDataType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState<FileDataType[] | null>(null);
+
+  const [showRsvpWarning, setShowRsvpWarning] = useState(false);
 
   // Pagination
   const [evaluatedKeyStack, setEvaluatedKeyStack] = useState<(string | null)[]>([null]);
@@ -104,6 +111,15 @@ export default function EmailServiceTemplateSelector({
           const htmlContent = await response.text();
           const doc = new DOMParser().parseFromString(htmlContent, "text/html");
           setContent(doc.body.innerHTML);
+
+          const hasRsvpButton = Array.from(doc.querySelectorAll("a")).some(a => {
+            const href = a.getAttribute("href") || "";
+            return href.includes(RSVP_LINK_PATH);
+          });
+
+          if (hasRsvpButton) {
+            setShowRsvpWarning(true);
+          }
         } catch (error) {
           console.error("Error fetching HTML:", error);
         }
@@ -124,6 +140,14 @@ export default function EmailServiceTemplateSelector({
       );
     }
   }, [selectedTemplate, onTemplateSelect]);
+
+  const handleRsvpWarningAcknowledge = () => {
+    setShowRsvpWarning(false);
+    if (mode === "resend") {
+      setSelectedTemplate(null);
+      setContent("");
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -285,6 +309,30 @@ export default function EmailServiceTemplateSelector({
           Select this Template
         </button>
       </div>
+
+      {/* RSVP 警告彈窗，依 mode 顯示不同文案跟關閉後行為 */}
+      {showRsvpWarning && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-left transform transition-all">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span className="text-amber-500">⚠️</span> Warning
+            </h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              {mode === "resend"
+                ? "This template contains an RSVP button and cannot be used for Resend Email. Please select another template."
+                : "This template contains an RSVP button. Please remove it before continuing to edit."}
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={handleRsvpWarningAcknowledge}
+                className="bg-gray-800 text-white px-5 py-2 rounded-md hover:bg-gray-700 transition"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
