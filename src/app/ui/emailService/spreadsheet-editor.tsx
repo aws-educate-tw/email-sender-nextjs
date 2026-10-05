@@ -5,6 +5,8 @@ import { EmailDataType } from "@/app/ui/emailService/type";
 import { Excel, TableChangeMeta } from "@/app/ui/emailService/type";
 import SpreadsheetDropdown from "@/app/ui/emailService/spreadsheet-dropdown";
 
+const RSVP_SYSTEM_GENERATED_COLUMNS = new Set(["jwt_token", "participant_id", "email_id"]);
+
 interface SpreadsheetEditorProps {
   emailData: EmailDataType;
   onTableChange: (excel: Excel[], meta: TableChangeMeta) => void;
@@ -44,8 +46,6 @@ export default function SpreadsheetEditor({
       setSelectedFileUrl(emailData.spreadsheetFileUrl);
     }
   }, [emailData.spreadsheetFileUrl]);
-
-  const RSVP_SYSTEM_GENERATED_COLUMNS = new Set(["jwt_token", "participant_id", "email_id"]);
 
   useEffect(() => {
     if (!selectedFileUrl) return;
