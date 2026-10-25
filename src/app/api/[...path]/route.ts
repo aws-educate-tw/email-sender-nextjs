@@ -21,6 +21,22 @@ function clearAuthenticationCookies(response: NextResponse) {
 
 async function proxyRequest(request: NextRequest, { params }: RouteContext) {
   try {
+    // Next.js already decodes each segment once. Reject embedded separators and
+    // nested encoding so later URL/backend parsing cannot change the route.
+    if (
+      params.path.some(
+        segment =>
+          segment === "." ||
+          segment === ".." ||
+          segment.includes("/") ||
+          segment.includes("\\") ||
+          segment.includes("\0") ||
+          /%[0-9a-f]{2}/i.test(segment)
+      )
+    ) {
+      return NextResponse.json({ message: "Invalid path" }, { status: 400 });
+    }
+
     const pathname = params.path.map(segment => encodeURIComponent(segment)).join("/");
     const backendPath = `${pathname}${request.nextUrl.search}`;
     const headers = new Headers(request.headers);
@@ -30,6 +46,7 @@ async function proxyRequest(request: NextRequest, { params }: RouteContext) {
     headers.delete("authorization");
     headers.delete("connection");
     headers.delete("content-length");
+    headers.delete("transfer-encoding");
     headers.delete("cookie");
     headers.delete("host");
 
@@ -71,6 +88,10 @@ async function proxyRequest(request: NextRequest, { params }: RouteContext) {
 
     return response;
   } catch (error) {
+    if (error instanceof Error && error.message === "Backend path escapes configured endpoint") {
+      return NextResponse.json({ message: "Invalid path" }, { status: 400 });
+    }
+
     if (error instanceof AuthenticationError) {
       const response = NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       clearAuthenticationCookies(response);
