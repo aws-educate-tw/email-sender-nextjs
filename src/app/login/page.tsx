@@ -21,6 +21,8 @@ export default function Page() {
   const ref = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
+    window.localStorage.removeItem("access_token");
+    window.localStorage.removeItem("token_expiry_time");
     showSessionExpiredNotice();
   }, []);
 
