@@ -108,7 +108,7 @@ export async function submitForm(data: string) {
     };
   } catch (error: any) {
     if (error instanceof AuthenticationError) {
-      redirect("/login");
+      redirect("/login?reason=session-expired");
     }
     return {
       status: "error",
@@ -274,7 +274,7 @@ export async function submitWebhookForm(data: string) {
     };
   } catch (error: any) {
     if (error instanceof AuthenticationError) {
-      redirect("/login");
+      redirect("/login?reason=session-expired");
     }
     console.error("Error during API call:", error);
     return {

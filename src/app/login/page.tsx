@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useRef, useState, useEffect } from "react";
 import { submitLogin, submitChangePassword } from "@/lib/actions";
+import { showSessionExpiredNotice } from "@/lib/authenticated-fetch";
 import { useRouter } from "next/navigation";
 import { ScanEye } from "lucide-react";
 
@@ -18,6 +19,10 @@ export default function Page() {
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const ref = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    showSessionExpiredNotice();
+  }, []);
 
   useEffect(() => {
     if (newPassword !== confirmPassword) {
