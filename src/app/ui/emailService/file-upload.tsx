@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import React, { useState, ChangeEvent } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
@@ -40,7 +41,7 @@ export default function FileUpload({ OnFileExtension }: { OnFileExtension: strin
 
     try {
       const url = new URL(`${BACKEND_API_ENDPOINT}/upload-multiple-file`, window.location.origin);
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "POST",
         body: formData,
       });

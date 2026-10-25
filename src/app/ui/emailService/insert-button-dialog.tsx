@@ -1,5 +1,6 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState, useEffect } from "react";
 import Modal from "@/app/ui/emailService/modal";
 import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-preview";
@@ -74,7 +75,7 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
+      const response = await authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -240,7 +241,7 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     if (!isOpen) return;
     const fetchCampaigns = async () => {
       try {
-        const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
+        const response = await authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
           headers: {
             "Content-Type": "application/json",
           },

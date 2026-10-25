@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import EmailHistoryCardLoading from "@/app/ui/skeleton/email-history-card-skeleton";
@@ -95,11 +96,14 @@ function EmailHistoryPageContent() {
     if (campaignId) {
       const fetchCampaignName = async () => {
         try {
-          const res = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          const res = await authenticatedFetch(
+            `${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
           if (res.ok) {
             const data = await res.json();
             if (data.campaign_name) {
@@ -144,7 +148,7 @@ function EmailHistoryPageContent() {
         url.searchParams.append("limit", limit.toString());
         url.searchParams.append("page", page.toString());
 
-        const response = await fetch(url.toString(), {
+        const response = await authenticatedFetch(url.toString(), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

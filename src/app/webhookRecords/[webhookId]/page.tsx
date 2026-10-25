@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useEffect, useState, useCallback } from "react";
 import WebhookRecordsSkeleton from "@/app/ui/skeleton/webhook-records-skeleton";
 import { HiClipboard } from "react-icons/hi";
@@ -142,7 +143,7 @@ export default function Page({ params }: PageProps) {
     try {
       const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks/${webhookId}`, window.location.origin);
 
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -193,7 +194,7 @@ export default function Page({ params }: PageProps) {
 
       while (retries < maxRetries) {
         try {
-          const response = await fetch(url.toString(), {
+          const response = await authenticatedFetch(url.toString(), {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -264,7 +265,7 @@ export default function Page({ params }: PageProps) {
           window.location.origin
         );
 
-        const runsResponse = await fetch(runsUrl.toString(), {
+        const runsResponse = await authenticatedFetch(runsUrl.toString(), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -444,7 +445,7 @@ export default function Page({ params }: PageProps) {
         window.location.origin
       );
 
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

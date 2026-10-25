@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import WebhookRecordsCardSkeleton from "@/app/ui/skeleton/webhook-records-card-skeleton";
@@ -53,7 +54,7 @@ export default function Page() {
       url.searchParams.append("page", page.toString());
       url.searchParams.append("sort_order", "DESC"); // Newest first
 
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

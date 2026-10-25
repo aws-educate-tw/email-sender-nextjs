@@ -1,5 +1,6 @@
 "use server";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
   ACCESS_TOKEN_COOKIE,
@@ -107,10 +108,7 @@ export async function submitForm(data: string) {
     };
   } catch (error: any) {
     if (error instanceof AuthenticationError) {
-      return {
-        status: "error",
-        message: "Unauthorized. Please login again.",
-      };
+      redirect("/login");
     }
     return {
       status: "error",
@@ -276,10 +274,7 @@ export async function submitWebhookForm(data: string) {
     };
   } catch (error: any) {
     if (error instanceof AuthenticationError) {
-      return {
-        status: "error",
-        message: "Unauthorized. Please login again.",
-      };
+      redirect("/login");
     }
     console.error("Error during API call:", error);
     return {

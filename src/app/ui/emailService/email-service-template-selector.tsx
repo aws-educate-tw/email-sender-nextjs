@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState, useEffect } from "react";
 import { ChevronRight, ChevronLeft, FileText, RefreshCw } from "lucide-react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
@@ -60,7 +61,7 @@ export default function EmailServiceTemplateSelector({
       url.searchParams.append("limit", limit.toString());
       if (lastEvaluatedKey) url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
 
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

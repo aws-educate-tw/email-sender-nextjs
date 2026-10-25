@@ -1,3 +1,4 @@
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState, useEffect, useCallback } from "react";
 import { Campaign, Run, Participant, CampaignDetailResponse, CampaignListItem } from "./types";
 import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
@@ -16,10 +17,10 @@ export function useCampaignDetail(campaignId: string) {
 
       // Fetch campaign list and detail in parallel because they do not depend on each other.
       const [campaignsResponse, detailResponse] = await Promise.all([
-        fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
+        authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
           headers,
         }),
-        fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`, {
+        authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`, {
           headers,
         }),
       ]);

@@ -1,5 +1,6 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
@@ -17,11 +18,14 @@ interface EditCampaignDialogProps {
 }
 
 async function updateCampaign(campaignId: string, data: any): Promise<void> {
-  const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  const response = await authenticatedFetch(
+    `${BACKEND_API_ENDPOINT}/rsvp/campaigns/${campaignId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }
+  );
   if (!response.ok) throw new Error("Failed to update campaign");
 }
 

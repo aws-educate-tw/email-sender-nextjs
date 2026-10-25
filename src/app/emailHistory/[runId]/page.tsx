@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import EmailDetailsDropdown from "@/app/ui/email-details-dropdown";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
@@ -150,7 +151,7 @@ export default function Page({ params }: PageProps) {
 
       while (retries < maxRetries) {
         try {
-          const response = await fetch(url.toString(), {
+          const response = await authenticatedFetch(url.toString(), {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -182,7 +183,7 @@ export default function Page({ params }: PageProps) {
   async function fetchRunDetails(runId: string) {
     const url = new URL(`${BACKEND_API_ENDPOINT}/runs/${runId}`, window.location.origin);
 
-    return fetch(url.toString(), {
+    return authenticatedFetch(url.toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

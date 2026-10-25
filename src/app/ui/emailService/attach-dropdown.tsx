@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime, formatFileSize } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft, ChevronDown } from "lucide-react";
@@ -76,7 +77,7 @@ export default function AttachDropdown({ value, onChange }: AttachDropdownProps)
         url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
       }
 
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "GET",
       });
 

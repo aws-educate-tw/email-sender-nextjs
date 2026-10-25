@@ -80,6 +80,7 @@ export async function authenticatedBackendFetch(pathname: string, init: RequestI
     const cookieStore = cookies();
     cookieStore.delete(ACCESS_TOKEN_COOKIE);
     cookieStore.delete(TOKEN_EXPIRY_COOKIE);
+    throw new AuthenticationError();
   }
 
   return response;

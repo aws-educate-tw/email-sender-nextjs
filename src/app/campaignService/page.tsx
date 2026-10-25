@@ -1,5 +1,6 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useEffect, useState, useCallback } from "react";
 import { Campaign, CampaignListItem } from "@/app/ui/campaignService/types";
 import CampaignList from "@/app/ui/campaignService/campaign-list";
@@ -20,7 +21,7 @@ export default function CampaignServicePage() {
   const loadCampaigns = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
+      const response = await authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
         headers: {
           "Content-Type": "application/json",
         },

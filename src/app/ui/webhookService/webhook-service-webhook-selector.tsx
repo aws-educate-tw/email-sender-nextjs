@@ -1,5 +1,6 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   ArrowRight,
@@ -64,7 +65,7 @@ export default function WebhookServiceWebhookSelector({
 
             console.log(`Fetching ${webhookType} webhooks from:`, url.toString());
 
-            const response = await fetch(url.toString(), {
+            const response = await authenticatedFetch(url.toString(), {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -111,7 +112,7 @@ export default function WebhookServiceWebhookSelector({
           url.searchParams.append("page", page.toString());
           url.searchParams.append("sort_order", "DESC");
 
-          const response = await fetch(url.toString(), {
+          const response = await authenticatedFetch(url.toString(), {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

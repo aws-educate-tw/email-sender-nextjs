@@ -1,5 +1,6 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState } from "react";
 import { X } from "lucide-react";
 import DateTimeInput from "./datetime-input";
@@ -38,7 +39,7 @@ export default function CreateCampaignDialog({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
+      const response = await authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

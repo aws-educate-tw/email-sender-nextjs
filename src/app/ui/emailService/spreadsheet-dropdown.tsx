@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState, useEffect, useRef } from "react";
 import { convertToTaipeiTime } from "@/lib/utils/dataUtils";
 import { ChevronRight, ChevronLeft, CalendarClock } from "lucide-react";
@@ -75,7 +76,7 @@ export default function SpreadsheetDropdown({
         url.searchParams.append("last_evaluated_key", lastEvaluatedKey);
       }
 
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

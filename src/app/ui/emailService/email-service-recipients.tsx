@@ -1,3 +1,4 @@
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import React, { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import SpreadsheetEditor from "@/app/ui/emailService/spreadsheet-editor";
@@ -120,7 +121,7 @@ export default function EmailServiceRecipients({
     const fetchVariables = async () => {
       setIsLoadingVariables(true);
       try {
-        const res = await fetch(
+        const res = await authenticatedFetch(
           `${BACKEND_API_ENDPOINT}/files/${templateFileId}/template-variables`
         );
         const data = await res.json();
@@ -200,7 +201,7 @@ export default function EmailServiceRecipients({
       formData.append("file", file);
 
       const url = new URL(`${BACKEND_API_ENDPOINT}/upload-multiple-file`, window.location.origin);
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "POST",
         body: formData,
       });
