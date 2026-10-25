@@ -1,12 +1,13 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useState, useEffect } from "react";
 import Modal from "@/app/ui/emailService/modal";
 import AttendancePreview from "@/app/ui/emailService/insert-button-attendance-preview";
 import { Info, ChevronsUpDown, Check } from "lucide-react";
 import DateTimeInput from "@/app/ui/emailService/insert-button-datetime-input";
 import { Listbox } from "@headlessui/react";
-import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 import { CampaignListItem } from "@/app/ui/campaignService/types";
 import { toIso8601Seconds } from "@/lib/utils/dataUtils";
 
@@ -74,13 +75,10 @@ function CreateCampaignDialog({ isOpen, onClose, onCampaignCreated }: CreateCamp
 
     setIsSubmitting(true);
     try {
-      const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-      const token = localStorage.getItem("access_token") || "";
-      const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+      const response = await authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           campaign_name: campaignName,
@@ -243,12 +241,9 @@ export default function InsertButtonDialog({ isOpen, onClose, onInsert }: Insert
     if (!isOpen) return;
     const fetchCampaigns = async () => {
       try {
-        const campaignServiceBaseUrl = getCampaignServiceBaseUrl();
-        const token = localStorage.getItem("access_token") || "";
-        const response = await fetch(`${campaignServiceBaseUrl}/campaigns`, {
+        const response = await authenticatedFetch(`${BACKEND_API_ENDPOINT}/rsvp/campaigns`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         });
         if (!response.ok) return;

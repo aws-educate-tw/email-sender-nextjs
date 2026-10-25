@@ -1,5 +1,6 @@
 "use client";
 
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   ArrowRight,
@@ -13,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { WebhookListItem } from "@/app/ui/webhookService/type";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface WebhookServiceWebhookSelectorProps {
   onNext: () => void;
@@ -46,11 +48,6 @@ export default function WebhookServiceWebhookSelector({
         setIsLoading(true);
         setError(null);
 
-        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        if (!base_url) {
-          throw new Error("API endpoint not configured");
-        }
-
         // Fetch webhooks of all types by making multiple requests if needed
         const webhookTypes = ["surveycake", "slack"];
         const allWebhooks: WebhookListItem[] = [];
@@ -58,7 +55,7 @@ export default function WebhookServiceWebhookSelector({
 
         for (const webhookType of webhookTypes) {
           try {
-            const url = new URL(`${base_url}/webhooks`);
+            const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks`, window.location.origin);
 
             // Add required parameters for each webhook type
             url.searchParams.append("webhook_type", webhookType);
@@ -66,18 +63,12 @@ export default function WebhookServiceWebhookSelector({
             url.searchParams.append("page", page.toString());
             url.searchParams.append("sort_order", "DESC");
 
-            const token = localStorage.getItem("access_token");
-            if (!token) {
-              throw new Error("No access token found. Please login again.");
-            }
-
             console.log(`Fetching ${webhookType} webhooks from:`, url.toString());
 
-            const response = await fetch(url.toString(), {
+            const response = await authenticatedFetch(url.toString(), {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
               },
             });
 
@@ -115,18 +106,16 @@ export default function WebhookServiceWebhookSelector({
         // If no webhooks were found at all, it might be an API issue
         if (allWebhooks.length === 0 && page === 1) {
           // Try one more time with just surveycake to get proper error message
-          const url = new URL(`${base_url}/webhooks`);
+          const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks`, window.location.origin);
           url.searchParams.append("webhook_type", "surveycake");
           url.searchParams.append("limit", limit.toString());
           url.searchParams.append("page", page.toString());
           url.searchParams.append("sort_order", "DESC");
 
-          const token = localStorage.getItem("access_token");
-          const response = await fetch(url.toString(), {
+          const response = await authenticatedFetch(url.toString(), {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
             },
           });
 

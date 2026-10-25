@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
-import { getCampaignServiceBaseUrl } from "@/app/ui/campaignService/utils";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 import RsvpStatusBanner from "./rsvp-status-banner";
 import RsvpRadioGroup from "./rsvp-radio-group";
 import RsvpSubmitButton from "./rsvp-submit-button";
@@ -61,7 +61,7 @@ function formatDatetime(isoString: string): string {
 
 function getRsvpApiEndpoint(): string | null {
   try {
-    return getCampaignServiceBaseUrl();
+    return `${BACKEND_API_ENDPOINT}/rsvp`;
   } catch {
     return null;
   }

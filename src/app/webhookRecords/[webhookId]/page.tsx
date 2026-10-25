@@ -1,4 +1,5 @@
 "use client";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { useEffect, useState, useCallback } from "react";
 import WebhookRecordsSkeleton from "@/app/ui/skeleton/webhook-records-skeleton";
 import { HiClipboard } from "react-icons/hi";
@@ -9,6 +10,7 @@ import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";
 import EmailDetailsTable from "@/app/ui/email-details-table";
 import EmailDetailsTableSkeleton from "@/app/ui/skeleton/email-details-table-skeleton";
+import { BACKEND_API_ENDPOINT } from "@/lib/api-paths";
 
 interface PageProps {
   params: {
@@ -139,15 +141,12 @@ export default function Page({ params }: PageProps) {
 
   const fetchWebhookDetails = async (webhookId: string) => {
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/webhooks/${webhookId}`);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/webhooks/${webhookId}`, window.location.origin);
 
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -175,11 +174,9 @@ export default function Page({ params }: PageProps) {
       runId: string,
       limit: string | number,
       page: number,
-      status: string | null = null,
-      access_token: string
+      status: string | null = null
     ): Promise<EmailsResponse> => {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/runs/${runId}/emails`);
+      const url = new URL(`${BACKEND_API_ENDPOINT}/runs/${runId}/emails`, window.location.origin);
 
       url.searchParams.append("page", page.toString());
 
@@ -197,11 +194,10 @@ export default function Page({ params }: PageProps) {
 
       while (retries < maxRetries) {
         try {
-          const response = await fetch(url.toString(), {
+          const response = await authenticatedFetch(url.toString(), {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${access_token}`,
             },
           });
 
@@ -242,13 +238,8 @@ export default function Page({ params }: PageProps) {
 
       setIsEmailLoading(true);
       try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          throw new Error("No access token found");
-        }
-
         // Fetch emails using the same pattern as emailHistory
-        const result = await fetchEmails(webhookRunId, "ALL", 0, status, token);
+        const result = await fetchEmails(webhookRunId, "ALL", 0, status);
         setAllEmails(result.data);
         setIsEmailLoading(false);
       } catch (error: any) {
@@ -266,22 +257,18 @@ export default function Page({ params }: PageProps) {
       setEmailError(null);
 
       try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          throw new Error("No access token found");
-        }
-
         // First, we need to get the run_id associated with this webhook
         // This could come from the webhook details API or a separate endpoint
         // For now, let's try to get it from webhook runs endpoint
-        const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-        const runsUrl = new URL(`${base_url}/webhooks/${webhookId}/runs`);
+        const runsUrl = new URL(
+          `${BACKEND_API_ENDPOINT}/webhooks/${webhookId}/runs`,
+          window.location.origin
+        );
 
-        const runsResponse = await fetch(runsUrl.toString(), {
+        const runsResponse = await authenticatedFetch(runsUrl.toString(), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -453,15 +440,15 @@ export default function Page({ params }: PageProps) {
     setSuccessMessage(null);
 
     try {
-      const base_url = process.env.NEXT_PUBLIC_API_ENDPOINT;
-      const url = new URL(`${base_url}/webhooks/${params.webhookId}`);
+      const url = new URL(
+        `${BACKEND_API_ENDPOINT}/webhooks/${params.webhookId}`,
+        window.location.origin
+      );
 
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(url.toString(), {
+      const response = await authenticatedFetch(url.toString(), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           subject: formData.subject,

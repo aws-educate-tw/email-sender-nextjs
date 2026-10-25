@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useRef, useState, useEffect } from "react";
 import { submitLogin, submitChangePassword } from "@/lib/actions";
+import { showSessionExpiredNotice } from "@/lib/authenticated-fetch";
 import { useRouter } from "next/navigation";
 import { ScanEye } from "lucide-react";
 
@@ -18,6 +19,12 @@ export default function Page() {
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const ref = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    window.localStorage.removeItem("access_token");
+    window.localStorage.removeItem("token_expiry_time");
+    showSessionExpiredNotice();
+  }, []);
 
   useEffect(() => {
     if (newPassword !== confirmPassword) {
@@ -42,11 +49,9 @@ export default function Page() {
     try {
       const response = await submitLogin(JSON.stringify(formData));
 
-      if ("access_token" in response && response.token_expiry_time) {
-        localStorage.setItem("access_token", response.access_token);
-        localStorage.setItem("token_expiry_time", response.token_expiry_time);
-
+      if ("success" in response && response.success) {
         router.push("/emailService");
+        router.refresh();
       } else if (response.message === "Password reset required for the user") {
         setVerificationRequired(true);
         setIsSubmitting(false);

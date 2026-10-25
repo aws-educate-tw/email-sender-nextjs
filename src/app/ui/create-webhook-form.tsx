@@ -9,8 +9,6 @@ import FileUpload from "@/app/ui/file-upload";
 import IframePreview from "@/app/ui/iframe-preview";
 import EmailInput from "@/app/ui/email-input";
 import { Info } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Toast } from "flowbite-react";
 import { HiCheck, HiClipboard } from "react-icons/hi";
 import { GoAlert } from "react-icons/go";
@@ -43,21 +41,6 @@ export default function CreateWebhookForm() {
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookType, setWebhookType] = useState<string>("surveycake");
 
-  const router = useRouter();
-
-  const isTokenExpired = () => {
-    const expiryTime = localStorage.getItem("token_expiry_time");
-    if (!expiryTime) return true;
-    return new Date().getTime() > parseInt(expiryTime);
-  };
-
-  useEffect(() => {
-    const access_token = localStorage.getItem("access_token");
-    if (!access_token || isTokenExpired()) {
-      router.push("/login");
-    }
-  }, [router]);
-
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrors({});
@@ -89,10 +72,7 @@ export default function CreateWebhookForm() {
     if (attachment_file_ids.length > 0) formData.attachment_file_ids = attachment_file_ids;
 
     try {
-      const response = await submitWebhookForm(
-        JSON.stringify(formData),
-        localStorage.getItem("access_token") || ""
-      );
+      const response = await submitWebhookForm(JSON.stringify(formData));
 
       handleResponse(response);
     } catch (error: any) {
